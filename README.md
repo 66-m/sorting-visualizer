@@ -1,4 +1,7 @@
-[![Build](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml)
+[![Build](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml) 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 <br />
 <div align="center">
   <a href="https://github.com/CompilerStuck/sorting-visualizer">
@@ -13,7 +16,7 @@
     <a href="insert link to exe"><strong>Try it »</strong></a>
     <br />
     <br />
-    <a href="insert link to video">View Demo</a>
+    <a href="https://youtu.be/9bm-q115OFM">View Demo</a>
     ·
     <a href="https://github.com/CompilerStuck/sorting-visualizer/issues">Report Bug</a>
     ·
@@ -91,3 +94,20 @@ You can download the latest version of my Visualizer [here](inset link to releas
         ./run
         
 
+## How to Contribute
+1. Clone repo and create a new branch
+2. Make changes and test
+3. Submit Pull Request with comprehensive description of changes
+
+## Acknowledgements
+[w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos, inspiring me to start this project.
+
+## License
+[MIT](https://github.com/CompilerStuck/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
+
+<br />
+<br />
+
+<p align="center">
+	<strong>Consider giving my work a :star: to show some :heart:</strong>
+</p>
