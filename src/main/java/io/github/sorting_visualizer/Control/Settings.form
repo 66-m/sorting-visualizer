@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="io.github.sorting_visualizer.Control.Settings">
+  <grid id="27dc6" binding="settingsPanel" layout-manager="GridLayoutManager" row-count="21" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="469" height="563"/>
+    </constraints>
+    <properties>
+      <name value="settingsPanel"/>
+      <opaque value="false"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <component id="ef0dd" class="javax.swing.JLabel" binding="gradientListLabel">
+        <constraints>
+          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Color gradient"/>
+        </properties>
+      </component>
+      <component id="29257" class="javax.swing.JLabel" binding="arrayTitleLabel">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="16" style="1"/>
+          <text value="Array"/>
+        </properties>
+      </component>
+      <component id="98ba2" class="javax.swing.JLabel" binding="arraySizeSliderLabel">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <alignmentX value="0.0"/>
+          <focusTraversalPolicyProvider value="false"/>
+          <horizontalAlignment value="0"/>
+          <text value="Array size"/>
+        </properties>
+      </component>
+      <component id="73ff6" class="javax.swing.JComboBox" binding="algorithmListComboBox">
+        <constraints>
+          <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <maximumRowCount value="20"/>
+        </properties>
+      </component>
+      <component id="82ca1" class="javax.swing.JComboBox" binding="gradientListComboBox">
+        <constraints>
+          <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <maximumRowCount value="20"/>
+          <name value=""/>
+        </properties>
+      </component>
+      <component id="dc713" class="javax.swing.JLabel" binding="algorithmListLabel">
+        <constraints>
+          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Sorting algorithm"/>
+        </properties>
+      </component>
+      <component id="7e293" class="javax.swing.JLabel" binding="shuffleListLabel">
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Shuffle type"/>
+        </properties>
+      </component>
+      <component id="e8f1b" class="javax.swing.JComboBox" binding="shuffleListBox">
+        <constraints>
+          <grid row="7" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <maximumRowCount value="20"/>
+        </properties>
+      </component>
+      <hspacer id="a10be">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>
+      <component id="ef4ce" class="javax.swing.JProgressBar" binding="progressBarArray">
+        <constraints>
+          <grid row="20" column="0" row-span="1" col-span="6" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="c040a" class="javax.swing.JLabel" binding="muteCheckBoxLabel">
+        <constraints>
+          <grid row="16" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Play sound"/>
+        </properties>
+      </component>
+      <component id="3ab2d" class="javax.swing.JCheckBox" binding="muteCheckBox">
+        <constraints>
+          <grid row="16" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <label value=""/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="7750" class="javax.swing.JLabel" binding="soundTitleLabel">
+        <constraints>
+          <grid row="15" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="16" style="1"/>
+          <text value="Sound"/>
+        </properties>
+      </component>
+      <component id="a2720" class="javax.swing.JCheckBox" binding="comparisonTableCheckBox">
+        <constraints>
+          <grid row="12" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="5a532" class="javax.swing.JLabel" binding="comparisonTableCheckBoxLabel">
+        <constraints>
+          <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Show comparison table"/>
+        </properties>
+      </component>
+      <vspacer id="cf9fc">
+        <constraints>
+          <grid row="14" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <component id="a0135" class="javax.swing.JButton" binding="runButton" default-binding="true">
+        <constraints>
+          <grid row="18" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="run"/>
+        </properties>
+      </component>
+      <component id="98c82" class="javax.swing.JButton" binding="cancelButton">
+        <constraints>
+          <grid row="18" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="cancel"/>
+        </properties>
+      </component>
+      <vspacer id="2ebeb">
+        <constraints>
+          <grid row="17" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <component id="d90e" class="javax.swing.JLabel" binding="visualTitleLabel">
+        <constraints>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="16" style="1"/>
+          <text value="Visual"/>
+        </properties>
+      </component>
+      <component id="6249d" class="javax.swing.JLabel" binding="sortingTitleLabel">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="16" style="1"/>
+          <text value="Sorting"/>
+        </properties>
+      </component>
+      <vspacer id="50bcd">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <component id="52599" class="javax.swing.JLabel" binding="visualizationListComboBoxLabel">
+        <constraints>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Visualization"/>
+        </properties>
+      </component>
+      <component id="bc424" class="javax.swing.JComboBox" binding="visualizationListComboBox">
+        <constraints>
+          <grid row="10" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <maximumRowCount value="20"/>
+        </properties>
+      </component>
+      <hspacer id="7a070">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>
+      <component id="61711" class="javax.swing.JSlider" binding="arraySizeSlider">
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <inverted value="false"/>
+          <name value=""/>
+          <orientation value="0"/>
+          <paintLabels value="true"/>
+          <paintTicks value="true"/>
+          <snapToTicks value="false"/>
+          <toolTipText value=""/>
+          <valueIsAdjusting value="false"/>
+        </properties>
+        <clientProperties>
+          <JSlider.isFilled class="java.lang.Boolean" value="false"/>
+          <Slider.paintThumbArrowShape class="java.lang.Boolean" value="false"/>
+        </clientProperties>
+      </component>
+      <component id="22ace" class="javax.swing.JTextField" binding="arraySizeTextField">
+        <constraints>
+          <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="20" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="5b97" class="javax.swing.JLabel" binding="showMeasurementsLabel">
+        <constraints>
+          <grid row="13" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Show measurements"/>
+        </properties>
+      </component>
+      <component id="defe9" class="javax.swing.JCheckBox" binding="showMeasurementsCheckBox">
+        <constraints>
+          <grid row="13" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <hspacer id="2adb7">
+        <constraints>
+          <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>
+      <component id="2684d" class="javax.swing.JButton" binding="arraySizeOkButton">
+        <constraints>
+          <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <maximum-size width="50" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="ok"/>
+        </properties>
+      </component>
+      <component id="8c0ce" class="javax.swing.JCheckBox" binding="runAllCheckBox">
+        <constraints>
+          <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="All"/>
+        </properties>
+      </component>
+      <grid id="181c0" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="11" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="15928" binding="colorChoose1" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="10" height="10"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-47032"/>
+              <name value="colorChoose1"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <grid id="ddb81" binding="colorChoose2" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="10" height="10"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-47032"/>
+              <doubleBuffered value="false"/>
+              <name value="colorChoose2"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+        </children>
+      </grid>
+      <vspacer id="7db51">
+        <constraints>
+          <grid row="19" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <vspacer id="7f4e5">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <vspacer id="7c69a">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+    </children>
+  </grid>
+</form>
