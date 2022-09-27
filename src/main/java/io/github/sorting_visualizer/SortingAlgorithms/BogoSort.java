@@ -25,20 +25,20 @@ public class BogoSort extends SortingAlgorithm {
 
 
     public void sort() {
-        trycnt=0;
+        trycnt = 0;
         MainController.setCurrentOperation(name);
         long startTime = System.nanoTime();
         Random r = new Random();
-        while(!arrayController.isSorted() && run){
+        while (!arrayController.isSorted() && run) {
 
             int a = r.nextInt(arrayController.getLength());
             int b = r.nextInt(arrayController.getLength());
 
-            arrayController.swap(a,b);
+            arrayController.swap(a, b);
 
 
-            arrayController.setMarker(a,Marker.SET);
-            if (delay & Math.random()>0.98){
+            arrayController.setMarker(a, Marker.SET);
+            if (delay & Math.random() > 0.98) {
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(1);
                 startTime = System.nanoTime();

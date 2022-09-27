@@ -1,8 +1,8 @@
 package io.github.sorting_visualizer.SortingAlgorithms;
 
+import io.github.sorting_visualizer.Control.ArrayController;
 import io.github.sorting_visualizer.Control.MainController;
 import io.github.sorting_visualizer.Visual.Marker;
-import io.github.sorting_visualizer.Control.ArrayController;
 
 public class SelectionSort extends SortingAlgorithm {
 
@@ -28,7 +28,7 @@ public class SelectionSort extends SortingAlgorithm {
                 }
                 arrayController.addComparisons(1);
             }
-            if (delay){
+            if (delay) {
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(10);
                 startTime = System.nanoTime();

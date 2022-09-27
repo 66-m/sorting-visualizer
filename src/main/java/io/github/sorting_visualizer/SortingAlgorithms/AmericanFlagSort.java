@@ -32,7 +32,7 @@ public class AmericanFlagSort extends SortingAlgorithm {
         }
         int[] start = new int[M];
         for (int i = 1; i < M && run; i++) {
-            start[i] = start[i-1] + count[i-1];
+            start[i] = start[i - 1] + count[i - 1];
             arrayController.addWritesAux(1);
         }
         for (int b = 0; b < M && run; b++) {
@@ -40,17 +40,17 @@ public class AmericanFlagSort extends SortingAlgorithm {
                 int origin = start[b];
                 int from = origin;
                 int num = arrayController.get(from);
-                arrayController.set(from,0);
+                arrayController.set(from, 0);
                 do {
                     int to = start[num % M]++;
                     count[num % M]--;
                     int temp = arrayController.get(to);
-                    arrayController.set(to,num);
+                    arrayController.set(to, num);
 
                     num = temp;
                     from = to;
-                    if(delay){
-                        arrayController.setMarker(to,Marker.SET);
+                    if (delay) {
+                        arrayController.setMarker(to, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
                         proc.delay(10);
                         startTime = System.nanoTime();

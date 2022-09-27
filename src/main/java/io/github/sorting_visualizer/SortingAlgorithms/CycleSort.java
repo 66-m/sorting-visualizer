@@ -43,7 +43,7 @@ public class CycleSort extends SortingAlgorithm {
                 continue;
 
             // ignore all duplicate elements
-            while (item == arrayController.get(pos)){
+            while (item == arrayController.get(pos)) {
                 pos += 1;
                 arrayController.addComparisons(1);
             }
@@ -54,9 +54,9 @@ public class CycleSort extends SortingAlgorithm {
             if (pos != cycle_start) {
                 int temp = item;
                 item = arrayController.get(pos);
-                arrayController.set(pos,temp);
+                arrayController.set(pos, temp);
             }
-            if (delay){
+            if (delay) {
                 arrayController.setMarker(pos, Marker.SET);
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(8);
@@ -75,17 +75,18 @@ public class CycleSort extends SortingAlgorithm {
                 }
 
                 // ignore all duplicate elements
-                while (item == arrayController.get(pos))
-                    {pos += 1;
-                        arrayController.addComparisons(1);}
+                while (item == arrayController.get(pos)) {
+                    pos += 1;
+                    arrayController.addComparisons(1);
+                }
 
                 // put the item to it's right position
                 if (item != arrayController.get(pos)) {
                     int temp = item;
                     item = arrayController.get(pos);
-                    arrayController.set(pos,temp);
+                    arrayController.set(pos, temp);
                 }
-                if (delay){
+                if (delay) {
                     arrayController.setMarker(pos, Marker.SET);
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(8);

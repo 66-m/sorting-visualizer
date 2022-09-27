@@ -28,7 +28,7 @@ public class DisparityGraph extends Visualization {
             proc.stroke(color.getRGB());
             proc.fill(color.getRGB());
 
-            int barHeight = (int)(((screenHeight-10.)/ arrayController.getLength() * (arrayController.getLength() - 2*Math.min(Math.min(Math.abs(i - arrayController.get(i)),Math.abs(i-arrayController.getLength() - arrayController.get(i))),Math.abs(i+arrayController.getLength() - arrayController.get(i))))));
+            int barHeight = (int) (((screenHeight - 10.) / arrayController.getLength() * (arrayController.getLength() - 2 * Math.min(Math.min(Math.abs(i - arrayController.get(i)), Math.abs(i - arrayController.getLength() - arrayController.get(i))), Math.abs(i + arrayController.getLength() - arrayController.get(i))))));
 
             if (arrayController.getMarker(i) == Marker.SET) {
                 sound.playSound(i);

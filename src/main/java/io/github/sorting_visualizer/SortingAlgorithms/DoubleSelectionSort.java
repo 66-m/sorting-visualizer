@@ -17,19 +17,14 @@ public class DoubleSelectionSort extends SortingAlgorithm {
         MainController.setCurrentOperation(name);
         long startTime = System.nanoTime();
 
-        for (int i = 0, j = arrayController.getLength() - 1; i < j && run; i++, j--)
-        {
+        for (int i = 0, j = arrayController.getLength() - 1; i < j && run; i++, j--) {
             int min = arrayController.get(i), max = arrayController.get(i);
             int min_i = i, max_i = i;
-            for (int k = i; k <= j && run; k++)
-            {
-                if (arrayController.get(k) > max)
-                {
+            for (int k = i; k <= j && run; k++) {
+                if (arrayController.get(k) > max) {
                     max = arrayController.get(k);
                     max_i = k;
-                }
-                else if (arrayController.get(k) < min)
-                {
+                } else if (arrayController.get(k) < min) {
                     min = arrayController.get(k);
                     min_i = k;
                 }
@@ -45,11 +40,11 @@ public class DoubleSelectionSort extends SortingAlgorithm {
                 arrayController.swap(j, max_i);
             arrayController.addComparisons(1);
 
-            if (delay){
+            if (delay) {
                 arrayController.setMarker(j, Marker.SET);
                 arrayController.setMarker(min_i, Marker.SET);
                 arrayController.setMarker(max_i, Marker.SET);
-                arrayController.setMarker(j,Marker.SET);
+                arrayController.setMarker(j, Marker.SET);
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(10);
                 startTime = System.nanoTime();

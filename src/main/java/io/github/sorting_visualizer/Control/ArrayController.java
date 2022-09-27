@@ -26,7 +26,7 @@ public class ArrayController {
         resize(size);
     }
 
-    public void resize(int size){
+    public void resize(int size) {
         array = new int[size];
         markers = new Marker[size];
         length = size;
@@ -37,8 +37,8 @@ public class ArrayController {
         delay = 0;
         realTime = 0;
         writesAux = 0;
-        sortedPercentage=1;
-        segments=1;
+        sortedPercentage = 1;
+        segments = 1;
         shuffleType = ShuffleType.RANDOM;
 
         //Initial Values
@@ -76,7 +76,9 @@ public class ArrayController {
         return delay;
     }
 
-    public void setDelay(double delay){ this.delay = delay;}
+    public void setDelay(double delay) {
+        this.delay = delay;
+    }
 
     public double getRealTime() {
         return realTime;
@@ -86,7 +88,9 @@ public class ArrayController {
         this.realTime += realTime;
     }
 
-    public int[] getArray(){return array;}
+    public int[] getArray() {
+        return array;
+    }
 
     public double getWritesAux() {
         return writesAux;
@@ -104,11 +108,11 @@ public class ArrayController {
         delay = 0;
         realTime = 0;
         writesAux = 0;
-        sortedPercentage=1;
-        segments=1;
+        sortedPercentage = 1;
+        segments = 1;
     }
 
-    public void resetArray(){
+    public void resetArray() {
         for (int i = 0; i < length; i++) {
             array[i] = i;
             markers[i] = Marker.NORMAL;
@@ -178,7 +182,7 @@ public class ArrayController {
                 segmentStart = i;
                 sgmnts++;
             } else if (i == length - 1 && array[length - 1] > array[length - 2]) {
-                sortedCount += i  -  segmentStart + 1;
+                sortedCount += i - segmentStart + 1;
                 segmentStart = i;
                 sgmnts++;
             }
@@ -188,9 +192,9 @@ public class ArrayController {
         sortedPercentage = sortedCount / length;
     }
 
-    void shuffle(){
+    void shuffle() {
         if (!SortingAlgorithm.isRun()) return;
-        switch (shuffleType){
+        switch (shuffleType) {
             case RANDOM -> standardShuffle();
             case REVERSE -> reverseShuffle();
             case ALMOST_SORTED -> almostSortedShuffle();
@@ -208,14 +212,14 @@ public class ArrayController {
             setMarker(i, Marker.SET);
             setMarker(swapTwo, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double)i / (length-1) * 100 ) + "%");
+            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) i / (length - 1) * 100) + "%");
 
-            MainController.processing.delay(2000/length);
+            MainController.processing.delay(2000 / length);
         }
 
     }
 
-    void reverseShuffle(){
+    void reverseShuffle() {
         for (int i = 0; i < length / 2 && SortingAlgorithm.isRun(); i++) {
             int swapTwo = length - 1 - i;
             swap(i, swapTwo);
@@ -223,13 +227,13 @@ public class ArrayController {
             setMarker(i, Marker.SET);
             setMarker(swapTwo, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) (i / (length/2.-1) * 100)+ "%");
-            MainController.processing.delay(2000/length);
+            MainController.setCurrentOperation("Shuffling.. " + (int) (i / (length / 2. - 1) * 100) + "%");
+            MainController.processing.delay(2000 / length);
         }
     }
 
     void almostSortedShuffle() {
-        for (int i = 0; i < length/10 && SortingAlgorithm.isRun(); i++) {
+        for (int i = 0; i < length / 10 && SortingAlgorithm.isRun(); i++) {
 
             int swapOne = (int) (Math.random() * length);
             int swapTwo = (int) (Math.random() * length);
@@ -239,8 +243,8 @@ public class ArrayController {
             setMarker(swapOne, Marker.SET);
             setMarker(swapTwo, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double)(i) / (length/10-1) * 100 ) + "%");
-            MainController.processing.delay(2000/length);
+            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) (i) / (length / 10 - 1) * 100) + "%");
+            MainController.processing.delay(2000 / length);
         }
 
     }
@@ -249,9 +253,9 @@ public class ArrayController {
         for (int i = 0; i < length && SortingAlgorithm.isRun(); i++) {
             setMarker(i, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double)(i) / (length-1) * 100 ) + "%");
-            MainController.processing.delay(2000/length);
-        };
+            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) (i) / (length - 1) * 100) + "%");
+            MainController.processing.delay(2000 / length);
+        }
     }
 
     public void setShuffleType(ShuffleType shuffleType) {

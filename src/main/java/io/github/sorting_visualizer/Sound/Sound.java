@@ -7,8 +7,11 @@ public abstract class Sound {
     protected PApplet proc;
     ArrayController arrayController;
 
-    public Sound(ArrayController arrayController){this.arrayController = arrayController;}
+    public Sound(ArrayController arrayController) {
+        this.arrayController = arrayController;
+    }
 
     public abstract void playSound(int value);
+
     public abstract void mute(boolean mute);
 }

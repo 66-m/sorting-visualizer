@@ -36,7 +36,7 @@ public class ScatterPlot extends Visualization {
 
             arrayController.setMarker(i, Marker.NORMAL);
 
-            proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight - barHeight, 7 + rectWidth,  7 + rectWidth); //Classic
+            proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight - barHeight, 7 + rectWidth, 7 + rectWidth); //Classic
 
         }
     }

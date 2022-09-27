@@ -35,9 +35,9 @@ public class BubbleSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if(delay && new Random().nextInt(1,40) == 1){
-                        arrayController.setMarker(i,Marker.SET);
-                        arrayController.setMarker(i+1,Marker.SET);
+                    if (delay && new Random().nextInt(1, 40) == 1) {
+                        arrayController.setMarker(i, Marker.SET);
+                        arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
                         proc.delay(1);
                         startTime = System.nanoTime();

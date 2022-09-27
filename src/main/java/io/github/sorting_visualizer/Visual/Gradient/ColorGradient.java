@@ -9,8 +9,8 @@ public class ColorGradient {
 
     private Color color1;
     private Color color2;
-    private Color markerSetColor;
-    private String name;
+    private final Color markerSetColor;
+    private final String name;
     protected Color[] colorGradient;
 
     public ColorGradient(Color color1, Color color2, Color markerSetColor, String name) {
@@ -31,12 +31,13 @@ public class ColorGradient {
             int g = (int) (color1.getGreen() + (color2.getGreen() - color1.getGreen()) * scalingFactor);
             int b = (int) (color1.getBlue() + (color2.getBlue() - color1.getBlue()) * scalingFactor);
 
-            colorGradient[i] = new Color(r,g,b);        }
+            colorGradient[i] = new Color(r, g, b);
+        }
 
         return colorGradient;
     }
 
-    public void updateGradient(int size){
+    public void updateGradient(int size) {
         colorGradient = getColorGradient(size);
     }
 

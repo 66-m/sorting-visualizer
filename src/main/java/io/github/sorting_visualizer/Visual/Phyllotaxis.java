@@ -24,8 +24,8 @@ public class Phyllotaxis extends Visualization {
     public void update() {
         super.update();
 
-        radius = (int)(Math.min(screenHeight,screenWidth)/2.5);
-        c = Math.min(screenHeight,screenWidth)/70;
+        radius = (int) (Math.min(screenHeight, screenWidth) / 2.5);
+        c = Math.min(screenHeight, screenWidth) / 70;
 
         for (int i = 0; i < arrayController.getLength(); i++) {
 
@@ -42,11 +42,11 @@ public class Phyllotaxis extends Visualization {
 
             float a = i * radians((float) 180.5);
             float r = (float) (c * sqrt(arrayController.get(i)));
-            r = PApplet.map(r, (float) 0, (float) (c*sqrt(arrayController.getLength())),0, Math.min(screenHeight,(float)screenWidth)/2-20);
+            r = PApplet.map(r, (float) 0, (float) (c * sqrt(arrayController.getLength())), 0, Math.min(screenHeight, (float) screenWidth) / 2 - 20);
             float x = (float) (r * cos(a));
             float y = (float) (r * sin(a));
 
-            proc.rect(screenWidth/2f+x,screenHeight/2f+y, 8, 8); //Swirl dots
+            proc.rect(screenWidth / 2f + x, screenHeight / 2f + y, 8, 8); //Swirl dots
 
         }
     }

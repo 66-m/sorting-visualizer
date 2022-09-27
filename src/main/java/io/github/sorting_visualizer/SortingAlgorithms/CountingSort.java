@@ -25,7 +25,7 @@ public class CountingSort extends SortingAlgorithm {
         for (int i : arrayController.getArray()) {
             counter[i]++;
             arrayController.addWritesAux(1);
-            if (delay){
+            if (delay) {
                 arrayController.setMarker(i, Marker.SET);
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(1);
@@ -36,13 +36,13 @@ public class CountingSort extends SortingAlgorithm {
         for (int i = 0; i < counter.length && run; i++) {
             while (0 < counter[i]) {
                 arrayController.addComparisons(1);
-                if (delay){
+                if (delay) {
                     arrayController.setMarker(ndx, Marker.SET);
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(5);
                     startTime = System.nanoTime();
                 }
-                arrayController.set(ndx++,i);
+                arrayController.set(ndx++, i);
                 counter[i]--;
                 arrayController.addWritesAux(1);
             }

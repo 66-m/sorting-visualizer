@@ -14,14 +14,14 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
     public RadixLSDSortBase10(ArrayController arrayController) {
         super(arrayController);
-        this.name = "Radix (LSD) Sort (Base "+RADIX+")";
+        this.name = "Radix (LSD) Sort (Base " + RADIX + ")";
         alternativeSize = arrayController.getLength();
     }
 
     public RadixLSDSortBase10(ArrayController arrayController, int radix_base) {
         super(arrayController);
         RADIX = radix_base;
-        this.name = "Radix (LSD) Sort (Base "+RADIX+")";
+        this.name = "Radix (LSD) Sort (Base " + RADIX + ")";
     }
 
 
@@ -48,8 +48,8 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
             int[] buckA = new int[RADIX];
             for (int i = 0; i < RADIX && run; i++) {
-                for (int j = i-1; j >= 0 && run; j--) {
-                    buckA[i]+=bucket[j].size();
+                for (int j = i - 1; j >= 0 && run; j--) {
+                    buckA[i] += bucket[j].size();
                 }
             }
 
@@ -62,11 +62,11 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
                         arrayController.set(buckA[j]++, bucket[j].get(i));
                     }
 
-                        arrayController.setMarker(buckA[j] - 1, Marker.SET);
+                    arrayController.setMarker(buckA[j] - 1, Marker.SET);
 
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(1);
-                        startTime = System.nanoTime();
+                    arrayController.addRealTime(System.nanoTime() - startTime);
+                    proc.delay(1);
+                    startTime = System.nanoTime();
 
 
                 }

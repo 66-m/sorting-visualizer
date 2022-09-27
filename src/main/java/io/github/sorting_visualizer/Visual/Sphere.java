@@ -27,17 +27,17 @@ public class Sphere extends Visualization {
     public void update() {
         super.update();
 
-        if (Math.pow(floor(Math.pow(arrayController.getLength(),1/2.)),2.) != arrayController.getLength()) {
+        if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
 
 //            code to update for non perfect squares
-            int nextN = (int) (floor(Math.pow(arrayController.getLength(),1/2.)+0.1)); //next lower
+            int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1)); //next lower
 
-            MainController.updateArraySize(nextN*nextN); // Update arraySize
+            MainController.updateArraySize(nextN * nextN); // Update arraySize
         }
 
-        squareRoot = (int) Math.pow(arrayController.getLength(),1/2.);
+        squareRoot = (int) Math.pow(arrayController.getLength(), 1 / 2.);
 
-        aa -= PApplet.PI / (10*proc.frameRate);
+        aa -= PApplet.PI / (10 * proc.frameRate);
 
         float m = 0;
         float n = 0;
@@ -61,7 +61,7 @@ public class Sphere extends Visualization {
 
             float barHeight = (((float) 100000 / arrayController.getLength() * (arrayController.getLength() - 2 * Math.min(Math.min(Math.abs(i - arrayController.get(i)), Math.abs(i - arrayController.getLength() - arrayController.get(i))), Math.abs(i + arrayController.getLength() - arrayController.get(i))))));
 
-            radius = (int) PApplet.map(barHeight, 0, 100000, 0, (int) (min(screenHeight,screenWidth) / 2.3));
+            radius = (int) PApplet.map(barHeight, 0, 100000, 0, (int) (min(screenHeight, screenWidth) / 2.3));
 
             float u = (float) ((m / squareRoot) * 2 * Math.PI);
             float v = (float) ((n / squareRoot) * Math.PI);
@@ -78,8 +78,6 @@ public class Sphere extends Visualization {
             //rotate z and x
             float zb = (float) (Math.sin(aa) * xMapped + Math.cos(aa) * zMapped);
             float x = (float) (screenWidth * 0.5 + (float) Math.cos(aa) * xMapped - Math.sin(aa) * zMapped);
-
-
 
 
             //change perspective
@@ -117,7 +115,7 @@ public class Sphere extends Visualization {
                         xCords.add(j, x);
                         yCords.add(j, y);
                         break;
-                    } else if (j == zCords.size()-1) {
+                    } else if (j == zCords.size() - 1) {
                         zCords.add(z);
                         colors.add(color);
                         sizes.add(size);
@@ -141,7 +139,7 @@ public class Sphere extends Visualization {
         }
 
         for (int i = 0; i < arrayController.getLength(); i++) {
-            if (colors.size()!=arrayController.getLength())return;
+            if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
             proc.stroke(color.getRGB());

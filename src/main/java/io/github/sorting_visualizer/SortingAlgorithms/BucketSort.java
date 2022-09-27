@@ -30,7 +30,7 @@ public class BucketSort extends SortingAlgorithm {
         for (int i = 0; i < arrayController.getLength() && run; i++) {
             bucket[arrayController.get(i)]++;
             arrayController.addWritesAux(1);
-            if (delay){
+            if (delay) {
                 arrayController.setMarker(i, Marker.SET);
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(1);
@@ -41,11 +41,11 @@ public class BucketSort extends SortingAlgorithm {
         for (int i = 0, j = 0; i <= max && run; i++) {
             while (bucket[i] > 0) {
                 arrayController.addComparisons(1);
-                arrayController.set(j++,i);
+                arrayController.set(j++, i);
                 bucket[i]--;
                 arrayController.addWritesAux(1);
-                if (delay){
-                    arrayController.setMarker(j-1, Marker.SET);
+                if (delay) {
+                    arrayController.setMarker(j - 1, Marker.SET);
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(1);
                     startTime = System.nanoTime();

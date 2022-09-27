@@ -22,7 +22,9 @@ public abstract class SortingAlgorithm {
 
     public abstract void sort();
 
-    public void setDelay(boolean delay){this.delay = delay;}
+    public void setDelay(boolean delay) {
+        this.delay = delay;
+    }
 
     public String getName() {
         return name;

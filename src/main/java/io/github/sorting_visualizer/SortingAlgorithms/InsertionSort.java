@@ -1,8 +1,8 @@
 package io.github.sorting_visualizer.SortingAlgorithms;
 
+import io.github.sorting_visualizer.Control.ArrayController;
 import io.github.sorting_visualizer.Control.MainController;
 import io.github.sorting_visualizer.Visual.Marker;
-import io.github.sorting_visualizer.Control.ArrayController;
 
 public class InsertionSort extends SortingAlgorithm {
 

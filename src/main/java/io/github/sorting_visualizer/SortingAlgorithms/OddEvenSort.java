@@ -27,22 +27,19 @@ public class OddEvenSort extends SortingAlgorithm {
 
         boolean isSorted = false; // Initially array is unsorted
 
-        while (!isSorted && run)
-        {
+        while (!isSorted && run) {
             isSorted = true;
-            int temp =0;
+            int temp = 0;
 
             // Perform Bubble sort on odd indexed element
-            for (int i=1; i<=arrayController.getLength()-2 && run; i=i+2)
-            {
-                if (arrayController.get(i) > arrayController.get(i+1))
-                {
-                    arrayController.swap(i,i+1);
+            for (int i = 1; i <= arrayController.getLength() - 2 && run; i = i + 2) {
+                if (arrayController.get(i) > arrayController.get(i + 1)) {
+                    arrayController.swap(i, i + 1);
                     isSorted = false;
 
-                    if (delay && i % 45 == 0){
+                    if (delay && i % 45 == 0) {
                         arrayController.setMarker(i, Marker.SET);
-                        arrayController.setMarker(i+1,Marker.SET);
+                        arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
                         proc.delay(1);
                         startTime = System.nanoTime();
@@ -52,15 +49,13 @@ public class OddEvenSort extends SortingAlgorithm {
             }
 
             // Perform Bubble sort on even indexed element
-            for (int i=0; i<=arrayController.getLength()-2 && run; i=i+2)
-            {
-                if (arrayController.get(i) > arrayController.get(i+1))
-                {
-                    arrayController.swap(i,i+1);
+            for (int i = 0; i <= arrayController.getLength() - 2 && run; i = i + 2) {
+                if (arrayController.get(i) > arrayController.get(i + 1)) {
+                    arrayController.swap(i, i + 1);
                     isSorted = false;
-                    if (delay && new Random().nextInt(1,45) == 1){
-                        arrayController.setMarker(i,Marker.SET);
-                        arrayController.setMarker(i+1,Marker.SET);
+                    if (delay && new Random().nextInt(1, 45) == 1) {
+                        arrayController.setMarker(i, Marker.SET);
+                        arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
                         proc.delay(1);
                         startTime = System.nanoTime();

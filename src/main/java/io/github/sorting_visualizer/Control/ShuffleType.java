@@ -10,7 +10,7 @@ public enum ShuffleType {
 
     @Override
     public String toString() {
-        return super.toString().toLowerCase(Locale.ROOT).replace('_',' ');
+        return super.toString().toLowerCase(Locale.ROOT).replace('_', ' ');
     }
 }
 

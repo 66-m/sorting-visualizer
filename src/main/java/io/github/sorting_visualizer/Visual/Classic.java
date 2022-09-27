@@ -1,8 +1,8 @@
 package io.github.sorting_visualizer.Visual;
 
 import io.github.sorting_visualizer.Control.ArrayController;
-import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import io.github.sorting_visualizer.Sound.Sound;
+import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import processing.core.PApplet;
 
 import java.awt.*;

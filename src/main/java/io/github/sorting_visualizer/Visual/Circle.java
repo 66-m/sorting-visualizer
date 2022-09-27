@@ -19,7 +19,7 @@ public class Circle extends Visualization {
     public void update() {
         super.update();
 
-        radius = (int)(Math.min(screenHeight,screenWidth)/2.4);
+        radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
 
         for (int i = 0; i < arrayController.getLength(); i++) {
 
@@ -36,11 +36,11 @@ public class Circle extends Visualization {
             arrayController.setMarker(i, Marker.NORMAL);
 
 
-            double phase = 2*Math.PI * i/arrayController.getLength();
-            int x = (screenWidth/2)+(int)(radius* Math.sin(phase));
-            int y = (screenHeight/2)-(int)(radius* Math.cos(phase));
+            double phase = 2 * Math.PI * i / arrayController.getLength();
+            int x = (screenWidth / 2) + (int) (radius * Math.sin(phase));
+            int y = (screenHeight / 2) - (int) (radius * Math.cos(phase));
 
-            proc.line((int)(screenWidth/2),(int)(screenHeight/2), x, y);
+            proc.line(screenWidth / 2, screenHeight / 2, x, y);
 
         }
     }

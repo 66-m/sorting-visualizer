@@ -1,8 +1,8 @@
 package io.github.sorting_visualizer.SortingAlgorithms;
 
+import io.github.sorting_visualizer.Control.ArrayController;
 import io.github.sorting_visualizer.Control.MainController;
 import io.github.sorting_visualizer.Visual.Marker;
-import io.github.sorting_visualizer.Control.ArrayController;
 
 public class QuickSortMiddlePivot extends SortingAlgorithm {
 
@@ -57,10 +57,11 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
                 j--;
             }
 
-            if (delay){
+            if (delay) {
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(1);
-                startTime = System.nanoTime();}
+                startTime = System.nanoTime();
+            }
 
         }
 

@@ -2,8 +2,8 @@ package io.github.sorting_visualizer.Visual;
 
 import io.github.sorting_visualizer.Control.ArrayController;
 import io.github.sorting_visualizer.Control.MainController;
-import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import io.github.sorting_visualizer.Sound.Sound;
+import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import processing.core.PApplet;
 
 public abstract class Visualization {
@@ -29,11 +29,11 @@ public abstract class Visualization {
         screenWidth = proc.width;
     }
 
-    public void updateColorGradient(ColorGradient colorGradient){
+    public void updateColorGradient(ColorGradient colorGradient) {
         this.colorGradient = colorGradient;
     }
 
-    public void update(){
+    public void update() {
         screenHeight = proc.height;
         screenWidth = proc.width;
 
@@ -41,7 +41,7 @@ public abstract class Visualization {
 
         proc.fill(255);
         proc.textSize(25);
-        proc.text("CompilerStuck", screenWidth-175, 20); //Branding
+        proc.text("CompilerStuck", screenWidth - 175, 20); //Branding
         proc.textSize(20);
     }
 

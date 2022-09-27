@@ -1,8 +1,8 @@
 package io.github.sorting_visualizer.Visual;
 
 import io.github.sorting_visualizer.Control.ArrayController;
-import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import io.github.sorting_visualizer.Sound.Sound;
+import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import processing.core.PApplet;
 
 import java.awt.*;
@@ -35,7 +35,6 @@ public class HorizontalPyramid extends Visualization {
             }
 
             arrayController.setMarker(i, Marker.NORMAL);
-
 
 
             proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), proc.height / 2f + barHeight / 2f, rectWidth, -1 * barHeight); //Horizontal Pyramid

@@ -29,11 +29,10 @@ public class PigeonholeSort extends SortingAlgorithm {
         int max = arrayController.get(0);
         int range, i, j, index;
 
-        for(int a=0; a<arrayController.getLength() && run; a++)
-        {
-            if(arrayController.get(a) > max)
+        for (int a = 0; a < arrayController.getLength() && run; a++) {
+            if (arrayController.get(a) > max)
                 max = arrayController.get(a);
-            if(arrayController.get(a) < min)
+            if (arrayController.get(a) < min)
                 min = arrayController.get(a);
             arrayController.addComparisons(2);
         }
@@ -43,24 +42,22 @@ public class PigeonholeSort extends SortingAlgorithm {
         Arrays.fill(phole, 0);
         arrayController.addWritesAux(range);
 
-        for(i = 0; i<arrayController.getLength() && run; i++) {
+        for (i = 0; i < arrayController.getLength() && run; i++) {
             phole[arrayController.get(i) - min]++;
             index = 0;
             arrayController.addWritesAux(1);
             int[] cpy = phole.clone();
-            for(j = 0; j<range; j++)
-                while(cpy[j]-->0) {
+            for (j = 0; j < range; j++)
+                while (cpy[j]-- > 0) {
                     arrayController.set(index++, j + min);
-                    if (delay){
-                        arrayController.setMarker(index-1,Marker.SET);
+                    if (delay) {
+                        arrayController.setMarker(index - 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
                         proc.delay(1);
                         startTime = System.nanoTime();
                     }
                 }
         }
-
-
 
 
         arrayController.addRealTime(System.nanoTime() - startTime);

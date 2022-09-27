@@ -19,7 +19,7 @@ public class DisparityCircle extends Visualization {
     public void update() {
         super.update();
 
-        radius = (int)(Math.min(screenHeight,screenWidth)/2.4);
+        radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
 
         for (int i = 0; i < arrayController.getLength(); i++) {
 
@@ -34,13 +34,13 @@ public class DisparityCircle extends Visualization {
 
             arrayController.setMarker(i, Marker.NORMAL);
 
-            double barHeight = ((screenHeight-0.1)/ arrayController.getLength() * (arrayController.getLength() - 2*Math.min(Math.min(Math.abs(i - arrayController.get(i)),Math.abs(i-arrayController.getLength() - arrayController.get(i))),Math.abs(i+arrayController.getLength() - arrayController.get(i)))))/(screenHeight);
+            double barHeight = ((screenHeight - 0.1) / arrayController.getLength() * (arrayController.getLength() - 2 * Math.min(Math.min(Math.abs(i - arrayController.get(i)), Math.abs(i - arrayController.getLength() - arrayController.get(i))), Math.abs(i + arrayController.getLength() - arrayController.get(i))))) / (screenHeight);
 
-            double phase = 2*Math.PI * i/arrayController.getLength();
-            int x = (screenWidth/2)+(int)(radius*barHeight* Math.sin(phase));
-            int y = (screenHeight/2)-(int)(radius*barHeight* Math.cos(phase));
+            double phase = 2 * Math.PI * i / arrayController.getLength();
+            int x = (screenWidth / 2) + (int) (radius * barHeight * Math.sin(phase));
+            int y = (screenHeight / 2) - (int) (radius * barHeight * Math.cos(phase));
 
-            proc.line((int)(screenWidth/2), (int)(screenHeight/2), x, y); //Swirl dots
+            proc.line(screenWidth / 2, screenHeight / 2, x, y); //Swirl dots
 
         }
     }

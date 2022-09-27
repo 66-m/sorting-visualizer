@@ -21,9 +21,9 @@ public class MorphingShell extends Visualization {
     public void update() {
         super.update();
 
-        radius = Math.min(screenHeight,screenWidth)/2;
+        radius = Math.min(screenHeight, screenWidth) / 2;
 
-        aa += PApplet.PI/(proc.frameRate*10);
+        aa += PApplet.PI / (proc.frameRate * 10);
 
         int colSize = (int) Math.sqrt(arrayController.getLength());
         int rowCnt = 0;
@@ -36,15 +36,15 @@ public class MorphingShell extends Visualization {
             proc.stroke(color.getRGB());
             proc.fill(color.getRGB());
 
-            if (arrayController.getMarker(rowCnt+colCnt*colSize) == Marker.SET) {
-                sound.playSound(rowCnt+colCnt*colSize);
+            if (arrayController.getMarker(rowCnt + colCnt * colSize) == Marker.SET) {
+                sound.playSound(rowCnt + colCnt * colSize);
             }
 
-            arrayController.setMarker(rowCnt+colCnt*colSize, Marker.NORMAL);
+            arrayController.setMarker(rowCnt + colCnt * colSize, Marker.NORMAL);
 
-            double barHeight = arrayController.get(rowCnt+colCnt*colSize);
+            double barHeight = arrayController.get(rowCnt + colCnt * colSize);
 
-            float lon = PApplet.map(rowCnt, 0, colSize, -PApplet.PI+ aa, PApplet.PI + aa);
+            float lon = PApplet.map(rowCnt, 0, colSize, -PApplet.PI + aa, PApplet.PI + aa);
             float lat = PApplet.map(colCnt, 0, colSize, -PApplet.PI + aa, PApplet.PI + aa);
             float z = (float) (radius * Math.sin(lon) * Math.cos(lat));
             float x = (float) (radius * Math.sin(lon) * Math.sin(lat));
@@ -52,12 +52,11 @@ public class MorphingShell extends Visualization {
             y += barHeight;
             int size = (int) PApplet.map(z, 0, screenHeight, 10, 20);
 
-            x = (float) (screenHeight*0.5+ x / 2);
-            y = screenHeight/2. + y / 2;
+            x = (float) (screenHeight * 0.5 + x / 2);
+            y = screenHeight / 2. + y / 2;
 
 
-
-            proc.ellipse((float)y,x,size,size); //Swirl dots
+            proc.ellipse((float) y, x, size, size); //Swirl dots
 
             colCnt++;
             if (colCnt == colSize) {

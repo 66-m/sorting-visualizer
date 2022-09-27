@@ -36,8 +36,7 @@ public class CombSort extends SortingAlgorithm {
 
         // Keep running while gap is more than 1 and last
         // iteration caused a swap
-        while (gap != 1 || swapped && run)
-        {
+        while (gap != 1 || swapped && run) {
             // Find next gap
             gap = getNextGap(gap);
 
@@ -46,19 +45,17 @@ public class CombSort extends SortingAlgorithm {
             swapped = false;
 
             // Compare all elements with current gap
-            for (int i=0; i<n-gap && run; i++)
-            {
-                if (arrayController.get(i) > arrayController.get(i+gap))
-                {
+            for (int i = 0; i < n - gap && run; i++) {
+                if (arrayController.get(i) > arrayController.get(i + gap)) {
                     // Swap arr[i] and arr[i+gap]
-                    arrayController.swap(i,i+gap);
+                    arrayController.swap(i, i + gap);
 
                     // Set swapped
                     swapped = true;
                 }
-                if (delay && new Random().nextInt(1,4) == 1){
-                    arrayController.setMarker(i,Marker.SET);
-                    arrayController.setMarker(i+gap,Marker.SET);
+                if (delay && new Random().nextInt(1, 4) == 1) {
+                    arrayController.setMarker(i, Marker.SET);
+                    arrayController.setMarker(i + gap, Marker.SET);
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(1);
                     startTime = System.nanoTime();
@@ -71,10 +68,9 @@ public class CombSort extends SortingAlgorithm {
         arrayController.addRealTime(System.nanoTime() - startTime);
     }
 
-    int getNextGap(int gap)
-    {
+    int getNextGap(int gap) {
         // Shrink gap by Shrink factor
-        gap = (gap*10)/13;
+        gap = (gap * 10) / 13;
         return Math.max(gap, 1);
     }
 }

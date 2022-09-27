@@ -11,7 +11,7 @@ public class DisparityGraphMirrored extends Visualization {
 
     public DisparityGraphMirrored(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-         name = "Disparity Graph Mirrored";
+        name = "Disparity Graph Mirrored";
     }
 
     @Override
@@ -27,7 +27,7 @@ public class DisparityGraphMirrored extends Visualization {
             proc.stroke(color.getRGB());
             proc.fill(color.getRGB());
 
-            int barHeight = (int)((screenHeight - 5.)/ arrayController.getLength() * (arrayController.getLength() - Math.abs(i - arrayController.get(i))));
+            int barHeight = (int) ((screenHeight - 5.) / arrayController.getLength() * (arrayController.getLength() - Math.abs(i - arrayController.get(i))));
 
             if (arrayController.getMarker(i) == Marker.SET) {
                 sound.playSound(i);

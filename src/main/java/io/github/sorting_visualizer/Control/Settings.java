@@ -1,19 +1,18 @@
 package io.github.sorting_visualizer.Control;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.text.StyleContext;
-
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import io.github.sorting_visualizer.SortingAlgorithms.*;
 import io.github.sorting_visualizer.Visual.*;
-import io.github.sorting_visualizer.Visual.Gradient.*;
+import io.github.sorting_visualizer.Visual.Gradient.ColorGradient;
 import processing.core.PApplet;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -343,34 +342,34 @@ public class Settings extends JFrame {
 
         visualizationListComboBox.addActionListener(e -> {
             int index = visualizationListComboBox.getSelectedIndex();
-            if (index != 14 && index != 15) {
-                MainController.setVisualization(visualizationList.get(index));
+//            if (index != 14 && index != 15) {
+            MainController.setVisualization(visualizationList.get(index));
 //                lastVisualIndex = index;
-            }//else{                JFileChooser fileChooser = new JFileChooser();
-            //                fileChooser.setDialogTitle("Select an image");
-            //                fileChooser.setAcceptAllFileFilterUsed(false);
-            //                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and JPG images", "png", "jpg");
-            //                fileChooser.addChoosableFileFilter(filter);
-            //                int fileChooserReturnValue = fileChooser.showDialog(null, "Select image");
-            //                if (fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
-            //                    File selectedFile = fileChooser.getSelectedFile();
-            //                    String imagePath = selectedFile.getAbsolutePath();
-            //
-            //                    Visualization visualization = visualizationList.get(index);
-            //                    if (Objects.equals(visualization.getName(), "Image - Vertical Sorting")) {
-            //                        ImageVertical imageVertical = (ImageVertical) visualization;
-            //                        PImage pImage = proc.loadImage(imagePath);
-            //                        imageVertical.setImg(pImage);
-            //                        MainController.resizeScreen(pImage.pixelWidth, pImage.pixelHeight);
-            //                        MainController.setVisualization(imageVertical);
-            //                    } else {
-            //                        ImageHorizontal imageHorizontal = (ImageHorizontal) visualization;
-            //                    }
-            //
-            //                } else {
-            //                    visualizationListComboBox.setSelectedIndex(lastVisualIndex);
-            //                }
-            //}
+//            }else{                JFileChooser fileChooser = new JFileChooser();
+//                            fileChooser.setDialogTitle("Select an image");
+//                            fileChooser.setAcceptAllFileFilterUsed(false);
+//                            FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and JPG images", "png", "jpg");
+//                            fileChooser.addChoosableFileFilter(filter);
+//                            int fileChooserReturnValue = fileChooser.showDialog(null, "Select image");
+//                            if (fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
+//                                File selectedFile = fileChooser.getSelectedFile();
+//                                String imagePath = selectedFile.getAbsolutePath();
+//
+//                                Visualization visualization = visualizationList.get(index);
+//                                if (Objects.equals(visualization.getName(), "Image - Vertical Sorting")) {
+//                                    ImageVertical imageVertical = (ImageVertical) visualization;
+//                                    PImage pImage = proc.loadImage(imagePath);
+//                                    imageVertical.setImg(pImage);
+//                                    MainController.resizeScreen(pImage.pixelWidth, pImage.pixelHeight);
+//                                    MainController.setVisualization(imageVertical);
+//                                } else {
+//                                    ImageHorizontal imageHorizontal = (ImageHorizontal) visualization;
+//                                }
+//
+//                            } else {
+//                                visualizationListComboBox.setSelectedIndex(lastVisualIndex);
+//                            }
+//            }
 
         });
 
