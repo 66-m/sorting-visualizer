@@ -40,7 +40,11 @@ It comes with a user friendly settings menu, letting the user customize what the
 ## Downloading and running the Visualizer
 You can download the latest version of my Visualizer [here](inset link to release)
 * Option 1: Just download the [executable](insert link to exe) and run it
-* Option 2: Download via git and build the code [on your own](https://github.com/CompilerStuck/sorting-visualizer#how-to-build-the-code-for-yourself):
+* Option 2: Download the [prebuild JAR file](insert link to jar) and run it with
+
+        java -jar sorting-visualizer-1.3.1.jar
+
+* Option 3: Clone the repository via git and build the code [on your own](https://github.com/CompilerStuck/sorting-visualizer#how-to-build-the-code-for-yourself):
 
 ## How to build the Code for yourself
 ### Clone this repository:
@@ -51,7 +55,7 @@ You can download the latest version of my Visualizer [here](inset link to releas
 
 ### Building the Code:
 
-1. Make sure [JDK 17](https://www.oracle.com/java/technologies/downloads/) is installed and your environment variable `JAVA_HOME` is set
+1. Make sure your installed [JDK](https://jdk.java.net/19/) is at least version 14 and your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
 2. Open a Terminal in the project folder and execute: 
 
         .\build
@@ -119,7 +123,8 @@ You can download the latest version of my Visualizer [here](inset link to releas
 
 ## Acknowledgements
 Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and inspiring me to start this project.
-Also a big thanks to [micycle1](https://github.com/micycle1) for his amazing mirror of the processing4 core library, making it available for maven imports.
+
+Also a big thanks to [@micycle1](https://github.com/micycle1) for his amazing mirror of the processing4 core library, making it available for maven.
 
 ## License
 [MIT](https://github.com/CompilerStuck/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
