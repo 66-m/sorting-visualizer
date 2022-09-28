@@ -42,15 +42,17 @@ You can download the latest version of my Visualizer [here](inset link to releas
 * Option 1: Just download the [executable](insert link to exe) and run it
 * Option 2: Download via git and build the code [on your own](https://github.com/CompilerStuck/sorting-visualizer#how-to-build-the-code-for-yourself):
 
+## How to build the Code for yourself
+### Clone this Repository
+
         git clone https://github.com/CompilerStuck/sorting-visualizer.git
         cd sorting-visualizer
 
-## How to build the Code for yourself
+
 ### Building the Code:
 
-1. Clone this repository
-2. Make sure [JDK 17](https://www.oracle.com/java/technologies/downloads/) is installed and your environment variable `JAVA_HOME` is set
-3. Open a Terminal in the project folder and execute: 
+1. Make sure [JDK 17](https://www.oracle.com/java/technologies/downloads/) is installed and your environment variable `JAVA_HOME` is set
+2. Open a Terminal in the project folder and execute: 
 
 * Windows    
 
