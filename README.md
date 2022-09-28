@@ -25,8 +25,7 @@
     <a href="https://github.com/CompilerStuck/sorting-visualizer/issues">Request Feature</a>
     </p>
 </div>
- <br/>
- 
+<br />
 This Program Visualizes and Audiolizes Sorting Algorithms. It includes 18 different Sorting Algorithms which can be visualized with 16 differnt Visuals, including two 3D models.
 It comes with a user friendly settings menu, letting the user customize what the program should do and how it should look.
 
@@ -46,7 +45,12 @@ You can download the latest version of my Visualizer [here](inset link to releas
 
 * Option 3: Clone the repository via git and build the code [on your own](https://github.com/CompilerStuck/sorting-visualizer#how-to-build-the-code-for-yourself):
 
-## How to build the Code for yourself
+## Getting Started - Building the code yourself
+### Requirements:
+
+* An installed JDK that is at least version 14. Download the newest version [here](https://jdk.java.net/19/)
+* Make sure your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
+
 ### Clone this repository:
 
         git clone https://github.com/CompilerStuck/sorting-visualizer.git
@@ -55,12 +59,11 @@ You can download the latest version of my Visualizer [here](inset link to releas
 
 ### Building the Code:
 
-1. Make sure your installed [JDK](https://jdk.java.net/19/) is at least version 14 and your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
-2. Open a Terminal in the project folder and execute: 
+1. Open a Terminal in the project folder and execute: 
 
         .\build
 
-3. Run the compiled jar with
+2. Run the compiled jar with
 
         .\run
         
