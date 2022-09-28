@@ -53,7 +53,7 @@ public class CombSort extends SortingAlgorithm {
                     // Set swapped
                     swapped = true;
                 }
-                if (delay && new Random().nextInt(1, 4) == 1) {
+                if (delay && new Random().nextInt(4) == 1) {
                     arrayController.setMarker(i, Marker.SET);
                     arrayController.setMarker(i + gap, Marker.SET);
                     arrayController.addRealTime(System.nanoTime() - startTime);

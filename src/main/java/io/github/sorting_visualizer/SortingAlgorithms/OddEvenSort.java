@@ -53,7 +53,7 @@ public class OddEvenSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     isSorted = false;
-                    if (delay && new Random().nextInt(1, 45) == 1) {
+                    if (delay && new Random().nextInt(45) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);

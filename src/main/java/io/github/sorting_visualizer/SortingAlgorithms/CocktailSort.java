@@ -37,7 +37,7 @@ public class CocktailSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(1, 20) == 1) {
+                    if (delay && new Random().nextInt(20) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
@@ -60,7 +60,7 @@ public class CocktailSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(1, 20) == 1) {
+                    if (delay && new Random().nextInt(20) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);

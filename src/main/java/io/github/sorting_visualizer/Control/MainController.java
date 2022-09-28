@@ -50,7 +50,6 @@ public class MainController extends PApplet {
 
 
     public static void main(String[] passedArgs) {
-
         //Changing UI Theme
         FlatDarculaLaf.setup();
         try {

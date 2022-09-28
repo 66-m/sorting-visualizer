@@ -36,7 +36,7 @@ public class GnomeSort extends SortingAlgorithm {
             else {
                 arrayController.swap(index, index - 1);
                 index--;
-                if (delay && new Random().nextInt(1, 30) == 1) {
+                if (delay && new Random().nextInt(30) == 1) {
                     arrayController.setMarker(index, Marker.SET);
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(1);

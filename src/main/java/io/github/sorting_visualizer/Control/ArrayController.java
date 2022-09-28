@@ -194,12 +194,16 @@ public class ArrayController {
 
     void shuffle() {
         if (!SortingAlgorithm.isRun()) return;
-        switch (shuffleType) {
-            case RANDOM -> standardShuffle();
-            case REVERSE -> reverseShuffle();
-            case ALMOST_SORTED -> almostSortedShuffle();
-            case SORTED -> sortedShuffle();
-        }
+//        switch (shuffleType) {
+//            case RANDOM -> standardShuffle();
+//            case REVERSE -> reverseShuffle();
+//            case ALMOST_SORTED -> almostSortedShuffle();
+//            case SORTED -> sortedShuffle();
+//        }
+        if (shuffleType==ShuffleType.RANDOM)standardShuffle();
+        else if(shuffleType==ShuffleType.REVERSE)reverseShuffle();
+        else if (shuffleType==ShuffleType.ALMOST_SORTED)almostSortedShuffle();
+        else if (shuffleType==ShuffleType.SORTED)sortedShuffle();
     }
 
     void standardShuffle() {
