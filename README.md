@@ -45,6 +45,33 @@ You can download the latest version of my Visualizer [here](inset link to releas
         git clone https://github.com/CompilerStuck/sorting-visualizer.git
         cd sorting-visualizer
 
+## How to build the Code for yourself
+### Building the Code:
+
+1. Clone this repository
+2. Make sure [JDK 17](https://www.oracle.com/java/technologies/downloads/) is installed and your environment variable `JAVA_HOME` is set
+3. Open a Terminal in the project folder and execute: 
+
+* Windows    
+
+        ./build.cmd
+
+* Linux/Mac
+
+        ./build
+
+
+### Running the compiled Code:
+
+* Windows
+
+        ./run.cmd
+
+* Linux/Mac
+
+        ./run
+        
+
 
 ## Features
 
@@ -89,32 +116,6 @@ You can download the latest version of my Visualizer [here](inset link to releas
    - American Flag Sort
 
 
-## How to build the Code for yourself
-### Building the Code:
-
-1. Clone this repository
-2. Make sure [JDK 17](https://www.oracle.com/java/technologies/downloads/) is installed and your environment variable `JAVA_HOME` is set
-3. Open a Terminal in the project folder and execute: 
-
-* Windows    
-
-        ./build.cmd
-
-* Linux/Mac
-
-        ./build
-
-
-### Running the compiled Code:
-
-* Windows
-
-        ./run.cmd
-
-* Linux/Mac
-
-        ./run
-        
 ## Known Issues (Work in progess)
 * Randomizing >2000 elements doesn't show an animation
 * Visuals ImageHorizontal & ImageVertical not included
