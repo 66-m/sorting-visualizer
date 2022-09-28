@@ -43,7 +43,7 @@ You can download the latest version of my Visualizer [here](inset link to releas
 * Option 2: Download via git and build the code [on your own](https://github.com/CompilerStuck/sorting-visualizer#how-to-build-the-code-for-yourself):
 
 ## How to build the Code for yourself
-### Clone this Repository
+### Clone this repository:
 
         git clone https://github.com/CompilerStuck/sorting-visualizer.git
         cd sorting-visualizer
