@@ -3,3 +3,4 @@
 *.iws
 log/
 target/
+*.exe
