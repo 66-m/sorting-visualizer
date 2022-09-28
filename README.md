@@ -119,6 +119,7 @@ You can download the latest version of my Visualizer [here](inset link to releas
 
 ## Acknowledgements
 Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and inspiring me to start this project.
+Also a big thanks to [micycle1](https://github.com/micycle1) for his amazing mirror of the processing4 core library, making it available for maven imports.
 
 ## License
 [MIT](https://github.com/CompilerStuck/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
