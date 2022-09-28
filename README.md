@@ -60,9 +60,7 @@ You can download the latest version of my Visualizer [here](inset link to releas
 
         .\build
 
-
-### Running the compiled Code:
-* Run following command in a Terminal:
+3. Run the compiled jar with
 
         .\run
         
