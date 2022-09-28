@@ -54,24 +54,13 @@ You can download the latest version of my Visualizer [here](inset link to releas
 1. Make sure [JDK 17](https://www.oracle.com/java/technologies/downloads/) is installed and your environment variable `JAVA_HOME` is set
 2. Open a Terminal in the project folder and execute: 
 
-* Windows    
-
-        ./build.cmd
-
-* Linux/Mac
-
-        ./build
+        .\build
 
 
 ### Running the compiled Code:
+* Run following command in a Terminal:
 
-* Windows
-
-        ./run.cmd
-
-* Linux/Mac
-
-        ./run
+        .\run
         
 
 
@@ -142,7 +131,7 @@ Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://ww
 	<br/>
 	<br/>
 	<br/>
-	<a href="https://www.buymeacoffee.com/gbraad" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+	<a href="https://www.buymeacoffee.com/CompilerStuck" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 </p>
 
 
