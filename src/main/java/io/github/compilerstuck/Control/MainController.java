@@ -140,6 +140,7 @@ public class MainController extends PApplet {
 
                 settings.setProgressBar(100);
                 settings.setEnableInputs(true);
+                settings.setEnableCancelButton(false);
             } else if (running) {
                 visualization.update();
                 arrayController.update();
