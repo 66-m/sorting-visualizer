@@ -405,6 +405,10 @@ public class Settings extends JFrame {
         visualizationListComboBox.setEnabled(enabled);
     }
 
+    public void setEnableCancelButton(boolean enabled){
+        cancelButton.setEnabled(enabled);
+    }
+
     public void setProgressBar(int progress) {
         progressBarArray.setValue(progress);
     }
