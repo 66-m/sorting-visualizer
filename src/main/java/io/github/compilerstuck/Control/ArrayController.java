@@ -23,6 +23,7 @@ public class ArrayController {
 
 
     public ArrayController(int size) {
+        shuffleType = ShuffleType.RANDOM;
         resize(size);
     }
 
@@ -39,7 +40,6 @@ public class ArrayController {
         writesAux = 0;
         sortedPercentage = 1;
         segments = 1;
-        shuffleType = ShuffleType.RANDOM;
 
         //Initial Values
         for (int i = 0; i < size; i++) {

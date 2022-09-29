@@ -229,7 +229,7 @@ public class Settings extends JFrame {
 
         //Mute button
         muteCheckBox.setSelected(true);
-        muteCheckBox.addChangeListener(e -> MainController.sound.mute(!muteCheckBox.isSelected()));
+        muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
 
 
         //Algorithm selection //TODO -> READO ALGORITHMS

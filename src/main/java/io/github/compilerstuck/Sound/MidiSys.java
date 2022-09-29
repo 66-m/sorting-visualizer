@@ -9,7 +9,8 @@ import javax.sound.midi.*;
 
 public class MidiSys extends Sound {
 
-    MidiChannel synthesizerChannel;
+    private final MidiChannel synthesizerChannel;
+
 
     public MidiSys(ArrayController arrayController) throws MidiUnavailableException {
         super(arrayController);
@@ -34,8 +35,11 @@ public class MidiSys extends Sound {
     @Override
     public void playSound(int index) {
 
-        if (index >= 0 && arrayController.getMarker(index) == Marker.SET) {
-            notesOff();
+        if (!isMuted && index >= 0 && arrayController.getMarker(index) == Marker.SET) {
+
+
+            synthesizerChannel.allSoundOff();
+            synthesizerChannel.allNotesOff();
 
             synthesizerChannel.noteOn(28 + 40 * (arrayController.get(index) + 1) / arrayController.getLength(), 90);
         }
@@ -44,12 +48,8 @@ public class MidiSys extends Sound {
 
     @Override
     public void mute(boolean mute) {
-        notesOff();
+        synthesizerChannel.allNotesOff();
         synthesizerChannel.setMute(mute);
     }
 
-    public void notesOff(){
-        synthesizerChannel.allSoundOff();
-        synthesizerChannel.allNotesOff();
-    }
 }

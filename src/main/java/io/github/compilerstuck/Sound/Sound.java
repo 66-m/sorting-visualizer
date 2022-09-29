@@ -6,6 +6,7 @@ import processing.core.PApplet;
 public abstract class Sound {
     protected PApplet proc;
     ArrayController arrayController;
+    protected boolean isMuted;
 
     public Sound(ArrayController arrayController) {
         this.arrayController = arrayController;
@@ -15,6 +16,8 @@ public abstract class Sound {
 
     public abstract void mute(boolean mute);
 
-    public void notesOff(){
+    public void setIsMuted(boolean muted) {
+        isMuted = muted;
+        mute(isMuted);
     }
 }
