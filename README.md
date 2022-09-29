@@ -41,7 +41,7 @@ You can download the latest version of my Visualizer [here](https://github.com/C
 
         java -jar sorting-visualizer-1.3.1.jar
 
-* Option 3: Clone the repository via git and build the code [on your own](https://github.com/CompilerStuck/sorting-visualizer#how-to-build-the-code-for-yourself):
+* Option 3: Clone the repository via git and build the code on your own:
 
 ## Getting Started - Building the code yourself
 ### Requirements:
