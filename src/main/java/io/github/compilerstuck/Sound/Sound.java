@@ -14,4 +14,7 @@ public abstract class Sound {
     public abstract void playSound(int value);
 
     public abstract void mute(boolean mute);
+
+    public void notesOff(){
+    }
 }

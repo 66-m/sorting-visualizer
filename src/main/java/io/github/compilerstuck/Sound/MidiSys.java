@@ -35,20 +35,21 @@ public class MidiSys extends Sound {
     public void playSound(int index) {
 
         if (index >= 0 && arrayController.getMarker(index) == Marker.SET) {
+            notesOff();
 
-            synthesizerChannel.allSoundOff();
-            synthesizerChannel.allNotesOff();
-
-            //int barHeight = (arrayController.get(index) + 1) * (proc.height - 5) / arrayController.getLength();
             synthesizerChannel.noteOn(28 + 40 * (arrayController.get(index) + 1) / arrayController.getLength(), 90);
-
         }
 
     }
 
     @Override
     public void mute(boolean mute) {
-        synthesizerChannel.allNotesOff();
+        notesOff();
         synthesizerChannel.setMute(mute);
+    }
+
+    public void notesOff(){
+        synthesizerChannel.allSoundOff();
+        synthesizerChannel.allNotesOff();
     }
 }
