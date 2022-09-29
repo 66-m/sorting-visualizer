@@ -124,7 +124,8 @@ public class MainController extends PApplet {
                 restart = false;
                 results = false;
 
-                sound.notesOff();
+                sound.mute(true);
+                sound.mute(false);
 
                 arrayController.resetMeasurements();
                 comparisons.clear();
@@ -163,9 +164,7 @@ public class MainController extends PApplet {
             if (exitCalled()){
                 shutdown();
             }
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
 
     private void startAlgorithmThread() {
@@ -182,12 +181,17 @@ public class MainController extends PApplet {
 //                    delay(1000);
 //                    sound.mute(false);
 //                }
+                sound.mute(true);
+                sound.mute(false);
+
+
                 arrayController.shuffle();
                 if (!SortingAlgorithm.isRun()) {
                     break;
                 }
-                sound.notesOff();
+                sound.mute(true);
                 delay(1000);
+                sound.mute(false);
                 arrayController.resetMeasurements();
 
                 //start sorting
@@ -200,8 +204,9 @@ public class MainController extends PApplet {
                 swaps.add(Double.toString(arrayController.getSwaps()));
                 writesMain.add(Double.toString(arrayController.getWrites()));
                 writesAux.add(Double.toString(arrayController.getWritesAux()));
-                sound.notesOff();
+                sound.mute(true);
                 delay(2000);
+                sound.mute(false);
                 arrayController.resetMeasurements();
             }
             if (showComparisonTable && SortingAlgorithm.isRun()) {
