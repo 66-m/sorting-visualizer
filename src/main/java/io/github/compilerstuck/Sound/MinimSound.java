@@ -12,6 +12,7 @@ public class MinimSound extends Sound {
     AudioOutput out;
     double timegone;
 
+    //Used this sound earlier in development
     public MinimSound(ArrayController arrayController) {
         super((arrayController));
         proc = MainController.processing;
