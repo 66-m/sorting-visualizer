@@ -44,11 +44,11 @@ public class MergeSort extends SortingAlgorithm {
         int[] L = new int[n1];
         int[] R = new int[n2];
 
-        for (int i = 0; i < n1; ++i) {
+        for (int i = 0; i < n1 && run; ++i) {
             L[i] = arrayController.get(l + i);
         }
         arrayController.addWritesAux(n1);
-        for (int j = 0; j < n2; ++j) {
+        for (int j = 0; j < n2 && run; ++j) {
             R[j] = arrayController.get(m + 1 + j);
         }
         arrayController.addWritesAux(n2);
@@ -57,7 +57,7 @@ public class MergeSort extends SortingAlgorithm {
         int i = 0, j = 0;
 
         int k = l;
-        while (i < n1 && j < n2) {
+        while (i < n1 && j < n2 && run) {
             if (L[i] <= R[j]) {
                 arrayController.set(k, L[i]);
                 i++;
@@ -82,7 +82,7 @@ public class MergeSort extends SortingAlgorithm {
     }
 
     private int copyRemainingElements(ArrayController arrayController, int n1, int[] l, int i, int k) {
-        while (i < n1) {
+        while (i < n1 && run) {
             arrayController.set(k, l[i]);
 
             arrayController.setMarker(k, Marker.SET);
