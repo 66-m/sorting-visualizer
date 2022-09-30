@@ -39,7 +39,7 @@ You can download the latest version of my Visualizer [here](https://github.com/C
 * Option 1: Just download the [executable](https://github.com/CompilerStuck/sorting-visualizer/releases/download/v1.3.1/sorting-visualizer.exe) and run it
 * Option 2: Download the [prebuild JAR file](https://github.com/CompilerStuck/sorting-visualizer/releases/download/v1.3.1/sorting-visualizer-1.3.1.jar) and run it with
 
-        java -jar sorting-visualizer-1.3.1.jar
+        java -jar sorting-visualizer-1.3.2.jar
 
 * Option 3: Clone the repository via git and build the code on your own:
 
