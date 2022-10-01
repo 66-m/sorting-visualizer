@@ -43,7 +43,7 @@ public class ColorGradient {
 
     public Color getMarkerColor(int index, Marker m) {
         if (m == Marker.NORMAL) return colorGradient[index];
-        else if (m == Marker.SET) return Color.WHITE;
+        else if (m == Marker.SET) return markerSetColor;
         else return Color.BLACK;
     }
 
