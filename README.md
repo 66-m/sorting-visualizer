@@ -1,6 +1,5 @@
 [![Java CI with Maven](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-<span class="badge-patreon"><a href="https://patreon.com/CompilerStuck" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
 
 
 
