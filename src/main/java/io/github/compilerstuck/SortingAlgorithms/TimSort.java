@@ -4,6 +4,8 @@ import io.github.compilerstuck.Control.ArrayController;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
 
+import java.util.Random;
+
 public class TimSort extends SortingAlgorithm {
     long startTime;
 
@@ -29,7 +31,7 @@ public class TimSort extends SortingAlgorithm {
                 arrayController.addComparisons(1);
                 arrayController.set(j + 1, arrayController.get(j));
                 arrayController.setMarker(j + 1, Marker.SET);
-                if (delay) {
+                if (delay && new Random().nextInt(3) == 1) {
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(1);
                     startTime = System.nanoTime();
@@ -39,7 +41,7 @@ public class TimSort extends SortingAlgorithm {
             arrayController.addComparisons(1);
             arrayController.set(j + 1, temp);
             arrayController.setMarker(j + 1, Marker.SET);
-            if (delay) {
+            if (delay && new Random().nextInt(3) == 1) {
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(1);
                 startTime = System.nanoTime();
@@ -124,8 +126,8 @@ public class TimSort extends SortingAlgorithm {
         for (int size = RUN; size < arrayController.getLength() && run; size = 2 * size) {
 
             for (int left = 0; left < arrayController.getLength() && run; left += 2 * size) {
-                int mid = left + size - 1;
                 int right = Math.min((left + 2 * size - 1), (arrayController.getLength() - 1));
+                int mid = Math.min(left + size - 1, right);
 
                 merge(left, mid, right);
             }

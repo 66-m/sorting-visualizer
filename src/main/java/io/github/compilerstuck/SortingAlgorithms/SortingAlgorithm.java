@@ -10,6 +10,7 @@ public abstract class SortingAlgorithm {
     protected boolean delay;
     protected int alternativeSize;
     protected static boolean run = true;
+    protected boolean selected = true;
 
 
     ArrayController arrayController;
@@ -46,5 +47,9 @@ public abstract class SortingAlgorithm {
     public static void setRun(boolean run) {
         SortingAlgorithm.run = run;
     }
+
+    public void setSelected(boolean selected){this.selected = selected;}
+
+    public boolean isSelected(){return selected;}
 
 }

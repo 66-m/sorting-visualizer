@@ -1,0 +1,23 @@
+package io.github.compilerstuck.Visual.Gradient;
+
+import io.github.compilerstuck.Control.MainController;
+
+import java.awt.*;
+
+public class MultiGradient extends ColorGradient {
+
+    public MultiGradient(Color markerSetColor, String name) {
+        super(Color.BLACK, Color.BLACK, markerSetColor, name);
+    }
+
+    @Override
+    protected Color[] getColorGradient(int size) {
+
+        Color[] colorGradient = new Color[size];
+
+        for (int i = 0; i < size; i++) {
+            colorGradient[i] = Color.getHSBColor(((float)i/(size-1)), 0.7f, 0.8f);
+        }
+        return colorGradient;
+    }
+}

@@ -18,7 +18,7 @@ public class ColorGradient {
         this.color2 = color2;
         this.markerSetColor = markerSetColor;
         this.name = name;
-        colorGradient = getColorGradient(MainController.getSize());
+        this.colorGradient = this.getColorGradient(MainController.getSize());
     }
 
     protected Color[] getColorGradient(int size) {

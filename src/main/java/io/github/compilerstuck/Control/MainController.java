@@ -5,7 +5,7 @@ import io.github.compilerstuck.SortingAlgorithms.QuickSortMiddlePivot;
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Sound.MidiSys;
 import io.github.compilerstuck.Sound.Sound;
-import io.github.compilerstuck.Visual.Classic;
+import io.github.compilerstuck.Visual.Bars;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import io.github.compilerstuck.Visual.Visualization;
 import processing.core.PApplet;
@@ -47,6 +47,7 @@ public class MainController extends PApplet {
     private Settings settings;
 
     private static boolean fullScreen = false;
+    private static boolean portrait = false;
 
 
     public static void main(String[] passedArgs) {
@@ -59,7 +60,8 @@ public class MainController extends PApplet {
         }
 
 
-        fullScreen = passedArgs.length != 0 && passedArgs[0].equalsIgnoreCase("fs");
+        fullScreen = passedArgs.length != 0 && passedArgs[0].equalsIgnoreCase("fullscreen");
+        portrait = passedArgs.length != 0 && passedArgs[0].equalsIgnoreCase("portrait");
 
         String[] appletArgs = new String[]{"io.github.compilerstuck.Control.MainController"};
         PApplet.main(concat(appletArgs, passedArgs));
@@ -69,7 +71,11 @@ public class MainController extends PApplet {
     public void settings() {
         if (fullScreen) {
             fullScreen(P2D);
-        } else {
+        }
+        else if(portrait){
+            this.size(576 , 1024 , P2D);
+        }
+        else {
             this.size(1280, 720, P2D);
         }
         smooth(8);
@@ -79,8 +85,8 @@ public class MainController extends PApplet {
     @Override
     public void setup() {
         if (!fullScreen) {
-            surface.setLocation(555, 10);
-            surface.setResizable(true);
+            surface.setLocation(605, 10);
+            surface.setResizable(false);
         } else {
             surface.setLocation(0, 0);
         }
@@ -101,7 +107,7 @@ public class MainController extends PApplet {
         }
 
         colorGradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red"); //Standard gradient
-        visualization = new Classic(arrayController, colorGradient, sound); //Standard visual
+        visualization = new Bars(arrayController, colorGradient, sound); //Standard visual
 
         algorithms = new ArrayList<>();
         algorithms.add(new QuickSortMiddlePivot(arrayController));
@@ -190,7 +196,7 @@ public class MainController extends PApplet {
                     break;
                 }
                 sound.mute(true);
-                delay(1000);
+                delay(500);
                 sound.mute(false);
                 arrayController.resetMeasurements();
 
@@ -199,13 +205,13 @@ public class MainController extends PApplet {
                 if (!SortingAlgorithm.isRun()) {
                     break;
                 }
-                comparisons.add(Double.toString(arrayController.getComparisons()));
+                comparisons.add(Long.toString(arrayController.getComparisons()));
                 realTime.add(Double.toString(arrayController.getRealTime()));
-                swaps.add(Double.toString(arrayController.getSwaps()));
-                writesMain.add(Double.toString(arrayController.getWrites()));
-                writesAux.add(Double.toString(arrayController.getWritesAux()));
+                swaps.add(Long.toString(arrayController.getSwaps()));
+                writesMain.add(Long.toString(arrayController.getWrites()));
+                writesAux.add(Long.toString(arrayController.getWritesAux()));
                 sound.mute(true);
-                delay(2000);
+                delay(1500);
                 sound.mute(false);
                 arrayController.resetMeasurements();
             }
@@ -253,11 +259,11 @@ public class MainController extends PApplet {
             line(0, (int) (50 + (height - 50.) / algorithms.size() * (i)), width, (int) (50 + (height - 50.) / algorithms.size() * i));
             text(algorithms.get(i).getName(), (int) (width / 7. * 0) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
             text(algorithms.get(i).getAlternativeSize(), (int) (width / 7. * 1 + (width / 7.) / 2) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", (int) (Double.parseDouble(comparisons.get(i)))), (int) (width / 7. * 2) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
+            text(String.format("%,d", (Long.parseLong(comparisons.get(i)))), (int) (width / 7. * 2) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
             text("~" + String.valueOf(Math.floor(Double.parseDouble(realTime.get(i)) / 10000.) / 100).replace(".", ",") + "ms", (int) (width / 7. * 3) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", (int) Double.parseDouble(swaps.get(i))), (int) (width / 7. * 4) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", (int) Double.parseDouble(writesMain.get(i))), (int) (width / 7. * 5) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", (int) Double.parseDouble(writesAux.get(i))), (int) (width / 7. * 6) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
+            text(String.format("%,d", Long.parseLong(swaps.get(i))), (int) (width / 7. * 4) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
+            text(String.format("%,d", Long.parseLong(writesMain.get(i))), (int) (width / 7. * 5) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
+            text(String.format("%,d", Long.parseLong(writesAux.get(i))), (int) (width / 7. * 6) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
         }
     }
 
@@ -268,11 +274,11 @@ public class MainController extends PApplet {
         textSize((int) (23. / 1280 * width));
         text(currentOperation, (int) (5. / 1280 * width), (int) (20. / 1280 * width));
         text((int) (arrayController.getSortedPercentage() * 100) + "% Sorted (" + arrayController.getSegments() + " Segments" + ")", (int) (5. / 1280 * width), (int) (40. / 1280 * width));
-        text(String.format("%,d", (int) arrayController.getComparisons()) + " Comparisons", (int) (5. / 1280 * width), (int) (60. / 1280 * width));
+        text(String.format("%,d", arrayController.getComparisons()) + " Comparisons", (int) (5. / 1280 * width), (int) (60. / 1280 * width));
         text("Estimated time: ~" + String.valueOf(Math.floor(arrayController.getRealTime() / 10000.) / 100).replace(".", ",") + "ms", (int) (5. / 1280 * width), (int) (80. / 1280 * width));
-        text(String.format("%,d", (int) arrayController.getSwaps()) + " Swaps", (int) (5. / 1280 * width), (int) (100. / 1280 * width));
-        text(String.format("%,d", (int) arrayController.getWrites()) + " Writes to main array", (int) (5. / 1280 * width), (int) (120. / 1280 * width));
-        text(String.format("%,d", (int) arrayController.getWritesAux()) + " Writes to auxiliary array", (int) (5. / 1280 * width), (int) (140. / 1280 * width));
+        text(String.format("%,d",  arrayController.getSwaps()) + " Swaps", (int) (5. / 1280 * width), (int) (100. / 1280 * width));
+        text(String.format("%,d", arrayController.getWrites()) + " Writes to main array", (int) (5. / 1280 * width), (int) (120. / 1280 * width));
+        text(String.format("%,d", arrayController.getWritesAux()) + " Writes to auxiliary array", (int) (5. / 1280 * width), (int) (140. / 1280 * width));
         text(arrayController.getLength() + " Elements", (int) (5. / 1280 * width), (int) (160. / 1280 * width));
     }
 
@@ -321,7 +327,13 @@ public class MainController extends PApplet {
     }
 
     public static void setAlgorithms(ArrayList<SortingAlgorithm> algorithms) {
-        MainController.algorithms = algorithms;
+        MainController.algorithms.clear();
+        for (SortingAlgorithm alg : algorithms){
+            if (alg.isSelected()){
+                MainController.algorithms.add(alg);
+            }
+        }
+
     }
 
     public static void setAlgorithm(SortingAlgorithm algorithm) {

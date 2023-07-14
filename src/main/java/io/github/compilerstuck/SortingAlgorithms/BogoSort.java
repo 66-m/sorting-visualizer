@@ -8,13 +8,13 @@ import java.util.Random;
 
 public class BogoSort extends SortingAlgorithm {
 
-    float startTime;
-    int trycnt = 0;
+    long trycnt = 0;
 
     public BogoSort(ArrayController arrayController) {
         super(arrayController);
         this.name = "Bogo Sort";
         alternativeSize = arrayController.getLength();
+        selected = false;
     }
 
     public BogoSort(ArrayController arrayController, int alternativeSize) {
@@ -38,7 +38,7 @@ public class BogoSort extends SortingAlgorithm {
 
 
             arrayController.setMarker(a, Marker.SET);
-            if (delay & Math.random() > 0.98) {
+            if (delay & Math.random() > 0.999999) {
                 arrayController.addRealTime(System.nanoTime() - startTime);
                 proc.delay(1);
                 startTime = System.nanoTime();

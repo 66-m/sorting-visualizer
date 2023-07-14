@@ -1,18 +1,18 @@
 package io.github.compilerstuck.Visual;
 
 import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import processing.core.PImage;
 
 public class ImageHorizontal extends Visualization {
-
-    PImage img;
+    private PImage img;
 
     public ImageHorizontal(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
         name = "Image - Horizontal Sorting";
-        img = proc.loadImage("pathToImage");
+        setImg("images/dummy-image.jpg");
     }
 
     @Override
@@ -20,8 +20,26 @@ public class ImageHorizontal extends Visualization {
         this.screenHeight = proc.height;
         this.screenWidth = proc.width;
 
-        proc.background(15);
+        if(arrayController.getLength()>img.pixelHeight){
+            MainController.updateArraySize(img.pixelHeight);
+        }
+        else if (img.pixelHeight % arrayController.getLength() > 0) {
+            int newWindowHeight = img.pixelHeight;
+            int max = img.pixelHeight;
 
+            // Find the next highest value that divides the image hight without a remainder
+            for (int i = arrayController.getLength(); i <= max; i++) {
+                if (img.pixelHeight % i == 0) {
+                    newWindowHeight = i;
+                    break;
+                }
+            }
+
+            // Update the array size and resize the window
+            MainController.updateArraySize(newWindowHeight);
+        }
+
+        proc.background(15);
 
         proc.loadPixels();
         img.loadPixels();
@@ -33,19 +51,14 @@ public class ImageHorizontal extends Visualization {
 
             for (int y = pos; y < pos + imgPartWidth; y++) {
 
-                for (int x = 0; x < img.pixelWidth; x++) {
-                    int realLoc = (x) + (y - pos + i * imgPartWidth) * img.pixelWidth;
+                for (int x = 0; x < screenWidth; x++) {
+                    int realLoc = x + (y - pos + i * imgPartWidth) * img.pixelWidth;
                     int loc = x + y * img.pixelWidth;
 
                     float r = proc.red(img.pixels[loc]);
                     float g = proc.green(img.pixels[loc]);
                     float b = proc.blue(img.pixels[loc]);
 
-                    if (arrayController.getMarker(i) == Marker.SET && r != 0 || g != 0 && b != 0) {
-                        r = 255;
-                        g = 255;
-                        b = 255;
-                    }
                     proc.pixels[realLoc] = proc.color(r, g, b);
                 }
 
@@ -67,6 +80,23 @@ public class ImageHorizontal extends Visualization {
         proc.textSize((int) (25. / 1280 * screenWidth));
         proc.text("CompilerStuck", screenWidth - (int) (175. / 1280 * screenWidth), (int) (21. / 1280 * screenWidth)); //Branding
         proc.textSize(20);
+    }
+
+    public boolean setImg(String imagePath) {
+        boolean imageFound = true;
+        proc.getSurface().setResizable(false); // Enable window resizing
+
+        try {
+            img = proc.loadImage(imagePath);
+
+            // Resize the image to match the window size
+            img.resize(proc.width, proc.height);
+
+        } catch (Exception e) {
+            imageFound = false;
+        }
+
+        return imageFound;
     }
 
 }

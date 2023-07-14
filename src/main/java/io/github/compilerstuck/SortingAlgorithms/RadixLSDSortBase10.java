@@ -67,14 +67,11 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
                     arrayController.addRealTime(System.nanoTime() - startTime);
                     proc.delay(1);
                     startTime = System.nanoTime();
-
-
                 }
             }
 
             placement *= RADIX;
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
     }

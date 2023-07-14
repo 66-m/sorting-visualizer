@@ -6,18 +6,23 @@ import com.intellij.uiDesigner.core.Spacer;
 import io.github.compilerstuck.SortingAlgorithms.*;
 import io.github.compilerstuck.Visual.*;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
+import io.github.compilerstuck.Visual.Gradient.MultiGradient;
 import processing.core.PApplet;
+import processing.core.PImage;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Settings extends JFrame {
 
@@ -33,7 +38,6 @@ public class Settings extends JFrame {
     private JComboBox<String> algorithmListComboBox;
     private JLabel gradientListLabel;
     private JLabel algorithmListLabel;
-    private JLabel arraySizeSliderLabel;
     private JLabel muteCheckBoxLabel;
     private JButton runButton;
     private JCheckBox runAllCheckBox;
@@ -53,6 +57,8 @@ public class Settings extends JFrame {
     private JButton arraySizeOkButton;
     private JCheckBox showMeasurementsCheckBox;
     private JLabel showMeasurementsLabel;
+    private JButton buttonRunAllSettings;
+    private JButton buttonSetImg;
 
     ArrayList<SortingAlgorithm> algorithmList;
     ArrayList<ColorGradient> gradientList;
@@ -67,11 +73,11 @@ public class Settings extends JFrame {
     public void initialize() {
 
         proc = MainController.processing;
-        int maxSize = 5000;
+        int maxSize = 10000;
 
         //Frame Settings
         setContentPane(settingsPanel);
-        setSize(550, 530);
+        setSize(600, 530);
         setLocation(10, 10);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
@@ -97,9 +103,9 @@ public class Settings extends JFrame {
                 new ColorGradient(Color.BLUE, Color.RED, Color.WHITE, "Blue -> Red"),
                 new ColorGradient(Color.BLACK, Color.WHITE, Color.WHITE, "Black -> White"),
                 new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red"),
+                new MultiGradient(Color.WHITE, "Rainbow"),
                 new ColorGradient(Color.PINK, Color.BLACK, Color.WHITE, "Custom Gradient")
         ));
-
 
         for (ColorGradient gradient : gradientList) {
             gradientListComboBox.addItem(gradient.getName());
@@ -113,7 +119,9 @@ public class Settings extends JFrame {
         colorChoose2.setVisible(true);
 
         gradientListComboBox.addActionListener(e -> {
-            MainController.setColorGradient(gradientList.get(gradientListComboBox.getSelectedIndex()));
+            ColorGradient selected = gradientList.get(gradientListComboBox.getSelectedIndex());
+            selected.updateGradient(MainController.getSize());
+            MainController.setColorGradient(selected);
             Color newColor1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
             colorChoose1.setBackground(newColor1);
             Color newColor2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
@@ -191,8 +199,6 @@ public class Settings extends JFrame {
         arraySizeOkButton.addActionListener(e -> {
             if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 5) {
                 if (Integer.parseInt(arraySizeTextField.getText()) > maxSize) {
-                    System.out.println("TEST ALLO");
-
                     arraySizeSlider.setValue(maxSize);
                     arraySizeTextField.setText(String.valueOf(maxSize));
                 } else {
@@ -231,48 +237,75 @@ public class Settings extends JFrame {
         muteCheckBox.setSelected(true);
         muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
 
-
-        //Algorithm selection //TODO -> READO ALGORITHMS
         algorithmList = new ArrayList<>(Arrays.asList(
-                new QuickSortMiddlePivot(MainController.getArrayController()),
-                new QuickSortDualPivot(MainController.getArrayController()),
-                new MergeSort(MainController.getArrayController()),
-                new ShellSort(MainController.getArrayController()),
-                new GravitySort(MainController.getArrayController()),
-                new RadixLSDSortBase10(MainController.getArrayController()),
-                new GnomeSort(MainController.getArrayController()),
-                new HeapSort(MainController.getArrayController()),
-                new SelectionSort(MainController.getArrayController()),
-                new CombSort(MainController.getArrayController()),
                 new OddEvenSort(MainController.getArrayController()),
+                new MergeSort(MainController.getArrayController()),
+                new GravitySort(MainController.getArrayController()),
+                new QuickSortDualPivot(MainController.getArrayController()),
+                new RadixLSDSortBase10(MainController.getArrayController()),
+                new ShellSort(MainController.getArrayController()),
+                new CombSort(MainController.getArrayController()),
+                new HeapSort(MainController.getArrayController()),
+                new CycleSort(MainController.getArrayController()),
+                new SelectionSort(MainController.getArrayController()),
+                new QuickSortMiddlePivot(MainController.getArrayController()),
+                new GnomeSort(MainController.getArrayController()),
+                new CountingSort(MainController.getArrayController()),
                 new DoubleSelectionSort(MainController.getArrayController()),
                 new InsertionSort(MainController.getArrayController()),
                 new BubbleSort(MainController.getArrayController()),
-                new CocktailSort(MainController.getArrayController()),
-                new CycleSort(MainController.getArrayController()),
-                //new BucketSort(MainController.getArrayController()),
-                new CountingSort(MainController.getArrayController()),
-                new AmericanFlagSort(MainController.getArrayController())
-                //new BogoSort(MainController.getArrayController()),
-                //new PigeonholeSort(MainController.getArrayController()),
-                //new TimSort(MainController.getArrayController())
+                new ShakerSort(MainController.getArrayController()),
+                new BucketSort(MainController.getArrayController()),
+                new AmericanFlagSort(MainController.getArrayController()),
+                new PigeonholeSort(MainController.getArrayController()),
+                new TimSort(MainController.getArrayController()),
+                new BogoSort(MainController.getArrayController())
         ));
 
         for (SortingAlgorithm algorithm : algorithmList) {
             algorithmListComboBox.addItem(algorithm.getName());
         }
+
         algorithmListComboBox.setSelectedIndex(0);
-        algorithmListComboBox.addActionListener(e -> MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex())));
+
+        algorithmListComboBox.addActionListener(e -> {
+            MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+        });
 
         //Run All Algorithms Checkbox
         runAllCheckBox.setSelected(false);
+        //buttonRunAllSettings.setVisible(true);
         runAllCheckBox.addActionListener(e -> {
             algorithmListComboBox.setEnabled(!runAllCheckBox.isSelected());
-            if (runAllCheckBox.isSelected()) {
-                MainController.setAlgorithms(algorithmList);
-            } else {
-                MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+            buttonRunAllSettings.setEnabled(runAllCheckBox.isSelected());
+        });
+
+
+        buttonRunAllSettings.addActionListener(e -> {
+            DefaultListModel<JCheckBox> runAllSettings = new DefaultListModel<JCheckBox>();
+            JCheckBoxList checkBoxList = new JCheckBoxList(runAllSettings);
+
+            for (SortingAlgorithm alg : algorithmList) {
+                JCheckBox algCheckBox = new JCheckBox(alg.getName());
+
+                algCheckBox.setSelected(alg.isSelected());
+                runAllSettings.addElement(algCheckBox);
+
+                algCheckBox.addChangeListener(e2 -> {
+                    alg.setSelected(algCheckBox.isSelected());
+                });
             }
+
+
+            JDialog runAllSettingDialog = new JDialog();
+            runAllSettingDialog.setSize(300, 500);
+            runAllSettingDialog.setLocation(this.getLocation().x + this.getSize().width + 5, this.getLocation().y);
+            runAllSettingDialog.setTitle("Run All - Settings");
+            runAllSettingDialog.add(checkBoxList);
+            runAllSettingDialog.setResizable(false);
+            runAllSettingDialog.setModal(true);
+            runAllSettingDialog.setVisible(true);
+
         });
 
 
@@ -293,6 +326,13 @@ public class Settings extends JFrame {
 
         //Run button
         runButton.addActionListener(e -> {
+
+            if (runAllCheckBox.isSelected()) {
+                MainController.setAlgorithms(algorithmList);
+            } else {
+                MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+            }
+
             MainController.setStart(true);
             cancelButton.setEnabled(true);
         });
@@ -318,7 +358,7 @@ public class Settings extends JFrame {
 
         //Visual selection
         visualizationList = new ArrayList<>(Arrays.asList(
-                new Classic(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new Bars(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new ScatterPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new ScatterPlotLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new NumberPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
@@ -332,49 +372,54 @@ public class Settings extends JFrame {
                 new DisparityCircleScatterLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new SwirlDots(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()), //behaving weird and kinda sucks
-//                new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-//                new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
 //                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())
-        ));
+                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));
 
         for (Visualization visualization : visualizationList) {
             visualizationListComboBox.addItem(visualization.getName());
         }
 
-//        lastVisualIndex = 0;
 
         visualizationListComboBox.addActionListener(e -> {
             int index = visualizationListComboBox.getSelectedIndex();
-//            if (index != 14 && index != 15) {
             MainController.setVisualization(visualizationList.get(index));
-//                lastVisualIndex = index;
-//            }else{                JFileChooser fileChooser = new JFileChooser();
-//                            fileChooser.setDialogTitle("Select an image");
-//                            fileChooser.setAcceptAllFileFilterUsed(false);
-//                            FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and JPG images", "png", "jpg");
-//                            fileChooser.addChoosableFileFilter(filter);
-//                            int fileChooserReturnValue = fileChooser.showDialog(null, "Select image");
-//                            if (fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
-//                                File selectedFile = fileChooser.getSelectedFile();
-//                                String imagePath = selectedFile.getAbsolutePath();
-//
-//                                Visualization visualization = visualizationList.get(index);
-//                                if (Objects.equals(visualization.getName(), "Image - Vertical Sorting")) {
-//                                    ImageVertical imageVertical = (ImageVertical) visualization;
-//                                    PImage pImage = proc.loadImage(imagePath);
-//                                    imageVertical.setImg(pImage);
-//                                    MainController.resizeScreen(pImage.pixelWidth, pImage.pixelHeight);
-//                                    MainController.setVisualization(imageVertical);
-//                                } else {
-//                                    ImageHorizontal imageHorizontal = (ImageHorizontal) visualization;
-//                                }
-//
-//                            } else {
-//                                visualizationListComboBox.setSelectedIndex(lastVisualIndex);
-//                            }
-//            }
+
+            buttonSetImg.setVisible(index == 14 || index == 15);
+            buttonSetImg.setEnabled(index == 14 || index == 15);
+        });
+
+
+        buttonSetImg.setVisible(false);
+        buttonSetImg.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select an image");
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and JPG images", "png", "jpg");
+            fileChooser.addChoosableFileFilter(filter);
+            int fileChooserReturnValue = fileChooser.showDialog(null, "Select image");
+            if (fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String imagePath = selectedFile.getAbsolutePath();
+
+                int index = visualizationListComboBox.getSelectedIndex();
+                Visualization visualizationVertical = visualizationList.get(14);
+                Visualization visualizationHorizontal = visualizationList.get(15);
+                ImageHorizontal imageHorizontal = (ImageHorizontal) visualizationHorizontal;
+                imageHorizontal.setImg(imagePath);
+                ImageVertical imageVertical = (ImageVertical) visualizationVertical;
+                imageVertical.setImg(imagePath);
+
+                if (Objects.equals(visualizationList.get(index).getName(), "Image - Vertical Sorting")) {
+                    MainController.setVisualization(imageVertical);
+                } else {
+                    MainController.setVisualization(imageHorizontal);
+                }
+
+            }
 
         });
 
@@ -403,9 +448,10 @@ public class Settings extends JFrame {
         arraySizeOkButton.setEnabled(enabled);
         arraySizeTextField.setEnabled(enabled);
         visualizationListComboBox.setEnabled(enabled);
+        buttonRunAllSettings.setEnabled(enabled);
     }
 
-    public void setEnableCancelButton(boolean enabled){
+    public void setEnableCancelButton(boolean enabled) {
         cancelButton.setEnabled(enabled);
     }
 
@@ -429,91 +475,85 @@ public class Settings extends JFrame {
      */
     private void $$$setupUI$$$() {
         settingsPanel = new JPanel();
-        settingsPanel.setLayout(new GridLayoutManager(21, 6, new Insets(0, 0, 0, 0), -1, -1));
+        settingsPanel.setLayout(new GridLayoutManager(20, 6, new Insets(0, 0, 0, 0), -1, -1));
         settingsPanel.setName("settingsPanel");
         settingsPanel.setOpaque(false);
         gradientListLabel = new JLabel();
         gradientListLabel.setText("Color gradient");
-        settingsPanel.add(gradientListLabel, new GridConstraints(11, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(gradientListLabel, new GridConstraints(10, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         arrayTitleLabel = new JLabel();
         Font arrayTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, arrayTitleLabel.getFont());
         if (arrayTitleLabelFont != null) arrayTitleLabel.setFont(arrayTitleLabelFont);
         arrayTitleLabel.setText("Array");
-        settingsPanel.add(arrayTitleLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        arraySizeSliderLabel = new JLabel();
-        arraySizeSliderLabel.setAlignmentX(0.0f);
-        arraySizeSliderLabel.setFocusTraversalPolicyProvider(false);
-        arraySizeSliderLabel.setHorizontalAlignment(0);
-        arraySizeSliderLabel.setText("Array size");
-        settingsPanel.add(arraySizeSliderLabel, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(arrayTitleLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
         algorithmListComboBox = new JComboBox();
         algorithmListComboBox.setMaximumRowCount(20);
-        settingsPanel.add(algorithmListComboBox, new GridConstraints(6, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(algorithmListComboBox, new GridConstraints(5, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         gradientListComboBox = new JComboBox();
         gradientListComboBox.setMaximumRowCount(20);
         gradientListComboBox.setName("");
-        settingsPanel.add(gradientListComboBox, new GridConstraints(11, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(gradientListComboBox, new GridConstraints(10, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         algorithmListLabel = new JLabel();
         algorithmListLabel.setText("Sorting algorithm");
-        settingsPanel.add(algorithmListLabel, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(algorithmListLabel, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         shuffleListLabel = new JLabel();
         shuffleListLabel.setText("Shuffle type");
-        settingsPanel.add(shuffleListLabel, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(shuffleListLabel, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         shuffleListBox = new JComboBox();
         shuffleListBox.setMaximumRowCount(20);
-        settingsPanel.add(shuffleListBox, new GridConstraints(7, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(shuffleListBox, new GridConstraints(6, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         final Spacer spacer1 = new Spacer();
-        settingsPanel.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        settingsPanel.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(20, 11), null, 0, false));
         progressBarArray = new JProgressBar();
-        settingsPanel.add(progressBarArray, new GridConstraints(20, 0, 1, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(progressBarArray, new GridConstraints(19, 0, 1, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         muteCheckBoxLabel = new JLabel();
         muteCheckBoxLabel.setText("Play sound");
-        settingsPanel.add(muteCheckBoxLabel, new GridConstraints(16, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(muteCheckBoxLabel, new GridConstraints(15, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         muteCheckBox = new JCheckBox();
         muteCheckBox.setLabel("");
         muteCheckBox.setText("");
-        settingsPanel.add(muteCheckBox, new GridConstraints(16, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(muteCheckBox, new GridConstraints(15, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
         soundTitleLabel = new JLabel();
         Font soundTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, soundTitleLabel.getFont());
         if (soundTitleLabelFont != null) soundTitleLabel.setFont(soundTitleLabelFont);
         soundTitleLabel.setText("Sound");
-        settingsPanel.add(soundTitleLabel, new GridConstraints(15, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(soundTitleLabel, new GridConstraints(14, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
         comparisonTableCheckBox = new JCheckBox();
         comparisonTableCheckBox.setText("");
-        settingsPanel.add(comparisonTableCheckBox, new GridConstraints(12, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(comparisonTableCheckBox, new GridConstraints(11, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
         comparisonTableCheckBoxLabel = new JLabel();
         comparisonTableCheckBoxLabel.setText("Show comparison table");
-        settingsPanel.add(comparisonTableCheckBoxLabel, new GridConstraints(12, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(comparisonTableCheckBoxLabel, new GridConstraints(11, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         final Spacer spacer2 = new Spacer();
-        settingsPanel.add(spacer2, new GridConstraints(14, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        settingsPanel.add(spacer2, new GridConstraints(13, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
         runButton = new JButton();
         runButton.setText("run");
-        settingsPanel.add(runButton, new GridConstraints(18, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(runButton, new GridConstraints(17, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(180, 30), null, 0, false));
         cancelButton = new JButton();
         cancelButton.setText("cancel");
-        settingsPanel.add(cancelButton, new GridConstraints(18, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(cancelButton, new GridConstraints(17, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 30), null, 0, false));
         final Spacer spacer3 = new Spacer();
-        settingsPanel.add(spacer3, new GridConstraints(17, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        settingsPanel.add(spacer3, new GridConstraints(16, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
         visualTitleLabel = new JLabel();
         Font visualTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, visualTitleLabel.getFont());
         if (visualTitleLabelFont != null) visualTitleLabel.setFont(visualTitleLabelFont);
         visualTitleLabel.setText("Visual");
-        settingsPanel.add(visualTitleLabel, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(visualTitleLabel, new GridConstraints(8, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
         sortingTitleLabel = new JLabel();
         Font sortingTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, sortingTitleLabel.getFont());
         if (sortingTitleLabelFont != null) sortingTitleLabel.setFont(sortingTitleLabelFont);
         sortingTitleLabel.setText("Sorting");
-        settingsPanel.add(sortingTitleLabel, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(sortingTitleLabel, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
         final Spacer spacer4 = new Spacer();
-        settingsPanel.add(spacer4, new GridConstraints(8, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        settingsPanel.add(spacer4, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
         visualizationListComboBoxLabel = new JLabel();
         visualizationListComboBoxLabel.setText("Visualization");
-        settingsPanel.add(visualizationListComboBoxLabel, new GridConstraints(10, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(visualizationListComboBoxLabel, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         visualizationListComboBox = new JComboBox();
         visualizationListComboBox.setMaximumRowCount(20);
-        settingsPanel.add(visualizationListComboBox, new GridConstraints(10, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(visualizationListComboBox, new GridConstraints(9, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         final Spacer spacer5 = new Spacer();
-        settingsPanel.add(spacer5, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        settingsPanel.add(spacer5, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(20, 11), null, 0, false));
         arraySizeSlider = new JSlider();
         arraySizeSlider.setInverted(false);
         arraySizeSlider.setName("");
@@ -525,26 +565,23 @@ public class Settings extends JFrame {
         arraySizeSlider.setValueIsAdjusting(false);
         arraySizeSlider.putClientProperty("JSlider.isFilled", Boolean.FALSE);
         arraySizeSlider.putClientProperty("Slider.paintThumbArrowShape", Boolean.FALSE);
-        settingsPanel.add(arraySizeSlider, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        settingsPanel.add(arraySizeSlider, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(180, 31), null, 0, false));
         arraySizeTextField = new JTextField();
-        settingsPanel.add(arraySizeTextField, new GridConstraints(3, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(20, -1), null, 0, false));
+        settingsPanel.add(arraySizeTextField, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         showMeasurementsLabel = new JLabel();
         showMeasurementsLabel.setText("Show measurements");
-        settingsPanel.add(showMeasurementsLabel, new GridConstraints(13, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(showMeasurementsLabel, new GridConstraints(12, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         showMeasurementsCheckBox = new JCheckBox();
         showMeasurementsCheckBox.setText("");
-        settingsPanel.add(showMeasurementsCheckBox, new GridConstraints(13, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(showMeasurementsCheckBox, new GridConstraints(12, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
         final Spacer spacer6 = new Spacer();
-        settingsPanel.add(spacer6, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        settingsPanel.add(spacer6, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(20, 11), null, 0, false));
         arraySizeOkButton = new JButton();
         arraySizeOkButton.setText("ok");
-        settingsPanel.add(arraySizeOkButton, new GridConstraints(3, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, new Dimension(50, -1), 0, false));
-        runAllCheckBox = new JCheckBox();
-        runAllCheckBox.setText("All");
-        settingsPanel.add(runAllCheckBox, new GridConstraints(6, 4, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        settingsPanel.add(arraySizeOkButton, new GridConstraints(2, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(137, 30), new Dimension(50, -1), 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        settingsPanel.add(panel1, new GridConstraints(11, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        settingsPanel.add(panel1, new GridConstraints(10, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, 1, 1, null, new Dimension(80, 30), null, 0, false));
         colorChoose1 = new JPanel();
         colorChoose1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         colorChoose1.setBackground(new Color(-47032));
@@ -557,11 +594,44 @@ public class Settings extends JFrame {
         colorChoose2.setName("colorChoose2");
         panel1.add(colorChoose2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(10, 10), null, 0, false));
         final Spacer spacer7 = new Spacer();
-        settingsPanel.add(spacer7, new GridConstraints(19, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        settingsPanel.add(spacer7, new GridConstraints(18, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
         final Spacer spacer8 = new Spacer();
-        settingsPanel.add(spacer8, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        settingsPanel.add(spacer8, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
         final Spacer spacer9 = new Spacer();
-        settingsPanel.add(spacer9, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        settingsPanel.add(spacer9, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel2.setEnabled(true);
+        settingsPanel.add(panel2, new GridConstraints(5, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, 1, 1, null, new Dimension(80, 30), null, 0, false));
+        runAllCheckBox = new JCheckBox();
+        runAllCheckBox.setAlignmentX(0.5f);
+        runAllCheckBox.setDoubleBuffered(true);
+        runAllCheckBox.setText("All");
+        panel2.add(runAllCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(40, 30), null, 0, false));
+        buttonRunAllSettings = new JButton();
+        buttonRunAllSettings.setAlignmentX(0.0f);
+        buttonRunAllSettings.setDoubleBuffered(false);
+        buttonRunAllSettings.setEnabled(false);
+        buttonRunAllSettings.setHorizontalAlignment(0);
+        buttonRunAllSettings.setHorizontalTextPosition(2);
+        buttonRunAllSettings.setIconTextGap(0);
+        buttonRunAllSettings.setText("Settings");
+        buttonRunAllSettings.setToolTipText("");
+        buttonRunAllSettings.setVerticalTextPosition(0);
+        buttonRunAllSettings.setVisible(true);
+        panel2.add(buttonRunAllSettings, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(30, 30), null, 0, false));
+        buttonSetImg = new JButton();
+        buttonSetImg.setAlignmentX(0.0f);
+        buttonSetImg.setDoubleBuffered(false);
+        buttonSetImg.setEnabled(false);
+        buttonSetImg.setHorizontalAlignment(0);
+        buttonSetImg.setHorizontalTextPosition(2);
+        buttonSetImg.setIconTextGap(0);
+        buttonSetImg.setText("Select Image");
+        buttonSetImg.setToolTipText("");
+        buttonSetImg.setVerticalTextPosition(0);
+        buttonSetImg.setVisible(true);
+        settingsPanel.add(buttonSetImg, new GridConstraints(9, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(30, 30), null, 0, false));
     }
 
     /**
@@ -593,4 +663,8 @@ public class Settings extends JFrame {
         return settingsPanel;
     }
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }
+

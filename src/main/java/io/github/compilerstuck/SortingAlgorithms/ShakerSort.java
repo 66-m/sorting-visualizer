@@ -6,19 +6,19 @@ import io.github.compilerstuck.Visual.Marker;
 
 import java.util.Random;
 
-public class CocktailSort extends SortingAlgorithm {
+public class ShakerSort extends SortingAlgorithm {
 
     long startTime;
 
-    public CocktailSort(ArrayController arrayController) {
+    public ShakerSort(ArrayController arrayController) {
         super(arrayController);
-        this.name = "Cocktail Shaker Sort";
+        this.name = "Shaker Sort";
         alternativeSize = arrayController.getLength();
     }
 
-    public CocktailSort(ArrayController arrayController, int alternativeSize) {
+    public ShakerSort(ArrayController arrayController, int alternativeSize) {
         super(arrayController);
-        this.name = "Cocktail Shaker Sort";
+        this.name = "Shaker Sort";
         this.alternativeSize = alternativeSize;
     }
 
@@ -37,7 +37,7 @@ public class CocktailSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(20) == 1) {
+                    if (delay && new Random().nextInt(100) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
@@ -60,7 +60,7 @@ public class CocktailSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(20) == 1) {
+                    if (delay && new Random().nextInt(100) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);

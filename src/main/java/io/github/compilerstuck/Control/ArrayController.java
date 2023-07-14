@@ -2,19 +2,28 @@ package io.github.compilerstuck.Control;
 
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Visual.Marker;
+import processing.core.PApplet;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.lang.Math.min;
 
 public class ArrayController {
     private int[] array;
     private Marker[] markers;
     private int length;
 
-    private double comparisons;
-    private double arrayAccesses;
-    private double swaps;
-    private double writes;
-    private double writesAux;
+    private long comparisons;
+    private long arrayAccesses;
+    private long swaps;
+    private long writes;
+    private long writesAux;
     private double sortedPercentage;
     private int segments;
+    private int maxSortingTime = 1000;
 
     private double delay;
     private double realTime;
@@ -48,7 +57,7 @@ public class ArrayController {
         }
     }
 
-    public double getComparisons() {
+    public long getComparisons() {
         return comparisons;
     }
 
@@ -56,15 +65,15 @@ public class ArrayController {
         comparisons += n;
     }
 
-    public double getArrayAccesses() {
+    public long getArrayAccesses() {
         return arrayAccesses;
     }
 
-    public double getSwaps() {
+    public long getSwaps() {
         return swaps;
     }
 
-    public double getWrites() {
+    public long getWrites() {
         return writes;
     }
 
@@ -92,7 +101,7 @@ public class ArrayController {
         return array;
     }
 
-    public double getWritesAux() {
+    public long getWritesAux() {
         return writesAux;
     }
 
@@ -214,7 +223,16 @@ public class ArrayController {
 
             MainController.setCurrentOperation("Shuffling.. " + (int) ((double) i / (length - 1) * 100) + "%");
 
-            MainController.processing.delay(2000 / length);
+
+            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            for (int j = 0; j < maxSortingTime; j++) {
+                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+            }
+
+
+            if (delayTimes.contains(i)) {
+                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+            }
         }
 
     }
@@ -228,7 +246,16 @@ public class ArrayController {
             setMarker(swapTwo, Marker.SET);
 
             MainController.setCurrentOperation("Shuffling.. " + (int) (i / (length / 2. - 1) * 100) + "%");
-            MainController.processing.delay(2000 / length);
+
+            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            for (int j = 0; j < maxSortingTime; j++) {
+                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+            }
+
+
+            if (delayTimes.contains(i)) {
+                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+            }
         }
     }
 
@@ -244,7 +271,16 @@ public class ArrayController {
             setMarker(swapTwo, Marker.SET);
 
             MainController.setCurrentOperation("Shuffling.. " + (int) ((double) (i) / (length / 10 - 1) * 100) + "%");
-            MainController.processing.delay(2000 / length);
+
+            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            for (int j = 0; j < maxSortingTime; j++) {
+                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+            }
+
+
+            if (delayTimes.contains(i)) {
+                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+            }
         }
 
     }
@@ -254,7 +290,16 @@ public class ArrayController {
             setMarker(i, Marker.SET);
 
             MainController.setCurrentOperation("Shuffling.. " + (int) ((double) (i) / (length - 1) * 100) + "%");
-            MainController.processing.delay(2000 / length);
+
+            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            for (int j = 0; j < maxSortingTime; j++) {
+                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+            }
+
+
+            if (delayTimes.contains(i)) {
+                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+            }
         }
     }
 
