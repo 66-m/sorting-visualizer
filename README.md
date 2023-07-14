@@ -110,9 +110,7 @@ You can download the latest version of my Visualizer [here](https://github.com/C
 
 
 ## Known Issues (Work in progess)
-* Randomizing >2000 elements doesn't show an animation
-* Visuals ImageHorizontal & ImageVertical not included
-* BucketSort, BogoSort, PigeonholeSort and TimSort not included
+* None
 
 ## How to Contribute
 1. Clone repo and create a new branch
