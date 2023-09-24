@@ -40,7 +40,7 @@ Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualiz
 
         java -jar sorting-visualizer-1.3.3.jar
 
-* Option 3: Clone the repository via git and build the code on your own:
+* Or clone the repository via git and build the code on your own:
 
 ## Getting Started - Building the code yourself
 ### Requirements:
