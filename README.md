@@ -25,7 +25,7 @@
     </p>
 </div>
 <br />
-This Program Visualizes and Audiolizes Sorting Algorithms. It includes 18 different Sorting Algorithms which can be visualized with 16 differnt Visuals, including two 3D models.
+This Program Visualizes and Audiolizes Sorting Algorithms. It includes 22 different Sorting Algorithms which can be visualized with 19 differnt Visuals, including two 3D models.
 It comes with a user friendly settings menu, letting the user customize what the program should do and how it should look.
 
 <div align="center">
@@ -75,7 +75,28 @@ You can download the latest version of my Visualizer [here](https://github.com/m
    - Reverse
    - Almost Sorted
    - Sorted
-* Selecting one of 16 Visualizations - two of those are 3D Models
+
+* Visualizations featured:
+   - Bars
+   - Scatter Plot
+   - Scatter Plot Linked
+   - Number Plot
+   - Disparity Graph
+   - Disparity Graph Mirrored
+   - Horizontal Pyramid
+   - Color Gradient Graph
+   - Circle
+   - Disparity Circle
+   - Disparity Circle Scatter
+   - Disparity Circle Scatter Linked
+   - Swirl Dots
+   - Phyllotaxis
+   - Image Vertical
+   - Image Horizontal
+   - Hoops
+   - Sphere (3D)
+   - Cube (3D)
+
 * Selecting different color gradients and creating your own!
 * Showing Measurements during the execution
    -  Sorted Percentage
@@ -98,15 +119,19 @@ You can download the latest version of my Visualizer [here](https://github.com/m
    - Insertion Sort
    - Heap Sort
    - Gravity Sort
-   - Radix Sort (Base 10)
+   - Radix Sort (LSD, Base 10)
    - Gnome Sort
    - Comb Sort
    - Odd Even Sort
    - Bubble Sort
-   - Cocktail Shaker Sort
+   - Cocktail Shaker Sort (Shaker Sort)
    - Cycle Sort
    - Counting Sort
    - American Flag Sort
+   - Bucket Sort
+   - Pigeonhole Sort
+   - Tim Sort
+   - Bogo Sort
 
 
 ## Known Issues (Work in progess)
