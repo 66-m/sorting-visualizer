@@ -1,11 +1,11 @@
-[![Java CI with Maven](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/CompilerStuck/sorting-visualizer/actions/workflows/maven.yml)
+[![Java CI with Maven](https://github.com/marcelmauel/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/marcelmauel/sorting-visualizer/actions/workflows/maven.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 
 <br />
 <div align="center">
-  <a href="https://github.com/CompilerStuck/sorting-visualizer">
+  <a href="https://github.com/marcelmauel/sorting-visualizer">
     <img src="images/logo.png" alt="Logo" width="200" height="200">
   </a>
 
@@ -14,14 +14,14 @@
   <p align="center">
     Visualizes and Audiolizes Sorting Algorithms!
     <br />
-    <a href="https://github.com/CompilerStuck/sorting-visualizer/releases/tag/v1.3.2"><strong>Try it »</strong></a>
+    <a href="https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.2"><strong>Try it »</strong></a>
     <br />
     <br />
     <a href="https://youtu.be/9bm-q115OFM">View Demo</a>
     ·
-    <a href="https://github.com/CompilerStuck/sorting-visualizer/issues">Report Bug</a>
+    <a href="https://github.com/marcelmauel/sorting-visualizer/issues">Report Bug</a>
     ·
-    <a href="https://github.com/CompilerStuck/sorting-visualizer/issues">Request Feature</a>
+    <a href="https://github.com/marcelmauel/sorting-visualizer/issues">Request Feature</a>
     </p>
 </div>
 <br />
@@ -34,9 +34,9 @@ It comes with a user friendly settings menu, letting the user customize what the
 </div>
 
 ## Downloading and running the Visualizer
-You can download the latest version of my Visualizer [here](https://github.com/CompilerStuck/sorting-visualizer/releases/tag/v1.3.2)
-* Option 1: Just download the [executable](https://github.com/CompilerStuck/sorting-visualizer/releases/download/v1.3.2/sorting-visualizer.exe) and run it
-* Option 2: Download the [prebuild JAR file](https://github.com/CompilerStuck/sorting-visualizer/releases/download/v1.3.2/sorting-visualizer-1.3.2.jar) and run it with
+You can download the latest version of my Visualizer [here](https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.2)
+* Option 1: Just download the [executable](https://github.com/marcelmauel/sorting-visualizer/releases/download/v1.3.2/sorting-visualizer.exe) and run it
+* Option 2: Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualizer/releases/download/v1.3.2/sorting-visualizer-1.3.2.jar) and run it with
 
         java -jar sorting-visualizer-1.3.2.jar
 
@@ -123,7 +123,7 @@ Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://ww
 Also a big thanks to [@micycle1](https://github.com/micycle1) for his amazing mirror of the processing4 core library, making it available for maven.
 
 ## License
-[MIT](https://github.com/CompilerStuck/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
+[MIT](https://github.com/marcelmauel/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
 
 <br />
 <br />
