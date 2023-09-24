@@ -8,7 +8,6 @@ import io.github.compilerstuck.Visual.*;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import io.github.compilerstuck.Visual.Gradient.MultiGradient;
 import processing.core.PApplet;
-import processing.core.PImage;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -27,7 +26,6 @@ import java.util.Objects;
 public class Settings extends JFrame {
 
     protected PApplet proc;
-    private int lastVisualIndex;
 
     JComboBox<String> gradientListComboBox;
     JSlider arraySizeSlider;
@@ -162,7 +160,7 @@ public class Settings extends JFrame {
         arraySizeSlider.setMajorTickSpacing(maxSize / 4);
         arraySizeSlider.setPaintLabels(true);
 
-        Color normalSliderColor = arraySizeSlider.getBackground();
+        //Color normalSliderColor = arraySizeSlider.getBackground();
         Color errorColor = new Color(255, 72, 72);
         Color normalTextFieldForegroundColor = arraySizeTextField.getForeground();
 
@@ -377,7 +375,9 @@ public class Settings extends JFrame {
 //                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));
+                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));//,
+                //new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
+
 
         for (Visualization visualization : visualizationList) {
             visualizationListComboBox.addItem(visualization.getName());

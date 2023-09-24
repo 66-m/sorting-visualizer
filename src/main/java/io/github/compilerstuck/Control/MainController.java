@@ -33,7 +33,7 @@ public class MainController extends PApplet {
 
     private static boolean start = false;
     private static boolean running = false;
-    private final boolean[] keys = new boolean[3];
+    //private final boolean[] keys = new boolean[3];
     private boolean results = false;
     private static boolean showComparisonTable = false;
     private static boolean printMeasurements = true;
@@ -70,15 +70,15 @@ public class MainController extends PApplet {
     @Override
     public void settings() {
         if (fullScreen) {
-            fullScreen(P2D);
+            fullScreen(P3D);
         }
         else if(portrait){
-            this.size(576 , 1024 , P2D);
+            this.size(576 , 1024 , P3D);
         }
         else {
-            this.size(1280, 720, P2D);
+            this.size(1280, 720, P3D);
         }
-        smooth(8);
+        noSmooth();
     }
 
 
@@ -271,15 +271,25 @@ public class MainController extends PApplet {
         stroke(255);
         fill(255);
 
-        textSize((int) (23. / 1280 * width));
-        text(currentOperation, (int) (5. / 1280 * width), (int) (20. / 1280 * width));
-        text((int) (arrayController.getSortedPercentage() * 100) + "% Sorted (" + arrayController.getSegments() + " Segments" + ")", (int) (5. / 1280 * width), (int) (40. / 1280 * width));
-        text(String.format("%,d", arrayController.getComparisons()) + " Comparisons", (int) (5. / 1280 * width), (int) (60. / 1280 * width));
-        text("Estimated time: ~" + String.valueOf(Math.floor(arrayController.getRealTime() / 10000.) / 100).replace(".", ",") + "ms", (int) (5. / 1280 * width), (int) (80. / 1280 * width));
-        text(String.format("%,d",  arrayController.getSwaps()) + " Swaps", (int) (5. / 1280 * width), (int) (100. / 1280 * width));
-        text(String.format("%,d", arrayController.getWrites()) + " Writes to main array", (int) (5. / 1280 * width), (int) (120. / 1280 * width));
-        text(String.format("%,d", arrayController.getWritesAux()) + " Writes to auxiliary array", (int) (5. / 1280 * width), (int) (140. / 1280 * width));
-        text(arrayController.getLength() + " Elements", (int) (5. / 1280 * width), (int) (160. / 1280 * width));
+        int textSize = (int) (23. / 1280 * width);
+        int textXPosition = (int) (5. / 1280 * width);
+        int lineHeight = (int) (20. / 1280 * width);
+        textSize(textSize);
+
+        String[] labels = {
+                currentOperation,
+                (int) (arrayController.getSortedPercentage() * 100) + "% Sorted (" + arrayController.getSegments() + " Segments)",
+                String.format("%,d", arrayController.getComparisons()) + " Comparisons",
+                "Estimated time: ~" + String.valueOf(Math.floor(arrayController.getRealTime() / 10000.) / 100).replace(".", ",") + "ms",
+                String.format("%,d",  arrayController.getSwaps()) + " Swaps",
+                String.format("%,d", arrayController.getWrites()) + " Writes to main array",
+                String.format("%,d", arrayController.getWritesAux()) + " Writes to auxiliary array",
+                arrayController.getLength() + " Elements"
+        };
+
+        for (int i = 0; i < labels.length; i++) {
+            text(labels[i], textXPosition, lineHeight * (i + 1));
+        }
     }
 
     public static void setCurrentOperation(String operation) {

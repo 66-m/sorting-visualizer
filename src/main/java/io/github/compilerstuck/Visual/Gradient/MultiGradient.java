@@ -1,7 +1,5 @@
 package io.github.compilerstuck.Visual.Gradient;
 
-import io.github.compilerstuck.Control.MainController;
-
 import java.awt.*;
 
 public class MultiGradient extends ColorGradient {

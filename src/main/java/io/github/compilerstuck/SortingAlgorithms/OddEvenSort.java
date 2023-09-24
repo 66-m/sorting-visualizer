@@ -29,7 +29,7 @@ public class OddEvenSort extends SortingAlgorithm {
 
         while (!isSorted && run) {
             isSorted = true;
-            int temp = 0;
+            //int temp = 0;
 
             // Perform Bubble sort on odd indexed element
             for (int i = 1; i <= arrayController.getLength() - 2 && run; i = i + 2) {
@@ -37,7 +37,7 @@ public class OddEvenSort extends SortingAlgorithm {
                     arrayController.swap(i, i + 1);
                     isSorted = false;
 
-                    if (delay && new Random().nextInt(45) == 1) {
+                    if (delay && new Random().nextInt(55) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);
@@ -53,7 +53,7 @@ public class OddEvenSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     isSorted = false;
-                    if (delay && new Random().nextInt(45) == 1) {
+                    if (delay && new Random().nextInt(55) == 1) {
                         arrayController.setMarker(i, Marker.SET);
                         arrayController.setMarker(i + 1, Marker.SET);
                         arrayController.addRealTime(System.nanoTime() - startTime);

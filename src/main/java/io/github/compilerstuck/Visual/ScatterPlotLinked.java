@@ -19,7 +19,7 @@ public class ScatterPlotLinked extends Visualization {
     public void update() {
         super.update();
 
-        int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
+        //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
 
         for (int i = 0; i < arrayController.getLength() - 1; i++) {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));

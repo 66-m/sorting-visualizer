@@ -60,6 +60,13 @@ public class ImageVertical extends Visualization {
                     float g = proc.green(img.pixels[loc]);
                     float b = proc.blue(img.pixels[loc]);
 
+                    // If Marker.SET is set, set the pixel to white
+                    if (arrayController.getMarker(i) == Marker.SET) {
+                        r = 255;
+                        g = 255;
+                        b = 255;
+                    }
+
                     proc.pixels[realLoc] = proc.color(r, g, b);
                 }
 

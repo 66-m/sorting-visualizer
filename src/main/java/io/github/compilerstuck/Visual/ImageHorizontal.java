@@ -55,9 +55,17 @@ public class ImageHorizontal extends Visualization {
                     int realLoc = x + (y - pos + i * imgPartWidth) * img.pixelWidth;
                     int loc = x + y * img.pixelWidth;
 
+
                     float r = proc.red(img.pixels[loc]);
                     float g = proc.green(img.pixels[loc]);
                     float b = proc.blue(img.pixels[loc]);
+
+                    // If Marker.SET is set, set the pixel to white
+                    if (arrayController.getMarker(i) == Marker.SET) {
+                        r = 255;
+                        g = 255;
+                        b = 255;
+                    }
 
                     proc.pixels[realLoc] = proc.color(r, g, b);
                 }

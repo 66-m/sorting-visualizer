@@ -43,7 +43,7 @@ public class Sphere extends Visualization {
         float n = 0;
 
         ArrayList<Color> colors = new ArrayList<>();
-        ArrayList<Float> sizes = new ArrayList<>();
+        //ArrayList<Float> sizes = new ArrayList<>();
         ArrayList<Float> xCords = new ArrayList<>();
         ArrayList<Float> yCords = new ArrayList<>();
         ArrayList<Float> zCords = new ArrayList<>();
@@ -77,11 +77,11 @@ public class Sphere extends Visualization {
 
             //rotate z and x
             float zb = (float) (Math.sin(aa) * xMapped + Math.cos(aa) * zMapped);
-            float x = (float) (screenWidth * 0.5 + (float) Math.cos(aa) * xMapped - Math.sin(aa) * zMapped);
+            float x = (float) ((float) Math.cos(aa) * xMapped - Math.sin(aa) * zMapped);
 
 
             //change perspective
-            float y = (float) (screenHeight * 0.5 - 20 + Math.cos(aa) * yMapped - Math.sin(aa) * zb);
+            float y = (float) (Math.cos(aa) * yMapped - Math.sin(aa) * zb);
             //float y = (float) (screenHeight * 0.5 - 20 + Math.cos(-10) * yMapped - Math.sin(-10) * zb);
 
             //calc sircle distance from viewpoint
@@ -89,21 +89,21 @@ public class Sphere extends Visualization {
             //float z = (float) (Math.sin(-10) * yMapped + Math.cos(-10) * zb);
 
             //calc circle sizes
-            float size = PApplet.map(z, -radius, radius, 20, 35);
+            //float size = PApplet.map(z, -radius, radius, 20, 35);
 
             //size = PApplet.map(barHeight, 0, arrayController.getLength(), 0, size);
 
 
+            //float x = xMapped;
+            //float y = yMapped;
+            //float z = zb;
+
             //sort for size
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-            proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
 
             if (zCords.isEmpty()) {
                 zCords.add(z);
                 colors.add(color);
-                sizes.add(size);
                 xCords.add(x);
                 yCords.add(y);
             } else {
@@ -111,14 +111,12 @@ public class Sphere extends Visualization {
                     if (zCords.get(j) > z) {
                         zCords.add(j, z);
                         colors.add(j, color);
-                        sizes.add(j, size);
                         xCords.add(j, x);
                         yCords.add(j, y);
                         break;
                     } else if (j == zCords.size() - 1) {
                         zCords.add(z);
                         colors.add(color);
-                        sizes.add(size);
                         xCords.add(x);
                         yCords.add(y);
                         break;
@@ -142,10 +140,20 @@ public class Sphere extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
+            //proc.stroke(color.getRGB());
+            proc.noStroke();
+            proc.fill(color.getRGB(), (float) (255.));
 
-            proc.ellipse(xCords.get(i), yCords.get(i), sizes.get(i), sizes.get(i)); //Swirl dots
+
+            //Max size: 35
+            proc.pushMatrix();
+            //set screen center
+            proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
+            //set circle position
+            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+
+            proc.ellipse(0, 0, 28, 28);
+            proc.popMatrix();
         }
     }
 

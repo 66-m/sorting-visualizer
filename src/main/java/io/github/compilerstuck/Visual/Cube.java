@@ -7,6 +7,7 @@ import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import processing.core.PApplet;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -41,6 +42,12 @@ public class Cube extends Visualization {
         int yCnt = 0;
         int zCnt = 0;
 
+        ArrayList<Color> colors = new ArrayList<>();
+        ArrayList<Float> sizes = new ArrayList<>();
+        ArrayList<Float> xCords = new ArrayList<>();
+        ArrayList<Float> yCords = new ArrayList<>();
+        ArrayList<Float> zCords = new ArrayList<>();
+
         for (int i = 0; i < arrayController.getLength(); i++) {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
@@ -61,22 +68,18 @@ public class Cube extends Visualization {
             float za = PApplet.map(zCnt, 0, xSize, -radius, radius);
 
             float zb = (float) (Math.sin(aa) * xa + Math.cos(aa) * za);
-            float x = (float) (screenWidth * 0.5 + (float) Math.cos(aa) * xa - Math.sin(aa) * za);
+            float x = (float) ((float) Math.cos(aa) * xa - Math.sin(aa) * za);
 
             float z = (float) (Math.sin(-10) * ya + Math.cos(-10) * zb);
-            float y = (float) (screenHeight * 0.5 - 20 + Math.cos(-10) * ya - Math.sin(-10) * zb);
+            float y = (float) (-20 + Math.cos(-10) * ya - Math.sin(-10) * zb);
 
+            float size = PApplet.map(barHeight, 0, 100000, 0, 40);
 
-            //16:9
-            //float size = PApplet.map(z, -radius, radius, 25, 40);
-
-            //9:16
-            float size = PApplet.map(z, -radius, radius, 15, 25);
-
-            size = PApplet.map(barHeight, 0, 100000, 0, size);
-
-
-            proc.ellipse(x, y, size, size); //Swirl dots
+            zCords.add(z);
+            colors.add(color);
+            xCords.add(x);
+            yCords.add(y);
+            sizes.add(size);
 
             zCnt++;
             if (zCnt == xSize) {
@@ -89,6 +92,26 @@ public class Cube extends Visualization {
                     zCnt = 0;
                 }
             }
+        }
+
+        for (int i = 0; i < arrayController.getLength(); i++) {
+            if (colors.size() != arrayController.getLength()) return;
+            Color color = colors.get(i);
+
+            //proc.stroke(color.getRGB());
+            proc.noStroke();
+            proc.fill(color.getRGB(), (float) (255.));
+
+
+            //Max size: 35
+            proc.pushMatrix();
+            //set screen center
+            proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
+            //set circle position
+            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+
+            proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
+            proc.popMatrix();
         }
     }
 
