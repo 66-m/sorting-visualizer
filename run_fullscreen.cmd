@@ -1,1 +1,1 @@
-java -jar .\target\sorting-visualizer-1.3.2.jar fullscreen
+java -jar .\target\sorting-visualizer-1.3.3.jar fullscreen

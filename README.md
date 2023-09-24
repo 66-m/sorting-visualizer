@@ -14,7 +14,7 @@
   <p align="center">
     Visualizes and Audiolizes Sorting Algorithms!
     <br />
-    <a href="https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.2"><strong>Try it »</strong></a>
+    <a href="https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.3"><strong>Try it »</strong></a>
     <br />
     <br />
     <a href="https://youtu.be/9bm-q115OFM">View Demo</a>
@@ -34,18 +34,18 @@ It comes with a user friendly settings menu, letting the user customize what the
 </div>
 
 ## Downloading and running the Visualizer
-You can download the latest version of my Visualizer [here](https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.2)
-* Option 1: Just download the [executable](https://github.com/marcelmauel/sorting-visualizer/releases/download/v1.3.2/sorting-visualizer.exe) and run it
-* Option 2: Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualizer/releases/download/v1.3.2/sorting-visualizer-1.3.2.jar) and run it with
+You can download the latest version of my Visualizer [here](https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.3)
 
-        java -jar sorting-visualizer-1.3.2.jar
+Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualizer/releases/download/v1.3.3/sorting-visualizer-1.3.3.jar) and run it with
+
+        java -jar sorting-visualizer-1.3.3.jar
 
 * Option 3: Clone the repository via git and build the code on your own:
 
 ## Getting Started - Building the code yourself
 ### Requirements:
 
-* An installed JDK that is at least version 14. Download the newest version [here](https://jdk.java.net/19/)
+* An installed JDK 19. Download [here](https://jdk.java.net/19/)
 * Make sure your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
 
 ### Clone this repository:
