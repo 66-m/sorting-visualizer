@@ -155,8 +155,3 @@ Also a big thanks to [@micycle1](https://github.com/micycle1) for his amazing mi
 
 <p align="center">
 	<strong>Consider giving my work a :star: to show some :heart:</strong>
-	<br/>
-	<br/>
-	<br/>
-	<a href="https://www.buymeacoffee.com/CompilerStuck" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-</p>
