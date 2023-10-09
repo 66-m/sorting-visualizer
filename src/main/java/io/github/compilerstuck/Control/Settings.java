@@ -236,22 +236,22 @@ public class Settings extends JFrame {
         muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
 
         algorithmList = new ArrayList<>(Arrays.asList(
-                new QuickSortDualPivot(MainController.getArrayController()),
                 new QuickSortMiddlePivot(MainController.getArrayController()),
-                new CombSort(MainController.getArrayController()),
-                new GravitySort(MainController.getArrayController()),
                 new MergeSort(MainController.getArrayController()),
                 new HeapSort(MainController.getArrayController()),
                 new RadixLSDSortBase10(MainController.getArrayController()),
                 new ShellSort(MainController.getArrayController()),
-                new OddEvenSort(MainController.getArrayController()),
                 new CycleSort(MainController.getArrayController()),
                 new SelectionSort(MainController.getArrayController()),
                 new GnomeSort(MainController.getArrayController()),
+                new GravitySort(MainController.getArrayController()),
                 new CountingSort(MainController.getArrayController()),
                 new DoubleSelectionSort(MainController.getArrayController()),
                 new InsertionSort(MainController.getArrayController()),
+                new OddEvenSort(MainController.getArrayController()),
+                new CombSort(MainController.getArrayController()),
                 new BubbleSort(MainController.getArrayController()),
+                new QuickSortDualPivot(MainController.getArrayController()),
                 new ShakerSort(MainController.getArrayController()),
                 new BucketSort(MainController.getArrayController()),
                 new AmericanFlagSort(MainController.getArrayController()),
@@ -376,7 +376,8 @@ public class Settings extends JFrame {
                 new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
+                new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
 
 
         for (Visualization visualization : visualizationList) {
