@@ -27,6 +27,8 @@ public class Cube extends Visualization {
     public void update() {
         super.update();
 
+        proc.lights();
+        
         radius = (int) (min(screenHeight, screenWidth) / 3.5);
 
         if (Math.pow((floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1)), 3) != arrayController.getLength()) {

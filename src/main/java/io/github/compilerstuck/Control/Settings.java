@@ -236,17 +236,17 @@ public class Settings extends JFrame {
         muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
 
         algorithmList = new ArrayList<>(Arrays.asList(
-                new OddEvenSort(MainController.getArrayController()),
-                new MergeSort(MainController.getArrayController()),
-                new GravitySort(MainController.getArrayController()),
                 new QuickSortDualPivot(MainController.getArrayController()),
+                new QuickSortMiddlePivot(MainController.getArrayController()),
+                new CombSort(MainController.getArrayController()),
+                new GravitySort(MainController.getArrayController()),
+                new MergeSort(MainController.getArrayController()),
+                new HeapSort(MainController.getArrayController()),
                 new RadixLSDSortBase10(MainController.getArrayController()),
                 new ShellSort(MainController.getArrayController()),
-                new CombSort(MainController.getArrayController()),
-                new HeapSort(MainController.getArrayController()),
+                new OddEvenSort(MainController.getArrayController()),
                 new CycleSort(MainController.getArrayController()),
                 new SelectionSort(MainController.getArrayController()),
-                new QuickSortMiddlePivot(MainController.getArrayController()),
                 new GnomeSort(MainController.getArrayController()),
                 new CountingSort(MainController.getArrayController()),
                 new DoubleSelectionSort(MainController.getArrayController()),
@@ -375,8 +375,8 @@ public class Settings extends JFrame {
 //                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));//,
-                //new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
+                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
 
 
         for (Visualization visualization : visualizationList) {

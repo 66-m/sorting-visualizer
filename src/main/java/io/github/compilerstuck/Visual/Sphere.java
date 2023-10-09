@@ -26,7 +26,9 @@ public class Sphere extends Visualization {
     @Override
     public void update() {
         super.update();
-
+        
+        proc.lights();
+        
         if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
 
 //            code to update for non perfect squares
