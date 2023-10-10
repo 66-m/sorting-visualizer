@@ -372,8 +372,8 @@ public class Settings extends JFrame {
                 new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()), //behaving weird and kinda sucks
                 new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-//                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
