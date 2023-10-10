@@ -377,7 +377,8 @@ public class Settings extends JFrame {
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
+                new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
 
 
         for (Visualization visualization : visualizationList) {
