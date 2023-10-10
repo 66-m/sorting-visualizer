@@ -21,7 +21,7 @@ public class Plane extends Visualization {
 
     public Plane(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-        name = "Plane";
+        name = "3D - Plane";
     }
 
     @Override

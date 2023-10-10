@@ -21,7 +21,7 @@ public class DisparityPlane extends Visualization {
 
     public DisparityPlane(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-        name = "Disparity Plane";
+        name = "3D - Disparity Plane";
     }
 
     @Override

@@ -17,7 +17,7 @@ public class Pyramid extends Visualization {
 
     public Pyramid(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-        name = "Pyramid";
+        name = "3D - Pyramid";
     }
 
     @Override
