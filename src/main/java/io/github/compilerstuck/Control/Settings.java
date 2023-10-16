@@ -109,7 +109,7 @@ public class Settings extends JFrame {
             gradientListComboBox.addItem(gradient.getName());
         }
 
-        gradientListComboBox.setSelectedIndex(8);
+        gradientListComboBox.setSelectedIndex(9);
         Color color1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
         colorChoose1.setBackground(color1);
         Color color2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
@@ -125,6 +125,8 @@ public class Settings extends JFrame {
             Color newColor2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
             colorChoose2.setBackground(newColor2);
         });
+
+        gradientListComboBox.actionPerformed(null);
 
         MouseListener ml = new MouseAdapter() {
             @Override
@@ -368,6 +370,7 @@ public class Settings extends JFrame {
                 new DisparityCircle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new DisparityCircleScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new DisparityCircleScatterLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new DisparityChords(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new SwirlDots(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()), //behaving weird and kinda sucks
                 new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
@@ -375,6 +378,8 @@ public class Settings extends JFrame {
                 new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new SphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new DisparitySphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
@@ -388,10 +393,17 @@ public class Settings extends JFrame {
 
         visualizationListComboBox.addActionListener(e -> {
             int index = visualizationListComboBox.getSelectedIndex();
+
+            Visualization visualization = visualizationList.get(index);
             MainController.setVisualization(visualizationList.get(index));
 
-            buttonSetImg.setVisible(index == 14 || index == 15);
-            buttonSetImg.setEnabled(index == 14 || index == 15);
+            if(visualization instanceof ImageHorizontal || visualization instanceof ImageVertical) {
+                buttonSetImg.setVisible(true);
+                buttonSetImg.setEnabled(true);
+            } else {
+                buttonSetImg.setVisible(false);
+                buttonSetImg.setEnabled(false);
+            }
         });
 
 
@@ -407,9 +419,9 @@ public class Settings extends JFrame {
                 File selectedFile = fileChooser.getSelectedFile();
                 String imagePath = selectedFile.getAbsolutePath();
 
-                int index = visualizationListComboBox.getSelectedIndex();
-                Visualization visualizationVertical = visualizationList.get(14);
-                Visualization visualizationHorizontal = visualizationList.get(15);
+                int index = visualizationListComboBox.getSelectedIndex(); 
+                ImageVertical visualizationVertical = (ImageVertical) visualizationList.get(15);
+                ImageHorizontal visualizationHorizontal = (ImageHorizontal) visualizationList.get(16);
                 ImageHorizontal imageHorizontal = (ImageHorizontal) visualizationHorizontal;
                 imageHorizontal.setImg(imagePath);
                 ImageVertical imageVertical = (ImageVertical) visualizationVertical;

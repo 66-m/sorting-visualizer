@@ -223,14 +223,14 @@ public class ArrayController {
             MainController.setCurrentOperation("Shuffling.. " + (int) ((double) i / (length - 1) * 100) + "%");
 
 
-            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            ArrayList<Integer> delayTimes = new ArrayList<>();
             for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
             }
 
-
             if (delayTimes.contains(i)) {
-                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
+                MainController.processing.delay(delayTime);
             }
         }
 
@@ -244,16 +244,16 @@ public class ArrayController {
             setMarker(i, Marker.SET);
             setMarker(swapTwo, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) (i / (length / 2. - 1) * 100) + "%");
+            MainController.setCurrentOperation("Shuffling (reverse).. " + (int) (i / (length / 2. - 1) * 100) + "%");
 
-            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            ArrayList<Integer> delayTimes = new ArrayList<>();
             for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
             }
 
-
             if (delayTimes.contains(i)) {
-                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
+                MainController.processing.delay(delayTime);
             }
         }
     }
@@ -269,16 +269,16 @@ public class ArrayController {
             setMarker(swapOne, Marker.SET);
             setMarker(swapTwo, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) (i) / (length / 10 - 1) * 100) + "%");
+            MainController.setCurrentOperation("Shuffling (almost).. " + (int) ((double) (i) / (length / 10 - 1) * 100) + "%");
 
-            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            ArrayList<Integer> delayTimes = new ArrayList<>();
             for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
             }
 
-
             if (delayTimes.contains(i)) {
-                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
+                MainController.processing.delay(delayTime);
             }
         }
 
@@ -288,16 +288,16 @@ public class ArrayController {
         for (int i = 0; i < length && SortingAlgorithm.isRun(); i++) {
             setMarker(i, Marker.SET);
 
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) (i) / (length - 1) * 100) + "%");
+            MainController.setCurrentOperation("Shuffling (sorted).. " + (int) ((double) (i) / (length - 1) * 100) + "%");
 
-            ArrayList<Integer> delayTimes = (ArrayList<Integer>) Arrays.stream(new int[maxSortingTime]).boxed().collect(Collectors.toList());
+            ArrayList<Integer> delayTimes = new ArrayList<>();
             for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.set(j, (int) PApplet.map(j, 0, maxSortingTime-1, 0, length-1));
+                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
             }
 
-
             if (delayTimes.contains(i)) {
-                MainController.processing.delay(maxSortingTime / min(maxSortingTime, length));
+                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
+                MainController.processing.delay(delayTime);
             }
         }
     }

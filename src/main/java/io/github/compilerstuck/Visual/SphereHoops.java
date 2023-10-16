@@ -10,14 +10,14 @@ import java.lang.Math;
 
 import java.awt.*;
 
-public class Pyramid extends Visualization {
+public class SphereHoops extends Visualization {
 
     float angle = 0;
 
 
-    public Pyramid(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
+    public SphereHoops(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-        name = "3D - Pyramid";
+        name = "3D - Sphere Hoops";
     }
 
     @Override
@@ -25,7 +25,7 @@ public class Pyramid extends Visualization {
         super.update();
 
         //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
-        int radius = (int) (Math.min(screenHeight, screenWidth) / 1.7);
+        int radius = (int) (Math.min(screenHeight, screenWidth) / 1.5);
 
         angle -= PApplet.PI / (15 * proc.frameRate);
         proc.lights();
@@ -34,8 +34,9 @@ public class Pyramid extends Visualization {
         for (int i = 0; i < arrayController.getLength(); i++) {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-
-            int barHeight = (arrayController.get(i) + 1) * (radius - 5) / arrayController.getLength();
+            float wi = (float) Math.sqrt(1-Math.pow((((float) i / arrayController.getLength()) * 2-1), 2));
+            
+            int sphere_wi = (int) PApplet.map(wi, 0, 1, 0, radius);
 
             if (arrayController.getMarker(i) == Marker.SET) {
                 sound.playSound(i);
@@ -44,21 +45,22 @@ public class Pyramid extends Visualization {
             arrayController.setMarker(i, Marker.NORMAL);
 
             proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
+            //proc.fill(color.getRGB());
+            proc.noFill();
 
 
             //proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight, rectWidth, -1 * barHeight); //Classic bar
 
             proc.pushMatrix();
 
-            proc.translate((float) screenWidth / 2, (float) (screenHeight / 2.5), -(int) (Math.min(screenHeight, screenWidth) / 10));
+            proc.translate((float) screenWidth / 2, (float) (screenHeight / 2), -(int) (Math.min(screenHeight, screenWidth) / 10));
 
             proc.rotateX(PConstants.PI/3);
-            proc.rotateZ(angle);
+            //proc.rotateX(angle);
 
             proc.translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
 
-            proc.rect(-barHeight/2, -barHeight/2, barHeight, barHeight);
+            proc.circle(0, 0, sphere_wi);
 
             proc.popMatrix();
 

@@ -31,7 +31,7 @@ public class DisparityPlane extends Visualization {
         //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
         int radius = (int) (Math.min(screenHeight, screenWidth) / 1.2);
 
-        angle += PApplet.PI / (7.5 * proc.frameRate);
+        angle += PApplet.PI / (15 * proc.frameRate);
         proc.lights();
 
         if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
