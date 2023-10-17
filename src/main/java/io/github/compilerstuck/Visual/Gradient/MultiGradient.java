@@ -14,7 +14,7 @@ public class MultiGradient extends ColorGradient {
         Color[] colorGradient = new Color[size];
 
         for (int i = 0; i < size; i++) {
-            colorGradient[i] = Color.getHSBColor(((float)i/(size-1)), 0.7f, 0.8f);
+            colorGradient[i] = Color.getHSBColor(((float)i/(size-1)), 0.9f, 0.9f);
         }
         return colorGradient;
     }
