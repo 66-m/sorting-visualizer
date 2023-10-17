@@ -71,7 +71,7 @@ public class Settings extends JFrame {
     public void initialize() {
 
         proc = MainController.processing;
-        int maxSize = 10000;
+        int maxSize = 20000;
 
         //Frame Settings
         setContentPane(settingsPanel);
