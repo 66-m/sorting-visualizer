@@ -6,8 +6,6 @@ import io.github.compilerstuck.Visual.Marker;
 
 public class QuickSortMiddlePivot extends SortingAlgorithm {
 
-    long startTime;
-
     public QuickSortMiddlePivot(ArrayController arrayController) {
         super(arrayController);
         this.name = "Quick Sort (Pivot Middle)";
@@ -57,11 +55,7 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
                 j--;
             }
 
-            if (delay) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            delay();
 
         }
 
@@ -72,59 +66,4 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
         if (end > i && run)
             sort(arrayController, i, end);
     }
-
-// CODE FOR RIGHTMOST ELEMENT AS PIVOT. Has Bug (?)
-//    private void sort(ArrayController arrayController, int start, int end){
-//        arrayController.addRealTime(System.nanoTime() - startTime);
-//        startTime = System.nanoTime();
-//
-//        int partition = partition(arrayController, start, end);
-//
-//        if (partition - 1 > start){
-//            sort(arrayController, start, partition - 1);
-//        }
-//        arrayController.addComparisons(1);
-//
-//
-//        if (partition + 1 < end){
-//            sort(arrayController, partition + 1, end);
-//        }
-//        arrayController.addComparisons(1);
-//
-//        arrayController.addRealTime(System.nanoTime() - startTime);
-//        startTime = System.nanoTime();
-//
-//    }
-//
-//    private int partition(ArrayController arrayController, int start, int end){
-//
-//        int pivot = arrayController.get(start+ (int) proc.random((end-start)));
-//
-//        for (int i = start; i < end; i++) {
-//
-//            if (arrayController.get(i) < pivot){
-//
-//                arrayController.swap(i,start);
-//                arrayController.setMarker(i, Marker.SET);
-//                arrayController.setMarker(start, Marker.SET);
-//
-//                start++;
-//            }
-//
-//            arrayController.addRealTime(System.nanoTime() - startTime);
-//            arrayController.addComparisons(1);
-//            if (i%2==0){proc.delay(1);}
-//            startTime = System.nanoTime();
-//        }
-//
-//        arrayController.swap(start, end);
-//
-//        arrayController.setMarker(start, Marker.SET);
-//        arrayController.setMarker(end, Marker.SET);
-//
-//        return start;
-//
-//    }
-
-
 }

@@ -10,12 +10,13 @@ public class SelectionSort extends SortingAlgorithm {
         super(arrayController);
         this.name = "Selection Sort";
         alternativeSize = arrayController.getLength();
+        delayTime = 10;
     }
 
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
         int n = arrayController.getLength();
 
@@ -28,16 +29,12 @@ public class SelectionSort extends SortingAlgorithm {
                 }
                 arrayController.addComparisons(1);
             }
-            if (delay) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(10);
-                startTime = System.nanoTime();
-            }
-
 
             arrayController.swap(min_index, i);
-            arrayController.setMarker(min_index, Marker.SET);
-            arrayController.setMarker(i, Marker.SET);
+
+            delay(new int[]{i, min_index});
+
+
         }
 
 

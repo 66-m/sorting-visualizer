@@ -6,8 +6,6 @@ import io.github.compilerstuck.Visual.Marker;
 
 public class MergeSort extends SortingAlgorithm {
 
-    long startTime;
-
     public MergeSort(ArrayController arrayController) {
         super(arrayController);
         this.name = "Merge Sort";
@@ -67,13 +65,9 @@ public class MergeSort extends SortingAlgorithm {
             }
             k++;
 
-            arrayController.setMarker(k, Marker.SET);
             arrayController.addComparisons(1);
-            if (delay) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            
+            delay(new int[]{k});
         }
 
         k = copyRemainingElements(arrayController, n1, L, i, k);
@@ -85,14 +79,9 @@ public class MergeSort extends SortingAlgorithm {
         while (i < n1 && run) {
             arrayController.set(k, l[i]);
 
-            arrayController.setMarker(k, Marker.SET);
             arrayController.addWritesAux(1);
-            if (delay) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
 
+            delay(new int[]{k});
 
             i++;
             k++;

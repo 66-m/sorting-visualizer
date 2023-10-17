@@ -12,18 +12,20 @@ public class GnomeSort extends SortingAlgorithm {
         super(arrayController);
         this.name = "Gnome Sort";
         alternativeSize = arrayController.getLength();
+        delayFactor = 1. / 50;
     }
 
     public GnomeSort(ArrayController arrayController, int alternativeArrSize) {
         super(arrayController);
         this.name = "Gnome Sort";
         this.alternativeSize = alternativeArrSize;
+        delayFactor = 1. / 50;
     }
 
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
         int index = 0;
         while (index < arrayController.getLength() && run) {
@@ -36,12 +38,8 @@ public class GnomeSort extends SortingAlgorithm {
             else {
                 arrayController.swap(index, index - 1);
                 index--;
-                if (delay && new Random().nextInt(50) == 1) {
-                    arrayController.setMarker(index, Marker.SET);
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
-                }
+
+                delay(new int[]{index});
             }
             arrayController.addComparisons(1);
 

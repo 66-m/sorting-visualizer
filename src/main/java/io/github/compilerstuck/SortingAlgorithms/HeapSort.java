@@ -6,8 +6,6 @@ import io.github.compilerstuck.Visual.Marker;
 
 public class HeapSort extends SortingAlgorithm {
 
-    long startTime;
-
     public HeapSort(ArrayController arrayController) {
         super(arrayController);
         this.name = "Heap Sort";
@@ -28,13 +26,7 @@ public class HeapSort extends SortingAlgorithm {
             arrayController.set(0, arrayController.get(i));
             arrayController.set(i, temp);
 
-            if (delay) {
-                arrayController.setMarker(i, Marker.SET);
-                arrayController.setMarker(0, Marker.SET);
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            delay(new int[]{i, 0});
 
             heapify(arrayController, i, 0);
         }
@@ -58,13 +50,7 @@ public class HeapSort extends SortingAlgorithm {
         if (largest != i && run) {
             arrayController.swap(i, largest);
 
-            if (delay) {
-                arrayController.setMarker(i, Marker.SET);
-                arrayController.setMarker(largest, Marker.SET);
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            delay(new int[]{i, largest});
 
             heapify(arrayController, n, largest);
         }

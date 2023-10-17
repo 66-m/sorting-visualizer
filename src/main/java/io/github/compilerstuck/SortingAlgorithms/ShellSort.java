@@ -15,7 +15,7 @@ public class ShellSort extends SortingAlgorithm {
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
         int n = arrayController.getLength();
 
@@ -32,12 +32,8 @@ public class ShellSort extends SortingAlgorithm {
                 }
                 arrayController.addComparisons(1);
                 arrayController.set(j, temp);
-                arrayController.setMarker(i, Marker.SET);
-                if (delay) {
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
-                }
+
+                delay(new int[]{i});
             }
 
             arrayController.setMarker(gap, Marker.SET);

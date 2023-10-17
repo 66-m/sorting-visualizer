@@ -6,18 +6,18 @@ import io.github.compilerstuck.Visual.Marker;
 
 public class QuickSortDualPivot extends SortingAlgorithm {
 
-    long startTime;
-
     public QuickSortDualPivot(ArrayController arrayController) {
         super(arrayController);
         this.name = "Quick Sort (Dual Pivot)";
         alternativeSize = arrayController.getLength();
+        delayTime = 3;
     }
 
     public QuickSortDualPivot(ArrayController arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Quick Sort (Dual Pivot)";
         this.alternativeSize = alternativeSize;
+        delayTime = 3;
     }
 
     public void sort() {
@@ -34,13 +34,8 @@ public class QuickSortDualPivot extends SortingAlgorithm {
             // Choose outermost elements as pivots
             if (arrayController.get(left) > arrayController.get(right)) {
                 arrayController.swap(left, right);
-                if (delay) {
-                    arrayController.setMarker(left, Marker.SET);
-                    arrayController.setMarker(right, Marker.SET);
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(3);
-                    startTime = System.nanoTime();
-                }
+
+                delay(new int[]{left, right});
             }
             arrayController.addComparisons(1);
             int p = arrayController.get(left), q = arrayController.get(right);
@@ -50,13 +45,9 @@ public class QuickSortDualPivot extends SortingAlgorithm {
             while (k <= g && run) {
                 if (arrayController.get(k) < p) {
                     arrayController.swap(k, l);
-                    if (delay) {
-                        arrayController.setMarker(l, Marker.SET);
-                        arrayController.setMarker(k, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(3);
-                        startTime = System.nanoTime();
-                    }
+                    
+                    delay(new int[]{k, l});
+
                     ++l;
                 } else if (arrayController.get(k) >= q) {
                     while (arrayController.get(g) > q && k < g && run) {
@@ -65,23 +56,15 @@ public class QuickSortDualPivot extends SortingAlgorithm {
                     }
                     arrayController.addComparisons(1);
                     arrayController.swap(k, g);
-                    if (delay) {
-                        arrayController.setMarker(g, Marker.SET);
-                        arrayController.setMarker(k, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(3);
-                        startTime = System.nanoTime();
-                    }
+
+                    delay(new int[]{k, g});
+
                     --g;
                     if (arrayController.get(k) < p) {
                         arrayController.swap(k, l);
-                        if (delay) {
-                            arrayController.setMarker(k, Marker.SET);
-                            arrayController.setMarker(l, Marker.SET);
-                            arrayController.addRealTime(System.nanoTime() - startTime);
-                            proc.delay(3);
-                            startTime = System.nanoTime();
-                        }
+                        
+                        delay(new int[]{k, l});
+
                         ++l;
                     }
                     arrayController.addComparisons(1);
@@ -95,15 +78,9 @@ public class QuickSortDualPivot extends SortingAlgorithm {
             // Swap pivots to final place
             arrayController.swap(left, l);
             arrayController.swap(right, g);
-            if (delay) {
-                arrayController.setMarker(left, Marker.SET);
-                arrayController.setMarker(left, Marker.SET);
-                arrayController.setMarker(l, Marker.SET);
-                arrayController.setMarker(g, Marker.SET);
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(3);
-                startTime = System.nanoTime();
-            }
+            
+            delay(new int[]{left, right, l, g});
+
 
             // Recursively sort partitions
             sort(arrayController, left, l - 1);

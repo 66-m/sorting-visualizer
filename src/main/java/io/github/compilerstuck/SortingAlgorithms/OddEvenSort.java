@@ -12,18 +12,20 @@ public class OddEvenSort extends SortingAlgorithm {
         super(arrayController);
         this.name = "Odd Even Sort";
         alternativeSize = arrayController.getLength();
+        delayFactor = 1. / 55;
     }
 
     public OddEvenSort(ArrayController arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Odd Even Sort";
         this.alternativeSize = alternativeSize;
+        delayFactor = 1. / 55;
     }
 
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
         boolean isSorted = false; // Initially array is unsorted
 
@@ -37,13 +39,7 @@ public class OddEvenSort extends SortingAlgorithm {
                     arrayController.swap(i, i + 1);
                     isSorted = false;
 
-                    if (delay && new Random().nextInt(55) == 1) {
-                        arrayController.setMarker(i, Marker.SET);
-                        arrayController.setMarker(i + 1, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(1);
-                        startTime = System.nanoTime();
-                    }
+                    delay(new int[]{i, i + 1});
                 }
                 arrayController.addComparisons(1);
             }
@@ -53,13 +49,8 @@ public class OddEvenSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     isSorted = false;
-                    if (delay && new Random().nextInt(55) == 1) {
-                        arrayController.setMarker(i, Marker.SET);
-                        arrayController.setMarker(i + 1, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(1);
-                        startTime = System.nanoTime();
-                    }
+                    
+                    delay(new int[]{i, i + 1});
                 }
 
                 arrayController.addComparisons(1);

@@ -7,7 +7,6 @@ import io.github.compilerstuck.Visual.Marker;
 import java.util.Random;
 
 public class TimSort extends SortingAlgorithm {
-    long startTime;
 
     public TimSort(ArrayController arrayController) {
         super(arrayController);
@@ -30,22 +29,19 @@ public class TimSort extends SortingAlgorithm {
             while (j >= left && arrayController.get(j) > temp && run) {
                 arrayController.addComparisons(1);
                 arrayController.set(j + 1, arrayController.get(j));
-                arrayController.setMarker(j + 1, Marker.SET);
-                if (delay && new Random().nextInt(3) == 1) {
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
+
+                if (new Random().nextInt(3) == 1) {
+                    delay(new int[]{j + 1});
                 }
+
                 j--;
             }
             arrayController.addComparisons(1);
             arrayController.set(j + 1, temp);
-            arrayController.setMarker(j + 1, Marker.SET);
-            if (delay && new Random().nextInt(3) == 1) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            
+                if (new Random().nextInt(3) == 1) {
+                    delay(new int[]{j + 1});
+                }
         }
     }
 
@@ -69,21 +65,15 @@ public class TimSort extends SortingAlgorithm {
         while (i < len1 && j < len2 && run) {
             if (left[i] <= right[j]) {
                 arrayController.set(k, left[i]);
-                arrayController.setMarker(k, Marker.SET);
-                if (delay) {
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
-                }
+                
+                delay(new int[]{k});
+
                 i++;
             } else {
                 arrayController.set(k, right[j]);
-                arrayController.setMarker(k, Marker.SET);
-                if (delay) {
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
-                }
+                
+                delay(new int[]{k});
+
                 j++;
             }
             arrayController.addComparisons(1);
@@ -92,23 +82,17 @@ public class TimSort extends SortingAlgorithm {
 
         while (i < len1 && run) {
             arrayController.set(k, left[i]);
-            arrayController.setMarker(k, Marker.SET);
-            if (delay) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            
+            delay(new int[]{k});
+
             k++;
             i++;
         }
         while (j < len2 && run) {
             arrayController.set(k, right[j]);
-            arrayController.setMarker(k, Marker.SET);
-            if (delay) {
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+            
+            delay(new int[]{k});
+
             k++;
             j++;
         }

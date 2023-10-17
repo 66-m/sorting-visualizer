@@ -23,7 +23,7 @@ public class PigeonholeSort extends SortingAlgorithm {
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
         int min = arrayController.get(0);
         int max = arrayController.get(0);
@@ -35,12 +35,8 @@ public class PigeonholeSort extends SortingAlgorithm {
             if (arrayController.get(a) < min)
                 min = arrayController.get(a);
             arrayController.addComparisons(2);
-            if (delay) {
-                arrayController.setMarker(a, Marker.SET);
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(1);
-                startTime = System.nanoTime();
-            }
+
+            delay(new int[]{a});
         }
 
         range = max - min + 1;
@@ -58,12 +54,8 @@ public class PigeonholeSort extends SortingAlgorithm {
         for (i = 0; i < range && run; i++) {
             while (phole[i] --> 0) {
                 arrayController.set(index++, i + min);
-                if (delay) {
-                    arrayController.setMarker(index - 1, Marker.SET);
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
-                }
+                
+                delay(new int[]{index - 1});
             }
         }
 

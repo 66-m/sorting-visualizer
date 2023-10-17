@@ -10,17 +10,19 @@ public class InsertionSort extends SortingAlgorithm {
         super(arrayController);
         this.name = "Insertion Sort";
         alternativeSize = arrayController.getLength();
+        delayTime = 10;
     }
 
     public InsertionSort(ArrayController arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Insertion Sort";
         this.alternativeSize = alternativeSize;
+        delayTime = 10;
     }
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
         int n = arrayController.getLength();
 
@@ -39,16 +41,10 @@ public class InsertionSort extends SortingAlgorithm {
                 j = j - 1;
             }
 
-            arrayController.addRealTime(System.nanoTime() - startTime);
-            proc.delay(10);
-            startTime = System.nanoTime();
-
-
+            
             arrayController.set(j + 1, x);
 
-
-            arrayController.setMarker(j + 1, Marker.SET);
-
+            delay(new int[]{j + 1});
         }
     }
 

@@ -8,12 +8,12 @@ import java.util.Random;
 
 public class BubbleSort extends SortingAlgorithm {
 
-    long startTime;
-
     public BubbleSort(ArrayController arrayController) {
         super(arrayController);
         this.name = "Bubble Sort";
         alternativeSize = arrayController.getLength();
+        this.delayFactor = 1. / 120;
+        delayTime = 1;
     }
 
 
@@ -21,6 +21,9 @@ public class BubbleSort extends SortingAlgorithm {
         super(arrayController);
         this.name = "Bubble Sort";
         this.alternativeSize = alternativeSize;
+        this.delayFactor = 1. / 120;
+        delayTime = 1;
+
     }
 
     public void sort() {
@@ -35,13 +38,8 @@ public class BubbleSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(120) == 1) {
-                        arrayController.setMarker(i, Marker.SET);
-                        arrayController.setMarker(i + 1, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(1);
-                        startTime = System.nanoTime();
-                    }
+                    
+                    delay(new int[]{i, i + 1});
                 }
                 arrayController.addComparisons(1);
 

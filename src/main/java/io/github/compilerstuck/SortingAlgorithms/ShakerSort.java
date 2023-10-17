@@ -8,18 +8,18 @@ import java.util.Random;
 
 public class ShakerSort extends SortingAlgorithm {
 
-    long startTime;
-
     public ShakerSort(ArrayController arrayController) {
         super(arrayController);
         this.name = "Shaker Sort";
         alternativeSize = arrayController.getLength();
+        delayFactor = 1. / 100;
     }
 
     public ShakerSort(ArrayController arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Shaker Sort";
         this.alternativeSize = alternativeSize;
+        delayFactor = 1. / 100;
     }
 
     public void sort() {
@@ -37,13 +37,8 @@ public class ShakerSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(100) == 1) {
-                        arrayController.setMarker(i, Marker.SET);
-                        arrayController.setMarker(i + 1, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        proc.delay(1);
-                        startTime = System.nanoTime();
-                    }
+                    
+                    delay(new int[]{i, i + 1});
                 }
                 arrayController.addComparisons(1);
 
@@ -60,12 +55,8 @@ public class ShakerSort extends SortingAlgorithm {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
-                    if (delay && new Random().nextInt(100) == 1) {
-                        arrayController.setMarker(i, Marker.SET);
-                        arrayController.setMarker(i + 1, Marker.SET);
-                        arrayController.addRealTime(System.nanoTime() - startTime);
-                        startTime = System.nanoTime();
-                    }
+                    
+                    delay(new int[]{i, i + 1});
                 }
                 arrayController.addComparisons(1);
 

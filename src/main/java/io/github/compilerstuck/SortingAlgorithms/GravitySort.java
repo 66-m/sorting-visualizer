@@ -6,12 +6,11 @@ import io.github.compilerstuck.Visual.Marker;
 
 public class GravitySort extends SortingAlgorithm {
 
-    long startTime;
-
     public GravitySort(ArrayController arrayController) {
         super(arrayController);
         this.name = "Gravity (Bead) Sort";
         alternativeSize = arrayController.getLength();
+        delayTime = 3;
     }
 
     public void sort() {
@@ -56,12 +55,8 @@ public class GravitySort extends SortingAlgorithm {
                     count += abacus[x][y];
                 arrayController.set(x, count);
             }
-            if (delay) {
-                arrayController.setMarker(arrayController.getLength() - i - 1, Marker.SET);
-                arrayController.addRealTime(System.nanoTime() - startTime);
-                proc.delay(3);
-                startTime = System.nanoTime();
-            }
+
+            delay(new int[]{arrayController.getLength() - i - 1});
         }
 
     }

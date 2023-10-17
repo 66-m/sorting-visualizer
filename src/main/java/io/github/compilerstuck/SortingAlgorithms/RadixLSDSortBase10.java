@@ -9,7 +9,6 @@ import java.util.List;
 
 public class RadixLSDSortBase10 extends SortingAlgorithm {
 
-    float startTime;
     int RADIX = 10;
 
     public RadixLSDSortBase10(ArrayController arrayController) {
@@ -27,7 +26,7 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
     public void sort() {
         MainController.setCurrentOperation(name);
-        long startTime = System.nanoTime();
+        startTime = System.nanoTime();
 
 
         List<Integer>[] bucket = new ArrayList[RADIX];
@@ -62,11 +61,7 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
                         arrayController.set(buckA[j]++, bucket[j].get(i));
                     }
 
-                    arrayController.setMarker(buckA[j] - 1, Marker.SET);
-
-                    arrayController.addRealTime(System.nanoTime() - startTime);
-                    proc.delay(1);
-                    startTime = System.nanoTime();
+                    delay(new int[]{buckA[j] - 1});
                 }
             }
 
