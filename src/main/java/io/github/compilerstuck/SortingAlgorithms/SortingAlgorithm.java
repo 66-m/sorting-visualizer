@@ -64,7 +64,7 @@ public abstract class SortingAlgorithm {
 
     public void delay(int[] markers) {
         // Delay if: delay is enabled, the array is small enough or a random number is smaller than the probability of delaying, and the delay factor is 1 or a random number is smaller than the delay factor
-        if (delay && (arrayController.getLength() <= elementsDelayThreshold || Math.random() < Math.pow(elementsDelayThreshold / arrayController.getLength(), 2)) && (delayFactor == 1 || Math.random() < delayFactor)) {
+        if (delay && (arrayController.getLength() <= elementsDelayThreshold || Math.random() < elementsDelayThreshold / arrayController.getLength()) && (delayFactor == 1 || Math.random() < delayFactor)) {
             arrayController.addRealTime(System.nanoTime() - startTime);
 
             for (int i : markers) {
