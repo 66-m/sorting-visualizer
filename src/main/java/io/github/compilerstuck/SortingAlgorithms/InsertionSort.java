@@ -2,7 +2,6 @@ package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.ArrayController;
 import io.github.compilerstuck.Control.MainController;
-import io.github.compilerstuck.Visual.Marker;
 
 public class InsertionSort extends SortingAlgorithm {
 
