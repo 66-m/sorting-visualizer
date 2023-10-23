@@ -63,7 +63,7 @@ public class Cube extends Visualization {
 
             arrayController.setMarker(arrayController.get(i), Marker.NORMAL);
 
-            int barHeight = ((100000 / arrayController.getLength() * (arrayController.getLength() - 2 * Math.min(Math.min(Math.abs(i - arrayController.get(i)), Math.abs(i - arrayController.getLength() - arrayController.get(i))), Math.abs(i + arrayController.getLength() - arrayController.get(i))))));
+            float barHeight = ((arrayController.getLength() / arrayController.getLength() * (arrayController.getLength() - 2f * Math.min(Math.min(Math.abs(i - arrayController.get(i)), Math.abs(i - arrayController.getLength() - arrayController.get(i))), Math.abs(i + arrayController.getLength() - arrayController.get(i))))));
 
             float xa = PApplet.map(xCnt, 0, xSize, -radius, radius);
             float ya = PApplet.map(yCnt, 0, xSize, -radius, radius);
@@ -75,7 +75,7 @@ public class Cube extends Visualization {
             float z = (float) (Math.sin(-10) * ya + Math.cos(-10) * zb);
             float y = (float) (-20 + Math.cos(-10) * ya - Math.sin(-10) * zb);
 
-            float size = PApplet.map(barHeight, 0, 100000, 0, 40);
+            float size = PApplet.map(barHeight, 0, arrayController.getLength(), 0, radius*2/xSize);
 
             zCords.add(z);
             colors.add(color);
@@ -100,19 +100,22 @@ public class Cube extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            //proc.stroke(color.getRGB());
-            proc.noStroke();
-            proc.fill(color.getRGB(), (float) (255.));
+            proc.stroke(color.getRGB(), 255f);
+            //proc.noStroke();
+            proc.fill(color.getRGB(), 120f);
 
 
-            //Max size: 35
             proc.pushMatrix();
             //set screen center
             proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
             //set circle position
             proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
 
-            proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
+            //proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
+            proc.rotateX(45);
+            proc.rotateY(0);
+            proc.rotateZ(-aa);
+            proc.box(sizes.get(i), sizes.get(i), sizes.get(i));
             proc.popMatrix();
         }
     }

@@ -259,8 +259,7 @@ public class Settings extends JFrame {
                 new AmericanFlagSort(MainController.getArrayController()),
                 new PigeonholeSort(MainController.getArrayController()),
                 new TimSort(MainController.getArrayController()),
-                new BogoSort(MainController.getArrayController())
-        ));
+                new BogoSort(MainController.getArrayController())));
 
         for (SortingAlgorithm algorithm : algorithmList) {
             algorithmListComboBox.addItem(algorithm.getName());
