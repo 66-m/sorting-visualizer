@@ -60,7 +60,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>com.github.CompilerStuck</groupId> <!--  micycle1 fork -->
+            <groupId>com.github.marcelmauel</groupId> <!--  micycle1 fork -->
             <artifactId>processing-core-4</artifactId>
             <version>41a134a448</version>
         </dependency>
