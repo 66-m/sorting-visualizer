@@ -5,47 +5,42 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/marcelmauel/sorting-visualizer">
-    <img src="images/logo.png" alt="Logo" width="200" height="200">
-  </a>
+  <img src="images/logo.png" alt="Logo" width="200" height="200">
 
-  <h1 align="center">Sorting Algorithm Visualizer</h3>
+  <h1 align="center">Sorting Algorithm Visualizer</h1>
 
   <p align="center">
     Visualizes and Audiolizes Sorting Algorithms!
     <br />
-    <a href="https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.3"><strong>Try it »</strong></a>
+    <br />
+    <a href="https://github.com/marcelmauel/sorting-visualizer/releases/latest"><strong>Try it »</strong></a>
     <br />
     <br />
     <a href="https://youtu.be/9bm-q115OFM">View Demo</a>
     ·
-    <a href="https://github.com/marcelmauel/sorting-visualizer/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/marcelmauel/sorting-visualizer/issues">Request Feature</a>
+    <a href="https://github.com/marcelmauel/sorting-visualizer/issues">Report Bug / Request Feature</a>
     </p>
 </div>
 <br />
-This Program Visualizes and Audiolizes Sorting Algorithms. It includes 22 different Sorting Algorithms which can be visualized with 19 differnt Visuals, including two 3D models.
-It comes with a user friendly settings menu, letting the user customize what the program should do and how it should look.
+This sorting visualizer offers both visual and auditory demonstrations of sorting algorithms. It features 22 different sorting methods represented through a collection of 27 visuals, including a selection of 3D models. A settings menu is included to enable users to adjust the appearance and functionality of the visualizer.
 
 <div align="center">
         <img src="images/demo.png" alt="Program demo">
   <p align="center">
 </div>
 
-## Downloading and running the Visualizer
-You can download the latest version of my Visualizer [here](https://github.com/marcelmauel/sorting-visualizer/releases/tag/v1.3.3)
+## Downloading and running the visualizer
+You can download the latest version of this visualizer [here](https://github.com/marcelmauel/sorting-visualizer/releases/latest)
 
-Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualizer/releases/download/v1.3.3/sorting-visualizer-1.3.3.jar) and run it with
+Download the [prebuilt JAR file](https://github.com/marcelmauel/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with
 
-        java -jar sorting-visualizer-1.3.3.jar
+        java -jar sorting-visualizer.jar
 
-* Or clone the repository via git and build the code on your own:
 
-## Getting Started - Building the code yourself
+## Building the project yourself
 ### Requirements:
 
-* An installed JDK 19. Download [here](https://jdk.java.net/19/)
+* An installed JDK. Download [here](https://jdk.java.net/21/)
 * Make sure your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
 
 ### Clone this repository:
@@ -58,84 +53,104 @@ Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualiz
 
 1. Open a Terminal in the project folder and execute: 
 
-        .\build
+        ./build
 
 2. Run the compiled jar with
 
-        .\run
+        ./run
         
-
 
 ## Features
 
+* Selecting algorithms:
+  - Quick Sort (Middle Pivot)
+  - Quick Sort (Dual Pivot)
+  - Merge Sort
+  - Shell Sort
+  - Selection Sort
+  - Double Selection Sort
+  - Insertion Sort
+  - Heap Sort
+  - Gravity Sort
+  - Radix Sort (LSD, Base 10)
+  - Gnome Sort
+  - Comb Sort
+  - Odd Even Sort
+  - Bubble Sort
+  - Cocktail Shaker Sort (Shaker Sort)
+  - Cycle Sort
+  - Counting Sort
+  - American Flag Sort
+  - Bucket Sort
+  - Pigeonhole Sort
+  - Tim Sort
+  - Bogo Sort
+
+
+* Running all algorithms
+   - Changing the execution order
+   - Selecting which algorithms to run
+
+
 * Changing the array size
-* Selecting algorithms / Run all algorithms
+
+
 * Changing the shuffle type
    - Random
    - Reverse
    - Almost Sorted
    - Sorted
 
-* Visualizations featured:
-   - Bars
-   - Scatter Plot
-   - Scatter Plot Linked
-   - Number Plot
-   - Disparity Graph
-   - Disparity Graph Mirrored
-   - Horizontal Pyramid
-   - Color Gradient Graph
-   - Circle
-   - Disparity Circle
-   - Disparity Circle Scatter
-   - Disparity Circle Scatter Linked
-   - Swirl Dots
-   - Phyllotaxis
-   - Image Vertical
-   - Image Horizontal
-   - Hoops
-   - Sphere (3D)
-   - Cube (3D)
 
-* Selecting different color gradients and creating your own!
+* Selecting Visualizations:
+  - Bars
+  - Scatter Plot
+  - Scatter Plot Linked
+  - Number Plot
+  - Disparity Graph
+  - Disparity Graph Mirrored
+  - Horizontal Pyramid
+  - Color Gradient Graph
+  - Circle
+  - Disparity Circle
+  - Disparity Circle Scatter
+  - Disparity Circle Scatter Linked
+  - Disparity Chords
+  - Disparity Square Scatter
+  - Swirl Dots
+  - Phyllotaxis
+  - Image Vertical
+  - Image Horizontal
+  - Hoops
+  - Morphing Shell
+  - Sphere (3D)
+  - Sphere Hoops (3D)
+  - Disparity Sphere Hoops (3D)
+  - Cube (3D)
+  - Pyramid (3D)
+  - Plane (3D)
+  - Disparity Plane (3D)
+
+
+* Selecting different color gradients and creating your own
+
 * Showing Measurements during the execution
-   -  Sorted Percentage
-   - Counting Comparisons
-   -  Measuring the estimated Real Time 
-   - Counting Swaps
-   - Counting Writes to the main Array
-   - Counting Writes to possible auxiliary Arrays
-* Displaying a comparison table at the end to compare algorithms
-* Playing / Muting Sound
-* Canceling the current execution
-
-* Sorting Algorithms featured:
-   - Quick Sort (Middle Pivot)
-   - Quick Sort (Dual Pivot)
-   - Merge Sort
-   - Shell Sort
-   - Selection Sort
-   - Double Selection Sort
-   - Insertion Sort
-   - Heap Sort
-   - Gravity Sort
-   - Radix Sort (LSD, Base 10)
-   - Gnome Sort
-   - Comb Sort
-   - Odd Even Sort
-   - Bubble Sort
-   - Cocktail Shaker Sort (Shaker Sort)
-   - Cycle Sort
-   - Counting Sort
-   - American Flag Sort
-   - Bucket Sort
-   - Pigeonhole Sort
-   - Tim Sort
-   - Bogo Sort
+   - Sorted percentage
+   - Counting comparisons
+   - Measuring the estimated real time 
+   - Counting swaps
+   - Counting writes to the main array
+   - Counting writes to possible auxiliary arrays
 
 
-## Known Issues (Work in progess)
-* None
+* Option to display a comparison table at the end of the execution
+
+
+* Muting Sound
+
+
+* Canceling execution
+
 
 ## How to Contribute
 1. Clone repo and create a new branch
@@ -145,13 +160,7 @@ Download the [prebuild JAR file](https://github.com/marcelmauel/sorting-visualiz
 ## Acknowledgements
 Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and inspiring me to start this project.
 
-Also a big thanks to [@micycle1](https://github.com/micycle1) for his amazing mirror of the processing4 core library, making it available for maven.
+Also thanks to [@micycle1](https://github.com/micycle1) for his mirror of the processing4 core library, making it available for maven.
 
 ## License
 [MIT](https://github.com/marcelmauel/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
-
-<br />
-<br />
-
-<p align="center">
-	<strong>Consider giving my work a :star: to show some :heart:</strong>
