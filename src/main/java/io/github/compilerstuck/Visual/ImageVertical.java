@@ -13,7 +13,7 @@ public class ImageVertical extends Visualization {
     public ImageVertical(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
         name = "Image - Vertical Sorting";
-        setImg("images/dummy-image.jpg");
+        setImg("dummy-image.jpg");
     }
 
     @Override

@@ -9,7 +9,7 @@ public class GravitySort extends SortingAlgorithm {
         super(arrayController);
         this.name = "Gravity (Bead) Sort";
         alternativeSize = arrayController.getLength();
-        delayTime = 3;
+        delayTime = 2;
     }
 
     public void sort() {

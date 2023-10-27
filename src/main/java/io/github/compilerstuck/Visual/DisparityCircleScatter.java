@@ -26,7 +26,8 @@ public class DisparityCircleScatter extends Visualization {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-            proc.stroke(color.getRGB());
+            //proc.stroke(color.getRGB());
+            proc.noStroke();
             proc.fill(color.getRGB());
 
             if (arrayController.getMarker(i) == Marker.SET) {

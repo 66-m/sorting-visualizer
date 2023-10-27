@@ -24,6 +24,8 @@ public class OddEvenSort extends SortingAlgorithm {
         MainController.setCurrentOperation(name);
         startTime = System.nanoTime();
 
+        delayFactor = 1. / (arrayController.getLength()/36);
+
         boolean isSorted = false; // Initially array is unsorted
 
         while (!isSorted && run) {

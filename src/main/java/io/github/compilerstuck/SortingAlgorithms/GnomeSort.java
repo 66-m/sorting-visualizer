@@ -24,6 +24,8 @@ public class GnomeSort extends SortingAlgorithm {
         MainController.setCurrentOperation(name);
         startTime = System.nanoTime();
 
+        delayFactor = 1. / (arrayController.getLength()/40);
+
         int index = 0;
         while (index < arrayController.getLength() && run) {
 

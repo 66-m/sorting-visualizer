@@ -288,13 +288,57 @@ public class Settings extends JFrame {
                 JCheckBox algCheckBox = new JCheckBox(alg.getName());
 
                 algCheckBox.setSelected(alg.isSelected());
-                runAllSettings.addElement(algCheckBox);
 
                 algCheckBox.addChangeListener(e2 -> {
                     alg.setSelected(algCheckBox.isSelected());
                 });
+
+                runAllSettings.addElement(algCheckBox);
             }
 
+            final int[] dragFromIndex = {-1};
+            final int[] originalIndex = {-1};
+            final boolean[] wasSelected = {false};
+
+            checkBoxList.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    dragFromIndex[0] = checkBoxList.locationToIndex(e.getPoint());
+                    originalIndex[0] = checkBoxList.locationToIndex(e.getPoint());
+                    wasSelected[0] = !runAllSettings.getElementAt(dragFromIndex[0]).isSelected();
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    dragFromIndex[0] = -1; // Reset after the drag operation is complete
+                    originalIndex[0] = -1;
+                    wasSelected[0] = false;
+                }
+            });
+
+            checkBoxList.addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    int currentDragIndex = checkBoxList.locationToIndex(e.getPoint());
+
+                    if (dragFromIndex[0] != -1 && currentDragIndex != -1 && dragFromIndex[0] != currentDragIndex) {
+                        JCheckBox draggedItem = runAllSettings.getElementAt(dragFromIndex[0]);
+                        runAllSettings.remove(dragFromIndex[0]);
+                        runAllSettings.add(currentDragIndex, draggedItem);
+
+                        SortingAlgorithm temp = algorithmList.get(dragFromIndex[0]);
+                        algorithmList.remove(dragFromIndex[0]);
+                        algorithmList.add(currentDragIndex, temp);
+
+                        dragFromIndex[0] = currentDragIndex; // Update the dragFromIndex to its new location
+                        if (wasSelected[0] != draggedItem.isSelected()) {
+                           draggedItem.setSelected(wasSelected[0]);
+                        }
+                    }
+
+                }
+            });
 
             JDialog runAllSettingDialog = new JDialog();
             runAllSettingDialog.setSize(300, 500);
@@ -306,6 +350,7 @@ public class Settings extends JFrame {
             runAllSettingDialog.setVisible(true);
 
         });
+
 
 
         //Shuffle type
@@ -370,8 +415,9 @@ public class Settings extends JFrame {
                 new DisparityCircleScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new DisparityCircleScatterLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new DisparityChords(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new DisparitySquareScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new SwirlDots(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()), //behaving weird and kinda sucks
+                new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
@@ -382,7 +428,7 @@ public class Settings extends JFrame {
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()))); // New Visual
+                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));
 
 
         for (Visualization visualization : visualizationList) {
@@ -419,8 +465,8 @@ public class Settings extends JFrame {
                 String imagePath = selectedFile.getAbsolutePath();
 
                 int index = visualizationListComboBox.getSelectedIndex(); 
-                ImageVertical visualizationVertical = (ImageVertical) visualizationList.get(15);
-                ImageHorizontal visualizationHorizontal = (ImageHorizontal) visualizationList.get(16);
+                ImageVertical visualizationVertical = (ImageVertical) visualizationList.get(16);
+                ImageHorizontal visualizationHorizontal = (ImageHorizontal) visualizationList.get(17);
                 ImageHorizontal imageHorizontal = (ImageHorizontal) visualizationHorizontal;
                 imageHorizontal.setImg(imagePath);
                 ImageVertical imageVertical = (ImageVertical) visualizationVertical;

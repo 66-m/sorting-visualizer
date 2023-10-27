@@ -12,7 +12,7 @@ public class ImageHorizontal extends Visualization {
     public ImageHorizontal(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
         name = "Image - Horizontal Sorting";
-        setImg("images/dummy-image.jpg");
+        setImg("dummy-image.jpg");
     }
 
     @Override
