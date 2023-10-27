@@ -1,1 +1,1 @@
-java -jar .\target\sorting-visualizer-1.3.3.jar portrait
+java -jar .\target\sorting-visualizer.jar portrait
