@@ -183,7 +183,7 @@ public class Settings extends JFrame {
 
         arraySizeTextField.setText(String.valueOf(arraySizeSlider.getValue()));
         arraySizeTextField.addActionListener(e -> {
-            if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 5) {
+            if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 6) {
                 if (Integer.parseInt(arraySizeTextField.getText()) > maxSize) {
                     arraySizeSlider.setValue(maxSize);
                     arraySizeTextField.setText(String.valueOf(maxSize));
@@ -197,7 +197,7 @@ public class Settings extends JFrame {
 
         arraySizeOkButton.setEnabled(false);
         arraySizeOkButton.addActionListener(e -> {
-            if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 5) {
+            if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 6) {
                 if (Integer.parseInt(arraySizeTextField.getText()) > maxSize) {
                     arraySizeSlider.setValue(maxSize);
                     arraySizeTextField.setText(String.valueOf(maxSize));
