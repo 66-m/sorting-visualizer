@@ -266,9 +266,11 @@ public class Settings extends JFrame {
         }
 
         algorithmListComboBox.setSelectedIndex(0);
+        final int[] selectedAlgorithmIndex = {0};
 
         algorithmListComboBox.addActionListener(e -> {
             MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+            selectedAlgorithmIndex[0] = algorithmListComboBox.getSelectedIndex();
         });
 
         //Run All Algorithms Checkbox
@@ -341,6 +343,18 @@ public class Settings extends JFrame {
             });
 
             JDialog runAllSettingDialog = new JDialog();
+
+            runAllSettingDialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    for (SortingAlgorithm alg : algorithmList) {
+                        algorithmListComboBox.addItem(alg.getName());
+                        algorithmListComboBox.removeItemAt(0);
+                    }
+                    algorithmListComboBox.setSelectedIndex(selectedAlgorithmIndex[0]);
+                }
+            });
+
             runAllSettingDialog.setSize(300, 500);
             runAllSettingDialog.setLocation(this.getLocation().x + this.getSize().width + 5, this.getLocation().y);
             runAllSettingDialog.setTitle("Run All - Settings");
@@ -348,6 +362,8 @@ public class Settings extends JFrame {
             runAllSettingDialog.setResizable(false);
             runAllSettingDialog.setModal(true);
             runAllSettingDialog.setVisible(true);
+
+
 
         });
 
