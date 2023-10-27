@@ -109,7 +109,7 @@ public class Settings extends JFrame {
             gradientListComboBox.addItem(gradient.getName());
         }
 
-        gradientListComboBox.setSelectedIndex(9);
+        gradientListComboBox.setSelectedIndex(5);
         Color color1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
         colorChoose1.setBackground(color1);
         Color color2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
