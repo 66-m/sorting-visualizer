@@ -73,7 +73,7 @@ public class Cube extends Visualization {
             float x = (float) ((float) Math.cos(aa) * xa - Math.sin(aa) * za);
 
             float z = (float) (Math.sin(-10) * ya + Math.cos(-10) * zb);
-            float y = (float) (-20 + Math.cos(-10) * ya - Math.sin(-10) * zb);
+            float y = (float) (Math.cos(-10) * ya - Math.sin(-10) * zb);
 
             float size = PApplet.map(barHeight, 0, arrayController.getLength(), 0, radius*2/xSize);
 
@@ -107,7 +107,7 @@ public class Cube extends Visualization {
 
             proc.pushMatrix();
             //set screen center
-            proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
+            proc.translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
             //set circle position
             proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
 

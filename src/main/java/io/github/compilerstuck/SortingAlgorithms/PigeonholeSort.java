@@ -26,7 +26,7 @@ public class PigeonholeSort extends SortingAlgorithm {
 
         int min = arrayController.get(0);
         int max = arrayController.get(0);
-        int range, i, j, index;
+        int range, i, index;
 
         for (int a = 0; a < arrayController.getLength() && run; a++) {
             if (arrayController.get(a) > max)

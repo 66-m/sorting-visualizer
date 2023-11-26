@@ -4,7 +4,6 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import io.github.compilerstuck.SortingAlgorithms.QuickSortMiddlePivot;
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Sound.MidiSys;
-import io.github.compilerstuck.Sound.MinimSound;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Bars;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;

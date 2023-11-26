@@ -5,10 +5,6 @@ import io.github.compilerstuck.Visual.Marker;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static java.lang.Math.min;
 
 public class ArrayController {
     private int[] array;
