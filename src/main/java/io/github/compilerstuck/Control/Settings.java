@@ -442,9 +442,11 @@ public class Settings extends JFrame {
                 new SphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new DisparitySphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new CubicLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));
+                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new MosaicSquares(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));
 
 
         for (Visualization visualization : visualizationList) {
