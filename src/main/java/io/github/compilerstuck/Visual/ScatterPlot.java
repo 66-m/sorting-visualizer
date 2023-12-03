@@ -19,7 +19,7 @@ public class ScatterPlot extends Visualization {
     public void update() {
         super.update();
 
-        int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
+        //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
 
         for (int i = 0; i < arrayController.getLength(); i++) {
 
@@ -36,7 +36,13 @@ public class ScatterPlot extends Visualization {
 
             arrayController.setMarker(i, Marker.NORMAL);
 
-            proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight - barHeight, 7 + rectWidth, 7 + rectWidth); //Classic
+            float x =  PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth);
+            float y = screenHeight - barHeight;
+
+            
+            proc.pushMatrix();
+            proc.circle(x, y, 3); //Classic
+            proc.popMatrix();
 
         }
     }

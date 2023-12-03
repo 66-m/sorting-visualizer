@@ -103,28 +103,10 @@ public class Sphere extends Visualization {
             //sort for size
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-            if (zCords.isEmpty()) {
-                zCords.add(z);
-                colors.add(color);
-                xCords.add(x);
-                yCords.add(y);
-            } else {
-                for (int j = 0; j <= zCords.size(); j++) {
-                    if (zCords.get(j) > z) {
-                        zCords.add(j, z);
-                        colors.add(j, color);
-                        xCords.add(j, x);
-                        yCords.add(j, y);
-                        break;
-                    } else if (j == zCords.size() - 1) {
-                        zCords.add(z);
-                        colors.add(color);
-                        xCords.add(x);
-                        yCords.add(y);
-                        break;
-                    }
-                }
-            }
+            zCords.add(z);
+            colors.add(color);
+            xCords.add(x);
+            yCords.add(y);
 
             if (m == squareRoot - 1) {
                 if (n == squareRoot - 1) {
@@ -142,19 +124,19 @@ public class Sphere extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            //proc.stroke(color.getRGB());
             proc.noStroke();
             proc.fill(color.getRGB(), (float) (255.));
 
 
-            //Max size: 35
             proc.pushMatrix();
+
             //set screen center
             proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
+
             //set circle position
             proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            proc.circle(0, 0, 3);
 
-            proc.ellipse(0, 0, 28, 28);
             proc.popMatrix();
         }
     }
