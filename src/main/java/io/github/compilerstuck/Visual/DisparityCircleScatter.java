@@ -44,7 +44,7 @@ public class DisparityCircleScatter extends Visualization {
             int x = (screenWidth / 2) + (int) (radius * barHeight * Math.sin(phase));
             int y = (screenHeight / 2) - (int) (radius * barHeight * Math.cos(phase));
 
-            proc.ellipse(x, y, 10, 10); //Swirl dots
+            proc.circle(x, y, 4); //Swirl dots
 
         }
     }

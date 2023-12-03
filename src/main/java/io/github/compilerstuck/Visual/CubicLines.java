@@ -101,7 +101,7 @@ public class CubicLines extends Visualization {
             Color color = colors.get(i);
 
             proc.stroke(color.getRGB(), 255f);
-            proc.fill(color.getRGB(), 120f);
+            proc.fill(color.getRGB(), 255f);
 
 
             proc.pushMatrix();
@@ -110,11 +110,12 @@ public class CubicLines extends Visualization {
 
             proc.rotateY(0);
 
-            proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
-
+            
             if (i == arrayController.get(i)) {
                 proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
                 proc.circle(0, 0, 2);
+            }else{
+                proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
             }
 
             proc.popMatrix();

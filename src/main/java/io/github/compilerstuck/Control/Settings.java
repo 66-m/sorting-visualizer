@@ -440,6 +440,7 @@ public class Settings extends JFrame {
                 new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new SphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
+                new SphericLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new DisparitySphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
                 new CubicLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),

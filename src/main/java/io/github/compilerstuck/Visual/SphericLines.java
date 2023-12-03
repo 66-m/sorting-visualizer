@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
-public class Sphere extends Visualization {
+public class SphericLines extends Visualization {
 
     int radius;
     float squareRoot;
     static float aa = 0;
 
-    public Sphere(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
+    public SphericLines(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-        name = "3D - Sphere";
+        name = "3D - Spheric Lines";
     }
 
     @Override
@@ -103,6 +103,7 @@ public class Sphere extends Visualization {
             //sort for size
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
+        
             zCords.add(z);
             colors.add(color);
             xCords.add(x);
@@ -124,18 +125,23 @@ public class Sphere extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            proc.noStroke();
-            proc.fill(color.getRGB(), (float) (255.));
+            //proc.stroke(color.getRGB());
+            proc.stroke(color.getRGB(), 255f);
+            proc.fill(color.getRGB(), 255f);
 
 
+            //Max size: 35
             proc.pushMatrix();
-
             //set screen center
             proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
-
             //set circle position
-            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
-            proc.circle(0, 0, 3);
+
+            if (i == arrayController.get(i)) {                
+                proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+                proc.circle(0, 0, 2);
+            } else{
+                proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
+            }
 
             proc.popMatrix();
         }

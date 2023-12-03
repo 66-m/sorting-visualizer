@@ -37,7 +37,7 @@ public class SwirlDots extends Visualization {
             int x = screenWidth / 2 + (int) (radius * arrayController.get(i) / arrayController.getLength() * Math.sin(phase));
             int y = screenHeight / 2 + (int) (radius * arrayController.get(i) / arrayController.getLength() * Math.cos(phase));
 
-            proc.ellipse(x, y, 7, 7); //Swirl dots
+            proc.circle(x, y, 5); //Swirl dots
 
         }
     }
