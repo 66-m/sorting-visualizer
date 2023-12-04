@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
-public class SphericLines extends Visualization {
+public class SphericDisparityLines extends Visualization {
 
     int radius;
     float squareRoot;
     static float aa = 0;
 
-    public SphericLines(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
+    public SphericDisparityLines(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
         super(arrayController, colorGradient, sound);
-        name = "3D - Spheric Lines";
+        name = "3D - Spheric Disparity Lines";
     }
 
     @Override
