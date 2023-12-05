@@ -8,7 +8,7 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
 
     public QuickSortMiddlePivot(ArrayController arrayController) {
         super(arrayController);
-        this.name = "Quick Sort (Pivot Middle)";
+        this.name = "Quick Sort (Middle Pivot)";
         alternativeSize = arrayController.getLength();
     }
 

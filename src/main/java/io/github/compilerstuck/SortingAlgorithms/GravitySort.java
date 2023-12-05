@@ -7,7 +7,7 @@ public class GravitySort extends SortingAlgorithm {
 
     public GravitySort(ArrayController arrayController) {
         super(arrayController);
-        this.name = "Gravity (Bead) Sort";
+        this.name = "Gravity Sort";
         alternativeSize = arrayController.getLength();
         delayTime = 2;
     }

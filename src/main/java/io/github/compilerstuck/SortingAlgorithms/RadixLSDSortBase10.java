@@ -12,14 +12,14 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
     public RadixLSDSortBase10(ArrayController arrayController) {
         super(arrayController);
-        this.name = "Radix (LSD) Sort (Base " + RADIX + ")";
+        this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
         alternativeSize = arrayController.getLength();
     }
 
     public RadixLSDSortBase10(ArrayController arrayController, int radix_base) {
         super(arrayController);
         RADIX = radix_base;
-        this.name = "Radix (LSD) Sort (Base " + RADIX + ")";
+        this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
     }
 
 
