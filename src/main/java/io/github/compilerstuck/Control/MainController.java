@@ -135,12 +135,15 @@ public class MainController extends PApplet {
                 sound.mute(true);
                 sound.mute(false);
 
+                printTimestampsToConsole();
+
                 arrayController.resetMeasurements();
                 comparisons.clear();
                 realTime.clear();
                 swaps.clear();
                 writesMain.clear();
                 writesAux.clear();
+                timestamps.clear();
                 setCurrentOperation("Waiting");
 
                 SortingAlgorithm.setRun(true);
@@ -150,7 +153,6 @@ public class MainController extends PApplet {
                 settings.setEnableInputs(true);
                 settings.setEnableCancelButton(false);
 
-                printTimestampsToConsole();
 
             } else if (running) {
                 visualization.update();
