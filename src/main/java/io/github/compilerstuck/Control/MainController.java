@@ -7,6 +7,7 @@ import io.github.compilerstuck.Sound.MidiSys;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Bars;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
+import javafx.util.Pair;
 import io.github.compilerstuck.Visual.Visualization;
 import processing.core.PApplet;
 
@@ -30,6 +31,7 @@ public class MainController extends PApplet {
     private final ArrayList<String> swaps = new ArrayList<>();
     private final ArrayList<String> writesMain = new ArrayList<>();
     private final ArrayList<String> writesAux = new ArrayList<>();
+    private final ArrayList<Integer> timestamps = new ArrayList<>();
 
     private static boolean start = false;
     private static boolean running = false;
@@ -147,6 +149,9 @@ public class MainController extends PApplet {
                 settings.setProgressBar(100);
                 settings.setEnableInputs(true);
                 settings.setEnableCancelButton(false);
+
+                printTimestampsToConsole();
+
             } else if (running) {
                 visualization.update();
                 arrayController.update();
@@ -175,21 +180,18 @@ public class MainController extends PApplet {
 
     private void startAlgorithmThread() {
         new Thread(() -> {
+
+            int startTime = (int) (System.currentTimeMillis() / 1000L);
+
             for (SortingAlgorithm algorithm : algorithms) {
                 if (!SortingAlgorithm.isRun()) {
                     break;
                 }
-//                if (alg.alternativeSize != arrayController.getLength()) {
-//                    sound.mute(true);
-//                    colorGradient.updateGradient(alg.alternativeSize);
-//                    arrayController.resize(alg.alternativeSize);
-//
-//                    delay(1000);
-//                    sound.mute(false);
-//                }
+                
                 sound.mute(true);
                 sound.mute(false);
 
+                timestamps.add((int) (System.currentTimeMillis() / 1000L) - startTime);
 
                 arrayController.shuffle();
                 if (!SortingAlgorithm.isRun()) {
@@ -236,6 +238,16 @@ public class MainController extends PApplet {
         SortingAlgorithm.setRun(false);
         processing.noLoop();
         processing.exit();
+    }
+
+    public void printTimestampsToConsole() {
+        System.out.println("\nTimestamps:");
+        for (int i = 0; i < algorithms.size(); i++) {
+            int minutes = timestamps.get(i) / 60;
+            int seconds = timestamps.get(i) % 60;
+            String time = String.format("%02d:%02d", minutes, seconds);
+            System.out.println(time + " " + algorithms.get(i).getName());
+        }
     }
 
     private void printResults() {
