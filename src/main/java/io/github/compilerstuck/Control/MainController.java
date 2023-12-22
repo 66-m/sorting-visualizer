@@ -243,7 +243,7 @@ public class MainController extends PApplet {
     }
 
     public void printTimestampsToConsole() {
-        System.out.println("\nTimestamps:");
+        System.out.println("\n\nTimestamps:\n");
         for (int i = 0; i < algorithms.size(); i++) {
             int minutes = timestamps.get(i) / 60;
             int seconds = timestamps.get(i) % 60;
