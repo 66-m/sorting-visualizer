@@ -20,8 +20,8 @@ public class DisparitySquareScatter extends Visualization {
         super.update();
 
         sideLength = (int) (Math.min(screenHeight, screenWidth) / 2.4) * 2;
-        int sideLengthX = (int) (screenWidth / 2.4) * 2;
-        int sideLengthY = (int) (screenHeight / 2.4) * 2;
+        int sideLengthX = (int) screenWidth; //(int) (screenWidth / 2.4) * 2;
+        int sideLengthY = (int) screenHeight; //(int) (screenHeight / 2.4) * 2;
 
         for (int i = 0; i < arrayController.getLength(); i++) {
 
