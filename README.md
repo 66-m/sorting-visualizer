@@ -1,4 +1,4 @@
-[![Java CI with Maven](https://github.com/marcelmauel/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/marcelmauel/sorting-visualizer/actions/workflows/maven.yml)
+[![Java CI with Maven](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -10,15 +10,15 @@
   <h1 align="center">Sorting Algorithm Visualizer</h1>
 
   <p align="center">
-    Visualizes and Audiolizes Sorting Algorithms!
+    Visualizes and Audiolizes Sorting Algorithms!<br/>
+    (Not actively maintained)
     <br />
     <br />
-    <a href="https://github.com/marcelmauel/sorting-visualizer/releases/latest"><strong>Try it »</strong></a>
+    <a href="https://github.com/66-m/sorting-visualizer/releases/latest"><strong>Try it »</strong></a>
     <br />
     <br />
-    <a href="https://youtu.be/9bm-q115OFM">View Demo</a>
     ·
-    <a href="https://github.com/marcelmauel/sorting-visualizer/issues">Report Bug / Request Feature</a>
+    <a href="https://github.com/66-m/sorting-visualizer/issues">Report Bug / Request Feature</a>
     </p>
 </div>
 <br />
@@ -30,9 +30,9 @@ This sorting visualizer offers both visual and auditory demonstrations of sortin
 </div>
 
 ## Downloading and running the visualizer
-You can download the latest version of this visualizer [here](https://github.com/marcelmauel/sorting-visualizer/releases/latest)
+You can download the latest version of this visualizer [here](https://github.com/66-m/sorting-visualizer/releases/latest)
 
-Download the [prebuilt JAR file](https://github.com/marcelmauel/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with
+Download the [prebuilt JAR file](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with
 
         java -jar sorting-visualizer.jar
 
@@ -45,7 +45,7 @@ Download the [prebuilt JAR file](https://github.com/marcelmauel/sorting-visualiz
 
 ### Clone this repository:
 
-        git clone https://github.com/CompilerStuck/sorting-visualizer.git
+        git clone https://github.com/66-m/sorting-visualizer.git
         cd sorting-visualizer
 
 
@@ -152,15 +152,7 @@ Download the [prebuilt JAR file](https://github.com/marcelmauel/sorting-visualiz
 * Canceling execution
 
 
-## How to Contribute
-1. Clone repo and create a new branch
-2. Make changes and test
-3. Submit Pull Request with comprehensive description of changes
-
 ## Acknowledgements
 Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and inspiring me to start this project.
 
 Also thanks to [@micycle1](https://github.com/micycle1) for his mirror of the processing4 core library, making it available for maven.
-
-## License
-[MIT](https://github.com/marcelmauel/sorting-visualizer/blob/main/LICENSE) - Marcel Mauel, 2022
