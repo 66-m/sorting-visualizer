@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.github.compilerstuck</groupId>
+    <groupId>io.github.66-m</groupId>
     <artifactId>sorting-visualizer</artifactId>
     <version>1.3.4</version>
     <packaging>jar</packaging>
@@ -44,7 +44,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        io.github.compilerstuck.Control.MainController
+                                        io.github.66-m.Control.MainController
                                     </mainClass>
                                 </manifest>
                             </archive>
@@ -60,7 +60,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>com.github.marcelmauel</groupId> <!--  micycle1 fork -->
+            <groupId>com.github.66-m</groupId> <!--  micycle1 fork -->
             <artifactId>processing-core-4</artifactId>
             <version>41a134a448</version>
         </dependency>
