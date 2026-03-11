@@ -1,0 +1,7 @@
+#!/bin/sh
+# build script for Unix-like systems
+
+# ensure Maven wrapper is executable
+chmod +x ./mvnw
+
+./mvnw clean package
