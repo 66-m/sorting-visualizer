@@ -29,6 +29,7 @@ public class Settings extends JFrame {
 
     JComboBox<String> gradientListComboBox;
     JSlider arraySizeSlider;
+    private JSlider speedSlider;
     private JPanel settingsPanel;
     private JPanel colorChoose1;
     private JPanel colorChoose2;
@@ -70,11 +71,50 @@ public class Settings extends JFrame {
 
     public void initialize() {
 
-        proc = MainController.processing;
+        proc = (PApplet) MainController.processing;
         int maxSize = 20000;
 
         //Frame Settings
-        setContentPane(settingsPanel);
+        // Speed control — 5 named snap levels
+        // Level:  1=Very Slow  2=Slow  3=Normal  4=Fast  5=Max
+        //  delayTime (ms):  50   10    1    1    1
+        //  delayFactor:    1.0  1.0  1.0  0.12  0.02
+        final int[]    DELAY_TIME   = { 50, 10, 1, 1,    1    };
+        final double[] DELAY_FACTOR = { 1.0, 1.0, 1.0, 0.12, 0.02 };
+
+        speedSlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 3);
+        speedSlider.setSnapToTicks(true);
+        speedSlider.setPaintTicks(true);
+        speedSlider.setPaintLabels(true);
+        speedSlider.setMajorTickSpacing(1);
+
+        java.util.Hashtable<Integer, JLabel> speedLabels = new java.util.Hashtable<>();
+        speedLabels.put(1, new JLabel("Very Slow"));
+        speedLabels.put(2, new JLabel("Slow"));
+        speedLabels.put(3, new JLabel("Normal"));
+        speedLabels.put(4, new JLabel("Fast"));
+        speedLabels.put(5, new JLabel("Max"));
+        speedSlider.setLabelTable(speedLabels);
+        speedSlider.setToolTipText("Animation speed");
+
+        speedSlider.addChangeListener(e -> {
+            int level = speedSlider.getValue() - 1;          // 0-based index
+            MainController.setDelayTime(DELAY_TIME[level]);
+            MainController.setDelayFactor(DELAY_FACTOR[level]);
+        });
+
+        JPanel speedPanel = new JPanel(new BorderLayout(6, 0));
+        speedPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Speed"),
+                BorderFactory.createEmptyBorder(2, 6, 6, 6)
+        ));
+        speedPanel.add(speedSlider, BorderLayout.CENTER);
+
+        JPanel root = new JPanel(new BorderLayout());
+        root.add(speedPanel, BorderLayout.NORTH);
+        root.add(settingsPanel, BorderLayout.CENTER);
+
+        setContentPane(root);
         setSize(650, 600);
         setLocation(10, 10);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -419,36 +459,36 @@ public class Settings extends JFrame {
 
         //Visual selection
         visualizationList = new ArrayList<>(Arrays.asList(
-                new Bars(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new ScatterPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new ScatterPlotLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new NumberPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityGraph(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityGraphMirrored(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new HorizontalPyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new ColorGradientGraph(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Circle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityCircle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityCircleScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityCircleScatterLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityChords(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparitySquareScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new SwirlDots(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new SphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new SphericDisparityLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparitySphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new CubicLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound()),
-                new MosaicSquares(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound())));
+                new Bars(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new ScatterPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new ScatterPlotLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new NumberPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityGraph(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityGraphMirrored(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new HorizontalPyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new ColorGradientGraph(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Circle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityCircle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityCircleScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityCircleScatterLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityChords(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparitySquareScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new SwirlDots(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new SphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new SphericDisparityLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparitySphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new CubicLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
+                new MosaicSquares(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing)));
 
 
         for (Visualization visualization : visualizationList) {
@@ -509,10 +549,6 @@ public class Settings extends JFrame {
             cancelButton.setEnabled(false);
         });
 
-
-        //Speed slider
-        //TODO
-
         //Error dialogs:
 //        JOptionPane.showMessageDialog(frame, "Eggs are not supposed to be green.");
         setVisible(true);
@@ -528,6 +564,7 @@ public class Settings extends JFrame {
         arraySizeTextField.setEnabled(enabled);
         visualizationListComboBox.setEnabled(enabled);
         buttonRunAllSettings.setEnabled(enabled);
+        speedSlider.setEnabled(enabled);
     }
 
     public void setEnableCancelButton(boolean enabled) {
@@ -743,7 +780,6 @@ public class Settings extends JFrame {
 
     @SuppressWarnings("unused")
     private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 }
 

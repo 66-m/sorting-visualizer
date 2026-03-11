@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class InsertionSort extends SortingAlgorithm {
 
-    public InsertionSort(ArrayController arrayController) {
+    public InsertionSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Insertion Sort";
         alternativeSize = arrayController.getLength();
         delayTime = 10;
     }
 
-    public InsertionSort(ArrayController arrayController, int alternativeSize) {
+    public InsertionSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Insertion Sort";
         this.alternativeSize = alternativeSize;

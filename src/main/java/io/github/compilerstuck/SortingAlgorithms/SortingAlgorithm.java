@@ -1,13 +1,14 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.DelayStrategy;
 import io.github.compilerstuck.Control.MainController;
-import processing.core.PApplet;
+import io.github.compilerstuck.Control.ProcessingContext;
 import io.github.compilerstuck.Visual.Marker;
 
 
 public abstract class SortingAlgorithm {
-    protected PApplet proc;
+    protected ProcessingContext proc;
     protected String name;
     protected boolean delay;
     protected int delayTime = 1; //ms
@@ -16,13 +17,17 @@ public abstract class SortingAlgorithm {
     protected boolean selected = true;
     protected long startTime;
     protected double delayFactor = 1.;
-    private double elementsDelayThreshold = 2000;
+    private DelayStrategy delayStrategy = DelayStrategy.DEFAULT;
 
 
-    ArrayController arrayController;
+    ArrayModel arrayController;
 
-    public SortingAlgorithm(ArrayController arrayController) {
-        proc = MainController.processing;
+    public SortingAlgorithm(ArrayModel arrayController) {
+        this(arrayController, MainController.processing);
+    }
+
+    public SortingAlgorithm(ArrayModel arrayController, ProcessingContext proc) {
+        this.proc = proc;
         this.arrayController = arrayController;
         delay = true;
     }
@@ -62,9 +67,16 @@ public abstract class SortingAlgorithm {
         this.delayTime = delayTime;
     }
 
+    public void setDelayFactor(double delayFactor) {
+        this.delayFactor = delayFactor;
+    }
+
+    public void setDelayStrategy(DelayStrategy delayStrategy) {
+        this.delayStrategy = delayStrategy;
+    }
+
     public void delay(int[] markers) {
-        // Delay if: delay is enabled, the array is small enough or a random number is smaller than the probability of delaying, and the delay factor is 1 or a random number is smaller than the delay factor
-        if (delay && (arrayController.getLength() <= elementsDelayThreshold || Math.random() < elementsDelayThreshold / arrayController.getLength()) && (delayFactor == 1 || Math.random() < delayFactor)) {
+        if (delay && delayStrategy.shouldDelay(arrayController.getLength(), delayFactor)) {
             arrayController.addRealTime(System.nanoTime() - startTime);
 
             for (int i : markers) {

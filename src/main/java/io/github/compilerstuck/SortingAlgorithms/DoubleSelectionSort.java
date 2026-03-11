@@ -1,11 +1,11 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class DoubleSelectionSort extends SortingAlgorithm {
 
-    public DoubleSelectionSort(ArrayController arrayController) {
+    public DoubleSelectionSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Double Selection Sort";
         alternativeSize = arrayController.getLength();

@@ -1,6 +1,7 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
@@ -13,8 +14,8 @@ import java.awt.*;
 
 public class MosaicSquares extends Visualization {
 
-    public MosaicSquares(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public MosaicSquares(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Mosaic Squares";
     }
 

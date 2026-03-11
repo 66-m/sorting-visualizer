@@ -1,11 +1,11 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class BubbleSort extends SortingAlgorithm {
 
-    public BubbleSort(ArrayController arrayController) {
+    public BubbleSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Bubble Sort";
         alternativeSize = arrayController.getLength();
@@ -14,7 +14,7 @@ public class BubbleSort extends SortingAlgorithm {
     }
 
 
-    public BubbleSort(ArrayController arrayController, int alternativeSize) {
+    public BubbleSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Bubble Sort";
         this.alternativeSize = alternativeSize;

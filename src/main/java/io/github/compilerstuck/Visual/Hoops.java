@@ -1,9 +1,10 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
 
@@ -11,8 +12,8 @@ public class Hoops extends Visualization {
 
     int radius;
 
-    public Hoops(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public Hoops(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Hoops";
     }
 
@@ -25,7 +26,7 @@ public class Hoops extends Visualization {
 
             proc.stroke(color.getRGB());
 
-            proc.noFill();
+            ((PApplet)proc).noFill();
 
             if (arrayController.getMarker(i) == Marker.SET) {
                 sound.playSound(i);

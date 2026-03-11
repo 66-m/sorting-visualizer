@@ -1,6 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 import java.util.ArrayList;
@@ -10,13 +10,13 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
     int RADIX = 10;
 
-    public RadixLSDSortBase10(ArrayController arrayController) {
+    public RadixLSDSortBase10(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
         alternativeSize = arrayController.getLength();
     }
 
-    public RadixLSDSortBase10(ArrayController arrayController, int radix_base) {
+    public RadixLSDSortBase10(ArrayModel arrayController, int radix_base) {
         super(arrayController);
         RADIX = radix_base;
         this.name = "Radix Sort (LSD) (Base " + RADIX + ")";

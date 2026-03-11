@@ -1,17 +1,18 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
 
 public class ScatterPlot extends Visualization {
 
 
-    public ScatterPlot(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public ScatterPlot(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Scatter Plot";
     }
 
@@ -40,9 +41,9 @@ public class ScatterPlot extends Visualization {
             float y = screenHeight - barHeight;
 
             
-            proc.pushMatrix();
-            proc.circle(x, y, 3); //Classic
-            proc.popMatrix();
+            ((PApplet)proc).pushMatrix();
+            ((PApplet)proc).circle(x, y, 3); //Classic
+            ((PApplet)proc).popMatrix();
 
         }
     }

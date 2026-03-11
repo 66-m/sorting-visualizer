@@ -1,6 +1,7 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -10,8 +11,8 @@ public class DisparityCircleScatterLinked extends Visualization {
 
     int radius;
 
-    public DisparityCircleScatterLinked(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public DisparityCircleScatterLinked(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Disparity Circle Scatter Linked";
     }
 

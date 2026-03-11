@@ -1,9 +1,10 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
 
@@ -15,8 +16,8 @@ public class Phyllotaxis extends Visualization {
     int radius;
     int c;
 
-    public Phyllotaxis(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public Phyllotaxis(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Phyllotaxis";
     }
 
@@ -46,7 +47,7 @@ public class Phyllotaxis extends Visualization {
             float x = (float) (r * cos(a));
             float y = (float) (r * sin(a));
 
-            proc.circle(screenWidth / 2f + x, screenHeight / 2f + y, 5); //Swirl dots
+            ((PApplet)proc).circle(screenWidth / 2f + x, screenHeight / 2f + y, 5); //Swirl dots
 
         }
     }

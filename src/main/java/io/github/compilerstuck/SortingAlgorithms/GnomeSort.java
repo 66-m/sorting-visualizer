@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class GnomeSort extends SortingAlgorithm {
 
-    public GnomeSort(ArrayController arrayController) {
+    public GnomeSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Gnome Sort";
         alternativeSize = arrayController.getLength();
         delayFactor = 1. / 50;
     }
 
-    public GnomeSort(ArrayController arrayController, int alternativeArrSize) {
+    public GnomeSort(ArrayModel arrayController, int alternativeArrSize) {
         super(arrayController);
         this.name = "Gnome Sort";
         this.alternativeSize = alternativeArrSize;

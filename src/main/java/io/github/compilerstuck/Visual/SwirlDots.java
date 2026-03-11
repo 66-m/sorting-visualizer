@@ -1,6 +1,8 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -10,8 +12,8 @@ public class SwirlDots extends Visualization {
 
     int radius;
 
-    public SwirlDots(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public SwirlDots(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Swirl Dots";
     }
 
@@ -37,7 +39,7 @@ public class SwirlDots extends Visualization {
             int x = screenWidth / 2 + (int) (radius * arrayController.get(i) / arrayController.getLength() * Math.sin(phase));
             int y = screenHeight / 2 + (int) (radius * arrayController.get(i) / arrayController.getLength() * Math.cos(phase));
 
-            proc.circle(x, y, 5); //Swirl dots
+            ((PApplet)proc).circle(x, y, 5); //Swirl dots
 
         }
     }

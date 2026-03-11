@@ -1,12 +1,12 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
 
 public class ShellSort extends SortingAlgorithm {
 
-    public ShellSort(ArrayController arrayController) {
+    public ShellSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Shell Sort";
         alternativeSize = arrayController.getLength();

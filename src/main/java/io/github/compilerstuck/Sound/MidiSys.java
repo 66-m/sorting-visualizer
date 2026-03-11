@@ -1,8 +1,9 @@
 package io.github.compilerstuck.Sound;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
+import processing.core.PApplet;
 
 import javax.sound.midi.*;
 
@@ -12,9 +13,9 @@ public class MidiSys extends Sound {
     private final MidiChannel synthesizerChannel;
 
 
-    public MidiSys(ArrayController arrayController) throws MidiUnavailableException {
+    public MidiSys(ArrayModel arrayController) throws MidiUnavailableException {
         super(arrayController);
-        proc = MainController.processing;
+        proc = (PApplet) MainController.processing;
         Synthesizer synthesizer = MidiSystem.getSynthesizer();
         synthesizer.open();
         synthesizer.loadAllInstruments(synthesizer.getDefaultSoundbank());

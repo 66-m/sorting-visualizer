@@ -1,11 +1,11 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class HeapSort extends SortingAlgorithm {
 
-    public HeapSort(ArrayController arrayController) {
+    public HeapSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Heap Sort";
         alternativeSize = arrayController.getLength();
@@ -33,7 +33,7 @@ public class HeapSort extends SortingAlgorithm {
         arrayController.addRealTime(System.nanoTime() - startTime);
     }
 
-    private void heapify(ArrayController arrayController, int n, int i) {
+    private void heapify(ArrayModel arrayController, int n, int i) {
         int largest = i;
         int l = 2 * i + 1;
         int r = 2 * i + 2;

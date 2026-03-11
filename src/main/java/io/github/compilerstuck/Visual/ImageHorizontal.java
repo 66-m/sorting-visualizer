@@ -1,6 +1,8 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
@@ -9,16 +11,16 @@ import processing.core.PImage;
 public class ImageHorizontal extends Visualization {
     private PImage img;
 
-    public ImageHorizontal(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public ImageHorizontal(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Image - Horizontal Sorting";
         setImg("dummy-image.jpg");
     }
 
     @Override
     public void update() {
-        this.screenHeight = proc.height;
-        this.screenWidth = proc.width;
+        this.screenHeight = proc.getHeight();
+        this.screenWidth = proc.getWidth();
 
         if(arrayController.getLength()>img.pixelHeight){
             MainController.updateArraySize(img.pixelHeight);
@@ -41,7 +43,7 @@ public class ImageHorizontal extends Visualization {
 
         proc.background(15);
 
-        proc.loadPixels();
+        ((PApplet)proc).loadPixels();
         img.loadPixels();
 
         int imgPartWidth = screenHeight / arrayController.getLength();
@@ -56,9 +58,9 @@ public class ImageHorizontal extends Visualization {
                     int loc = x + y * img.pixelWidth;
 
 
-                    float r = proc.red(img.pixels[loc]);
-                    float g = proc.green(img.pixels[loc]);
-                    float b = proc.blue(img.pixels[loc]);
+                    float r = ((PApplet)proc).red(img.pixels[loc]);
+                    float g = ((PApplet)proc).green(img.pixels[loc]);
+                    float b = ((PApplet)proc).blue(img.pixels[loc]);
 
                     // If Marker.SET is set, set the pixel to white
                     if (arrayController.getMarker(i) == Marker.SET) {
@@ -67,7 +69,7 @@ public class ImageHorizontal extends Visualization {
                         b = 255;
                     }
 
-                    proc.pixels[realLoc] = proc.color(r, g, b);
+                    ((PApplet)proc).pixels[realLoc] = ((PApplet)proc).color(r, g, b);
                 }
 
             }
@@ -82,7 +84,7 @@ public class ImageHorizontal extends Visualization {
 
         }
 
-        proc.updatePixels();
+        ((PApplet)proc).updatePixels();
 
         proc.fill(255);
         proc.textSize((int) (25. / 1280 * screenWidth));
@@ -92,13 +94,13 @@ public class ImageHorizontal extends Visualization {
 
     public boolean setImg(String imagePath) {
         boolean imageFound = true;
-        proc.getSurface().setResizable(false); // Enable window resizing
+        ((PApplet)proc).getSurface().setResizable(false); // Enable window resizing
 
         try {
-            img = proc.loadImage(imagePath);
+            img = ((PApplet)proc).loadImage(imagePath);
 
             // Resize the image to match the window size
-            img.resize(proc.width, proc.height);
+            img.resize(proc.getWidth(), proc.getHeight());
 
         } catch (Exception e) {
             imageFound = false;

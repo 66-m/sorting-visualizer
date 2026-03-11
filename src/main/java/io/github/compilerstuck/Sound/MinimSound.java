@@ -2,8 +2,9 @@ package io.github.compilerstuck.Sound;
 
 import ddf.minim.AudioOutput;
 import ddf.minim.Minim;
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
+import processing.core.PApplet;
 
 
 public class MinimSound extends Sound {
@@ -13,9 +14,9 @@ public class MinimSound extends Sound {
     double timegone;
 
     //Used this sound earlier in development
-    public MinimSound(ArrayController arrayController) {
+    public MinimSound(ArrayModel arrayController) {
         super((arrayController));
-        proc = MainController.processing;
+        proc = (PApplet) MainController.processing;
         minim = new Minim(proc);
         out = minim.getLineOut(Minim.MONO);
         timegone = System.nanoTime();

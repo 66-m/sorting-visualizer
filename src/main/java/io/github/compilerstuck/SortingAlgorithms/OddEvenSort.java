@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class OddEvenSort extends SortingAlgorithm {
 
-    public OddEvenSort(ArrayController arrayController) {
+    public OddEvenSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Odd Even Sort";
         alternativeSize = arrayController.getLength();
         delayFactor = 1. / 55;
     }
 
-    public OddEvenSort(ArrayController arrayController, int alternativeSize) {
+    public OddEvenSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Odd Even Sort";
         this.alternativeSize = alternativeSize;

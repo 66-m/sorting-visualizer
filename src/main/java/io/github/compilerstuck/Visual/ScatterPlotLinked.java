@@ -1,17 +1,18 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
+import processing.core.PApplet;
 
 public class ScatterPlotLinked extends Visualization {
 
 
-    public ScatterPlotLinked(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public ScatterPlotLinked(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Scatter Plot Linked";
     }
 

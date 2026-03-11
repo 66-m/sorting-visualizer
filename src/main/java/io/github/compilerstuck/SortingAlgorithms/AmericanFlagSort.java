@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class AmericanFlagSort extends SortingAlgorithm {
 
-    public AmericanFlagSort(ArrayController arrayController) {
+    public AmericanFlagSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "American Flag Sort";
         alternativeSize = arrayController.getLength();
         this.delayTime = 10;
     }
 
-    public AmericanFlagSort(ArrayController arrayController, int alternativeSize) {
+    public AmericanFlagSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "American Flag Sort";
         this.alternativeSize = alternativeSize;

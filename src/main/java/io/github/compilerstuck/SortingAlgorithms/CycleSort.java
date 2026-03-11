@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class CycleSort extends SortingAlgorithm {
 
-    public CycleSort(ArrayController arrayController) {
+    public CycleSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Cycle Sort";
         alternativeSize = arrayController.getLength();
         delayTime = 8;
     }
 
-    public CycleSort(ArrayController arrayController, int alternativeSize) {
+    public CycleSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Cycle Sort";
         this.alternativeSize = alternativeSize;

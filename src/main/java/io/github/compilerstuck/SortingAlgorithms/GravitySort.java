@@ -1,11 +1,11 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class GravitySort extends SortingAlgorithm {
 
-    public GravitySort(ArrayController arrayController) {
+    public GravitySort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Gravity Sort";
         alternativeSize = arrayController.getLength();

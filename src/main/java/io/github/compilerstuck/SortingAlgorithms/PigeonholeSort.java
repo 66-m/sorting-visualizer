@@ -1,19 +1,19 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 import java.util.Arrays;
 
 public class PigeonholeSort extends SortingAlgorithm {
 
-    public PigeonholeSort(ArrayController arrayController) {
+    public PigeonholeSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Pigeonhole Sort";
         alternativeSize = arrayController.getLength();
     }
 
-    public PigeonholeSort(ArrayController arrayController, int alternativeSize) {
+    public PigeonholeSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Pigeonhole Sort";
         this.alternativeSize = alternativeSize;

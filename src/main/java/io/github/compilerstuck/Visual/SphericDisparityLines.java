@@ -1,10 +1,11 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,8 +19,8 @@ public class SphericDisparityLines extends Visualization {
     float squareRoot;
     static float aa = 0;
 
-    public SphericDisparityLines(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public SphericDisparityLines(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "3D - Spheric Disparity Lines";
     }
 
@@ -27,7 +28,7 @@ public class SphericDisparityLines extends Visualization {
     public void update() {
         super.update();
         
-        proc.lights();
+        ((PApplet)proc).lights();
         
         if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
 
@@ -39,7 +40,7 @@ public class SphericDisparityLines extends Visualization {
 
         squareRoot = (int) Math.pow(arrayController.getLength(), 1 / 2.);
 
-        aa -= PApplet.PI / (10 * proc.frameRate);
+        aa -= PApplet.PI / (10 * ((PApplet)proc).frameRate);
 
         float m = 0;
         float n = 0;
@@ -125,25 +126,25 @@ public class SphericDisparityLines extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            //proc.stroke(color.getRGB());
-            proc.stroke(color.getRGB(), 255f);
-            proc.fill(color.getRGB(), 255f);
+            //((PApplet)proc).stroke(color.getRGB());
+            ((PApplet)proc).stroke(color.getRGB(), 255f);
+            ((PApplet)proc).fill(color.getRGB(), 255f);
 
 
             //Max size: 35
-            proc.pushMatrix();
+            ((PApplet)proc).pushMatrix();
             //set screen center
-            proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
+            ((PApplet)proc).translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
             //set circle position
 
             if (i == arrayController.get(i)) {                
-                proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
-                proc.circle(0, 0, 2);
+                ((PApplet)proc).translate(xCords.get(i), yCords.get(i), zCords.get(i));
+                ((PApplet)proc).circle(0, 0, 2);
             } else{
-                proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
+                ((PApplet)proc).line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
             }
 
-            proc.popMatrix();
+            ((PApplet)proc).popMatrix();
         }
     }
 

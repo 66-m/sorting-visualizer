@@ -1,13 +1,13 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 import java.util.Arrays;
 
 public class BucketSort extends SortingAlgorithm {
 
-    public BucketSort(ArrayController arrayController) {
+    public BucketSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Bucket Sort";
         alternativeSize = arrayController.getLength();
