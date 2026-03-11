@@ -11,7 +11,6 @@
 
   <p align="center">
     Visualizes and Audiolizes Sorting Algorithms!<br/>
-    (Not actively maintained)
     <br />
     <br />
     <a href="https://github.com/66-m/sorting-visualizer/releases/latest"><strong>Try it »</strong></a>
