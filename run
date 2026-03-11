@@ -2,7 +2,7 @@
 # run the packaged JAR
 
 if [ ! -f ./target/sorting-visualizer.jar ]; then
-    echo "Jar not found, please build first (./build) or run mvn package."
+    echo "Jar not found, please build first (./build) or run ./mvnw package."
     exit 1
 fi
 
