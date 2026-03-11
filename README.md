@@ -1,174 +1,160 @@
-[![Java CI with Maven](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-
-
-<br />
 <div align="center">
-  <img src="images/logo.png" alt="Logo" width="200" height="200">
 
-  <h1 align="center">Sorting Algorithm Visualizer</h1>
+  <img src="images/logo.png" alt="Logo" width="160" height="160">
 
-  <p align="center">
-    Visualizes and Audiolizes Sorting Algorithms!<br/>
-    <br />
-    <br />
-    <a href="https://github.com/66-m/sorting-visualizer/releases/latest"><strong>Try it »</strong></a>
-    <br />
-    <br />
-    ·
-    <a href="https://github.com/66-m/sorting-visualizer/issues">Report Bug / Request Feature</a>
-    </p>
-</div>
-<br />
-This sorting visualizer offers both visual and auditory demonstrations of sorting algorithms. It features 22 different sorting methods represented through a collection of 30 visuals, including a selection of 3D models. A settings menu is included to enable users to adjust the appearance and functionality of the visualizer.
+  <h1>Sorting Algorithm Visualizer</h1>
 
-<div align="center">
-        <img src="images/demo.png" alt="Program demo">
-  <p align="center">
+  <p>Visualize and audiolize sorting algorithms in real time — with 22 algorithms, 30 visualizations, and full 3D support.</p>
+
+  [![Java CI with Maven](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Latest Release](https://img.shields.io/github/v/release/66-m/sorting-visualizer)](https://github.com/66-m/sorting-visualizer/releases/latest)
+
+  <br/>
+
+  [**Download latest release »**](https://github.com/66-m/sorting-visualizer/releases/latest)
+  &nbsp;·&nbsp;
+  [Report a bug or request a feature](https://github.com/66-m/sorting-visualizer/issues)
+
+  <br/>
+
+  <img src="images/demo.png" alt="Program demo" width="80%">
+
 </div>
 
-## Downloading and running the visualizer
-You can download the latest version of this visualizer [here](https://github.com/66-m/sorting-visualizer/releases/latest)
+---
 
-Download the [prebuilt JAR file](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with
+## Table of Contents
 
-        java -jar sorting-visualizer.jar
+- [Getting Started](#getting-started)
+- [Building from Source](#building-from-source)
+- [Features](#features)
+  - [Sorting Algorithms](#sorting-algorithms)
+  - [Visualizations](#visualizations)
+  - [Controls & Settings](#controls--settings)
+- [Acknowledgements](#acknowledgements)
 
+---
 
-## Building the project yourself
-### Requirements:
+## Getting Started
 
-* An installed JDK (Java 25 or later). Download [here](https://jdk.java.net/25/)
-* Make sure your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
-
-### Clone this repository:
-
-        git clone https://github.com/66-m/sorting-visualizer.git
-        cd sorting-visualizer
-
-
-### Building the Code:
-
-1. Open a terminal in the project folder and execute one of the following:
+Download the [prebuilt JAR](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with:
 
 ```sh
-# using the bundled Maven wrapper (recommended on Linux/Mac)
+java -jar sorting-visualizer.jar
+```
+
+> **Requires Java 25 or later.** Download from [jdk.java.net/25](https://jdk.java.net/25/).
+
+---
+
+## Building from Source
+
+**Requirements:**
+- JDK 25 or later — [download here](https://jdk.java.net/25/)
+- Ensure your [JAVA_HOME environment variable](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) is set
+
+**Clone and build:**
+
+```sh
+git clone https://github.com/66-m/sorting-visualizer.git
+cd sorting-visualizer
+
+# Build (using bundled Maven wrapper — recommended)
 ./mvnw clean package
-# or, if you prefer convenience scripts provided in this repo:
+# or use the convenience script:
 ./build
 ```
 
-2. Run the compiled jar with either:
+**Run:**
 
 ```sh
 java -jar target/sorting-visualizer.jar
-# or using the helper script:
+# or:
 ./run
 ```
 
-(The helper scripts `build` and `run` are provided for Unix-like systems; they simply wrap the above commands.)
-        
+> The `build` and `run` helper scripts are provided for Unix-like systems.
+
+---
 
 ## Features
 
-* Selecting algorithms:
-  - Quick Sort (Middle Pivot)
-  - Quick Sort (Dual Pivot)
-  - Merge Sort
-  - Shell Sort
-  - Selection Sort
-  - Double Selection Sort
-  - Insertion Sort
-  - Heap Sort
-  - Gravity Sort
-  - Radix Sort (LSD, Base 10)
-  - Gnome Sort
-  - Comb Sort
-  - Odd Even Sort
-  - Bubble Sort
-  - Cocktail Shaker Sort (Shaker Sort)
-  - Cycle Sort
-  - Counting Sort
-  - American Flag Sort
-  - Bucket Sort
-  - Pigeonhole Sort
-  - Tim Sort
-  - Bogo Sort
+### Sorting Algorithms
 
+22 algorithms available:
 
-* Running all algorithms
-   - Changing the execution order
-   - Selecting which algorithms to run
+| | | |
+|---|---|---|
+| Quick Sort (Middle Pivot) | Quick Sort (Dual Pivot) | Merge Sort |
+| Shell Sort | Selection Sort | Double Selection Sort |
+| Insertion Sort | Heap Sort | Gravity Sort |
+| Radix Sort (LSD, Base 10) | Gnome Sort | Comb Sort |
+| Odd Even Sort | Bubble Sort | Cocktail Shaker Sort |
+| Cycle Sort | Counting Sort | American Flag Sort |
+| Bucket Sort | Pigeonhole Sort | Tim Sort |
+| Bogo Sort | | |
 
+**Algorithm run options:**
+- Run all algorithms in sequence
+- Change the execution order
+- Select which algorithms to include
 
-* Changing the array size
+### Visualizations
 
+30 visualizations including 3D models:
 
-* Changing the shuffle type
-   - Random
-   - Reverse
-   - Almost Sorted
-   - Sorted
+<details>
+<summary>2D Visualizations (20)</summary>
 
+- Bars
+- Scatter Plot / Scatter Plot Linked
+- Number Plot
+- Disparity Graph / Disparity Graph Mirrored
+- Horizontal Pyramid
+- Color Gradient Graph
+- Circle
+- Disparity Circle / Disparity Circle Scatter / Disparity Circle Scatter Linked
+- Disparity Chords
+- Disparity Square Scatter
+- Swirl Dots
+- Phyllotaxis
+- Image Vertical / Image Horizontal
+- Hoops
+- Morphing Shell
+- Mosaic Squares
 
-* Selecting Visualizations:
-  - Bars
-  - Scatter Plot
-  - Scatter Plot Linked
-  - Number Plot
-  - Disparity Graph
-  - Disparity Graph Mirrored
-  - Horizontal Pyramid
-  - Color Gradient Graph
-  - Circle
-  - Disparity Circle
-  - Disparity Circle Scatter
-  - Disparity Circle Scatter Linked
-  - Disparity Chords
-  - Disparity Square Scatter
-  - Swirl Dots
-  - Phyllotaxis
-  - Image Vertical
-  - Image Horizontal
-  - Hoops
-  - Morphing Shell
-  - Sphere (3D)
-  - Sphere Hoops (3D)
-  - Spheric Disparity Lines (3D)
-  - Disparity Sphere Hoops (3D)
-  - Cube (3D)
-  - Cubic Lines (3D)
-  - Pyramid (3D)
-  - Plane (3D)
-  - Disparity Plane (3D)
-  - Mosaic Squares
+</details>
 
+<details>
+<summary>3D Visualizations (10)</summary>
 
-* Selecting different color gradients and creating your own
+- Sphere
+- Sphere Hoops
+- Spheric Disparity Lines
+- Disparity Sphere Hoops
+- Cube
+- Cubic Lines
+- Pyramid
+- Plane
+- Disparity Plane
 
-* Showing Measurements during the execution
-   - Sorted percentage
-   - Counting comparisons
-   - Measuring the estimated real time 
-   - Counting swaps
-   - Counting writes to the main array
-   - Counting writes to possible auxiliary arrays
+</details>
 
+### Controls & Settings
 
-* Option to display a comparison table at the end of the execution
+- **Array:** Configurable size and shuffle type (Random, Reverse, Almost Sorted, Sorted)
+- **Color gradients:** Choose from presets or create your own
+- **Speed:** Adjustable animation speed
+- **Sound:** Toggle mute at any time
+- **Live measurements:** sorted %, comparisons, swaps, array writes, auxiliary writes, estimated real time
+- **Comparison table:** Optionally display a summary after all algorithms have run
+- **Cancel:** Stop execution at any time
 
-
-* Controlling animation speed
-
-
-* Muting Sound
-
-
-* Canceling execution
-
+---
 
 ## Acknowledgements
-Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and inspiring me to start this project.
 
-Also thanks to [@micycle1](https://github.com/micycle1) for his mirror of the processing4 core library, making it available for maven.
+Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and for inspiring this project.
+
+Thanks to [@micycle1](https://github.com/micycle1) for his mirror of the processing4 core library, making it available for Maven.
