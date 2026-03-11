@@ -75,10 +75,11 @@ public class Settings extends JFrame {
 
         //Frame Settings
         setContentPane(settingsPanel);
-        setSize(600, 530);
+        setSize(650, 600);
         setLocation(10, 10);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setResizable(false);
+        setResizable(true);
+        setMinimumSize(new Dimension(650, 600));
         setTitle("Sorting Algorithm Visualizer - Settings");
         //setIconImage(new ImageIcon("src/main/resources/ChannelLogoWhite_64x64.png").getImage());
 
