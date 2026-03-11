@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class ShakerSort extends SortingAlgorithm {
 
-    public ShakerSort(ArrayController arrayController) {
+    public ShakerSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Shaker Sort";
         alternativeSize = arrayController.getLength();
         delayFactor = 1. / 100;
     }
 
-    public ShakerSort(ArrayController arrayController, int alternativeSize) {
+    public ShakerSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Shaker Sort";
         this.alternativeSize = alternativeSize;

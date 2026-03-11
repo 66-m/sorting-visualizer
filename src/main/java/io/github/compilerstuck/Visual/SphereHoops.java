@@ -1,9 +1,10 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 import processing.core.PConstants;
 
 import java.lang.Math;
@@ -15,8 +16,8 @@ public class SphereHoops extends Visualization {
     float angle = 0;
 
 
-    public SphereHoops(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public SphereHoops(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "3D - Sphere Hoops";
     }
 
@@ -27,8 +28,8 @@ public class SphereHoops extends Visualization {
         //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
         int radius = (int) (Math.min(screenHeight, screenWidth) / 1.5);
 
-        angle -= PApplet.PI / (15 * proc.frameRate);
-        proc.lights();
+        angle -= PApplet.PI / (15 * ((PApplet)proc).frameRate);
+        ((PApplet)proc).lights();
 
 
         for (int i = 0; i < arrayController.getLength(); i++) {
@@ -46,23 +47,23 @@ public class SphereHoops extends Visualization {
 
             proc.stroke(color.getRGB());
             //proc.fill(color.getRGB());
-            proc.noFill();
+            ((PApplet)proc).noFill();
 
 
             //proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight, rectWidth, -1 * barHeight); //Classic bar
 
-            proc.pushMatrix();
+            ((PApplet)proc).pushMatrix();
 
-            proc.translate((float) screenWidth / 2, (float) (screenHeight / 2), -(int) (Math.min(screenHeight, screenWidth) / 10));
+            ((PApplet)proc).translate((float) screenWidth / 2, (float) (screenHeight / 2), -(int) (Math.min(screenHeight, screenWidth) / 10));
 
-            proc.rotateX(PConstants.PI/3);
-            //proc.rotateX(angle);
+            ((PApplet)proc).rotateX(PConstants.PI/3);
+            //((PApplet)proc).rotateX(angle);
 
-            proc.translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
+            ((PApplet)proc).translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
 
-            proc.circle(0, 0, sphere_wi);
+            ((PApplet)proc).circle(0, 0, sphere_wi);
 
-            proc.popMatrix();
+            ((PApplet)proc).popMatrix();
 
         }
     }

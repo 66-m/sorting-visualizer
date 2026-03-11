@@ -1,1 +1,1 @@
-java -jar .\target\sorting-visualizer.jar fullscreen
+java -cp ".\target\sorting-visualizer.jar;.\target\dependency\*" io.github.compilerstuck.Control.MainController fullscreen

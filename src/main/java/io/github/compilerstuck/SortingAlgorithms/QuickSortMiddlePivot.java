@@ -1,12 +1,12 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
 
 public class QuickSortMiddlePivot extends SortingAlgorithm {
 
-    public QuickSortMiddlePivot(ArrayController arrayController) {
+    public QuickSortMiddlePivot(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Quick Sort (Middle Pivot)";
         alternativeSize = arrayController.getLength();
@@ -19,7 +19,7 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
         arrayController.addRealTime(System.nanoTime() - startTime);
     }
 
-    private void sort(ArrayController arrayController, int start, int end) {
+    private void sort(ArrayModel arrayController, int start, int end) {
         if (arrayController.getLength() == 0) {
             return;
         }

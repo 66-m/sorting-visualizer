@@ -1,6 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
 
@@ -10,7 +10,7 @@ public class BogoSort extends SortingAlgorithm {
 
     long trycnt = 0;
 
-    public BogoSort(ArrayController arrayController) {
+    public BogoSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Bogo Sort";
         alternativeSize = arrayController.getLength();
@@ -18,7 +18,7 @@ public class BogoSort extends SortingAlgorithm {
         delayFactor = 0.000001;
     }
 
-    public BogoSort(ArrayController arrayController, int alternativeSize) {
+    public BogoSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Bogo Sort";
         this.alternativeSize = alternativeSize;

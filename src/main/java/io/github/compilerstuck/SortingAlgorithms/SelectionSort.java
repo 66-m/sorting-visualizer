@@ -1,11 +1,11 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class SelectionSort extends SortingAlgorithm {
 
-    public SelectionSort(ArrayController arrayController) {
+    public SelectionSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Selection Sort";
         alternativeSize = arrayController.getLength();

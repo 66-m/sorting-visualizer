@@ -7,8 +7,9 @@ import javax.swing.border.*;
 
 import java.awt.event.*;
 
-@SuppressWarnings("serial")
 public class JCheckBoxList extends JList<JCheckBox> {
+    /** Generated UID to satisfy serialization warnings. */
+    private static final long serialVersionUID = 1L;
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
     public JCheckBoxList() {

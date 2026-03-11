@@ -1,10 +1,11 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -17,8 +18,8 @@ public class CubicLines extends Visualization {
     int radius;
     static float aa = 0;
 
-    public CubicLines(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public CubicLines(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "3D - Cubic Lines";
 
     }
@@ -27,7 +28,7 @@ public class CubicLines extends Visualization {
     public void update() {
         super.update();
 
-        proc.lights();
+        ((PApplet)proc).lights();
         
         radius = (int) (min(screenHeight, screenWidth) / 3.5);
 
@@ -37,7 +38,7 @@ public class CubicLines extends Visualization {
             MainController.updateArraySize(nextN * nextN * nextN); // Update arraySize
         }
 
-        aa -= PApplet.PI / (10 * proc.frameRate);
+        aa -= PApplet.PI / (10 * ((PApplet)proc).frameRate);
 
         int xSize = (int) (Math.pow(arrayController.getLength(), 1 / 3.) + 0.1);
         int xCnt = 0;
@@ -54,8 +55,8 @@ public class CubicLines extends Visualization {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-            proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
+            ((PApplet)proc).stroke(color.getRGB());
+            ((PApplet)proc).fill(color.getRGB());
 
             if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
                 sound.playSound(arrayController.get(i));
@@ -100,25 +101,25 @@ public class CubicLines extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            proc.stroke(color.getRGB(), 255f);
-            proc.fill(color.getRGB(), 255f);
+            ((PApplet)proc).stroke(color.getRGB(), 255f);
+            ((PApplet)proc).fill(color.getRGB(), 255f);
 
 
-            proc.pushMatrix();
+            ((PApplet)proc).pushMatrix();
 
-            proc.translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
+            ((PApplet)proc).translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
 
-            proc.rotateY(0);
+            ((PApplet)proc).rotateY(0);
 
             
             if (i == arrayController.get(i)) {
-                proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
-                proc.circle(0, 0, 2);
+                ((PApplet)proc).translate(xCords.get(i), yCords.get(i), zCords.get(i));
+                ((PApplet)proc).circle(0, 0, 2);
             }else{
-                proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
+                ((PApplet)proc).line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(arrayController.get(i)), yCords.get(arrayController.get(i)), zCords.get(arrayController.get(i)));
             }
 
-            proc.popMatrix();
+            ((PApplet)proc).popMatrix();
 
         }
     }

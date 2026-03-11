@@ -15,10 +15,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class MainController extends PApplet {
+public class MainController extends PApplet implements RenderContext {
 
 
-    public static PApplet processing;
+    public static ProcessingContext processing;
 
     private static int size;
 
@@ -69,6 +69,11 @@ public class MainController extends PApplet {
     }
 
     @Override
+    public void delay(int ms) {
+        super.delay(ms);
+    }
+
+    @Override
     public void settings() {
         if (fullScreen) {
             fullScreen(P3D);
@@ -95,7 +100,7 @@ public class MainController extends PApplet {
         surface.setTitle("Sorting Algorithm Visualizer");
         frameRate(1000);
         textSize(50);//Setting max text size - due to processing bug
-        processing = this;
+        processing = this; // this implements ProcessingContext via class declaration
 
         size = 1280; //Standard size
         arrayController = new ArrayController(size); //Initialize ArrayController with the standard size
@@ -108,7 +113,7 @@ public class MainController extends PApplet {
         }
 
         colorGradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red"); //Standard gradient
-        visualization = new Bars(arrayController, colorGradient, sound); //Standard visual
+        visualization = new Bars(arrayController, colorGradient, sound, (RenderContext) processing); //Standard visual
 
         algorithms = new ArrayList<>();
         algorithms.add(new QuickSortMiddlePivot(arrayController));
@@ -237,8 +242,12 @@ public class MainController extends PApplet {
 
     public static void shutdown(){
         SortingAlgorithm.setRun(false);
-        processing.noLoop();
-        processing.exit();
+        // processing is a ProcessingContext, but the static methods noLoop/exit are
+        // defined on PApplet.  Cast back when needed.
+        if (processing instanceof PApplet p) {
+            p.noLoop();
+            p.exit();
+        }
     }
 
     public void printTimestampsToConsole() {
@@ -368,6 +377,60 @@ public class MainController extends PApplet {
         MainController.start = start;
     }
 
+    // RenderContext implementations ------------------------------------------------
+    
+    @Override
+    public void background(int rgb) {
+        super.background(rgb);
+    }
+
+    @Override
+    public void fill(int rgb) {
+        super.fill(rgb);
+    }
+
+    @Override
+    public void textSize(int size) {
+        super.textSize(size);
+    }
+
+    @Override
+    public void text(String str, float x, float y) {
+        super.text(str, x, y);
+    }
+
+    @Override
+    public void stroke(int rgb) {
+        super.stroke(rgb);
+    }
+
+    @Override
+    public void rect(float x, float y, float w, float h) {
+        super.rect(x, y, w, h);
+    }
+
+
+
+    @Override
+    public void line(float x1, float y1, float x2, float y2) {
+        super.line(x1, y1, x2, y2);
+    }
+
+    @Override
+    public void ellipse(float x, float y, float w, float h) {
+        super.ellipse(x, y, w, h);
+    }
+
+    @Override
+    public int getWidth() {
+        return super.width;
+    }
+
+    @Override
+    public int getHeight() {
+        return super.height;
+    }
+
     public static boolean isRunning() {
         return running;
     }
@@ -390,5 +453,24 @@ public class MainController extends PApplet {
 
     public static void setPrintMeasurements(boolean printMeasurements) {
         MainController.printMeasurements = printMeasurements;
+    }
+
+    /**
+     * Sets the delay factor on every registered algorithm.
+     * A value of {@code 1.0} means every eligible step fires a delay; lower
+     * values reduce the frame rate proportionally (see {@link DelayStrategy}).
+     *
+     * @param factor value in the range (0, 1]
+     */
+    public static void setDelayFactor(double factor) {
+        for (SortingAlgorithm alg : algorithms) {
+            alg.setDelayFactor(factor);
+        }
+    }
+
+    public static void setDelayTime(int ms) {
+        for (SortingAlgorithm alg : algorithms) {
+            alg.setDelayTime(ms);
+        }
     }
 }

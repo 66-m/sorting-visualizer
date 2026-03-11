@@ -6,4 +6,4 @@ if [ ! -f ./target/sorting-visualizer.jar ]; then
     exit 1
 fi
 
-java -jar ./target/sorting-visualizer.jar
+java -cp "target/sorting-visualizer.jar:target/dependency/*" io.github.compilerstuck.Control.MainController "$@"

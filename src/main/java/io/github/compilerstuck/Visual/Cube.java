@@ -1,10 +1,11 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -17,8 +18,8 @@ public class Cube extends Visualization {
     int radius;
     static float aa = 0;
 
-    public Cube(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public Cube(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "3D - Cube";
 
     }
@@ -27,7 +28,7 @@ public class Cube extends Visualization {
     public void update() {
         super.update();
 
-        proc.lights();
+        ((PApplet)proc).lights();
         
         radius = (int) (min(screenHeight, screenWidth) / 3.5);
 
@@ -37,7 +38,7 @@ public class Cube extends Visualization {
             MainController.updateArraySize(nextN * nextN * nextN); // Update arraySize
         }
 
-        aa -= PApplet.PI / (10 * proc.frameRate);
+        aa -= PApplet.PI / (10 * ((PApplet)proc).frameRate);
 
         int xSize = (int) (Math.pow(arrayController.getLength(), 1 / 3.) + 0.1);
         int xCnt = 0;
@@ -54,8 +55,8 @@ public class Cube extends Visualization {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-            proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
+            ((PApplet)proc).stroke(color.getRGB());
+            ((PApplet)proc).fill(color.getRGB());
 
             if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
                 sound.playSound(arrayController.get(i));
@@ -100,23 +101,23 @@ public class Cube extends Visualization {
             if (colors.size() != arrayController.getLength()) return;
             Color color = colors.get(i);
 
-            proc.stroke(color.getRGB(), 255f);
-            //proc.noStroke();
-            proc.fill(color.getRGB(), 120f);
+            ((PApplet)proc).stroke(color.getRGB(), 255f);
+            //((PApplet)proc).noStroke();
+            ((PApplet)proc).fill(color.getRGB(), 120f);
 
 
-            proc.pushMatrix();
+            ((PApplet)proc).pushMatrix();
             //set screen center
-            proc.translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
+            ((PApplet)proc).translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
             //set circle position
-            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            ((PApplet)proc).translate(xCords.get(i), yCords.get(i), zCords.get(i));
 
             //proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
-            proc.rotateX(45);
-            proc.rotateY(0);
-            proc.rotateZ(-aa);
-            proc.box(sizes.get(i), sizes.get(i), sizes.get(i));
-            proc.popMatrix();
+            ((PApplet)proc).rotateX(45);
+            ((PApplet)proc).rotateY(0);
+            ((PApplet)proc).rotateZ(-aa);
+            ((PApplet)proc).box(sizes.get(i), sizes.get(i), sizes.get(i));
+            ((PApplet)proc).popMatrix();
         }
     }
 

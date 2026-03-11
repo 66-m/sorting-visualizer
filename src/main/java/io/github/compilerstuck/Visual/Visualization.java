@@ -1,16 +1,15 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
-import io.github.compilerstuck.Control.MainController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 public abstract class Visualization {
 
-    protected ArrayController arrayController;
+    protected ArrayModel arrayController;
     protected ColorGradient colorGradient;
-    protected PApplet proc;
+    protected RenderContext proc;
     protected int screenWidth;
     protected int screenHeight;
     protected String name;
@@ -20,13 +19,13 @@ public abstract class Visualization {
         return name;
     }
 
-    public Visualization(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
+    public Visualization(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
         this.arrayController = arrayController;
         this.colorGradient = colorGradient;
-        proc = MainController.processing;
+        this.proc = proc;
         this.sound = sound;
-        screenHeight = proc.height;
-        screenWidth = proc.width;
+        screenHeight = proc.getHeight();
+        screenWidth = proc.getWidth();
     }
 
     public void updateColorGradient(ColorGradient colorGradient) {
@@ -34,8 +33,8 @@ public abstract class Visualization {
     }
 
     public void update() {
-        screenHeight = proc.height;
-        screenWidth = proc.width;
+        screenHeight = proc.getHeight();
+        screenWidth = proc.getWidth();
 
         proc.background(15);
 

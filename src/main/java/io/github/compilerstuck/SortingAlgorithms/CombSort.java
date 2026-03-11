@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class CombSort extends SortingAlgorithm {
 
-    public CombSort(ArrayController arrayController) {
+    public CombSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Comb Sort";
         alternativeSize = arrayController.getLength();
         delayFactor = 0.25;
     }
 
-    public CombSort(ArrayController arrayController, int alternativeSize) {
+    public CombSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Comb Sort";
         this.alternativeSize = alternativeSize;

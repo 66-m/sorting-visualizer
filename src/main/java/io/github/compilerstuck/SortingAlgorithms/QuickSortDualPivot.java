@@ -1,18 +1,18 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class QuickSortDualPivot extends SortingAlgorithm {
 
-    public QuickSortDualPivot(ArrayController arrayController) {
+    public QuickSortDualPivot(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Quick Sort (Dual Pivot)";
         alternativeSize = arrayController.getLength();
         delayTime = 3;
     }
 
-    public QuickSortDualPivot(ArrayController arrayController, int alternativeSize) {
+    public QuickSortDualPivot(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Quick Sort (Dual Pivot)";
         this.alternativeSize = alternativeSize;
@@ -28,7 +28,7 @@ public class QuickSortDualPivot extends SortingAlgorithm {
         arrayController.addRealTime(System.nanoTime() - startTime);
     }
 
-    private void sort(ArrayController arrayController, int left, int right) {
+    private void sort(ArrayModel arrayController, int left, int right) {
         if (right > left && run) {
             // Choose outermost elements as pivots
             if (arrayController.get(left) > arrayController.get(right)) {

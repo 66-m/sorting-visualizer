@@ -1,19 +1,19 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 import java.util.Random;
 
 public class TimSort extends SortingAlgorithm {
 
-    public TimSort(ArrayController arrayController) {
+    public TimSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Tim Sort";
         alternativeSize = arrayController.getLength();
     }
 
-    public TimSort(ArrayController arrayController, int alternativeSize) {
+    public TimSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Tim Sort";
         this.alternativeSize = alternativeSize;

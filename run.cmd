@@ -1,1 +1,1 @@
-java -jar ./target/sorting-visualizer.jar
+java -cp ".\target\sorting-visualizer.jar;.\target\dependency\*" io.github.compilerstuck.Control.MainController

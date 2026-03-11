@@ -21,7 +21,7 @@
     </p>
 </div>
 <br />
-This sorting visualizer offers both visual and auditory demonstrations of sorting algorithms. It features 22 different sorting methods represented through a collection of 27 visuals, including a selection of 3D models. A settings menu is included to enable users to adjust the appearance and functionality of the visualizer.
+This sorting visualizer offers both visual and auditory demonstrations of sorting algorithms. It features 22 different sorting methods represented through a collection of 30 visuals, including a selection of 3D models. A settings menu is included to enable users to adjust the appearance and functionality of the visualizer.
 
 <div align="center">
         <img src="images/demo.png" alt="Program demo">
@@ -135,11 +135,14 @@ java -jar target/sorting-visualizer.jar
   - Morphing Shell
   - Sphere (3D)
   - Sphere Hoops (3D)
+  - Spheric Disparity Lines (3D)
   - Disparity Sphere Hoops (3D)
   - Cube (3D)
+  - Cubic Lines (3D)
   - Pyramid (3D)
   - Plane (3D)
   - Disparity Plane (3D)
+  - Mosaic Squares
 
 
 * Selecting different color gradients and creating your own
@@ -154,6 +157,9 @@ java -jar target/sorting-visualizer.jar
 
 
 * Option to display a comparison table at the end of the execution
+
+
+* Controlling animation speed
 
 
 * Muting Sound

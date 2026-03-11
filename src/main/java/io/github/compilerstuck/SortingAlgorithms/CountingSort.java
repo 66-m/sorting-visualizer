@@ -1,13 +1,13 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 import java.util.Arrays;
 
 public class CountingSort extends SortingAlgorithm {
 
-    public CountingSort(ArrayController arrayController) {
+    public CountingSort(ArrayModel arrayController) {
         super(arrayController);
         this.name = "Counting Sort";
         alternativeSize = arrayController.getLength();

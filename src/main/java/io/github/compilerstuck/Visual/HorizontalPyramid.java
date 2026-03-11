@@ -1,16 +1,17 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PApplet;
 
 import java.awt.*;
+import processing.core.PApplet;
 
 public class HorizontalPyramid extends Visualization {
 
-    public HorizontalPyramid(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public HorizontalPyramid(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
 
         name = "Horizontal Pyramid";
     }
@@ -37,7 +38,7 @@ public class HorizontalPyramid extends Visualization {
             arrayController.setMarker(i, Marker.NORMAL);
 
 
-            proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), proc.height / 2f + barHeight / 2f, rectWidth, -1 * barHeight); //Horizontal Pyramid
+            proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), proc.getHeight() / 2f + barHeight / 2f, rectWidth, -1 * barHeight); //Horizontal Pyramid
         }
     }
 

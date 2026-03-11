@@ -1,12 +1,13 @@
 package io.github.compilerstuck.Control;
 
+import io.github.compilerstuck.Control.shuffle.AlmostSortedShuffleStrategy;
+import io.github.compilerstuck.Control.shuffle.RandomShuffleStrategy;
+import io.github.compilerstuck.Control.shuffle.ReverseShuffleStrategy;
+import io.github.compilerstuck.Control.shuffle.SortedShuffleStrategy;
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Visual.Marker;
-import processing.core.PApplet;
 
-import java.util.ArrayList;
-
-public class ArrayController {
+public class ArrayController implements ArrayModel {
     private int[] array;
     private Marker[] markers;
     private int length;
@@ -18,16 +19,14 @@ public class ArrayController {
     private long writesAux;
     private double sortedPercentage;
     private int segments;
-    private int maxSortingTime = 1000;
-
     private double delay;
     private double realTime;
 
-    private ShuffleType shuffleType;
+    private ShuffleStrategy shuffleStrategy;
 
 
     public ArrayController(int size) {
-        shuffleType = ShuffleType.RANDOM;
+        setShuffleType(ShuffleType.RANDOM);
         resize(size);
     }
 
@@ -52,30 +51,37 @@ public class ArrayController {
         }
     }
 
+    @Override
     public long getComparisons() {
         return comparisons;
     }
 
+    @Override
     public void addComparisons(int n) {
         comparisons += n;
     }
 
+    @Override
     public long getArrayAccesses() {
         return arrayAccesses;
     }
 
+    @Override
     public long getSwaps() {
         return swaps;
     }
 
+    @Override
     public long getWrites() {
         return writes;
     }
 
+    @Override
     public void addSleepTime(double sleepTime) {
         this.delay += sleepTime;
     }
 
+    @Override
     public double getDelay() {
         return delay;
     }
@@ -84,14 +90,17 @@ public class ArrayController {
         this.delay = delay;
     }
 
+    @Override
     public double getRealTime() {
         return realTime;
     }
 
+    @Override
     public void addRealTime(double realTime) {
         this.realTime += realTime;
     }
 
+    @Override
     public int[] getArray() {
         return array;
     }
@@ -123,10 +132,12 @@ public class ArrayController {
         }
     }
 
+    @Override
     public Marker getMarker(int index) {
         return markers[index];
     }
 
+    @Override
     public void setMarker(int i, Marker m) {
         markers[i] = m;
     }
@@ -137,19 +148,23 @@ public class ArrayController {
         }
     }
 
+    @Override
     public int getLength() {
         return length;
     }
 
+    @Override
     public int get(int i) {
         return array[i];
     }
 
+    @Override
     public void set(int i, int value) {
         array[i] = value;
         writes += 1;
     }
 
+    @Override
     public void swap(int i, int j) {
         int swapOneValue = array[i];
         array[i] = array[j];
@@ -158,6 +173,7 @@ public class ArrayController {
         swaps += 1;
     }
 
+    @Override
     public boolean isSorted() {
         for (int i = 1; i < length; i++) {
             if (array[i - 1] > array[i]) return false;
@@ -167,10 +183,12 @@ public class ArrayController {
     }
 
 
+    @Override
     public double getSortedPercentage() {
         return sortedPercentage;
     }
 
+    @Override
     public int getSegments() {
         return segments;
     }
@@ -198,108 +216,16 @@ public class ArrayController {
 
     void shuffle() {
         if (!SortingAlgorithm.isRun()) return;
-        switch (shuffleType) {
-            case RANDOM -> standardShuffle();
-            case REVERSE -> reverseShuffle();
-            case ALMOST_SORTED -> almostSortedShuffle();
-            case SORTED -> sortedShuffle();
-        }
-    }
-
-    void standardShuffle() {
-        for (int i = 0; i < length && SortingAlgorithm.isRun(); i++) {
-
-            int swapTwo = (int) (Math.random() * length);
-
-            swap(i, swapTwo);
-
-            setMarker(i, Marker.SET);
-            setMarker(swapTwo, Marker.SET);
-
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) i / (length - 1) * 100) + "%");
-
-
-            ArrayList<Integer> delayTimes = new ArrayList<>();
-            for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
-            }
-
-            if (delayTimes.contains(i)) {
-                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
-                MainController.processing.delay(delayTime);
-            }
-        }
-
-    }
-
-    void reverseShuffle() {
-        for (int i = 0; i < length / 2 && SortingAlgorithm.isRun(); i++) {
-            int swapTwo = length - 1 - i;
-            swap(i, swapTwo);
-
-            setMarker(i, Marker.SET);
-            setMarker(swapTwo, Marker.SET);
-
-            MainController.setCurrentOperation("Shuffling (reverse).. " + (int) (i / (length / 2. - 1) * 100) + "%");
-
-            ArrayList<Integer> delayTimes = new ArrayList<>();
-            for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
-            }
-
-            if (delayTimes.contains(i)) {
-                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
-                MainController.processing.delay(delayTime);
-            }
-        }
-    }
-
-    void almostSortedShuffle() {
-        for (int i = 0; i < length / 10 && SortingAlgorithm.isRun(); i++) {
-
-            int swapOne = (int) (Math.random() * length);
-            int swapTwo = (int) (Math.random() * length);
-
-            swap(swapOne, swapTwo);
-
-            setMarker(swapOne, Marker.SET);
-            setMarker(swapTwo, Marker.SET);
-
-            MainController.setCurrentOperation("Shuffling (almost).. " + (int) ((double) (i) / (length / 10 - 1) * 100) + "%");
-
-            ArrayList<Integer> delayTimes = new ArrayList<>();
-            for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
-            }
-
-            if (delayTimes.contains(i)) {
-                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
-                MainController.processing.delay(delayTime);
-            }
-        }
-
-    }
-
-    void sortedShuffle() {
-        for (int i = 0; i < length && SortingAlgorithm.isRun(); i++) {
-            setMarker(i, Marker.SET);
-
-            MainController.setCurrentOperation("Shuffling (sorted).. " + (int) ((double) (i) / (length - 1) * 100) + "%");
-
-            ArrayList<Integer> delayTimes = new ArrayList<>();
-            for (int j = 0; j < maxSortingTime; j++) {
-                delayTimes.add((int) PApplet.map(j, 0, maxSortingTime - 1, 0, length - 1));
-            }
-
-            if (delayTimes.contains(i)) {
-                int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
-                MainController.processing.delay(delayTime);
-            }
-        }
+        shuffleStrategy.shuffle(this, MainController.processing);
     }
 
     public void setShuffleType(ShuffleType shuffleType) {
-        this.shuffleType = shuffleType;
+        this.shuffleStrategy = switch (shuffleType) {
+            case RANDOM -> new RandomShuffleStrategy();
+            case REVERSE -> new ReverseShuffleStrategy();
+            case ALMOST_SORTED -> new AlmostSortedShuffleStrategy();
+            case SORTED -> new SortedShuffleStrategy();
+        };
     }
 
 }

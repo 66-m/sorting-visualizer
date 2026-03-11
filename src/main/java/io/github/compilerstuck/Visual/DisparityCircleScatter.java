@@ -1,6 +1,8 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayController;
+import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.RenderContext;
+import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -10,8 +12,8 @@ public class DisparityCircleScatter extends Visualization {
 
     int radius;
 
-    public DisparityCircleScatter(ArrayController arrayController, ColorGradient colorGradient, Sound sound) {
-        super(arrayController, colorGradient, sound);
+    public DisparityCircleScatter(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
         name = "Disparity Circle Scatter";
     }
 
@@ -27,7 +29,7 @@ public class DisparityCircleScatter extends Visualization {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
             //proc.stroke(color.getRGB());
-            proc.noStroke();
+            ((PApplet)proc).noStroke();
             proc.fill(color.getRGB());
 
             if (arrayController.getMarker(i) == Marker.SET) {
@@ -44,7 +46,7 @@ public class DisparityCircleScatter extends Visualization {
             int x = (screenWidth / 2) + (int) (radius * barHeight * Math.sin(phase));
             int y = (screenHeight / 2) - (int) (radius * barHeight * Math.cos(phase));
 
-            proc.circle(x, y, 4); //Swirl dots
+            ((PApplet)proc).circle(x, y, 4); //Swirl dots
 
         }
     }
