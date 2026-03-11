@@ -7,7 +7,6 @@ import io.github.compilerstuck.Sound.MidiSys;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Bars;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import javafx.util.Pair;
 import io.github.compilerstuck.Visual.Visualization;
 import processing.core.PApplet;
 
