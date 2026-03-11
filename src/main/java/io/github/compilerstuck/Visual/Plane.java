@@ -46,9 +46,6 @@ public class Plane extends Visualization {
 
         for (int i = 0; i < arrayController.getLength(); i++) {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-
-            int barHeight = (arrayController.get(i) + 1) * (radius - 5) / arrayController.getLength();
             
             float tileDim = radius / squareRoot;
 

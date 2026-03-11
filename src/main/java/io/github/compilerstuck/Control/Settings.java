@@ -565,10 +565,10 @@ public class Settings extends JFrame {
         if (arrayTitleLabelFont != null) arrayTitleLabel.setFont(arrayTitleLabelFont);
         arrayTitleLabel.setText("Array");
         settingsPanel.add(arrayTitleLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
-        algorithmListComboBox = new JComboBox();
+        algorithmListComboBox = new JComboBox<>();
         algorithmListComboBox.setMaximumRowCount(20);
         settingsPanel.add(algorithmListComboBox, new GridConstraints(5, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
-        gradientListComboBox = new JComboBox();
+        gradientListComboBox = new JComboBox<>();
         gradientListComboBox.setMaximumRowCount(20);
         gradientListComboBox.setName("");
         settingsPanel.add(gradientListComboBox, new GridConstraints(10, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
@@ -578,7 +578,7 @@ public class Settings extends JFrame {
         shuffleListLabel = new JLabel();
         shuffleListLabel.setText("Shuffle type");
         settingsPanel.add(shuffleListLabel, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        shuffleListBox = new JComboBox();
+        shuffleListBox = new JComboBox<>();
         shuffleListBox.setMaximumRowCount(20);
         settingsPanel.add(shuffleListBox, new GridConstraints(6, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         final Spacer spacer1 = new Spacer();
@@ -589,7 +589,6 @@ public class Settings extends JFrame {
         muteCheckBoxLabel.setText("Play sound");
         settingsPanel.add(muteCheckBoxLabel, new GridConstraints(15, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
         muteCheckBox = new JCheckBox();
-        muteCheckBox.setLabel("");
         muteCheckBox.setText("");
         settingsPanel.add(muteCheckBox, new GridConstraints(15, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
         soundTitleLabel = new JLabel();
@@ -628,7 +627,7 @@ public class Settings extends JFrame {
         visualizationListComboBoxLabel = new JLabel();
         visualizationListComboBoxLabel.setText("Visualization");
         settingsPanel.add(visualizationListComboBoxLabel, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        visualizationListComboBox = new JComboBox();
+        visualizationListComboBox = new JComboBox<>();
         visualizationListComboBox.setMaximumRowCount(20);
         settingsPanel.add(visualizationListComboBox, new GridConstraints(9, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
         final Spacer spacer5 = new Spacer();
@@ -742,6 +741,7 @@ public class Settings extends JFrame {
         return settingsPanel;
     }
 
+    @SuppressWarnings("unused")
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }

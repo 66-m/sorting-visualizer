@@ -28,7 +28,8 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
         startTime = System.nanoTime();
 
 
-        List<Integer>[] bucket = new ArrayList[RADIX];
+        @SuppressWarnings("unchecked")
+        List<Integer>[] bucket = new List[RADIX];
         for (int i = 0; i < bucket.length && run; i++) {
             bucket[i] = new ArrayList<>();
         }

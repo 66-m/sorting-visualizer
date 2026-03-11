@@ -4,9 +4,7 @@ import io.github.compilerstuck.Control.ArrayController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import processing.core.PApplet;
-import processing.core.PConstants;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
 import java.awt.*;
@@ -60,7 +58,6 @@ public class MorphingShell extends Visualization {
             float x = (float) (radius * Math.sin(lon) * Math.sin(lat));
             float y = (float) (radius * Math.cos(lon));
             y += barHeight;
-            int size = (int) PApplet.map(z, 0, screenHeight, 10, 20);
 
             //x = (float) (screenHeight * 0.5 + x / 2);
             //y = screenHeight / 2. + y / 2;
