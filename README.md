@@ -40,7 +40,7 @@ Download the [prebuilt JAR file](https://github.com/66-m/sorting-visualizer/rele
 ## Building the project yourself
 ### Requirements:
 
-* An installed JDK. Download [here](https://jdk.java.net/21/)
+* An installed JDK (Java 25 or later). Download [here](https://jdk.java.net/25/)
 * Make sure your [environment variables](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) are set.
 
 ### Clone this repository:
@@ -51,13 +51,24 @@ Download the [prebuilt JAR file](https://github.com/66-m/sorting-visualizer/rele
 
 ### Building the Code:
 
-1. Open a Terminal in the project folder and execute: 
+1. Open a terminal in the project folder and execute one of the following:
 
-        ./build
+```sh
+# using the bundled Maven wrapper (recommended on Linux/Mac)
+./mvnw clean package
+# or, if you prefer convenience scripts provided in this repo:
+./build
+```
 
-2. Run the compiled jar with
+2. Run the compiled jar with either:
 
-        ./run
+```sh
+java -jar target/sorting-visualizer.jar
+# or using the helper script:
+./run
+```
+
+(The helper scripts `build` and `run` are provided for Unix-like systems; they simply wrap the above commands.)
         
 
 ## Features
