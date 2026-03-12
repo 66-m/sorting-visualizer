@@ -29,6 +29,7 @@ class HeadlessVisualizationAndSoundTest {
     @DisplayName("Visualization instances update without throwing exceptions")
     void visualizationsUpdateHeadlessly() {
         ColorGradient gradient = new ColorGradient(Color.WHITE, Color.WHITE, Color.BLACK, "test");
+        gradient.updateGradient(10); // Initialize gradient colors to match array size
         Bars bars = new Bars(controller, gradient, sound, renderCtx);
         Circle circle = new Circle(controller, gradient, sound, renderCtx);
 
