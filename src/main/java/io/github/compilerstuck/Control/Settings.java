@@ -1,8 +1,5 @@
 package io.github.compilerstuck.Control;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import io.github.compilerstuck.SortingAlgorithms.*;
 import io.github.compilerstuck.Visual.*;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
@@ -13,118 +10,77 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Modernized Settings UI for the Sorting Algorithm Visualizer.
+ * Features:
+ * - Tabbed interface for better organization
+ * - Modern color scheme and typography
+ * - Improved spacing and visual hierarchy
+ * - Enhanced component styling for better UX
+ * - All original functionality preserved
+ */
 public class Settings extends JFrame {
 
     protected PApplet proc;
 
-    JComboBox<String> gradientListComboBox;
-    JSlider arraySizeSlider;
+    // UI Components
     private JSlider speedSlider;
-    private JPanel settingsPanel;
-    private JPanel colorChoose1;
-    private JPanel colorChoose2;
-    private JCheckBox muteCheckBox;
-    private JComboBox<String> algorithmListComboBox;
-    private JLabel gradientListLabel;
-    private JLabel algorithmListLabel;
-    private JLabel muteCheckBoxLabel;
-    private JButton runButton;
-    private JCheckBox runAllCheckBox;
-    private JComboBox<String> shuffleListBox;
-    private JLabel shuffleListLabel;
-    private JButton cancelButton;
-    private JCheckBox comparisonTableCheckBox;
-    private JLabel arrayTitleLabel;
-    private JLabel visualTitleLabel;
-    private JProgressBar progressBarArray;
-    private JLabel soundTitleLabel;
-    private JLabel comparisonTableCheckBoxLabel;
-    private JLabel sortingTitleLabel;
-    private JComboBox<String> visualizationListComboBox;
-    private JLabel visualizationListComboBoxLabel;
+    private JSlider arraySizeSlider;
     private JTextField arraySizeTextField;
     private JButton arraySizeOkButton;
-    private JCheckBox showMeasurementsCheckBox;
-    private JLabel showMeasurementsLabel;
+    
+    private JComboBox<String> algorithmListComboBox;
+    private JCheckBox runAllCheckBox;
     private JButton buttonRunAllSettings;
+    private JComboBox<String> shuffleListBox;
+    
+    private JComboBox<String> visualizationListComboBox;
+    private JComboBox<String> gradientListComboBox;
+    private JPanel colorChoose1;
+    private JPanel colorChoose2;
+    private JCheckBox showMeasurementsCheckBox;
+    private JCheckBox comparisonTableCheckBox;
     private JButton buttonSetImg;
-
-    ArrayList<SortingAlgorithm> algorithmList;
-    ArrayList<ColorGradient> gradientList;
-    ArrayList<ShuffleType> shuffleTypes;
-    ArrayList<Visualization> visualizationList;
-
+    
+    private JCheckBox muteCheckBox;
+    
+    private JButton runButton;
+    private JButton cancelButton;
+    private JProgressBar progressBarArray;
+    
+    // Data
+    private ArrayList<SortingAlgorithm> algorithmList;
+    private ArrayList<ColorGradient> gradientList;
+    private ArrayList<ShuffleType> shuffleTypes;
+    private ArrayList<Visualization> visualizationList;
+    
+    // State
+    private final Color errorColor = new Color(244, 67, 54);
+    private int maxSize = 20000;
 
     public Settings() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         initialize();
     }
 
     public void initialize() {
-
         proc = (PApplet) MainController.processing;
-        int maxSize = 20000;
 
-        //Frame Settings
-        // Speed control — 5 named snap levels
-        // Level:  1=Very Slow  2=Slow  3=Normal  4=Fast  5=Max
-        //  delayTime (ms):  50   10    1    1    1
-        //  delayFactor:    1.0  1.0  1.0  0.12  0.02
-        final int[]    DELAY_TIME   = { 50, 10, 1, 1,    1    };
-        final double[] DELAY_FACTOR = { 1.0, 1.0, 1.0, 0.12, 0.02 };
-
-        speedSlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 3);
-        speedSlider.setSnapToTicks(true);
-        speedSlider.setPaintTicks(true);
-        speedSlider.setPaintLabels(true);
-        speedSlider.setMajorTickSpacing(1);
-
-        java.util.Hashtable<Integer, JLabel> speedLabels = new java.util.Hashtable<>();
-        speedLabels.put(1, new JLabel("Very Slow"));
-        speedLabels.put(2, new JLabel("Slow"));
-        speedLabels.put(3, new JLabel("Normal"));
-        speedLabels.put(4, new JLabel("Fast"));
-        speedLabels.put(5, new JLabel("Max"));
-        speedSlider.setLabelTable(speedLabels);
-        speedSlider.setToolTipText("Animation speed");
-
-        speedSlider.addChangeListener(e -> {
-            int level = speedSlider.getValue() - 1;          // 0-based index
-            MainController.setDelayTime(DELAY_TIME[level]);
-            MainController.setDelayFactor(DELAY_FACTOR[level]);
-        });
-
-        JPanel speedPanel = new JPanel(new BorderLayout(6, 0));
-        speedPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Speed"),
-                BorderFactory.createEmptyBorder(2, 6, 6, 6)
-        ));
-        speedPanel.add(speedSlider, BorderLayout.CENTER);
-
-        JPanel root = new JPanel(new BorderLayout());
-        root.add(speedPanel, BorderLayout.NORTH);
-        root.add(settingsPanel, BorderLayout.CENTER);
-
-        setContentPane(root);
-        setSize(650, 600);
-        setLocation(10, 10);
+        // Configure window
+        setTitle("Sorting Algorithm Visualizer - Settings");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(true);
-        setMinimumSize(new Dimension(650, 600));
-        setTitle("Sorting Algorithm Visualizer - Settings");
-        //setIconImage(new ImageIcon("src/main/resources/ChannelLogoWhite_64x64.png").getImage());
-
-        int arraySize = MainController.getSize();
-
+        setSize(1100, 640);
+        setMinimumSize(new Dimension(900, 580));
+        setLocationRelativeTo(null);
+        
+        // Add window listener
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
@@ -132,151 +88,219 @@ public class Settings extends JFrame {
             }
         });
 
-        gradientList = new ArrayList<>(Arrays.asList(
-                new ColorGradient(new Color(200, 0, 0), new Color(200, 0, 0), Color.WHITE, "Red"),
-                new ColorGradient(new Color(0, 200, 0), new Color(0, 200, 0), Color.WHITE, "Green"),
-                new ColorGradient(new Color(0, 0, 200), new Color(0, 0, 200), Color.WHITE, "Blue"),
-                new ColorGradient(Color.WHITE, Color.WHITE, Color.RED, "White"),
-                new ColorGradient(Color.WHITE, Color.BLACK, Color.WHITE, "White -> Black"),
-                new ColorGradient(Color.RED, Color.BLACK, Color.WHITE, "Red -> Black"),
-                new ColorGradient(Color.BLUE, Color.RED, Color.WHITE, "Blue -> Red"),
-                new ColorGradient(Color.BLACK, Color.WHITE, Color.WHITE, "Black -> White"),
-                new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red"),
-                new MultiGradient(Color.WHITE, "Rainbow"),
-                new ColorGradient(Color.PINK, Color.BLACK, Color.WHITE, "Custom Gradient")
-        ));
+        // Create main UI
+        JComponent mainPanel = createMainUI();
+        setContentPane(mainPanel);
+        setVisible(true);
+    }
 
-        for (ColorGradient gradient : gradientList) {
-            gradientListComboBox.addItem(gradient.getName());
+    /**
+     * Create the main one-page two-column interface
+     */
+    private JComponent createMainUI() {
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBackground(UiTheme.BG_PRIMARY);
+        root.setBorder(BorderFactory.createEmptyBorder(
+                UiTheme.SPACING_LG, UiTheme.SPACING_LG, 0, UiTheme.SPACING_LG));
+
+        root.add(createHeaderPanel(), BorderLayout.NORTH);
+
+        // Two equal columns separated by a gap
+        JPanel columns = new JPanel(new GridLayout(1, 2, UiTheme.SPACING_LG, 0));
+        columns.setBackground(UiTheme.BG_PRIMARY);
+        columns.setBorder(BorderFactory.createEmptyBorder(UiTheme.SPACING_MD, 0, 0, 0));
+        columns.add(createLeftColumn());
+        columns.add(createRightColumn());
+
+        JScrollPane scroll = new JScrollPane(columns);
+        scroll.setBorder(null);
+        scroll.getViewport().setBackground(UiTheme.BG_PRIMARY);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        root.add(scroll, BorderLayout.CENTER);
+        root.add(createActionPanel(), BorderLayout.SOUTH);
+        return root;
+    }
+
+    /** Small uppercase section label placed above each card. */
+    private JLabel createSectionLabel(String text) {
+        JLabel label = new JLabel(text.toUpperCase());
+        label.setFont(UiTheme.FONT_SECTION);
+        label.setForeground(UiTheme.ACCENT_PRIMARY);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        label.setBorder(BorderFactory.createEmptyBorder(0, 2, UiTheme.SPACING_XS, 0));
+        return label;
+    }
+
+    /** Left column: Array Size → Sorting → Speed */
+    private JPanel createLeftColumn() {
+        JPanel col = new JPanel();
+        col.setLayout(new BoxLayout(col, BoxLayout.Y_AXIS));
+        col.setBackground(UiTheme.BG_PRIMARY);
+
+        StyledCard arraySizeCard = createArraySizeCard();
+        StyledCard sortingCard   = createSortingCard();
+        StyledCard speedCard     = createSpeedCard();
+        for (StyledCard c : new StyledCard[]{arraySizeCard, sortingCard, speedCard}) {
+            c.setAlignmentX(Component.LEFT_ALIGNMENT);
+            c.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1000));
         }
 
-        gradientListComboBox.setSelectedIndex(5);
-        Color color1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
-        colorChoose1.setBackground(color1);
-        Color color2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
-        colorChoose2.setBackground(color2);
-        colorChoose2.setVisible(true);
+        col.add(createSectionLabel("Array Size"));
+        col.add(arraySizeCard);
+        col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
+        col.add(createSectionLabel("Sorting"));
+        col.add(sortingCard);
+        col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
+        col.add(createSectionLabel("Speed"));
+        col.add(speedCard);
+        col.add(Box.createVerticalGlue());
+        return col;
+    }
 
-        gradientListComboBox.addActionListener(e -> {
-            ColorGradient selected = gradientList.get(gradientListComboBox.getSelectedIndex());
-            selected.updateGradient(MainController.getSize());
-            MainController.setColorGradient(selected);
-            Color newColor1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
-            colorChoose1.setBackground(newColor1);
-            Color newColor2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
-            colorChoose2.setBackground(newColor2);
-        });
+    /** Right column: Visualization → Gradient → Display → Sound */
+    private JPanel createRightColumn() {
+        JPanel col = new JPanel();
+        col.setLayout(new BoxLayout(col, BoxLayout.Y_AXIS));
+        col.setBackground(UiTheme.BG_PRIMARY);
 
-        gradientListComboBox.actionPerformed(null);
+        StyledCard vizCard     = createVisualizationCard();
+        StyledCard gradientCard = createGradientCard();
+        StyledCard displayCard = createDisplayCard();
+        StyledCard soundCard   = createSoundCard();
+        for (StyledCard c : new StyledCard[]{vizCard, gradientCard, displayCard, soundCard}) {
+            c.setAlignmentX(Component.LEFT_ALIGNMENT);
+            c.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1000));
+        }
 
-        MouseListener ml = new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                JPanel jPanel = (JPanel) e.getSource();
-                Color initColor = jPanel.getBackground();
-                Color selectedColor = JColorChooser.showDialog(null,
-                        "Color picker", jPanel.getBackground());
-                if (selectedColor != null && !initColor.equals(selectedColor)) {
-                    jPanel.setBackground(selectedColor);
-                    if (jPanel.getName().equals("colorChoose1")) {
-                        gradientList.get(gradientList.size() - 1).setColor1(selectedColor);
-                        gradientList.get(gradientList.size() - 1).setColor2(colorChoose2.getBackground());
-                    } else {
-                        gradientList.get(gradientList.size() - 1).setColor2(selectedColor);
-                        gradientList.get(gradientList.size() - 1).setColor1(colorChoose1.getBackground());
-                    }
-                    gradientListComboBox.setSelectedIndex(gradientList.size() - 1);
-                }
-            }
-        };
+        col.add(createSectionLabel("Visualization"));
+        col.add(vizCard);
+        col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
+        col.add(createSectionLabel("Gradient"));
+        col.add(gradientCard);
+        col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
+        col.add(createSectionLabel("Display"));
+        col.add(displayCard);
+        col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
+        col.add(createSectionLabel("Sound"));
+        col.add(soundCard);
+        col.add(Box.createVerticalGlue());
+        return col;
+    }
 
-        colorChoose1.addMouseListener(ml);
-        colorChoose2.addMouseListener(ml);
+    /** Slim title bar: "Sorting Visualizer" on the left, "Settings" on the right. */
+    private JPanel createHeaderPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(UiTheme.BG_PRIMARY);
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, UiTheme.SPACING_MD, 0));
 
-        //Array size slider
+        JLabel title = new JLabel("Sorting Visualizer");
+        title.setFont(UiTheme.FONT_TITLE);
+        title.setForeground(UiTheme.TEXT_PRIMARY);
+        panel.add(title, BorderLayout.WEST);
+
+        JLabel subtitle = new JLabel("Settings");
+        subtitle.setFont(UiTheme.FONT_BODY);
+        subtitle.setForeground(UiTheme.TEXT_SECONDARY);
+        panel.add(subtitle, BorderLayout.EAST);
+        return panel;
+    }
+
+    /** Array size: slider on top, then [text-field] [Apply] in one row. */
+    private StyledCard createArraySizeCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+        int arraySize = MainController.getSize();
+        arraySizeSlider = ComponentFactory.createSlider(0, maxSize, arraySize);
         arraySizeSlider.setPaintTicks(true);
-        arraySizeSlider.setPaintTrack(true);
-        arraySizeSlider.setMinimum(0);
-        arraySizeSlider.setMaximum(maxSize);
-        arraySizeSlider.setValue(arraySize);
+        arraySizeSlider.setPaintLabels(true);
         arraySizeSlider.setMinorTickSpacing(maxSize / 8);
         arraySizeSlider.setMajorTickSpacing(maxSize / 4);
-        arraySizeSlider.setPaintLabels(true);
+        arraySizeSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        arraySizeSlider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
 
-        //Color normalSliderColor = arraySizeSlider.getBackground();
-        Color errorColor = new Color(255, 72, 72);
-        Color normalTextFieldForegroundColor = arraySizeTextField.getForeground();
+        arraySizeTextField = ComponentFactory.createTextField();
+        arraySizeTextField.setText(String.valueOf(arraySize));
+        arraySizeTextField.setMaximumSize(new Dimension(90, UiTheme.INPUT_HEIGHT));
+        arraySizeTextField.setPreferredSize(new Dimension(90, UiTheme.INPUT_HEIGHT));
 
+        arraySizeOkButton = ComponentFactory.createSmallButton("Apply");
+        arraySizeOkButton.setEnabled(false);
+
+        JPanel inputRow = new JPanel();
+        inputRow.setLayout(new BoxLayout(inputRow, BoxLayout.X_AXIS));
+        inputRow.setOpaque(false);
+        inputRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
+        inputRow.add(arraySizeTextField);
+        inputRow.add(Box.createHorizontalStrut(UiTheme.SPACING_SM));
+        inputRow.add(arraySizeOkButton);
+        inputRow.add(Box.createHorizontalGlue());
+
+        Color normalColor = UiTheme.TEXT_PRIMARY;
         arraySizeSlider.addChangeListener(e -> {
             if (arraySizeSlider.getValue() <= 3) {
-                //arraySizeSlider.setValue(3);
                 runButton.setEnabled(false);
                 arraySizeSlider.setValue(3);
                 arraySizeTextField.setText("3");
+                arraySizeTextField.setForeground(errorColor);
             } else {
                 MainController.updateArraySize(arraySizeSlider.getValue());
                 arraySizeTextField.setText(String.valueOf(arraySizeSlider.getValue()));
+                arraySizeTextField.setForeground(normalColor);
                 runButton.setEnabled(true);
             }
-
             arraySizeOkButton.setEnabled(false);
         });
 
-        arraySizeTextField.setText(String.valueOf(arraySizeSlider.getValue()));
         arraySizeTextField.addActionListener(e -> {
-            if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 6) {
-                if (Integer.parseInt(arraySizeTextField.getText()) > maxSize) {
-                    arraySizeSlider.setValue(maxSize);
-                    arraySizeTextField.setText(String.valueOf(maxSize));
-                } else {
-                    arraySizeSlider.setValue(Integer.parseInt(arraySizeTextField.getText()));
-                }
-
-            }
+            validateAndApplySize();
             arraySizeOkButton.setEnabled(false);
-        });
-
-        arraySizeOkButton.setEnabled(false);
-        arraySizeOkButton.addActionListener(e -> {
-            if (arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", "")) && arraySizeTextField.getText().length() < 6) {
-                if (Integer.parseInt(arraySizeTextField.getText()) > maxSize) {
-                    arraySizeSlider.setValue(maxSize);
-                    arraySizeTextField.setText(String.valueOf(maxSize));
-                } else {
-                    arraySizeSlider.setValue(Integer.parseInt(arraySizeTextField.getText()));
-                }
-            }
         });
 
         arraySizeTextField.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                if (!arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", ""))) {
+            public void changedUpdate(DocumentEvent e) { updateSizeInputState(); }
+            public void removeUpdate(DocumentEvent e)  { updateSizeInputState(); }
+            public void insertUpdate(DocumentEvent e)  { updateSizeInputState(); }
+            private void updateSizeInputState() {
+                String text = arraySizeTextField.getText();
+                if (text.equals(text.replaceAll("[^0-9]", ""))) {
+                    arraySizeOkButton.setEnabled(true);
+                    arraySizeTextField.setForeground(normalColor);
+                } else {
                     arraySizeOkButton.setEnabled(false);
                     arraySizeTextField.setForeground(errorColor);
-                } else {
-                    arraySizeOkButton.setEnabled(true);
-                    arraySizeTextField.setForeground(normalTextFieldForegroundColor);
-                }
-            }
-
-            public void insertUpdate(DocumentEvent e) {
-                if (!arraySizeTextField.getText().equals(arraySizeTextField.getText().replaceAll("[^0-9]", ""))) {
-                    arraySizeOkButton.setEnabled(false);
-                    arraySizeTextField.setForeground(errorColor);
-                } else {
-                    arraySizeOkButton.setEnabled(true);
-                    arraySizeTextField.setForeground(normalTextFieldForegroundColor);
                 }
             }
         });
 
+        arraySizeOkButton.addActionListener(e -> validateAndApplySize());
 
-        //Mute button
-        muteCheckBox.setSelected(true);
-        muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
+        card.add(arraySizeSlider);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(inputRow);
+        return card;
+    }
+
+    private void validateAndApplySize() {
+        String text = arraySizeTextField.getText();
+        if (text.matches("[0-9]+") && text.length() < 6) {
+            int value = Integer.parseInt(text);
+            if (value > maxSize) {
+                arraySizeSlider.setValue(maxSize);
+            } else if (value < 3) {
+                arraySizeSlider.setValue(3);
+            } else {
+                arraySizeSlider.setValue(value);
+            }
+        }
+    }
+
+    /** Sorting: algorithm combo + run-all row + shuffle combo, all in one card. */
+    private StyledCard createSortingCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
         algorithmList = new ArrayList<>(Arrays.asList(
                 new QuickSortMiddlePivot(MainController.getArrayController()),
@@ -300,164 +324,109 @@ public class Settings extends JFrame {
                 new AmericanFlagSort(MainController.getArrayController()),
                 new PigeonholeSort(MainController.getArrayController()),
                 new TimSort(MainController.getArrayController()),
-                new BogoSort(MainController.getArrayController())));
+                new BogoSort(MainController.getArrayController())
+        ));
 
+        algorithmListComboBox = ComponentFactory.createComboBox();
         for (SortingAlgorithm algorithm : algorithmList) {
             algorithmListComboBox.addItem(algorithm.getName());
         }
-
         algorithmListComboBox.setSelectedIndex(0);
-        final int[] selectedAlgorithmIndex = {0};
+        algorithmListComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        algorithmListComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
 
+        final int[] selectedAlgorithmIndex = {0};
         algorithmListComboBox.addActionListener(e -> {
             MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
             selectedAlgorithmIndex[0] = algorithmListComboBox.getSelectedIndex();
         });
 
-        //Run All Algorithms Checkbox
+        // Run-all row
+        JPanel runAllRow = new JPanel();
+        runAllRow.setLayout(new BoxLayout(runAllRow, BoxLayout.X_AXIS));
+        runAllRow.setOpaque(false);
+        runAllRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        runAllRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.BUTTON_HEIGHT));
+
+        runAllCheckBox = ComponentFactory.createCheckBox("Run all");
         runAllCheckBox.setSelected(false);
-        //buttonRunAllSettings.setVisible(true);
         runAllCheckBox.addActionListener(e -> {
             algorithmListComboBox.setEnabled(!runAllCheckBox.isSelected());
             buttonRunAllSettings.setEnabled(runAllCheckBox.isSelected());
         });
 
+        buttonRunAllSettings = ComponentFactory.createSmallButton("Configure");
+        buttonRunAllSettings.setEnabled(false);
+        buttonRunAllSettings.addActionListener(e -> showRunAllDialog(selectedAlgorithmIndex[0]));
 
-        buttonRunAllSettings.addActionListener(e -> {
-            DefaultListModel<JCheckBox> runAllSettings = new DefaultListModel<JCheckBox>();
-            JCheckBoxList checkBoxList = new JCheckBoxList(runAllSettings);
+        runAllRow.add(runAllCheckBox);
+        runAllRow.add(Box.createHorizontalGlue());
+        runAllRow.add(buttonRunAllSettings);
 
-            for (SortingAlgorithm alg : algorithmList) {
-                JCheckBox algCheckBox = new JCheckBox(alg.getName());
-
-                algCheckBox.setSelected(alg.isSelected());
-
-                algCheckBox.addChangeListener(e2 -> {
-                    alg.setSelected(algCheckBox.isSelected());
-                });
-
-                runAllSettings.addElement(algCheckBox);
-            }
-
-            final int[] dragFromIndex = {-1};
-            final int[] originalIndex = {-1};
-            final boolean[] wasSelected = {false};
-
-            checkBoxList.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    dragFromIndex[0] = checkBoxList.locationToIndex(e.getPoint());
-                    originalIndex[0] = checkBoxList.locationToIndex(e.getPoint());
-                    wasSelected[0] = !runAllSettings.getElementAt(dragFromIndex[0]).isSelected();
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    dragFromIndex[0] = -1; // Reset after the drag operation is complete
-                    originalIndex[0] = -1;
-                    wasSelected[0] = false;
-                }
-            });
-
-            checkBoxList.addMouseMotionListener(new MouseMotionAdapter() {
-                @Override
-                public void mouseDragged(MouseEvent e) {
-                    int currentDragIndex = checkBoxList.locationToIndex(e.getPoint());
-
-                    if (dragFromIndex[0] != -1 && currentDragIndex != -1 && dragFromIndex[0] != currentDragIndex) {
-                        JCheckBox draggedItem = runAllSettings.getElementAt(dragFromIndex[0]);
-                        runAllSettings.remove(dragFromIndex[0]);
-                        runAllSettings.add(currentDragIndex, draggedItem);
-
-                        SortingAlgorithm temp = algorithmList.get(dragFromIndex[0]);
-                        algorithmList.remove(dragFromIndex[0]);
-                        algorithmList.add(currentDragIndex, temp);
-
-                        dragFromIndex[0] = currentDragIndex; // Update the dragFromIndex to its new location
-                        if (wasSelected[0] != draggedItem.isSelected()) {
-                           draggedItem.setSelected(wasSelected[0]);
-                        }
-                    }
-
-                }
-            });
-
-            JDialog runAllSettingDialog = new JDialog();
-
-            runAllSettingDialog.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    for (SortingAlgorithm alg : algorithmList) {
-                        algorithmListComboBox.addItem(alg.getName());
-                        algorithmListComboBox.removeItemAt(0);
-                    }
-                    algorithmListComboBox.setSelectedIndex(selectedAlgorithmIndex[0]);
-                }
-            });
-
-            runAllSettingDialog.setSize(300, 500);
-            runAllSettingDialog.setLocation(this.getLocation().x + this.getSize().width + 5, this.getLocation().y);
-            runAllSettingDialog.setTitle("Run All - Settings");
-            runAllSettingDialog.add(checkBoxList);
-            runAllSettingDialog.setResizable(false);
-            runAllSettingDialog.setModal(true);
-            runAllSettingDialog.setVisible(true);
-
-
-
-        });
-
-
-
-        //Shuffle type
+        // Shuffle combo
         shuffleTypes = new ArrayList<>(Arrays.asList(
-                ShuffleType.RANDOM,
-                ShuffleType.REVERSE,
-                ShuffleType.ALMOST_SORTED,
-                ShuffleType.SORTED
+                ShuffleType.RANDOM, ShuffleType.REVERSE,
+                ShuffleType.ALMOST_SORTED, ShuffleType.SORTED
         ));
 
-        for (ShuffleType shuffleType : shuffleTypes) {
-            shuffleListBox.addItem(shuffleType.toString());
+        shuffleListBox = ComponentFactory.createComboBox();
+        for (ShuffleType st : shuffleTypes) {
+            shuffleListBox.addItem(st.toString());
         }
         shuffleListBox.setSelectedIndex(0);
-        shuffleListBox.addActionListener(e -> MainController.getArrayController().setShuffleType(shuffleTypes.get(shuffleListBox.getSelectedIndex())));
+        shuffleListBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        shuffleListBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
+        shuffleListBox.addActionListener(e ->
+                MainController.getArrayController().setShuffleType(shuffleTypes.get(shuffleListBox.getSelectedIndex()))
+        );
 
+        card.add(algorithmListComboBox);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(runAllRow);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(shuffleListBox);
+        return card;
+    }
 
-        //Run button
-        runButton.addActionListener(e -> {
+    /** Speed slider with emoji labels. */
+    private StyledCard createSpeedCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-            if (runAllCheckBox.isSelected()) {
-                MainController.setAlgorithms(algorithmList);
-            } else {
-                MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
-            }
+        final int[] DELAY_TIME = {50, 10, 1, 1, 1};
+        final double[] DELAY_FACTOR = {1.0, 1.0, 1.0, 0.12, 0.02};
 
-            MainController.setStart(true);
-            cancelButton.setEnabled(true);
+        speedSlider = ComponentFactory.createSlider(1, 5, 3);
+        speedSlider.setSnapToTicks(true);
+        speedSlider.setMajorTickSpacing(1);
+        speedSlider.setToolTipText("Select animation speed level");
+        speedSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        speedSlider.setPreferredSize(new Dimension(400, 55));
+        speedSlider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
+
+        java.util.Hashtable<Integer, JLabel> speedLabels = new java.util.Hashtable<>();
+        speedLabels.put(1, new JLabel("Very Slow"));
+        speedLabels.put(2, new JLabel("Slow"));
+        speedLabels.put(3, new JLabel("Normal"));
+        speedLabels.put(4, new JLabel("Fast"));
+        speedLabels.put(5, new JLabel("Max"));
+        speedSlider.setLabelTable(speedLabels);
+
+        speedSlider.addChangeListener(e -> {
+            int level = speedSlider.getValue() - 1;
+            MainController.setDelayTime(DELAY_TIME[level]);
+            MainController.setDelayFactor(DELAY_FACTOR[level]);
         });
 
-        //Show measurements box
-        showMeasurementsCheckBox.setSelected(true);
-        showMeasurementsCheckBox.addActionListener(e -> {
-            MainController.setPrintMeasurements(showMeasurementsCheckBox.isSelected());
-        });
+        card.add(speedSlider);
+        return card;
+    }
 
-        //Show results Box
-        comparisonTableCheckBox.addActionListener(e -> {
-            MainController.setShowComparisonTable(comparisonTableCheckBox.isSelected());
-            if (!MainController.isRunning() && cancelButton.isEnabled()) cancelButton.setEnabled(false);
-        });
+    /** Visualization type picker + conditional image-file button. */
+    private StyledCard createVisualizationCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-
-        //Progress bar
-        progressBarArray.setMinimum(0);
-        progressBarArray.setMaximum(100);
-        progressBarArray.setValue(100);
-
-
-        //Visual selection
         visualizationList = new ArrayList<>(Arrays.asList(
                 new Bars(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
                 new ScatterPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
@@ -488,72 +457,305 @@ public class Settings extends JFrame {
                 new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
                 new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
                 new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new MosaicSquares(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing)));
+                new MosaicSquares(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing)
+        ));
 
-
+        visualizationListComboBox = ComponentFactory.createComboBox();
         for (Visualization visualization : visualizationList) {
             visualizationListComboBox.addItem(visualization.getName());
         }
-
-
+        visualizationListComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        visualizationListComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
         visualizationListComboBox.addActionListener(e -> {
             int index = visualizationListComboBox.getSelectedIndex();
-
             Visualization visualization = visualizationList.get(index);
-            MainController.setVisualization(visualizationList.get(index));
-
-            if(visualization instanceof ImageHorizontal || visualization instanceof ImageVertical) {
-                buttonSetImg.setVisible(true);
-                buttonSetImg.setEnabled(true);
-            } else {
-                buttonSetImg.setVisible(false);
-                buttonSetImg.setEnabled(false);
-            }
+            MainController.setVisualization(visualization);
+            boolean isImage = visualization instanceof ImageHorizontal || visualization instanceof ImageVertical;
+            buttonSetImg.setVisible(isImage);
+            buttonSetImg.setEnabled(isImage);
         });
 
-
+        buttonSetImg = ComponentFactory.createSmallButton("Select Image");
         buttonSetImg.setVisible(false);
-        buttonSetImg.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Select an image");
-            fileChooser.setAcceptAllFileFilterUsed(false);
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and JPG images", "png", "jpg");
-            fileChooser.addChoosableFileFilter(filter);
-            int fileChooserReturnValue = fileChooser.showDialog(null, "Select image");
-            if (fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                String imagePath = selectedFile.getAbsolutePath();
+        buttonSetImg.setAlignmentX(Component.LEFT_ALIGNMENT);
+        buttonSetImg.addActionListener(e -> selectImageFile());
 
-                int index = visualizationListComboBox.getSelectedIndex(); 
-                ImageVertical visualizationVertical = (ImageVertical) visualizationList.get(16);
-                ImageHorizontal visualizationHorizontal = (ImageHorizontal) visualizationList.get(17);
-                ImageHorizontal imageHorizontal = (ImageHorizontal) visualizationHorizontal;
-                imageHorizontal.setImg(imagePath);
-                ImageVertical imageVertical = (ImageVertical) visualizationVertical;
-                imageVertical.setImg(imagePath);
+        card.add(visualizationListComboBox);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(buttonSetImg);
+        return card;
+    }
 
-                if (Objects.equals(visualizationList.get(index).getName(), "Image - Vertical Sorting")) {
-                    MainController.setVisualization(imageVertical);
-                } else {
-                    MainController.setVisualization(imageHorizontal);
-                }
+    /** Gradient picker + two clickable color swatches for custom colors. */
+    private StyledCard createGradientCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-            }
+        gradientList = new ArrayList<>(Arrays.asList(
+                new ColorGradient(new Color(200, 0, 0), new Color(200, 0, 0), Color.WHITE, "Red"),
+                new ColorGradient(new Color(0, 200, 0), new Color(0, 200, 0), Color.WHITE, "Green"),
+                new ColorGradient(new Color(0, 0, 200), new Color(0, 0, 200), Color.WHITE, "Blue"),
+                new ColorGradient(Color.WHITE, Color.WHITE, Color.RED, "White"),
+                new ColorGradient(Color.WHITE, Color.BLACK, Color.WHITE, "White -> Black"),
+                new ColorGradient(Color.RED, Color.BLACK, Color.WHITE, "Red -> Black"),
+                new ColorGradient(Color.BLUE, Color.RED, Color.WHITE, "Blue -> Red"),
+                new ColorGradient(Color.BLACK, Color.WHITE, Color.WHITE, "Black -> White"),
+                new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red"),
+                new MultiGradient(Color.WHITE, "Rainbow"),
+                new ColorGradient(Color.PINK, Color.BLACK, Color.WHITE, "Custom Gradient")
+        ));
 
+        gradientListComboBox = ComponentFactory.createComboBox();
+        for (ColorGradient gradient : gradientList) {
+            gradientListComboBox.addItem(gradient.getName());
+        }
+        gradientListComboBox.setSelectedIndex(5);
+        gradientListComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        gradientListComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
+
+        Color color1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
+        colorChoose1 = ComponentFactory.createColorSwatch(color1);
+
+        Color color2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
+        colorChoose2 = ComponentFactory.createColorSwatch(color2);
+
+        JPanel swatchRow = new JPanel();
+        swatchRow.setLayout(new BoxLayout(swatchRow, BoxLayout.X_AXIS));
+        swatchRow.setOpaque(false);
+        swatchRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        swatchRow.add(colorChoose1);
+        swatchRow.add(Box.createHorizontalStrut(UiTheme.SPACING_SM));
+        swatchRow.add(colorChoose2);
+        swatchRow.add(Box.createHorizontalGlue());
+
+        gradientListComboBox.addActionListener(e -> {
+            ColorGradient selected = gradientList.get(gradientListComboBox.getSelectedIndex());
+            selected.updateGradient(MainController.getSize());
+            MainController.setColorGradient(selected);
+            colorChoose1.setBackground(MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL));
+            colorChoose2.setBackground(MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL));
         });
 
-        //Cancel button
+        MouseListener ml = new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                JPanel jPanel = (JPanel) e.getSource();
+                Color initColor = jPanel.getBackground();
+                Color selectedColor = JColorChooser.showDialog(null, "Select Color", jPanel.getBackground());
+                if (selectedColor != null && !initColor.equals(selectedColor)) {
+                    jPanel.setBackground(selectedColor);
+                    if (jPanel.getName().equals("colorChoose1")) {
+                        gradientList.get(gradientList.size() - 1).setColor1(selectedColor);
+                        gradientList.get(gradientList.size() - 1).setColor2(colorChoose2.getBackground());
+                    } else {
+                        gradientList.get(gradientList.size() - 1).setColor2(selectedColor);
+                        gradientList.get(gradientList.size() - 1).setColor1(colorChoose1.getBackground());
+                    }
+                    gradientListComboBox.setSelectedIndex(gradientList.size() - 1);
+                }
+            }
+        };
+        colorChoose1.addMouseListener(ml);
+        colorChoose1.setName("colorChoose1");
+        colorChoose2.addMouseListener(ml);
+        colorChoose2.setName("colorChoose2");
+
+        JLabel swatchHint = new JLabel("Click swatch to customize");
+        swatchHint.setFont(UiTheme.FONT_SMALL);
+        swatchHint.setForeground(UiTheme.TEXT_SECONDARY);
+        swatchHint.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        card.add(gradientListComboBox);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(swatchRow);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_XS));
+        card.add(swatchHint);
+        return card;
+    }
+
+    /** Display options: show measurements + comparison table toggles. */
+    private StyledCard createDisplayCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+        showMeasurementsCheckBox = ComponentFactory.createCheckBox("Show measurements");
+        showMeasurementsCheckBox.setSelected(true);
+        showMeasurementsCheckBox.addActionListener(e ->
+                MainController.setPrintMeasurements(showMeasurementsCheckBox.isSelected()));
+        showMeasurementsCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        comparisonTableCheckBox = ComponentFactory.createCheckBox("Show comparison table");
+        comparisonTableCheckBox.addActionListener(e -> {
+            MainController.setShowComparisonTable(comparisonTableCheckBox.isSelected());
+            if (!MainController.isRunning() && cancelButton.isEnabled()) cancelButton.setEnabled(false);
+        });
+        comparisonTableCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        card.add(showMeasurementsCheckBox);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(comparisonTableCheckBox);
+        return card;
+    }
+
+    /** Sound enable toggle. */
+    private StyledCard createSoundCard() {
+        StyledCard card = ComponentFactory.createCard();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+        muteCheckBox = ComponentFactory.createCheckBox("Enable sound effects");
+        muteCheckBox.setSelected(true);
+        muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
+        muteCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        card.add(muteCheckBox);
+        return card;
+    }
+
+    /** Bottom bar: [Cancel] [RUN] buttons + thin progress strip. */
+    private JPanel createActionPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(UiTheme.BG_PRIMARY);
+        panel.setBorder(BorderFactory.createEmptyBorder(
+                UiTheme.SPACING_MD, 0, UiTheme.SPACING_LG, 0));
+
+        runButton = ComponentFactory.createPrimaryButton("RUN");
+        runButton.addActionListener(e -> {
+            if (runAllCheckBox.isSelected()) {
+                MainController.setAlgorithms(algorithmList);
+            } else {
+                MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+            }
+            MainController.setStart(true);
+            cancelButton.setEnabled(true);
+        });
+
+        cancelButton = ComponentFactory.createSecondaryButton("Cancel");
         cancelButton.setEnabled(false);
         cancelButton.addActionListener(e -> {
             SortingAlgorithm.setRun(false);
             cancelButton.setEnabled(false);
         });
 
-        //Error dialogs:
-//        JOptionPane.showMessageDialog(frame, "Eggs are not supposed to be green.");
-        setVisible(true);
+        JPanel buttonsRow = new JPanel();
+        buttonsRow.setLayout(new BoxLayout(buttonsRow, BoxLayout.X_AXIS));
+        buttonsRow.setOpaque(false);
+        buttonsRow.add(Box.createHorizontalGlue());
+        buttonsRow.add(cancelButton);
+        buttonsRow.add(Box.createHorizontalStrut(UiTheme.SPACING_SM));
+        buttonsRow.add(runButton);
+
+        progressBarArray = ComponentFactory.createProgressBar();
+        progressBarArray.setValue(100);
+
+        panel.add(buttonsRow, BorderLayout.CENTER);
+        panel.add(progressBarArray, BorderLayout.SOUTH);
+        return panel;
     }
 
+    /**
+     * Show run all algorithms configuration dialog
+     */
+    private void showRunAllDialog(int selectedIndex) {
+        DefaultListModel<JCheckBox> runAllSettings = new DefaultListModel<>();
+        JCheckBoxList checkBoxList = new JCheckBoxList(runAllSettings);
+
+        for (SortingAlgorithm alg : algorithmList) {
+            JCheckBox algCheckBox = new JCheckBox(alg.getName());
+            algCheckBox.setSelected(alg.isSelected());
+            algCheckBox.addChangeListener(e -> alg.setSelected(algCheckBox.isSelected()));
+            runAllSettings.addElement(algCheckBox);
+        }
+
+        final int[] dragFromIndex = {-1};
+        final boolean[] wasSelected = {false};
+
+        checkBoxList.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                dragFromIndex[0] = checkBoxList.locationToIndex(e.getPoint());
+                wasSelected[0] = !runAllSettings.getElementAt(dragFromIndex[0]).isSelected();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                dragFromIndex[0] = -1;
+                wasSelected[0] = false;
+            }
+        });
+
+        checkBoxList.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int currentDragIndex = checkBoxList.locationToIndex(e.getPoint());
+
+                if (dragFromIndex[0] != -1 && currentDragIndex != -1 && dragFromIndex[0] != currentDragIndex) {
+                    JCheckBox draggedItem = runAllSettings.getElementAt(dragFromIndex[0]);
+                    runAllSettings.remove(dragFromIndex[0]);
+                    runAllSettings.add(currentDragIndex, draggedItem);
+
+                    SortingAlgorithm temp = algorithmList.get(dragFromIndex[0]);
+                    algorithmList.remove(dragFromIndex[0]);
+                    algorithmList.add(currentDragIndex, temp);
+
+                    dragFromIndex[0] = currentDragIndex;
+                    if (wasSelected[0] != draggedItem.isSelected()) {
+                        draggedItem.setSelected(wasSelected[0]);
+                    }
+                }
+            }
+        });
+
+        JDialog runAllSettingDialog = new JDialog();
+        runAllSettingDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                for (SortingAlgorithm alg : algorithmList) {
+                    algorithmListComboBox.addItem(alg.getName());
+                    algorithmListComboBox.removeItemAt(0);
+                }
+                algorithmListComboBox.setSelectedIndex(selectedIndex);
+            }
+        });
+
+        runAllSettingDialog.setSize(350, 500);
+        runAllSettingDialog.setLocationRelativeTo(this);
+        runAllSettingDialog.setTitle("Configure Algorithm Execution Order");
+        runAllSettingDialog.add(new JScrollPane(checkBoxList));
+        runAllSettingDialog.setResizable(false);
+        runAllSettingDialog.setModal(true);
+        runAllSettingDialog.setVisible(true);
+    }
+
+    /**
+     * Open file chooser for image selection
+     */
+    private void selectImageFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select an image for visualization");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG and JPG images", "png", "jpg");
+        fileChooser.addChoosableFileFilter(filter);
+        int retval = fileChooser.showDialog(null, "Select image");
+        if (retval == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String imagePath = selectedFile.getAbsolutePath();
+
+            int index = visualizationListComboBox.getSelectedIndex();
+            ImageVertical imageVertical = (ImageVertical) visualizationList.get(16);
+            ImageHorizontal imageHorizontal = (ImageHorizontal) visualizationList.get(17);
+            imageHorizontal.setImg(imagePath);
+            imageVertical.setImg(imagePath);
+
+            if (Objects.equals(visualizationList.get(index).getName(), "Image - Vertical Sorting")) {
+                MainController.setVisualization(imageVertical);
+            } else {
+                MainController.setVisualization(imageHorizontal);
+            }
+        }
+    }
+
+    // Public interface methods
+    
     public void setEnableInputs(boolean enabled) {
         arraySizeSlider.setEnabled(enabled);
         algorithmListComboBox.setEnabled(enabled);
@@ -574,212 +776,4 @@ public class Settings extends JFrame {
     public void setProgressBar(int progress) {
         progressBarArray.setValue(progress);
     }
-
-    {
-// GUI initializer generated by IntelliJ IDEA GUI Designer
-// >>> IMPORTANT!! <<<
-// DO NOT EDIT OR ADD ANY CODE HERE!
-        $$$setupUI$$$();
-    }
-
-    /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
-     *
-     * @noinspection ALL
-     */
-    private void $$$setupUI$$$() {
-        settingsPanel = new JPanel();
-        settingsPanel.setLayout(new GridLayoutManager(20, 6, new Insets(0, 0, 0, 0), -1, -1));
-        settingsPanel.setName("settingsPanel");
-        settingsPanel.setOpaque(false);
-        gradientListLabel = new JLabel();
-        gradientListLabel.setText("Color gradient");
-        settingsPanel.add(gradientListLabel, new GridConstraints(10, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        arrayTitleLabel = new JLabel();
-        Font arrayTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, arrayTitleLabel.getFont());
-        if (arrayTitleLabelFont != null) arrayTitleLabel.setFont(arrayTitleLabelFont);
-        arrayTitleLabel.setText("Array");
-        settingsPanel.add(arrayTitleLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
-        algorithmListComboBox = new JComboBox<>();
-        algorithmListComboBox.setMaximumRowCount(20);
-        settingsPanel.add(algorithmListComboBox, new GridConstraints(5, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
-        gradientListComboBox = new JComboBox<>();
-        gradientListComboBox.setMaximumRowCount(20);
-        gradientListComboBox.setName("");
-        settingsPanel.add(gradientListComboBox, new GridConstraints(10, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
-        algorithmListLabel = new JLabel();
-        algorithmListLabel.setText("Sorting algorithm");
-        settingsPanel.add(algorithmListLabel, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        shuffleListLabel = new JLabel();
-        shuffleListLabel.setText("Shuffle type");
-        settingsPanel.add(shuffleListLabel, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        shuffleListBox = new JComboBox<>();
-        shuffleListBox.setMaximumRowCount(20);
-        settingsPanel.add(shuffleListBox, new GridConstraints(6, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
-        final Spacer spacer1 = new Spacer();
-        settingsPanel.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(20, 11), null, 0, false));
-        progressBarArray = new JProgressBar();
-        settingsPanel.add(progressBarArray, new GridConstraints(19, 0, 1, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        muteCheckBoxLabel = new JLabel();
-        muteCheckBoxLabel.setText("Play sound");
-        settingsPanel.add(muteCheckBoxLabel, new GridConstraints(15, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        muteCheckBox = new JCheckBox();
-        muteCheckBox.setText("");
-        settingsPanel.add(muteCheckBox, new GridConstraints(15, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
-        soundTitleLabel = new JLabel();
-        Font soundTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, soundTitleLabel.getFont());
-        if (soundTitleLabelFont != null) soundTitleLabel.setFont(soundTitleLabelFont);
-        soundTitleLabel.setText("Sound");
-        settingsPanel.add(soundTitleLabel, new GridConstraints(14, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
-        comparisonTableCheckBox = new JCheckBox();
-        comparisonTableCheckBox.setText("");
-        settingsPanel.add(comparisonTableCheckBox, new GridConstraints(11, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
-        comparisonTableCheckBoxLabel = new JLabel();
-        comparisonTableCheckBoxLabel.setText("Show comparison table");
-        settingsPanel.add(comparisonTableCheckBoxLabel, new GridConstraints(11, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        final Spacer spacer2 = new Spacer();
-        settingsPanel.add(spacer2, new GridConstraints(13, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
-        runButton = new JButton();
-        runButton.setText("run");
-        settingsPanel.add(runButton, new GridConstraints(17, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(180, 30), null, 0, false));
-        cancelButton = new JButton();
-        cancelButton.setText("cancel");
-        settingsPanel.add(cancelButton, new GridConstraints(17, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 30), null, 0, false));
-        final Spacer spacer3 = new Spacer();
-        settingsPanel.add(spacer3, new GridConstraints(16, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
-        visualTitleLabel = new JLabel();
-        Font visualTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, visualTitleLabel.getFont());
-        if (visualTitleLabelFont != null) visualTitleLabel.setFont(visualTitleLabelFont);
-        visualTitleLabel.setText("Visual");
-        settingsPanel.add(visualTitleLabel, new GridConstraints(8, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
-        sortingTitleLabel = new JLabel();
-        Font sortingTitleLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, sortingTitleLabel.getFont());
-        if (sortingTitleLabelFont != null) sortingTitleLabel.setFont(sortingTitleLabelFont);
-        sortingTitleLabel.setText("Sorting");
-        settingsPanel.add(sortingTitleLabel, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 22), null, 0, false));
-        final Spacer spacer4 = new Spacer();
-        settingsPanel.add(spacer4, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
-        visualizationListComboBoxLabel = new JLabel();
-        visualizationListComboBoxLabel.setText("Visualization");
-        settingsPanel.add(visualizationListComboBoxLabel, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        visualizationListComboBox = new JComboBox<>();
-        visualizationListComboBox.setMaximumRowCount(20);
-        settingsPanel.add(visualizationListComboBox, new GridConstraints(9, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
-        final Spacer spacer5 = new Spacer();
-        settingsPanel.add(spacer5, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(20, 11), null, 0, false));
-        arraySizeSlider = new JSlider();
-        arraySizeSlider.setInverted(false);
-        arraySizeSlider.setName("");
-        arraySizeSlider.setOrientation(0);
-        arraySizeSlider.setPaintLabels(true);
-        arraySizeSlider.setPaintTicks(true);
-        arraySizeSlider.setSnapToTicks(false);
-        arraySizeSlider.setToolTipText("");
-        arraySizeSlider.setValueIsAdjusting(false);
-        arraySizeSlider.putClientProperty("JSlider.isFilled", Boolean.FALSE);
-        arraySizeSlider.putClientProperty("Slider.paintThumbArrowShape", Boolean.FALSE);
-        settingsPanel.add(arraySizeSlider, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(180, 31), null, 0, false));
-        arraySizeTextField = new JTextField();
-        settingsPanel.add(arraySizeTextField, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(115, 30), null, 0, false));
-        showMeasurementsLabel = new JLabel();
-        showMeasurementsLabel.setText("Show measurements");
-        settingsPanel.add(showMeasurementsLabel, new GridConstraints(12, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(194, 16), null, 0, false));
-        showMeasurementsCheckBox = new JCheckBox();
-        showMeasurementsCheckBox.setText("");
-        settingsPanel.add(showMeasurementsCheckBox, new GridConstraints(12, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(132, 18), null, 0, false));
-        final Spacer spacer6 = new Spacer();
-        settingsPanel.add(spacer6, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(20, 11), null, 0, false));
-        arraySizeOkButton = new JButton();
-        arraySizeOkButton.setText("ok");
-        settingsPanel.add(arraySizeOkButton, new GridConstraints(2, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(137, 30), new Dimension(50, -1), 0, false));
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        settingsPanel.add(panel1, new GridConstraints(10, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, 1, 1, null, new Dimension(80, 30), null, 0, false));
-        colorChoose1 = new JPanel();
-        colorChoose1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        colorChoose1.setBackground(new Color(-47032));
-        colorChoose1.setName("colorChoose1");
-        panel1.add(colorChoose1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(10, 10), null, 0, false));
-        colorChoose2 = new JPanel();
-        colorChoose2.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        colorChoose2.setBackground(new Color(-47032));
-        colorChoose2.setDoubleBuffered(false);
-        colorChoose2.setName("colorChoose2");
-        panel1.add(colorChoose2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(10, 10), null, 0, false));
-        final Spacer spacer7 = new Spacer();
-        settingsPanel.add(spacer7, new GridConstraints(18, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
-        final Spacer spacer8 = new Spacer();
-        settingsPanel.add(spacer8, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
-        final Spacer spacer9 = new Spacer();
-        settingsPanel.add(spacer9, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(194, 14), null, 0, false));
-        final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panel2.setEnabled(true);
-        settingsPanel.add(panel2, new GridConstraints(5, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, 1, 1, null, new Dimension(80, 30), null, 0, false));
-        runAllCheckBox = new JCheckBox();
-        runAllCheckBox.setAlignmentX(0.5f);
-        runAllCheckBox.setDoubleBuffered(true);
-        runAllCheckBox.setText("All");
-        panel2.add(runAllCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(40, 30), null, 0, false));
-        buttonRunAllSettings = new JButton();
-        buttonRunAllSettings.setAlignmentX(0.0f);
-        buttonRunAllSettings.setDoubleBuffered(false);
-        buttonRunAllSettings.setEnabled(false);
-        buttonRunAllSettings.setHorizontalAlignment(0);
-        buttonRunAllSettings.setHorizontalTextPosition(2);
-        buttonRunAllSettings.setIconTextGap(0);
-        buttonRunAllSettings.setText("Settings");
-        buttonRunAllSettings.setToolTipText("");
-        buttonRunAllSettings.setVerticalTextPosition(0);
-        buttonRunAllSettings.setVisible(true);
-        panel2.add(buttonRunAllSettings, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(30, 30), null, 0, false));
-        buttonSetImg = new JButton();
-        buttonSetImg.setAlignmentX(0.0f);
-        buttonSetImg.setDoubleBuffered(false);
-        buttonSetImg.setEnabled(false);
-        buttonSetImg.setHorizontalAlignment(0);
-        buttonSetImg.setHorizontalTextPosition(2);
-        buttonSetImg.setIconTextGap(0);
-        buttonSetImg.setText("Select Image");
-        buttonSetImg.setToolTipText("");
-        buttonSetImg.setVerticalTextPosition(0);
-        buttonSetImg.setVisible(true);
-        settingsPanel.add(buttonSetImg, new GridConstraints(9, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(30, 30), null, 0, false));
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
-        if (currentFont == null) return null;
-        String resultName;
-        if (fontName == null) {
-            resultName = currentFont.getName();
-        } else {
-            Font testFont = new Font(fontName, Font.PLAIN, 10);
-            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
-                resultName = fontName;
-            } else {
-                resultName = currentFont.getName();
-            }
-        }
-        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
-        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
-        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
-        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    public JComponent $$$getRootComponent$$$() {
-        return settingsPanel;
-    }
-
-    @SuppressWarnings("unused")
-    private void createUIComponents() {
-    }
 }
-
