@@ -1,6 +1,6 @@
 package io.github.compilerstuck.Sound;
 
-import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.model.ArrayModel;
 
 /**
  * No-op sound implementation used when audio output is not desired (e.g. in

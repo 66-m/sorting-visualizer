@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.config;
 
 /**
  * Configuration constants for MainController.

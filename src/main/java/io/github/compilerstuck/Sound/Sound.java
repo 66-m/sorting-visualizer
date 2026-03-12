@@ -1,6 +1,6 @@
 package io.github.compilerstuck.Sound;
 
-import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.model.ArrayModel;
 import processing.core.PApplet;
 
 public abstract class Sound {

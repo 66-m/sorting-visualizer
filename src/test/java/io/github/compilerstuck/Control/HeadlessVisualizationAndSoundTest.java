@@ -1,5 +1,7 @@
 package io.github.compilerstuck.Control;
 
+import io.github.compilerstuck.Control.model.ArrayController;
+import io.github.compilerstuck.Control.render.HeadlessRenderContext;
 import io.github.compilerstuck.Sound.HeadlessSound;
 import io.github.compilerstuck.Visual.Bars;
 import io.github.compilerstuck.Visual.Circle;

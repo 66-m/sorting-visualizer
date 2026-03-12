@@ -1,5 +1,8 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.ui;
 
+import io.github.compilerstuck.Control.MainController;
+import io.github.compilerstuck.Control.config.ShuffleType;
+import io.github.compilerstuck.Control.render.RenderContext;
 import io.github.compilerstuck.SortingAlgorithms.*;
 import io.github.compilerstuck.Visual.*;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;

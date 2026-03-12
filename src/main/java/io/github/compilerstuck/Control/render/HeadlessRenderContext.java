@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.render;
 
 /**
  * A trivial {@link RenderContext} implementation that does nothing.  Useful for

@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.render;
 
 /**
  * Minimal abstraction of the Processing runtime used by sorting algorithms to

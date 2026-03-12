@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.ui;
 
 import javax.swing.*;
 import java.awt.*;

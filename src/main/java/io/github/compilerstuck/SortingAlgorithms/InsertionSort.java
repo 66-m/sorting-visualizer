@@ -1,6 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 
 public class InsertionSort extends SortingAlgorithm {

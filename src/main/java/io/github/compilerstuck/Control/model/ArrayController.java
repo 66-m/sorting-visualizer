@@ -1,5 +1,8 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.model;
 
+import io.github.compilerstuck.Control.MainController;
+import io.github.compilerstuck.Control.config.ShuffleStrategy;
+import io.github.compilerstuck.Control.config.ShuffleType;
 import io.github.compilerstuck.Control.shuffle.AlmostSortedShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.ReverseShuffleStrategy;
