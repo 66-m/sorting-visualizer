@@ -14,58 +14,63 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ * Main controller for the sorting algorithm visualizer.
+ * 
+ * Manages the Processing display loop, user interaction, and coordinates between
+ * visualization, sound, algorithm execution, and UI settings.
+ * 
+ * Note: This class maintains some static fields for backwards compatibility with
+ * the Settings UI and algorithm infrastructure. Access to these is coordinated
+ * through synchronized accessors.
+ */
 public class MainController extends PApplet implements RenderContext {
+    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
 
-
+    // Static reference for backwards compatibility with Settings UI
     public static ProcessingContext processing;
-
-    private static int size;
-
-    private static ArrayController arrayController;
-    private static ArrayList<SortingAlgorithm> algorithms;
-
-    private final ArrayList<String> comparisons = new ArrayList<>();
-    private final ArrayList<String> realTime = new ArrayList<>();
-    private final ArrayList<String> swaps = new ArrayList<>();
-    private final ArrayList<String> writesMain = new ArrayList<>();
-    private final ArrayList<String> writesAux = new ArrayList<>();
-    private final ArrayList<Integer> timestamps = new ArrayList<>();
-
-    private static boolean start = false;
-    private static boolean running = false;
-    //private final boolean[] keys = new boolean[3];
-    private boolean results = false;
-    private static boolean showComparisonTable = false;
-    private static boolean printMeasurements = true;
-    private boolean restart = false;
-    private static String currentOperation = "Waiting";
-
-    private static Visualization visualization;
     public static Sound sound;
-    private static ColorGradient colorGradient;
 
+    // Instance fields (preferred pattern)
+    private int size;
+    private ArrayController arrayController;
+    private List<SortingAlgorithm> algorithms;
+    private Visualization visualization;
+    private ColorGradient colorGradient;
     private Settings settings;
 
-    private static boolean fullScreen = false;
-    private static boolean portrait = false;
+    private SortingStateManager stateManager;
+    private SortingSessionManager sessionManager;
 
+    private boolean fullScreen = false;
+    private boolean portrait = false;
 
+    /**
+     * Entry point for the sorting visualizer application.
+     * 
+     * @param passedArgs command line arguments: "fullscreen" or "portrait"
+     */
     public static void main(String[] passedArgs) {
-        //Changing UI Theme
+        setupUITheme();
+
+        String[] appletArgs = new String[]{"io.github.compilerstuck.Control.MainController"};
+        PApplet.main(concat(appletArgs, passedArgs));
+    }
+
+    /**
+     * Configures the application's UI theme using FlatLaf dark theme.
+     */
+    private static void setupUITheme() {
         FlatDarculaLaf.setup();
         try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
         } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed to set FlatDarculaLaf look and feel", e);
         }
-
-
-        fullScreen = passedArgs.length != 0 && passedArgs[0].equalsIgnoreCase("fullscreen");
-        portrait = passedArgs.length != 0 && passedArgs[0].equalsIgnoreCase("portrait");
-
-        String[] appletArgs = new String[]{"io.github.compilerstuck.Control.MainController"};
-        PApplet.main(concat(appletArgs, passedArgs));
     }
 
     @Override
@@ -73,237 +78,376 @@ public class MainController extends PApplet implements RenderContext {
         super.delay(ms);
     }
 
+    /**
+     * Processing settings hook. Configures window size and rendering mode.
+     */
     @Override
     public void settings() {
         if (fullScreen) {
             fullScreen(P3D);
-        }
-        else if(portrait){
-            this.size(576 , 1024 , P3D);
-        }
-        else {
-            this.size(1280, 720, P3D);
+        } else if (portrait) {
+            this.size(MainControllerConfig.PORTRAIT_WIDTH, MainControllerConfig.PORTRAIT_HEIGHT, P3D);
+        } else {
+            this.size(MainControllerConfig.STANDARD_WIDTH, MainControllerConfig.STANDARD_HEIGHT, P3D);
         }
         noSmooth();
     }
 
 
+    /**
+     * Processing setup hook. Initializes all components including visualization,
+     * sound, algorithms, and settings UI.
+     */
     @Override
     public void setup() {
+        configureWindow();
+        
+        processing = this; // Static reference for backwards compatibility
+        
+        initializeComponents();
+        initializeState();
+        
+        try {
+            settings = new Settings();
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | 
+                 InstantiationException | IllegalAccessException e) {
+            LOGGER.log(Level.SEVERE, "Failed to initialize Settings UI", e);
+        }
+    }
+
+    /**
+     * Configures window size, position, and title.
+     */
+    private void configureWindow() {
         if (!fullScreen) {
-            surface.setLocation(605, 10);
+            surface.setLocation(MainControllerConfig.WINDOW_X_POSITION, 
+                              MainControllerConfig.WINDOW_Y_POSITION);
             surface.setResizable(false);
         } else {
             surface.setLocation(0, 0);
         }
 
         surface.setTitle("Sorting Algorithm Visualizer");
-        frameRate(1000);
-        textSize(50);//Setting max text size - due to processing bug
-        processing = this; // this implements ProcessingContext via class declaration
+        frameRate(MainControllerConfig.TARGET_FRAME_RATE);
+        textSize(MainControllerConfig.MAX_TEXT_SIZE); // Processing workaround
+    }
 
-        size = 1280; //Standard size
-        arrayController = new ArrayController(size); //Initialize ArrayController with the standard size
+    /**
+     * Initializes visualization, sound, color gradient, and algorithms.
+     */
+    private void initializeComponents() {
+        size = MainControllerConfig.DEFAULT_ARRAY_SIZE;
+        arrayController = new ArrayController(size);
 
-        //Standard Sound
+        // Initialize sound system
         try {
             sound = new MidiSys(arrayController);
         } catch (MidiUnavailableException e) {
-            System.out.println("Sound could not be loaded");
+            LOGGER.log(Level.WARNING, "Sound system unavailable, running without audio", e);
+            sound = null;
         }
 
-        colorGradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red"); //Standard gradient
-        visualization = new Bars(arrayController, colorGradient, sound, (RenderContext) processing); //Standard visual
+        // Initialize visualization
+        colorGradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red");
+        visualization = new Bars(arrayController, colorGradient, sound, this);
 
+        // Initialize algorithms
         algorithms = new ArrayList<>();
         algorithms.add(new QuickSortMiddlePivot(arrayController));
-
-        try {
-            settings = new Settings();
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
     }
 
+    /**
+     * Initializes state managers for thread coordination.
+     */
+    private void initializeState() {
+        stateManager = new SortingStateManager();
+        sessionManager = new SortingSessionManager(arrayController, sound, stateManager);
+    }
+
+    /**
+     * Processing draw hook. Called repeatedly to update and render the visualization.
+     * Handles state transitions and coordinates between simulation and rendering.
+     */
     @Override
     public void draw() {
         try {
-            if (results && showComparisonTable && SortingAlgorithm.isRun()) {
-                printResults();
-            } else if (restart) {
-                running = false;
-                start = false;
-                restart = false;
-                results = false;
-
-                sound.mute(true);
-                sound.mute(false);
-
-                printTimestampsToConsole();
-
-                arrayController.resetMeasurements();
-                comparisons.clear();
-                realTime.clear();
-                swaps.clear();
-                writesMain.clear();
-                writesAux.clear();
-                timestamps.clear();
-                setCurrentOperation("Waiting");
-
-                SortingAlgorithm.setRun(true);
-                arrayController.resetArray();
-
-                settings.setProgressBar(100);
-                settings.setEnableInputs(true);
-                settings.setEnableCancelButton(false);
-
-
-            } else if (running) {
-                visualization.update();
-                arrayController.update();
-                if (printMeasurements) printMeasurements();
-                settings.setProgressBar((int) (arrayController.getSortedPercentage() * 100));
+            if (stateManager.shouldShowResults()) {
+                handleResultsDisplay();
+            } else if (stateManager.shouldRestart()) {
+                handleRestart();
+            } else if (stateManager.isRunning()) {
+                handleActiveSort();
             } else {
-                if (start) {
-                    if (printMeasurements) printMeasurements();
-                    results = false;
-                    start = false;
-                    delay(500);
-                    running = true;
-                    settings.setEnableInputs(false);
-                    arrayController.resetArray();
-                    startAlgorithmThread();
-                } else {
-                    visualization.update();
-                    if (printMeasurements) printMeasurements();
-                }
+                handleIdleState();
             }
-            if (exitCalled()){
+
+            if (exitCalled()) {
                 shutdown();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error during draw loop", e);
+        }
     }
 
-    private void startAlgorithmThread() {
-        new Thread(() -> {
-
-            int startTime = (int) (System.currentTimeMillis() / 1000L);
-
-            for (SortingAlgorithm algorithm : algorithms) {
-                if (!SortingAlgorithm.isRun()) {
-                    break;
-                }
-                
-                sound.mute(true);
-                sound.mute(false);
-
-                timestamps.add((int) (System.currentTimeMillis() / 1000L) - startTime);
-
-                arrayController.shuffle();
-                if (!SortingAlgorithm.isRun()) {
-                    break;
-                }
-                sound.mute(true);
-                delay(500);
-                sound.mute(false);
-                arrayController.resetMeasurements();
-
-                //start sorting
-                algorithm.sort();
-                if (!SortingAlgorithm.isRun()) {
-                    break;
-                }
-                comparisons.add(Long.toString(arrayController.getComparisons()));
-                realTime.add(Double.toString(arrayController.getRealTime()));
-                swaps.add(Long.toString(arrayController.getSwaps()));
-                writesMain.add(Long.toString(arrayController.getWrites()));
-                writesAux.add(Long.toString(arrayController.getWritesAux()));
-                sound.mute(true);
-                delay(1500);
-                sound.mute(false);
-                arrayController.resetMeasurements();
-            }
-            if (showComparisonTable && SortingAlgorithm.isRun()) {
-                results = true;
-            }
-            restart = true;
-            running = false;
-
-        }).start();
+    /**
+     * Handles displaying results table after sorting completes.
+     */
+    private void handleResultsDisplay() {
+        if (stateManager.shouldShowComparisonTable() && SortingAlgorithm.isRun()) {
+            printResults();
+        }
     }
 
+    /**
+     * Handles restart/reset state after algorithms complete.
+     */
+    private void handleRestart() {
+        stateManager.setRunning(false);
+        stateManager.setStartRequested(false);
+        stateManager.setRestart(false);
+        stateManager.setShowResults(false);
+
+        if (sound != null) {
+            sound.mute(true);
+            sound.mute(false);
+        }
+
+        sessionManager.printTimestampsToConsole(new ArrayList<>(algorithms));
+        arrayController.resetMeasurements();
+        stateManager.setCurrentOperation("Waiting");
+
+        SortingAlgorithm.setRun(true);
+        arrayController.resetArray();
+
+        if (settings != null) {
+            settings.setProgressBar(100);
+            settings.setEnableInputs(true);
+            settings.setEnableCancelButton(false);
+        }
+    }
+
+    /**
+     * Handles rendering and updates during active sorting.
+     */
+    private void handleActiveSort() {
+        visualization.update();
+        arrayController.update();
+        
+        if (stateManager.shouldPrintMeasurements()) {
+            printMeasurements();
+        }
+        
+        if (settings != null) {
+            settings.setProgressBar((int) (arrayController.getSortedPercentage() * 100));
+        }
+    }
+
+    /**
+     * Handles idle state or starting new sort session.
+     */
+    private void handleIdleState() {
+        if (stateManager.requestedStart()) {
+            startSortingSession();
+        } else {
+            visualization.update();
+            if (stateManager.shouldPrintMeasurements()) {
+                printMeasurements();
+            }
+        }
+    }
+
+    /**
+     * Initiates a new sorting session.
+     */
+    private void startSortingSession() {
+        if (stateManager.shouldPrintMeasurements()) {
+            printMeasurements();
+        }
+        
+        stateManager.setShowResults(false);
+        
+        try {
+            Thread.sleep(MainControllerConfig.SETUP_DELAY);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.log(Level.WARNING, "Thread interrupted during setup delay", e);
+        }
+        
+        stateManager.setRunning(true);
+        
+        if (settings != null) {
+            settings.setEnableInputs(false);
+        }
+        
+        arrayController.resetArray();
+        sessionManager.startSortingSession(algorithms);
+    }
+
+    /**
+     * Handles ESC key press to gracefully shutdown the application.
+     */
     @Override
     public void keyPressed() {
         if (keyCode == ESC) {
-            sound.mute(true);
+            if (sound != null) {
+                sound.mute(true);
+            }
             shutdown();
         }
     }
 
-    public static void shutdown(){
+    /**
+     * Gracefully shuts down the application.
+     * Sets the run flag and exits the Processing loop and JVM.
+     */
+    public static void shutdown() {
         SortingAlgorithm.setRun(false);
-        // processing is a ProcessingContext, but the static methods noLoop/exit are
-        // defined on PApplet.  Cast back when needed.
+        
         if (processing instanceof PApplet p) {
             p.noLoop();
             p.exit();
         }
     }
 
-    public void printTimestampsToConsole() {
-        System.out.println("\n\nTimestamps:\n");
-        for (int i = 0; i < algorithms.size(); i++) {
-            int minutes = timestamps.get(i) / 60;
-            int seconds = timestamps.get(i) % 60;
-            String time = String.format("%02d:%02d", minutes, seconds);
-            System.out.println(time + " " + algorithms.get(i).getName());
-        }
-    }
-
+    /**
+     * Displays a table of algorithm comparison results on screen.
+     * Shows metrics like comparisons, swaps, writes, and execution time.
+     */
     private void printResults() {
-        textSize((int) (20. / 1280 * width));
-        background(15);
-        fill(255);
-        stroke(255);
-        line((int) ((width / 7.) + (width / 7.) / 2), 0, (int) ((width / 7.) + (width / 7.) / 2), height);
-        for (int i = 2; i < 7; i++) {
-            line((int) (width / 7. * i), 0, (int) (width / 7. * i), height);
-        }
-        text("Alg. name", (int) (width / 7. * 0) + 10, (int) (20. / 1280 * width));
-        text("Elements", (int) (width / 7. * 1 + (width / 7.) / 2) + 5, (int) (20. / 1280 * width));
-        text("Comparisons", (int) (width / 7. * 2) + 10, (int) (20. / 1280 * width));
-        text("Est. time", (int) (width / 7. * 3) + 10, (int) (20. / 1280 * width));
-        text("Swaps", (int) (width / 7. * 4) + 10, (int) (20. / 1280 * width));
-        text("Writes main", (int) (width / 7. * 5) + 10, (int) (20. / 1280 * width));
-        text("Writes aux", (int) (width / 7. * 6) + 10, (int) (20. / 1280 * width));
+        textSize((int) (MainControllerConfig.FONT_SIZE_RATIO / MainControllerConfig.WINDOW_RATIO_WIDTH * width));
+        background(MainControllerConfig.RESULTS_TABLE_BACKGROUND);
+        fill(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
+        stroke(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
 
-        for (int i = 0; i < algorithms.size(); i++) {
-            line(0, (int) (50 + (height - 50.) / algorithms.size() * (i)), width, (int) (50 + (height - 50.) / algorithms.size() * i));
-            text(algorithms.get(i).getName(), (int) (width / 7. * 0) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(algorithms.get(i).getAlternativeSize(), (int) (width / 7. * 1 + (width / 7.) / 2) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", (Long.parseLong(comparisons.get(i)))), (int) (width / 7. * 2) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text("~" + String.valueOf(Math.floor(Double.parseDouble(realTime.get(i)) / 10000.) / 100).replace(".", ",") + "ms", (int) (width / 7. * 3) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", Long.parseLong(swaps.get(i))), (int) (width / 7. * 4) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", Long.parseLong(writesMain.get(i))), (int) (width / 7. * 5) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
-            text(String.format("%,d", Long.parseLong(writesAux.get(i))), (int) (width / 7. * 6) + 10, (int) (10 + 50 + (height - 50.) / algorithms.size() * (i) + (height - 50.) / algorithms.size() / 2));
+        drawResultsTableGrid();
+        drawResultsTableHeaders();
+        drawResultsTableData();
+    }
+
+    /**
+     * Draws the grid lines for the results table.
+     */
+    private void drawResultsTableGrid() {
+        float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
+        
+        line((int) (columnWidth + columnWidth / 2), 0, 
+             (int) (columnWidth + columnWidth / 2), height);
+        
+        for (int i = 2; i < 7; i++) {
+            line((int) (columnWidth * i), 0, (int) (columnWidth * i), height);
         }
     }
 
+    /**
+     * Draws the header row of the results table.
+     */
+    private void drawResultsTableHeaders() {
+        float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
+        int textY = (int) (MainControllerConfig.FONT_SIZE_RATIO / MainControllerConfig.WINDOW_RATIO_WIDTH * width);
+        
+        text("Alg. name", columnWidth * 0 + 10, textY);
+        text("Elements", columnWidth * 1 + columnWidth / 2 + 5, textY);
+        text("Comparisons", columnWidth * 2 + 10, textY);
+        text("Est. time", columnWidth * 3 + 10, textY);
+        text("Swaps", columnWidth * 4 + 10, textY);
+        text("Writes main", columnWidth * 5 + 10, textY);
+        text("Writes aux", columnWidth * 6 + 10, textY);
+    }
+
+    /**
+     * Draws the data rows of the results table.
+     */
+    private void drawResultsTableData() {
+        if (algorithms.isEmpty()) {
+            return;
+        }
+
+        float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
+        float rowHeight = (height - MainControllerConfig.TABLE_TOP_ROW) / algorithms.size();
+        float textY = 20.0f / MainControllerConfig.WINDOW_RATIO_WIDTH * width;
+
+        List<String> comparisons = sessionManager.getComparisons();
+        List<String> realTime = sessionManager.getRealTime();
+        List<String> swaps = sessionManager.getSwaps();
+        List<String> writesMain = sessionManager.getWritesMain();
+        List<String> writesAux = sessionManager.getWritesAux();
+
+        for (int i = 0; i < algorithms.size(); i++) {
+            float rowY = MainControllerConfig.TABLE_TOP_ROW + rowHeight * i;
+            line(0, (int) rowY, width, (int) rowY);
+
+            drawResultsRow(i, columnWidth, rowY, textY, 
+                          comparisons, realTime, swaps, writesMain, writesAux);
+        }
+    }
+
+    /**
+     * Draws a single data row in the results table.
+     */
+    private void drawResultsRow(int index, float columnWidth, float rowY, float textY,
+                               List<String> comparisons, List<String> realTime,
+                               List<String> swaps, List<String> writesMain,
+                               List<String> writesAux) {
+        SortingAlgorithm alg = algorithms.get(index);
+        float rowCenterY = rowY + 10 + (height - MainControllerConfig.TABLE_TOP_ROW) 
+                          / algorithms.size() / 2;
+
+        text(alg.getName(), columnWidth * 0 + 10, (int) rowCenterY);
+        text(String.valueOf(alg.getAlternativeSize()), 
+             (int) (columnWidth * 1 + columnWidth / 2) + 10, (int) rowCenterY);
+
+        if (index < comparisons.size()) {
+            text(String.format("%,d", Long.parseLong(comparisons.get(index))), 
+                 (int) (columnWidth * 2) + 10, (int) rowCenterY);
+        }
+
+        if (index < realTime.size()) {
+            String timeStr = "~" + formatTimeEstimate(Double.parseDouble(realTime.get(index))) + "ms";
+            text(timeStr, (int) (columnWidth * 3) + 10, (int) rowCenterY);
+        }
+
+        if (index < swaps.size()) {
+            text(String.format("%,d", Long.parseLong(swaps.get(index))), 
+                 (int) (columnWidth * 4) + 10, (int) rowCenterY);
+        }
+
+        if (index < writesMain.size()) {
+            text(String.format("%,d", Long.parseLong(writesMain.get(index))), 
+                 (int) (columnWidth * 5) + 10, (int) rowCenterY);
+        }
+
+        if (index < writesAux.size()) {
+            text(String.format("%,d", Long.parseLong(writesAux.get(index))), 
+                 (int) (columnWidth * 6) + 10, (int) rowCenterY);
+        }
+    }
+
+    /**
+     * Formats time estimate from raw measurement to readable format.
+     */
+    private String formatTimeEstimate(double rawTime) {
+        double ms = Math.floor(rawTime / 10000.0) / 100;
+        return String.valueOf(ms).replace(".", ",");
+    }
+
+    /**
+     * Prints live measurements during sorting (comparisons, swaps, time, etc).
+     */
     private void printMeasurements() {
         stroke(255);
         fill(255);
 
-        int textSize = (int) (23. / 1280 * width);
-        int textXPosition = (int) (5. / 1280 * width);
-        int lineHeight = (int) (20. / 1280 * width);
+        int textSize = (int) (MainControllerConfig.TEXT_Y_OFFSET / MainControllerConfig.WINDOW_RATIO_WIDTH * width);
+        int textXPosition = (int) (MainControllerConfig.TEXT_X_OFFSET / MainControllerConfig.WINDOW_RATIO_WIDTH * width);
+        int lineHeight = (int) (MainControllerConfig.LINE_HEIGHT_OFFSET / MainControllerConfig.WINDOW_RATIO_WIDTH * width);
         textSize(textSize);
 
         String[] labels = {
-                currentOperation,
+                stateManager.getCurrentOperation(),
                 (int) (arrayController.getSortedPercentage() * 100) + "% Sorted (" + arrayController.getSegments() + " Segments)",
                 String.format("%,d", arrayController.getComparisons()) + " Comparisons",
-                "Estimated time: ~" + String.valueOf(Math.floor(arrayController.getRealTime() / 10000.) / 100).replace(".", ",") + "ms",
-                String.format("%,d",  arrayController.getSwaps()) + " Swaps",
+                "Estimated time: ~" + formatTimeEstimate(arrayController.getRealTime()) + "ms",
+                String.format("%,d", arrayController.getSwaps()) + " Swaps",
                 String.format("%,d", arrayController.getWrites()) + " Writes to main array",
                 String.format("%,d", arrayController.getWritesAux()) + " Writes to auxiliary array",
                 arrayController.getLength() + " Elements"
@@ -314,70 +458,224 @@ public class MainController extends PApplet implements RenderContext {
         }
     }
 
+    /**
+     * Sets the current operation name for display.
+     * @param operation the operation name to display
+     */
     public static void setCurrentOperation(String operation) {
-        currentOperation = operation;
+        if (processing instanceof MainController controller) {
+            controller.stateManager.setCurrentOperation(operation);
+        }
     }
 
+    // Static accessor methods for backwards compatibility with Settings UI
+    // These delegate to instance state or maintain static references
 
+    /**
+     * Sets the color gradient for all visualizations.
+     * @param newColorGradient the new color gradient to apply
+     */
     public static void setColorGradient(ColorGradient newColorGradient) {
-        colorGradient = newColorGradient;
-        colorGradient.updateGradient(size);
-        visualization.updateColorGradient(colorGradient);
+        if (processing instanceof MainController controller) {
+            controller.colorGradient = newColorGradient;
+            controller.colorGradient.updateGradient(controller.size);
+            controller.visualization.updateColorGradient(newColorGradient);
+        }
     }
 
+    /**
+     * Updates the array size and resizes all related components.
+     * @param newSize the new array size
+     */
     public static void updateArraySize(int newSize) {
-        size = newSize;
-        colorGradient.updateGradient(size);
-        visualization.updateColorGradient(colorGradient);
-        for (SortingAlgorithm alg : algorithms) {
-            if (alg.getAlternativeSize() == arrayController.getLength()) {
-                alg.setAlternativeSize(newSize);
+        if (processing instanceof MainController controller) {
+            controller.size = newSize;
+            controller.colorGradient.updateGradient(newSize);
+            controller.visualization.updateColorGradient(controller.colorGradient);
+            
+            for (SortingAlgorithm alg : controller.algorithms) {
+                if (alg.getAlternativeSize() == controller.arrayController.getLength()) {
+                    alg.setAlternativeSize(newSize);
+                }
             }
+            controller.arrayController.resize(newSize);
         }
-        arrayController.resize(size);
     }
 
-    public static void setVisualization(Visualization visualization) {
-        MainController.visualization = visualization;
-        visualization.updateColorGradient(colorGradient);
+    /**
+     * Sets the visualization implementation.
+     * @param viz the new visualization to use
+     */
+    public static void setVisualization(Visualization viz) {
+        if (processing instanceof MainController controller) {
+            controller.visualization = viz;
+            viz.updateColorGradient(controller.colorGradient);
+        }
     }
 
+    /**
+     * Gets the current array size.
+     * @return the array size
+     */
     public static int getSize() {
-        return size;
+        if (processing instanceof MainController controller) {
+            return controller.size;
+        }
+        return 0;
     }
 
-    public static void setSize(int size) {
-        MainController.size = size;
+    /**
+     * Sets the array size.
+     * @param newSize the new array size
+     */
+    public static void setSize(int newSize) {
+        if (processing instanceof MainController controller) {
+            controller.size = newSize;
+        }
     }
 
+    /**
+     * Directfieldaccess to array controller.
+     * @return the array controller instance
+     */
     public static ArrayController getArrayController() {
-        return arrayController;
+        if (processing instanceof MainController controller) {
+            return controller.arrayController;
+        }
+        return null;
     }
 
+    /**
+     * Gets the list of registered algorithms.
+     * @return the algorithms list
+     */
     public static ArrayList<SortingAlgorithm> getAlgorithms() {
-        return algorithms;
+        if (processing instanceof MainController controller) {
+            return new ArrayList<>(controller.algorithms);
+        }
+        return new ArrayList<>();
     }
 
-    public static void setAlgorithms(ArrayList<SortingAlgorithm> algorithms) {
-        MainController.algorithms.clear();
-        for (SortingAlgorithm alg : algorithms){
-            if (alg.isSelected()){
-                MainController.algorithms.add(alg);
+    /**
+     * Sets which algorithms to run (selects only those marked as selected).
+     * @param algorithmList list of algorithms to consider
+     */
+    public static void setAlgorithms(ArrayList<SortingAlgorithm> algorithmList) {
+        if (processing instanceof MainController controller) {
+            controller.algorithms.clear();
+            for (SortingAlgorithm alg : algorithmList) {
+                if (alg.isSelected()) {
+                    controller.algorithms.add(alg);
+                }
             }
         }
-
     }
 
+    /**
+     * Sets a single algorithm to run.
+     * @param algorithm the algorithm to run
+     */
     public static void setAlgorithm(SortingAlgorithm algorithm) {
-        algorithms.clear();
-        algorithms.add(algorithm);
+        if (processing instanceof MainController controller) {
+            controller.algorithms.clear();
+            controller.algorithms.add(algorithm);
+        }
     }
 
-    public static void setStart(boolean start) {
-        MainController.start = start;
+    /**
+     * Requests to start the sorting process.
+     * @param shouldStart true to request start
+     */
+    public static void setStart(boolean shouldStart) {
+        if (processing instanceof MainController controller) {
+            controller.stateManager.setStartRequested(shouldStart);
+        }
     }
 
-    // RenderContext implementations ------------------------------------------------
+    /**
+     * Checks if sorting is currently running.
+     * @return true if active
+     */
+    public static boolean isRunning() {
+        if (processing instanceof MainController controller) {
+            return controller.stateManager.isRunning();
+        }
+        return false;
+    }
+
+    /**
+     * Gets sound system.
+     * @return the sound instance
+     */
+    public static Sound getSound() {
+        return sound;
+    }
+
+    /**
+     * Sets the sound instance.
+     * @param soundSystem the sound to use
+     */
+    public static void setSound(Sound soundSystem) {
+        sound = soundSystem;
+    }
+
+    /**
+     * Gets current color gradient.
+     * @return the color gradient
+     */
+    public static ColorGradient getColorGradient() {
+        if (processing instanceof MainController controller) {
+            return controller.colorGradient;
+        }
+        return null;
+    }
+
+    /**
+     * Sets whether to show the comparison table.
+     * @param show true to show table
+     */
+    public static void setShowComparisonTable(boolean show) {
+        if (processing instanceof MainController controller) {
+            controller.stateManager.setShowComparisonTable(show);
+        }
+    }
+
+    /**
+     * Sets whether to print on-screen measurements.
+     * @param print true to print
+     */
+    public static void setPrintMeasurements(boolean print) {
+        if (processing instanceof MainController controller) {
+            controller.stateManager.setPrintMeasurements(print);
+        }
+    }
+
+    /**
+     * Sets the animation delay factor for all algorithms.
+     * A value of 1.0 means every step fires a delay; lower values reduce frame rate.
+     * @param factor the delay factor (0 < factor <= 1)
+     */
+    public static void setDelayFactor(double factor) {
+        if (processing instanceof MainController controller) {
+            for (SortingAlgorithm alg : controller.algorithms) {
+                alg.setDelayFactor(factor);
+            }
+        }
+    }
+
+    /**
+     * Sets the animation delay time in milliseconds for all algorithms.
+     * @param ms the delay in milliseconds
+     */
+    public static void setDelayTime(int ms) {
+        if (processing instanceof MainController controller) {
+            for (SortingAlgorithm alg : controller.algorithms) {
+                alg.setDelayTime(ms);
+            }
+        }
+    }
+
+    // RenderContext implementation - delegates to Processing PApplet methods
     
     @Override
     public void background(int rgb) {
@@ -409,8 +707,6 @@ public class MainController extends PApplet implements RenderContext {
         super.rect(x, y, w, h);
     }
 
-
-
     @Override
     public void line(float x1, float y1, float x2, float y2) {
         super.line(x1, y1, x2, y2);
@@ -429,48 +725,5 @@ public class MainController extends PApplet implements RenderContext {
     @Override
     public int getHeight() {
         return super.height;
-    }
-
-    public static boolean isRunning() {
-        return running;
-    }
-
-    public static Sound getSound() {
-        return sound;
-    }
-
-    public static void setSound(Sound sound) {
-        MainController.sound = sound;
-    }
-
-    public static ColorGradient getColorGradient() {
-        return colorGradient;
-    }
-
-    public static void setShowComparisonTable(boolean showComparisonTable) {
-        MainController.showComparisonTable = showComparisonTable;
-    }
-
-    public static void setPrintMeasurements(boolean printMeasurements) {
-        MainController.printMeasurements = printMeasurements;
-    }
-
-    /**
-     * Sets the delay factor on every registered algorithm.
-     * A value of {@code 1.0} means every eligible step fires a delay; lower
-     * values reduce the frame rate proportionally (see {@link DelayStrategy}).
-     *
-     * @param factor value in the range (0, 1]
-     */
-    public static void setDelayFactor(double factor) {
-        for (SortingAlgorithm alg : algorithms) {
-            alg.setDelayFactor(factor);
-        }
-    }
-
-    public static void setDelayTime(int ms) {
-        for (SortingAlgorithm alg : algorithms) {
-            alg.setDelayTime(ms);
-        }
     }
 }
