@@ -1,7 +1,7 @@
 package io.github.compilerstuck.Visual;
 
-import io.github.compilerstuck.Control.ArrayModel;
-import io.github.compilerstuck.Control.RenderContext;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.render.RenderContext;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;

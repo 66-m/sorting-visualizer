@@ -1,8 +1,9 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayModel;
-import io.github.compilerstuck.Control.ArrayController;
 import io.github.compilerstuck.Control.MainController;
+import io.github.compilerstuck.Control.model.ArrayController;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.render.ProcessingContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class SortingAlgorithmsTest {
      * Most of the sorting code only ever calls {@code delay(int)}, so we provide a
      * no-op implementation to avoid starting a real graphics context during tests.
      */
-    static class DummyProcessing extends PApplet implements io.github.compilerstuck.Control.ProcessingContext {
+    static class DummyProcessing extends PApplet implements ProcessingContext {
         @Override
         public void delay(int ms) {
             // do nothing, keep tests fast

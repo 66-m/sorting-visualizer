@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: Create a meaningful branch and commit all pending changes, then advise on pushing.
 ---
 

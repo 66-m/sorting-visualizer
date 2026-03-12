@@ -1,4 +1,7 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.config;
+
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.render.ProcessingContext;
 
 /**
  * Strategy interface for array shuffle behaviours.

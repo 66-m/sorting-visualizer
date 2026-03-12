@@ -1,8 +1,8 @@
 package io.github.compilerstuck.Control.shuffle;
 
-import io.github.compilerstuck.Control.ArrayModel;
-import io.github.compilerstuck.Control.ProcessingContext;
-import io.github.compilerstuck.Control.ShuffleStrategy;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.render.ProcessingContext;
+import io.github.compilerstuck.Control.config.ShuffleStrategy;
 import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Visual.Marker;

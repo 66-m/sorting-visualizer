@@ -1,6 +1,13 @@
 package io.github.compilerstuck.Control;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
+import io.github.compilerstuck.Control.config.MainControllerConfig;
+import io.github.compilerstuck.Control.model.ArrayController;
+import io.github.compilerstuck.Control.model.SortingSessionManager;
+import io.github.compilerstuck.Control.model.SortingStateManager;
+import io.github.compilerstuck.Control.render.ProcessingContext;
+import io.github.compilerstuck.Control.render.RenderContext;
+import io.github.compilerstuck.Control.ui.Settings;
 import io.github.compilerstuck.SortingAlgorithms.QuickSortMiddlePivot;
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Sound.MidiSys;

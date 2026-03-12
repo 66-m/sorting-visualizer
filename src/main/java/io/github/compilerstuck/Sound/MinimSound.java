@@ -2,7 +2,7 @@ package io.github.compilerstuck.Sound;
 
 import ddf.minim.AudioOutput;
 import ddf.minim.Minim;
-import io.github.compilerstuck.Control.ArrayModel;
+import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.MainController;
 import processing.core.PApplet;
 

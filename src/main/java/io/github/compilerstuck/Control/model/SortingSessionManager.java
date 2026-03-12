@@ -1,5 +1,6 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.model;
 
+import io.github.compilerstuck.Control.config.MainControllerConfig;
 import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Sound.Sound;
 

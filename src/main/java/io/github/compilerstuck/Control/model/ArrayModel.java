@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.model;
 
 import io.github.compilerstuck.Visual.Marker;
 

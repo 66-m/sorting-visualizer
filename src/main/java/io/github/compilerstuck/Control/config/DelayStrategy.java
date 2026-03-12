@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.config;
 
 /**
  * Strategy that decides whether a visualisation delay should fire for a given

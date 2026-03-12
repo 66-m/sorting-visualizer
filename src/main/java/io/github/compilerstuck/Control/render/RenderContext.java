@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.render;
 
 /**
  * Abstraction over the minimal subset of Processing's drawing API used by

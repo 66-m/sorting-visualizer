@@ -1,4 +1,4 @@
-package io.github.compilerstuck.Control;
+package io.github.compilerstuck.Control.model;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

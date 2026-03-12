@@ -1,9 +1,9 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.ArrayModel;
-import io.github.compilerstuck.Control.DelayStrategy;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.config.DelayStrategy;
 import io.github.compilerstuck.Control.MainController;
-import io.github.compilerstuck.Control.ProcessingContext;
+import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Visual.Marker;
 
 
