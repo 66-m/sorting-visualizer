@@ -1,7 +1,35 @@
+# IDE
 .idea/
 .vscode/
 *.iml
 *.iws
-log/
-target/
+
+# Java legacy (preserved for reference)
+java-legacy/target/
+java-legacy/log/
 *.exe
+
+# Node/SvelteKit
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
