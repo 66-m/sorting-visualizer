@@ -1,42 +1,130 @@
-# sv
+# Sorting Algorithm Visualizer - SvelteKit Migration
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This repository is currently undergoing a **major architectural refactor** from a Java/Processing desktop application to a **modern SvelteKit web application**.
 
-## Creating a project
+## Migration Status
 
-If you're seeing this, you've probably already done this step. Congrats!
+### ✅ Completed
+- [x] SvelteKit project structure initialized with TypeScript
+- [x] Core data models ported (ArrayModel, ArrayController)
+- [x] Shuffle strategies implemented
+- [x] Base SortingAlgorithm class created
 
-```sh
-# create a new project
-npx sv create my-app
+### 🚧 In Progress
+- [ ] Port 22 sorting algorithms to TypeScript
+- [ ] Create canvas-based 2D visualization system (20 visualizations)
+- [ ] Create WebGL/Three.js 3D visualization system (10 visualizations)
+- [ ] Implement Web Audio API sound system
+- [ ] Build main visualization page with controls
+- [ ] Build settings UI panel
+- [ ] Implement state management for sorting sessions
+
+### 📋 Architecture
+
+#### SvelteKit Structure (Following Official Best Practices)
+
+```
+src/
+├── routes/                    # Filesystem-based routing
+│   ├── +page.svelte          # Main visualization page
+│   ├── +layout.svelte        # App layout
+│   └── +page.ts              # Page load function (if needed)
+├── lib/                      # Shared code ($lib alias)
+│   ├── models/               # Data models
+│   │   ├── ArrayModel.ts
+│   │   └── ArrayController.ts
+│   ├── algorithms/           # Sorting algorithms (22 total)
+│   │   ├── SortingAlgorithm.ts
+│   │   ├── BubbleSort.ts
+│   │   ├── QuickSort.ts
+│   │   └── ...
+│   ├── visualizations/       # Canvas/WebGL visualizations (30 total)
+│   │   ├── 2d/              # Canvas-based 2D visualizations
+│   │   └── 3d/              # WebGL/Three.js 3D visualizations
+│   ├── sound/                # Web Audio API
+│   └── components/           # Svelte components
+│       └── Settings.svelte
+static/                       # Static assets (images, etc.)
+java-legacy/                  # Original Java source (preserved for reference)
 ```
 
-To recreate this project with the same configuration:
+#### Key Technical Decisions
 
-```sh
-# recreate this project
-npx sv@0.12.7 create --template minimal --types ts --no-install sveltekit-app
+1. **TypeScript** for type safety and better development experience
+2. **Canvas API** for 2D visualizations (replacing Processing 2D)
+3. **Three.js + WebGL** for 3D visualizations (replacing Processing P3D)
+4. **Web Audio API** for sound synthesis (replacing Java MIDI/Minim)
+5. **Svelte 5 Runes** for reactive state management
+6. **SvelteKit** for SSR + CSR hybrid rendering (SSR for initial load, CSR for interactivity)
+
+### 🎯 Critical Requirements
+
+Per the SvelteKit migration specification, this refactor MUST preserve:
+
+- ✓ Identical visible UI and layout
+- ✓ Identical component structure for rendering
+- ✓ Identical routes and URLs
+- ✓ Identical form behavior and interactions
+- ✓ Identical state behavior from user's perspective
+- ✓ All 22 sorting algorithms with identical behavior
+- ✓ All 30 visualizations with identical appearance
+- ✓ All controls and settings
+- ✓ Metrics tracking (comparisons, swaps, writes, time)
+- ✓ Sound/audio visualization
+
+**User-facing functionality must be 1:1 identical** to the original Java application.
+
+## Original Java Application
+
+The original application features:
+- **22 Sorting Algorithms**: Quick Sort, Merge Sort, Bubble Sort, Shell Sort, Heap Sort, etc.
+- **30 Visualizations**: 20 2D (Bars, Scatter Plot, Circle, etc.) + 10 3D (Sphere, Cube, Pyramid, etc.)
+- **Real-time Audio**: MIDI-based sound synthesis tied to array values
+- **Metrics Dashboard**: Live tracking of comparisons, swaps, writes, sorted percentage
+- **Settings Panel**: Array size, shuffle type, speed control, color gradients, algorithm selection
+- **Results Table**: Comparison of algorithm performance after execution
+
+### Running the Java Application (Legacy)
+
+```bash
+cd java-legacy
+./mvnw clean package
+java -jar target/sorting-visualizer.jar
 ```
 
-## Developing
+## Development (SvelteKit App)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Prerequisites
+- Node.js 18+ and npm
+- Modern browser with Canvas and WebGL support
 
-```sh
+### Setup
+
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+Open [http://localhost:5173](http://localhost:5173)
 
-To create a production version of your app:
+### Build
 
-```sh
+```bash
 npm run build
+npm run preview
 ```
 
-You can preview the production build with `npm run preview`.
+## Project History
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- **v1.4.1 and earlier**: Java/Processing desktop application
+- **Current (refactor branch)**: Migration to SvelteKit web application
+
+## License
+
+MIT License - See [LICENSE](LICENSE)
+
+## Acknowledgements
+
+Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for inspiring this project.
+
+Thanks to [@micycle1](https://github.com/micycle1) for the Processing 4 core library mirror.
