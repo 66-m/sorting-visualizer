@@ -5,64 +5,61 @@ import io.github.compilerstuck.visual.Marker;
 
 public class QuickSortMiddlePivot extends SortingAlgorithm {
 
-    public QuickSortMiddlePivot(ArrayModel arrayController) {
-        super(arrayController);
-        this.name = "Quick Sort (Middle Pivot)";
-        alternativeSize = arrayController.getLength();
+  public QuickSortMiddlePivot(ArrayModel arrayController) {
+    super(arrayController);
+    this.name = "Quick Sort (Middle Pivot)";
+    alternativeSize = arrayController.getLength();
+  }
+
+  public void sort() {
+    report(name);
+    startTime = System.nanoTime();
+    sort(arrayController, 0, arrayController.getLength() - 1);
+    arrayController.addRealTime(System.nanoTime() - startTime);
+  }
+
+  private void sort(ArrayModel arrayController, int start, int end) {
+    if (arrayController.getLength() == 0) {
+      return;
     }
 
-    public void sort() {
-        report(name);
-        startTime = System.nanoTime();
-        sort(arrayController, 0, arrayController.getLength() - 1);
-        arrayController.addRealTime(System.nanoTime() - startTime);
+    if (start >= end) {
+      return;
     }
 
-    private void sort(ArrayModel arrayController, int start, int end) {
-        if (arrayController.getLength() == 0) {
-            return;
-        }
+    // pick the pivot
+    int middle = start + (end - start) / 2;
+    int pivot = arrayController.get(middle);
 
-        if (start >= end) {
-            return;
-        }
+    // make left < pivot and right > pivot
+    int i = start, j = end;
+    while (i <= j && !isCancelled()) {
+      while (arrayController.get(i) < pivot && !isCancelled()) {
+        i++;
+        arrayController.addComparisons(1);
+      }
+      arrayController.addComparisons(1);
 
-        // pick the pivot
-        int middle = start + (end - start) / 2;
-        int pivot = arrayController.get(middle);
+      while (arrayController.get(j) > pivot && !isCancelled()) {
+        j--;
+        arrayController.addComparisons(1);
+      }
+      arrayController.addComparisons(1);
 
-        // make left < pivot and right > pivot
-        int i = start, j = end;
-        while (i <= j && !isCancelled()) {
-            while (arrayController.get(i) < pivot && !isCancelled()) {
-                i++;
-                arrayController.addComparisons(1);
-            }
-            arrayController.addComparisons(1);
+      if (i <= j) {
+        arrayController.swap(i, j);
+        arrayController.setMarker(i, Marker.SET);
+        arrayController.setMarker(j, Marker.SET);
+        i++;
+        j--;
+      }
 
-            while (arrayController.get(j) > pivot && !isCancelled()) {
-                j--;
-                arrayController.addComparisons(1);
-            }
-            arrayController.addComparisons(1);
-
-            if (i <= j) {
-                arrayController.swap(i, j);
-                arrayController.setMarker(i, Marker.SET);
-                arrayController.setMarker(j, Marker.SET);
-                i++;
-                j--;
-            }
-
-            delay();
-
-        }
-
-        // recursively sort two sub parts
-        if (start < j && !isCancelled())
-            sort(arrayController, start, j);
-
-        if (end > i && !isCancelled())
-            sort(arrayController, i, end);
+      delay();
     }
+
+    // recursively sort two sub parts
+    if (start < j && !isCancelled()) sort(arrayController, start, j);
+
+    if (end > i && !isCancelled()) sort(arrayController, i, end);
+  }
 }

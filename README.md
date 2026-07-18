@@ -64,6 +64,17 @@ Release fat JAR (same layout as GitHub Releases):
 java -jar target/sorting-visualizer-jar-with-dependencies.jar
 ```
 
+`-Prelease` also writes a CycloneDX SBOM to `target/bom.json`.
+
+Linux app-image (requires JDK `jpackage`, Linux host):
+
+```sh
+./mvnw clean verify -Pjpackage
+# output under target/jpackage/sorting-visualizer/
+```
+
+Windows/macOS installers: run `jpackage` locally against the fat JAR (not covered by CI).
+
 ## Features
 
 ### Algorithms (22)
@@ -95,8 +106,19 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 | Metrics | Sorted %, comparisons, swaps, main/aux writes, estimated time |
 | Session | Cancel mid-run; optional end-of-run comparison table |
 
+## Docs
+
+- [Contributing](CONTRIBUTING.md)
+- [Architecture](docs/architecture.md)
+- [Add an algorithm](docs/add-algorithm.md)
+
 ## License
 
 Copyright (C) 2020–2026 Marcel Mauel
+
+Identities (kept separate on purpose):
+- In-app visualizer watermark: **CompilerStuck**
+- Copyright: **Marcel Mauel**
+- GitHub / Maven (`io.github.66-m`): **66-m**
 
 Licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). See [`LICENSE`](LICENSE).

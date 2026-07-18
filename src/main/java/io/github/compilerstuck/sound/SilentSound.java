@@ -3,21 +3,21 @@ package io.github.compilerstuck.sound;
 import io.github.compilerstuck.control.model.ArrayModel;
 
 /**
- * Null-object sound implementation used when MIDI is unavailable or audio
- * output is not desired. Never throws; safe to call from UI and draw loops.
+ * Null-object sound implementation used when MIDI is unavailable or audio output is not desired.
+ * Never throws; safe to call from UI and draw loops.
  */
 public class SilentSound extends Sound {
-    public SilentSound(ArrayModel arrayController) {
-        super(arrayController);
-    }
+  public SilentSound(ArrayModel arrayController) {
+    super(arrayController);
+  }
 
-    @Override
-    public void playSound(int value) {
-        // no-op
-    }
+  @Override
+  public void playSound(int value) {
+    // no-op
+  }
 
-    @Override
-    public void mute(boolean mute) {
-        // no-op
-    }
+  @Override
+  public void mute(boolean mute) {
+    // no-op
+  }
 }

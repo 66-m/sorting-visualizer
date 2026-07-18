@@ -1,45 +1,43 @@
 package io.github.compilerstuck.sortingalgorithms;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-
 import java.util.Arrays;
 
 public class CountingSort extends SortingAlgorithm {
 
-    public CountingSort(ArrayModel arrayController) {
-        super(arrayController);
-        this.name = "Counting Sort";
-        alternativeSize = arrayController.getLength();
+  public CountingSort(ArrayModel arrayController) {
+    super(arrayController);
+    this.name = "Counting Sort";
+    alternativeSize = arrayController.getLength();
+  }
+
+  public void sort() {
+    report(name);
+    startTime = System.nanoTime();
+    int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
+    int[] counter = new int[max + 1];
+    for (int i : arrayController.getArray()) {
+      counter[i]++;
+      arrayController.addWritesAux(1);
+
+      delay(new int[] {i});
     }
 
-    public void sort() {
-        report(name);
-        startTime = System.nanoTime();
-        int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
-        int[] counter = new int[max + 1];
-        for (int i : arrayController.getArray()) {
-            counter[i]++;
-            arrayController.addWritesAux(1);
-            
-            delay(new int[]{i});
-        }
+    delayTime = 5;
 
-        delayTime = 5;
+    int ndx = 0;
+    for (int i = 0; i < counter.length && !isCancelled(); i++) {
+      while (0 < counter[i]) {
+        arrayController.addComparisons(1);
 
-        int ndx = 0;
-        for (int i = 0; i < counter.length && !isCancelled(); i++) {
-            while (0 < counter[i]) {
-                arrayController.addComparisons(1);
-                
-                delay(new int[]{ndx});
+        delay(new int[] {ndx});
 
-                arrayController.set(ndx++, i);
-                counter[i]--;
-                arrayController.addWritesAux(1);
-            }
-        }
-
-        arrayController.addRealTime(System.nanoTime() - startTime);
-
+        arrayController.set(ndx++, i);
+        counter[i]--;
+        arrayController.addWritesAux(1);
+      }
     }
+
+    arrayController.addRealTime(System.nanoTime() - startTime);
+  }
 }
