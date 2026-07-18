@@ -474,14 +474,12 @@ public class MainController extends PApplet implements RenderContext {
     algorithms = new ArrayList<>(currentAlgorithms());
     visualization = currentVisualization();
 
+    frameRate(MainControllerConfig.TARGET_FRAME_RATE);
     if (appContext != null && appContext.isUseStepEngine()) {
       appContext.getFrameGate().reset();
-      frameRate(MainControllerConfig.STEP_ENGINE_FRAME_RATE);
       for (SortingAlgorithm alg : algorithms) {
         alg.setDelayStrategy(DelayStrategy.ALWAYS);
       }
-    } else {
-      frameRate(MainControllerConfig.TARGET_FRAME_RATE);
     }
 
     sessionManager.startSortingSession(algorithms);

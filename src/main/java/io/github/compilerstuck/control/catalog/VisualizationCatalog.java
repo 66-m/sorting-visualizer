@@ -76,10 +76,13 @@ public final class VisualizationCatalog {
             ImageHorizontal::new),
         new VisualizationDescriptor("hoops", "Hoops", VisualConstraints.NONE, Hoops::new),
         new VisualizationDescriptor(
-            "morphing-shell", "Morphing Shell", VisualConstraints.NONE, MorphingShell::new),
+            "morphing-shell",
+            "3D - Morphing Shell",
+            VisualConstraints.NONE,
+            MorphingShell::new),
         new VisualizationDescriptor("sphere", "3D - Sphere", VisualConstraints.SQUARE, Sphere::new),
         new VisualizationDescriptor(
-            "sphere-hoops", "Sphere Hoops", VisualConstraints.NONE, SphereHoops::new),
+            "sphere-hoops", "3D - Sphere Hoops", VisualConstraints.NONE, SphereHoops::new),
         new VisualizationDescriptor(
             "spheric-disparity-lines",
             "3D - Spheric Disparity Lines",
@@ -87,13 +90,14 @@ public final class VisualizationCatalog {
             SphericDisparityLines::new),
         new VisualizationDescriptor(
             "disparity-sphere-hoops",
-            "Disparity Sphere Hoops",
+            "3D - Disparity Sphere Hoops",
             VisualConstraints.NONE,
             DisparitySphereHoops::new),
         new VisualizationDescriptor("cube", "3D - Cube", VisualConstraints.CUBE, Cube::new),
         new VisualizationDescriptor(
             "cubic-lines", "3D - Cubic Lines", VisualConstraints.CUBE, CubicLines::new),
-        new VisualizationDescriptor("pyramid", "Pyramid", VisualConstraints.NONE, Pyramid::new),
+        new VisualizationDescriptor(
+            "pyramid", "3D - Pyramid", VisualConstraints.NONE, Pyramid::new),
         new VisualizationDescriptor("plane", "3D - Plane", VisualConstraints.SQUARE, Plane::new),
         new VisualizationDescriptor(
             "disparity-plane",

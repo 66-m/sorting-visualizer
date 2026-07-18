@@ -33,11 +33,8 @@ public final class MainControllerConfig {
 
   public static final int SETTINGS_DEFAULT_HEIGHT = 560;
 
-  // Frame rate and rendering
-  public static final int TARGET_FRAME_RATE = 1000;
-
-  /** Cap when FrameGate step engine is active so grants match display cadence. */
-  public static final int STEP_ENGINE_FRAME_RATE = 60;
+  // Frame rate and rendering (display cadence; sort pacing uses delays / FrameGate)
+  public static final int TARGET_FRAME_RATE = 60;
 
   public static final int MAX_TEXT_SIZE = 50;
 
