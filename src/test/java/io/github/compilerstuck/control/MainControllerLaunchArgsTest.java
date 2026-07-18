@@ -73,12 +73,12 @@ class MainControllerLaunchArgsTest {
   }
 
   @Test
-  @DisplayName("settingsSize is half width and half height (max bounds)")
+  @DisplayName("settingsSize is half width and ~90% height (max bounds)")
   void settingsSizeIsHalfScreenMax() {
     Rectangle screen = new Rectangle(0, 0, 1920, 1080);
     var size = FullscreenDisplay.settingsSize(screen);
     assertEquals(960, size.width);
-    assertEquals(540, size.height);
+    assertEquals(972, size.height);
   }
 
   @Test

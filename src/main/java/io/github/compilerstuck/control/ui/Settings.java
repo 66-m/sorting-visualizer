@@ -63,15 +63,21 @@ public class Settings extends JFrame {
         });
 
     int targetWidth = Math.max(1, launchScreenBounds.width / 2);
-    int maxHeight = Math.max(1, launchScreenBounds.height / 2);
+    // Half-screen height clips the form on common displays; allow up to ~90% tall.
+    int maxHeight = Math.max(1, (int) Math.round(launchScreenBounds.height * 0.9));
 
     JComponent mainPanel = createMainUI();
     setContentPane(mainPanel);
     pack();
 
+    // Preferred height from pack() is for pack-width; remeasure at the launch width.
+    Insets insets = getInsets();
+    int innerWidth = Math.max(1, targetWidth - insets.left - insets.right);
+    mainPanel.setSize(innerWidth, Short.MAX_VALUE);
+    int neededHeight = mainPanel.getPreferredSize().height + insets.top + insets.bottom;
     int h =
         Math.min(
-            maxHeight, Math.max(MainControllerConfig.SETTINGS_MIN_HEIGHT, getPreferredSize().height));
+            maxHeight, Math.max(MainControllerConfig.SETTINGS_MIN_HEIGHT, neededHeight));
     setSize(targetWidth, h);
     setMinimumSize(
         new Dimension(
@@ -111,31 +117,20 @@ public class Settings extends JFrame {
 
     root.add(createHeaderPanel(), BorderLayout.NORTH);
 
-    JPanel columns = new JPanel(new GridLayout(1, 2, UiTheme.SPACING_LG, 0));
+    ViewportWidthPanel columns = new ViewportWidthPanel();
+    columns.setLayout(new GridLayout(1, 2, UiTheme.SPACING_LG, 0));
     columns.setBackground(UiTheme.BG_PRIMARY);
     columns.setBorder(BorderFactory.createEmptyBorder(UiTheme.SPACING_MD, 0, 0, 0));
-    columns.setAlignmentX(Component.LEFT_ALIGNMENT);
     columns.add(createLeftColumn(arraySizePanel, sortingPanel, speedPanel));
     columns.add(createRightColumn(visualizationPanel, gradientPanel, displayPanel, soundPanel));
-    columns.setMaximumSize(new Dimension(Integer.MAX_VALUE, columns.getPreferredSize().height));
 
-    JPanel actionPanel = actionBar.getPanel();
-    actionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    actionPanel.setMaximumSize(
-        new Dimension(Integer.MAX_VALUE, actionPanel.getPreferredSize().height));
-
-    ViewportWidthPanel stack = new ViewportWidthPanel();
-    stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
-    stack.setBackground(UiTheme.BG_PRIMARY);
-    stack.add(columns);
-    stack.add(actionPanel);
-
-    JScrollPane scroll = new JScrollPane(stack);
+    JScrollPane scroll = new JScrollPane(columns);
     scroll.setBorder(null);
     scroll.getViewport().setBackground(UiTheme.BG_PRIMARY);
     scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     root.add(scroll, BorderLayout.CENTER);
+    root.add(actionBar.getPanel(), BorderLayout.SOUTH);
     return root;
   }
 
@@ -231,8 +226,8 @@ public class Settings extends JFrame {
 
   private static void prepareCard(StyledCard card) {
     card.setAlignmentX(Component.LEFT_ALIGNMENT);
-    Dimension pref = card.getPreferredSize();
-    card.setMaximumSize(new Dimension(Integer.MAX_VALUE, pref.height));
+    // Allow height to grow when the column narrows and controls wrap.
+    card.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
   }
 
   private JPanel createHeaderPanel() {

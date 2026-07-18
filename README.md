@@ -4,7 +4,7 @@
 
 # Sorting Algorithm Visualizer
 
-See and hear sorting algorithms in real time — 22 algorithms, 30 visualizations (including 3D), live metrics, and MIDI audio.
+See and hear sorting algorithms in real time - 22 algorithms, 30 visualizations (including 3D), live metrics, and MIDI audio.
 
 [![CI](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -16,12 +16,9 @@ See and hear sorting algorithms in real time — 22 algorithms, 30 visualization
 
 </div>
 
-## Requirements
-
-- **JDK 26+** — [jdk.java.net/26](https://jdk.java.net/26/)
-- A desktop environment with audio (MIDI) optional but recommended
-
 ## Quick start
+
+Requires **[JDK 26+](https://jdk.java.net/26/)**.
 
 Download [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) from the latest release, then:
 
@@ -31,55 +28,23 @@ java --enable-native-access=ALL-UNNAMED \
   -jar sorting-visualizer.jar
 ```
 
-Optional launch flags: `fullscreen`, `portrait`, `--display=N` (1-based). Example: `java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar fullscreen`.
+Press **ESC** to quit.
 
-A visualization window and a settings window open together. In windowed mode the visualization starts maximized; settings opens about half screen wide with height fitted to the controls (capped at half screen tall), centered on the same display. Press **ESC** to quit.
+### Launch flags
 
-## Build from source
+Pass any of these after the JAR name (order does not matter; `fullscreen` wins over `portrait`):
 
-```sh
-git clone https://github.com/66-m/sorting-visualizer.git
-cd sorting-visualizer
-
-./mvnw clean package          # build + tests
-./run                         # run with dependencies on the classpath
-```
-
-Convenience scripts:
-
-| Command | What it does |
-|---------|----------------|
-| `./build` | Package with tests |
-| `./build skip-tests` | Fast package (skips tests) |
-| `./build release` | Clean build + fat JAR (`-Prelease`) |
-| `./run` | Launch the local build |
-| `./run fullscreen` | Launch in fullscreen |
-| `./run fullscreen --display=2` | Fullscreen on display 2 (1-based; see below) |
-| `./run portrait` | Launch in portrait window size |
-
-Windows: use `build.cmd` / `run.cmd` the same way (e.g. `run.cmd fullscreen`). Or call `mvnw.cmd` directly.
-
-Displays are numbered starting at **1** (Processing / Java order). On Linux you can list them with `xrandr --listmonitors`. Example: laptop primary = `--display=1`, HDMI = `--display=2`.
-
-Release fat JAR (same layout as GitHub Releases):
+| Flag | Effect |
+|------|--------|
+| `fullscreen` | Fullscreen visualization on the chosen display |
+| `portrait` | Tall portrait window (~9:16) |
+| `--display=N` | Use display `N` (1-based; default is the primary) |
 
 ```sh
-./mvnw clean package -Prelease
 java --enable-native-access=ALL-UNNAMED \
   --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
-  -jar target/sorting-visualizer-jar-with-dependencies.jar
+  -jar sorting-visualizer.jar fullscreen --display=2
 ```
-
-`-Prelease` also writes a CycloneDX SBOM to `target/bom.json`.
-
-Linux app-image (requires JDK `jpackage`, Linux host):
-
-```sh
-./mvnw clean verify -Pjpackage
-# output under target/jpackage/sorting-visualizer/
-```
-
-Windows/macOS installers: run `jpackage` locally against the fat JAR (not covered by CI).
 
 ## Features
 
@@ -97,9 +62,18 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 
 ### Visualizations (30)
 
-**2D** — bars, scatter (linked), number plot, disparity graphs, pyramids, circles & chords, swirl / phyllotaxis, hoops, mosaic, morphing shell, image vertical/horizontal, and more.
-
-**3D** — sphere, sphere hoops, spheric disparity lines, cube, cubic lines, pyramid, plane, disparity plane / sphere hoops.
+| | | |
+|---|---|---|
+| Bars | Scatter Plot | Scatter Plot Linked |
+| Number Plot | Disparity Graph | Disparity Graph Mirrored |
+| Horizontal Pyramid | Color Gradient Graph | Circle |
+| Disparity Circle | Disparity Circle Scatter | Disparity Circle Scatter Linked |
+| Disparity Chords | Disparity Square Scatter | Swirl Dots |
+| Phyllotaxis | Image Vertical | Image Horizontal |
+| Hoops | Mosaic Squares | Morphing Shell (3D) |
+| Sphere (3D) | Sphere Hoops (3D) | Spheric Disparity Lines (3D) |
+| Disparity Sphere Hoops (3D) | Cube (3D) | Cubic Lines (3D) |
+| Pyramid (3D) | Plane (3D) | Disparity Plane (3D) |
 
 ### Controls
 
@@ -112,6 +86,26 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 | Metrics | Sorted %, comparisons, swaps, main/aux writes, estimated time |
 | Session | Cancel mid-run; optional end-of-run comparison table |
 
+## Build from source
+
+```sh
+git clone https://github.com/66-m/sorting-visualizer.git
+cd sorting-visualizer
+
+./mvnw clean package
+./run
+```
+
+| Command | What it does |
+|---------|----------------|
+| `./build` | Package with tests |
+| `./build skip-tests` | Fast package (skips tests) |
+| `./run` | Launch the local build |
+
+`./run` accepts the same [launch flags](#launch-flags) as the JAR. On Windows, use `build.cmd`, `run.cmd`, or `mvnw.cmd`.
+
+For release fat JARs, SBOM, and `jpackage` builds, see [Contributing](CONTRIBUTING.md#packaging).
+
 ## Docs
 
 - [Contributing](CONTRIBUTING.md)
@@ -120,6 +114,6 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 
 ## License
 
-Copyright (C) 2020–2026 Marcel Mauel
+Copyright (C) 2020-2026 Marcel Mauel
 
 Licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). See [`LICENSE`](LICENSE).

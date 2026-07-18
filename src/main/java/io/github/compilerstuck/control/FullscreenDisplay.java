@@ -49,11 +49,12 @@ final class FullscreenDisplay {
   }
 
   /**
-   * Max settings frame size for a screen: half width × half height. Actual height is packed to
+   * Max settings frame size for a screen: half width × ~90% height. Actual height is packed to
    * content and capped by this height.
    */
   static Dimension settingsSize(Rectangle screen) {
-    return new Dimension(Math.max(1, screen.width / 2), Math.max(1, screen.height / 2));
+    return new Dimension(
+        Math.max(1, screen.width / 2), Math.max(1, (int) Math.round(screen.height * 0.9)));
   }
 
   /**

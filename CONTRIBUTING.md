@@ -17,7 +17,30 @@ By submitting a contribution, you agree that your work is licensed under the sam
 ./run
 ```
 
-See [README](README.md) for scripts (`./build`, fullscreen/portrait, release fat JAR).
+See [README](README.md) for scripts (`./build`, `./run`) and [launch flags](README.md#launch-flags).
+
+## Packaging
+
+Release fat JAR (same layout as GitHub Releases):
+
+```sh
+./mvnw clean package -Prelease
+# or: ./build release
+java --enable-native-access=ALL-UNNAMED \
+  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
+  -jar target/sorting-visualizer-jar-with-dependencies.jar
+```
+
+`-Prelease` also writes a CycloneDX SBOM to `target/bom.json`.
+
+Linux app-image (requires JDK `jpackage`, Linux host):
+
+```sh
+./mvnw clean verify -Pjpackage
+# output under target/jpackage/sorting-visualizer/
+```
+
+Windows/macOS installers: run `jpackage` locally against the fat JAR (not covered by CI).
 
 ## Project docs
 
