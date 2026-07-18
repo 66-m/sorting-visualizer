@@ -50,7 +50,7 @@ public class Settings extends JFrame {
 
   public void initialize() {
     setTitle("Sorting Algorithm Visualizer - Settings");
-    AppIcons.applyTo(this);
+    AppIcons.applySettingsTo(this);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setResizable(true);
 

@@ -15,13 +15,16 @@ import javax.imageio.ImageIO;
 
 /**
  * Loads {@code logo.png} (and multi-size variants) for window decorations, the taskbar, and NEWT /
- * Processing surfaces.
+ * Processing surfaces. The settings window uses {@code settings.png} instead.
  */
 public final class AppIcons {
   private static final Logger LOGGER = Logger.getLogger(AppIcons.class.getName());
 
   /** Canonical app logo on the classpath (same asset as {@code images/logo.png}). */
   public static final String LOGO_RESOURCE = "/logo.png";
+
+  /** Settings window icon (PNG raster of {@code settings.svg}; ImageIO cannot load SVG). */
+  public static final String SETTINGS_RESOURCE = "/settings.png";
 
   /**
    * NEWT wants several PNGs from small to large for window / taskbar icons. Generated from {@link
@@ -38,6 +41,7 @@ public final class AppIcons {
   };
 
   private static Image logoImage;
+  private static Image settingsImage;
   private static List<Image> logoImages;
 
   private AppIcons() {}
@@ -82,11 +86,29 @@ public final class AppIcons {
     }
   }
 
+  /** Applies the settings gear icon to a Swing / AWT window title bar. */
+  public static void applySettingsTo(Window window) {
+    if (window == null) {
+      return;
+    }
+    Image settings = settingsIcon();
+    if (settings != null) {
+      window.setIconImage(settings);
+    }
+  }
+
   public static Image logo() {
     if (logoImage == null) {
       logoImage = load(LOGO_RESOURCE);
     }
     return logoImage;
+  }
+
+  public static Image settingsIcon() {
+    if (settingsImage == null) {
+      settingsImage = load(SETTINGS_RESOURCE);
+    }
+    return settingsImage;
   }
 
   private static List<Image> logoImages() {
