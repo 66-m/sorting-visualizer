@@ -1,6 +1,9 @@
 package io.github.compilerstuck.control;
 
 import io.github.compilerstuck.control.config.DelayStrategy;
+import io.github.compilerstuck.control.config.RunAllEntryPref;
+import io.github.compilerstuck.control.config.SettingsDefaults;
+import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.config.UserPreferences;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.FrameGate;
@@ -24,12 +27,6 @@ import java.util.logging.Logger;
 public final class AppContext {
   private static final Logger LOGGER = Logger.getLogger(AppContext.class.getName());
 
-  private static final int[] DELAY_TIME = {50, 10, 1, 1, 1};
-  private static final double[] DELAY_FACTOR = {1.0, 1.0, 1.0, 0.12, 0.02};
-
-  /** Speed levels 1–5 → steps per frame when step engine is enabled. */
-  private static final int[] STEPS_PER_FRAME = {1, 5, 25, 200, 2000};
-
   private final ArrayController arrayController;
   private final SortingStateManager stateManager;
   private final SortingSessionManager sessionManager;
@@ -45,8 +42,9 @@ public final class AppContext {
   /** Step engine is opt-in via {@code -Dsv.stepEngine=true} or Settings. */
   private boolean useStepEngine;
 
-  private int speedLevel = 3; // 1–5, default Normal
-  private int stepsPerFrame = STEPS_PER_FRAME[2];
+  private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
+  private int stepsPerFrame =
+      SettingsDefaults.STEPS_PER_FRAME[SettingsDefaults.DEFAULT_SPEED_LEVEL - 1];
 
   public AppContext(
       ArrayController arrayController,
@@ -79,6 +77,18 @@ public final class AppContext {
       preferences.setMuted(sound.isMuted());
     }
     preferences.setUseStepEngine(useStepEngine);
+    preferences.setShuffleType(arrayController.getShuffleType());
+    preferences.setPrintMeasurements(stateManager.shouldPrintMeasurements());
+    preferences.setShowComparisonTable(stateManager.shouldShowComparisonTable());
+    if (colorGradient != null) {
+      preferences.setGradientName(colorGradient.getName());
+      if (colorGradient.getColor1() != null) {
+        preferences.setGradientColor1Rgb(colorGradient.getColor1().getRGB());
+      }
+      if (colorGradient.getColor2() != null) {
+        preferences.setGradientColor2Rgb(colorGradient.getColor2().getRGB());
+      }
+    }
     preferences.save();
   }
 
@@ -123,7 +133,7 @@ public final class AppContext {
 
   /** Applies speed level 1–5: steps/frame in step-engine mode, delay time/factor in legacy mode. */
   public void setSpeedLevel(int level1to5) {
-    this.speedLevel = Math.max(1, Math.min(5, level1to5));
+    this.speedLevel = SettingsDefaults.clampSpeedLevel(level1to5);
     applySpeedLevel();
     preferences.setSpeedLevel(this.speedLevel);
     preferences.save();
@@ -132,11 +142,11 @@ public final class AppContext {
   private void applySpeedLevel() {
     int idx = speedLevel - 1;
     if (useStepEngine) {
-      stepsPerFrame = STEPS_PER_FRAME[idx];
+      stepsPerFrame = SettingsDefaults.STEPS_PER_FRAME[idx];
       algorithms.forEach(a -> a.setDelayStrategy(DelayStrategy.ALWAYS));
     } else {
-      setDelayTime(DELAY_TIME[idx]);
-      setDelayFactor(DELAY_FACTOR[idx]);
+      setDelayTime(SettingsDefaults.DELAY_TIME[idx]);
+      setDelayFactor(SettingsDefaults.DELAY_FACTOR[idx]);
       algorithms.forEach(a -> a.setDelayStrategy(DelayStrategy.DEFAULT));
     }
   }
@@ -157,6 +167,14 @@ public final class AppContext {
     this.colorGradient = colorGradient;
     if (this.colorGradient != null) {
       this.colorGradient.updateGradient(size);
+      preferences.setGradientName(this.colorGradient.getName());
+      if (this.colorGradient.getColor1() != null) {
+        preferences.setGradientColor1Rgb(this.colorGradient.getColor1().getRGB());
+      }
+      if (this.colorGradient.getColor2() != null) {
+        preferences.setGradientColor2Rgb(this.colorGradient.getColor2().getRGB());
+      }
+      preferences.save();
     }
     if (visualization != null && this.colorGradient != null) {
       visualization.updateColorGradient(this.colorGradient);
@@ -274,10 +292,31 @@ public final class AppContext {
 
   public void setShowComparisonTable(boolean show) {
     stateManager.setShowComparisonTable(show);
+    preferences.setShowComparisonTable(show);
+    preferences.save();
   }
 
   public void setPrintMeasurements(boolean print) {
     stateManager.setPrintMeasurements(print);
+    preferences.setPrintMeasurements(print);
+    preferences.save();
+  }
+
+  public void setShuffleType(ShuffleType shuffleType) {
+    arrayController.setShuffleType(shuffleType);
+    preferences.setShuffleType(shuffleType);
+    preferences.save();
+  }
+
+  public void setImagePath(String path) {
+    preferences.setImagePath(path != null ? path : "");
+    preferences.save();
+  }
+
+  public void persistRunAll(boolean runAll, List<RunAllEntryPref> entries) {
+    preferences.setRunAll(runAll);
+    preferences.setRunAllEntries(entries);
+    preferences.save();
   }
 
   public void shutdown() {

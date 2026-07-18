@@ -43,7 +43,8 @@ public class MidiSys extends Sound {
 
   /**
    * Prefer a low SoftSynthesizer buffer when the JVM opens {@code com.sun.media.sound} (manifest
-   * {@code Add-Opens} or {@code --add-opens}). Falls back to the default {@link Synthesizer#open()}.
+   * {@code Add-Opens} or {@code --add-opens}). Falls back to the default {@link
+   * Synthesizer#open()}.
    */
   private static void openSynthesizer(Synthesizer synthesizer) throws MidiUnavailableException {
     try {
@@ -52,8 +53,7 @@ public class MidiSys extends Sound {
       Map<String, Object> info = new HashMap<>();
       info.put("latency", TARGET_LATENCY_MICROS);
       open.invoke(synthesizer, null, info);
-      LOGGER.log(
-          Level.FINE, "Opened SoftSynthesizer with latency={0}µs", synthesizer.getLatency());
+      LOGGER.log(Level.FINE, "Opened SoftSynthesizer with latency={0}µs", synthesizer.getLatency());
       return;
     } catch (ReflectiveOperationException | RuntimeException e) {
       LOGGER.log(

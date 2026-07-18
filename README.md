@@ -28,7 +28,7 @@ java --enable-native-access=ALL-UNNAMED \
   -jar sorting-visualizer.jar
 ```
 
-Press **ESC** to quit.
+**Settings** is a JavaFX window (AtlantaFX). Closing Settings or pressing **Esc** on the canvas quits the app.
 
 ### Launch flags
 
@@ -80,11 +80,13 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 | Control | Options |
 |---------|---------|
 | Array | Size up to 20 000; shuffle: random, reverse, almost sorted, sorted |
-| Speed | Five animation speed levels |
+| Sorting | Algorithm picker, run-all with inline reorder, shuffle type |
+| Speed | Five levels; optional step engine |
 | Appearance | Gradient presets + custom colors |
+| Visualization | 30 modes; image path with validation for image viz |
 | Sound | MIDI tones mapped to values; mute anytime |
 | Metrics | Sorted %, comparisons, swaps, main/aux writes, estimated time |
-| Session | Cancel mid-run; optional end-of-run comparison table |
+| Session | Cancel mid-run; optional end-of-run comparison table (persisted prefs) |
 
 ## Build from source
 

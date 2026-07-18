@@ -7,5 +7,8 @@
 ## Test plan
 
 - [ ] `./mvnw verify`
-- [ ] Manual: Settings + visualization smoke (if UI touched)
-- [ ] Manual: relevant algorithm / visual path (if behavior changed)
+- [ ] Manual: JavaFX Settings smoke (if UI touched)
+  - [ ] Run / Cancel / progress while sorting
+  - [ ] Close Settings / Esc exits both windows
+  - [ ] Disabled-while-running (incl. step engine); image path validation if relevant
+- [ ] Manual: relevant algorithm / visualization path (if behavior changed)

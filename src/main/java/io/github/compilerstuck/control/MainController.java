@@ -1,6 +1,5 @@
 package io.github.compilerstuck.control;
 
-import com.formdev.flatlaf.FlatLightLaf;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.opengl.GLWindow;
@@ -9,6 +8,7 @@ import io.github.compilerstuck.control.catalog.AlgorithmDescriptor;
 import io.github.compilerstuck.control.catalog.VisualizationCatalog;
 import io.github.compilerstuck.control.catalog.VisualizationDescriptor;
 import io.github.compilerstuck.control.config.DelayStrategy;
+import io.github.compilerstuck.control.config.GradientPreferences;
 import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.config.UserPreferences;
 import io.github.compilerstuck.control.model.ArrayController;
@@ -19,13 +19,15 @@ import io.github.compilerstuck.control.render.ProcessingLoadedImage;
 import io.github.compilerstuck.control.render.RenderContext;
 import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.ResultsTableRenderer;
-import io.github.compilerstuck.control.ui.Settings;
 import io.github.compilerstuck.control.ui.TimeEstimateFormat;
-import io.github.compilerstuck.control.ui.UiTheme;
+import io.github.compilerstuck.control.ui.settingsfx.JavaFxBootstrap;
+import io.github.compilerstuck.control.ui.settingsfx.SettingsFxController;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.MidiSys;
 import io.github.compilerstuck.sound.SilentSound;
 import io.github.compilerstuck.sound.Sound;
+import io.github.compilerstuck.visual.ImageHorizontal;
+import io.github.compilerstuck.visual.ImageVertical;
 import io.github.compilerstuck.visual.Visualization;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.*;
@@ -34,7 +36,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.MidiUnavailableException;
-import javax.swing.*;
 import processing.core.PApplet;
 import processing.opengl.PJOGL;
 
@@ -44,9 +45,10 @@ import processing.opengl.PJOGL;
  * <p>Manages the Processing display loop, user interaction, and coordinates between visualization,
  * sound, algorithm execution, and UI settings.
  *
- * <p>Composition root: {@link #main} / {@link #setup} wires {@link AppContext}; Settings and UI
- * panels use {@link AppContext} only. Residual statics ({@link #processing}, {@link #sound}, {@link
- * #app}) exist for Processing bootstrap and shutdown — not as a Settings service locator.
+ * <p>Composition root: {@link #main} / {@link #setup} wires {@link AppContext}; JavaFX Settings
+ * ({@link SettingsFxController}) uses {@link AppContext} only. Residual statics ({@link
+ * #processing}, {@link #sound}, {@link #app}) exist for Processing bootstrap and shutdown — not as
+ * a Settings service locator.
  */
 public class MainController extends PApplet implements RenderContext {
   private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
@@ -73,7 +75,6 @@ public class MainController extends PApplet implements RenderContext {
   private List<SortingAlgorithm> algorithms;
   private Visualization visualization;
   private ColorGradient colorGradient;
-  private Settings settings;
 
   private SortingStateManager stateManager;
   private SortingSessionManager sessionManager;
@@ -91,9 +92,12 @@ public class MainController extends PApplet implements RenderContext {
    */
   public static void main(String[] passedArgs) {
     parseLaunchArgs(passedArgs);
-    setupUITheme();
     // Must run before any NEWT / Processing window is created.
     AppIcons.installApplicationIcons();
+
+    // JavaFX Settings toolkit before PApplet.main — Platform.startup returns immediately
+    // (Phase 0 finding).
+    JavaFxBootstrap.start();
 
     String[] appletArgs = new String[] {"io.github.compilerstuck.control.MainController"};
     PApplet.main(concat(appletArgs, passedArgs));
@@ -151,19 +155,6 @@ public class MainController extends PApplet implements RenderContext {
     return launchDisplay;
   }
 
-  /**
-   * Configures the application's UI theme using FlatLaf light theme aligned with {@link UiTheme}.
-   */
-  private static void setupUITheme() {
-    FlatLightLaf.setup();
-    try {
-      UIManager.setLookAndFeel(new FlatLightLaf());
-    } catch (UnsupportedLookAndFeelException e) {
-      LOGGER.log(Level.WARNING, "Failed to set FlatLightLaf look and feel", e);
-    }
-    UiTheme.applyLookAndFeelDefaults();
-  }
-
   @Override
   public void delay(int ms) {
     if (appContext != null && appContext.isUseStepEngine()) {
@@ -215,20 +206,16 @@ public class MainController extends PApplet implements RenderContext {
 
     processing = this;
 
+    if (launchScreenBounds == null) {
+      launchScreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
+    }
+    // Open Settings chrome now so it appears while MIDI / AppContext init runs.
+    SettingsFxController.prepare(launchScreenBounds);
+
     initializeComponents();
     initializeState();
 
-    try {
-      if (launchScreenBounds == null) {
-        launchScreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
-      }
-      settings = new Settings(appContext, launchScreenBounds);
-    } catch (UnsupportedLookAndFeelException
-        | ClassNotFoundException
-        | InstantiationException
-        | IllegalAccessException e) {
-      LOGGER.log(Level.SEVERE, "Failed to initialize Settings UI", e);
-    }
+    SettingsFxController.show(launchScreenBounds, appContext);
   }
 
   /** Configures window size, position, and title. */
@@ -304,10 +291,16 @@ public class MainController extends PApplet implements RenderContext {
     }
     sound.setIsMuted(prefs.isMuted());
 
-    colorGradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red", size);
+    colorGradient =
+        GradientPreferences.resolve(
+            prefs.getGradientName(),
+            prefs.getGradientColor1Rgb(),
+            prefs.getGradientColor2Rgb(),
+            size);
 
     VisualizationDescriptor vizDesc = VisualizationCatalog.findById(prefs.getVisualizationId());
     visualization = vizDesc.factory().create(arrayController, colorGradient, sound, this);
+    restoreImagePath(visualization, prefs.getImagePath());
 
     AlgorithmDescriptor algDesc = AlgorithmCatalog.findById(prefs.getAlgorithmId());
     SortingAlgorithm algorithm = algDesc.factory().apply(arrayController, this);
@@ -315,24 +308,40 @@ public class MainController extends PApplet implements RenderContext {
     algorithms.add(algorithm);
 
     arrayController.setProcessingContext(this);
+    arrayController.setShuffleType(prefs.getShuffleType());
   }
 
   /** Initializes state managers for thread coordination. */
   private void initializeState() {
     UserPreferences prefs = UserPreferences.load();
     stateManager = new SortingStateManager();
+    stateManager.setPrintMeasurements(prefs.isPrintMeasurements());
+    stateManager.setShowComparisonTable(prefs.isShowComparisonTable());
     sessionManager = new SortingSessionManager(arrayController, sound, stateManager);
 
     appContext = new AppContext(arrayController, stateManager, sessionManager, prefs);
     appContext.setSize(size);
     appContext.setRenderContext(this);
     appContext.setSound(sound);
+    // Assign gradient without re-saving prefs (already loaded from disk).
     appContext.setColorGradient(colorGradient);
     appContext.setVisualization(visualization);
     appContext.setAlgorithm(algorithms.get(0));
     algorithms.get(0).setOperationReporter(stateManager::setCurrentOperation);
     appContext.setSpeedLevel(prefs.getSpeedLevel());
     app = appContext;
+  }
+
+  /** Best-effort restore of last image path for image visualizations (G3 keeps failures soft). */
+  private static void restoreImagePath(Visualization viz, String imagePath) {
+    if (imagePath == null || imagePath.isBlank() || viz == null) {
+      return;
+    }
+    if (viz instanceof ImageVertical imageVertical) {
+      imageVertical.setImg(imagePath);
+    } else if (viz instanceof ImageHorizontal imageHorizontal) {
+      imageHorizontal.setImg(imagePath);
+    }
   }
 
   /**
@@ -402,11 +411,10 @@ public class MainController extends PApplet implements RenderContext {
     stateManager.setContinueExecution(true);
     arrayController.resetArray();
 
-    if (settings != null) {
-      settings.setProgressBar(100);
-      settings.setEnableInputs(true);
-      settings.setEnableCancelButton(false);
-    }
+    SettingsFxController.setProgress(100);
+    SettingsFxController.setInputsEnabled(true);
+    SettingsFxController.setCancelEnabled(false);
+    SettingsFxController.refreshExportEnabled();
 
     frameRate(MainControllerConfig.TARGET_FRAME_RATE);
     if (appContext != null) {
@@ -426,9 +434,8 @@ public class MainController extends PApplet implements RenderContext {
       printMeasurements();
     }
 
-    if (settings != null) {
-      settings.setProgressBar((int) (arrayController.getSortedPercentage() * 100));
-    }
+    int progress = (int) (arrayController.getSortedPercentage() * 100);
+    SettingsFxController.setProgress(progress);
   }
 
   /** Handles idle state or starting new sort session. */
@@ -460,9 +467,7 @@ public class MainController extends PApplet implements RenderContext {
 
     stateManager.setRunning(true);
 
-    if (settings != null) {
-      settings.setEnableInputs(false);
-    }
+    SettingsFxController.setInputsEnabled(false);
 
     arrayController.resetArray();
     // Keep local mirrors aligned with AppContext (Settings writes there).
@@ -504,7 +509,7 @@ public class MainController extends PApplet implements RenderContext {
     return algorithms;
   }
 
-  /** Handles ESC key press to gracefully shutdown the application. */
+  /** Canvas {@code Esc} quits Settings and the visualization. */
   @Override
   public void keyPressed() {
     if (keyCode == ESC) {
@@ -542,6 +547,9 @@ public class MainController extends PApplet implements RenderContext {
     if (sound != null) {
       sound.dispose();
     }
+
+    // Terminate JavaFX toolkit so Platform.setImplicitExit(false) does not keep the JVM alive.
+    JavaFxBootstrap.shutdown();
 
     if (processing instanceof PApplet p) {
       p.noLoop();

@@ -27,6 +27,7 @@ public class ArrayController implements ArrayModel {
   private double delay;
   private double realTime;
 
+  private ShuffleType shuffleType = ShuffleType.RANDOM;
   private ShuffleStrategy shuffleStrategy;
   private OperationReporter operationReporter = OperationReporter.NOOP;
   private CancellationToken cancellationToken = CancellationToken.alwaysActive();
@@ -248,7 +249,12 @@ public class ArrayController implements ArrayModel {
             };
   }
 
+  public ShuffleType getShuffleType() {
+    return shuffleType;
+  }
+
   public void setShuffleType(ShuffleType shuffleType) {
+    this.shuffleType = shuffleType;
     this.shuffleStrategy =
         switch (shuffleType) {
           case RANDOM -> new RandomShuffleStrategy();

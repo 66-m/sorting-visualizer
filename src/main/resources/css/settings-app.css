@@ -1,0 +1,74 @@
+/* Brand accent override on top of AtlantaFX Primer Light (see 04-ui-ux-design-mockup §4.5). */
+.root {
+  -color-accent-emphasis: #6366F1; /* indigo-500 */
+  -color-accent-fg: #FFFFFF;
+  -color-accent-subtle: #EEF2FF; /* indigo-50 */
+}
+
+/*
+ * AtlantaFX sets -fx-cell-size: 0 on combo popup cells (variable-height), which forces VirtualFlow
+ * to measure every row on open. Fixed size matches Primer's padded cell height and keeps opens snappy.
+ */
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+  -fx-cell-size: 36px;
+}
+
+/* Invisible while PopupPrewarm opens skins once after Settings content loads. */
+.root.prewarming-popups .combo-box-popup,
+.root.prewarming-popups .color-palette {
+  -fx-opacity: 0;
+}
+
+.settings-title {
+  -fx-font-size: 1.35em;
+  -fx-font-weight: bold;
+}
+
+.settings-loading-label {
+  -fx-text-fill: -color-fg-muted;
+  -fx-font-size: 0.95em;
+}
+
+.settings-section-label {
+  -fx-font-size: 0.75em;
+  -fx-font-weight: bold;
+  -fx-text-fill: -color-fg-muted;
+  -fx-letter-spacing: 0.06em;
+  -fx-padding: 0 0 0 0;
+}
+
+/* Sections separated by spacing + labels only; action bar keeps the sole structural rule. */
+.settings-section {
+  -fx-padding: 0 0 8 0;
+}
+
+.settings-muted {
+  -fx-text-fill: -color-fg-muted;
+  -fx-font-size: 0.85em;
+}
+
+.settings-inline-error {
+  -fx-text-fill: -color-danger-fg;
+  -fx-font-size: 0.85em;
+}
+
+.settings-run-all-list {
+  -fx-padding: 8;
+  -fx-background-color: -color-bg-subtle;
+  -fx-background-radius: 6;
+}
+
+.settings-run-all-row {
+  -fx-padding: 2 0;
+}
+
+.settings-icon-button {
+  -fx-min-width: 28;
+  -fx-padding: 2 6;
+}
+
+.settings-action-bar {
+  -fx-padding: 12 0 0 0;
+  -fx-border-color: -color-border-default transparent transparent transparent;
+  -fx-border-width: 1 0 0 0;
+}

@@ -4,7 +4,6 @@ import com.jogamp.common.util.IOUtil;
 import com.jogamp.newt.NewtFactory;
 import java.awt.Image;
 import java.awt.Taskbar;
-import java.awt.Window;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,8 +13,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
- * Loads {@code logo.png} (and multi-size variants) for window decorations, the taskbar, and NEWT /
- * Processing surfaces. The settings window uses {@code settings.png} instead.
+ * Loads {@code logo.png} (and multi-size variants) for the taskbar and NEWT / Processing surfaces.
+ * Settings window icons are applied separately via JavaFX ({@code settings.png}).
  */
 public final class AppIcons {
   private static final Logger LOGGER = Logger.getLogger(AppIcons.class.getName());
@@ -41,7 +40,6 @@ public final class AppIcons {
   };
 
   private static Image logoImage;
-  private static Image settingsImage;
   private static List<Image> logoImages;
 
   private AppIcons() {}
@@ -75,28 +73,6 @@ public final class AppIcons {
     }
   }
 
-  /** Applies the app logo to a Swing / AWT window title bar and taskbar entry. */
-  public static void applyTo(Window window) {
-    if (window == null) {
-      return;
-    }
-    List<Image> images = logoImages();
-    if (!images.isEmpty()) {
-      window.setIconImages(images);
-    }
-  }
-
-  /** Applies the settings gear icon to a Swing / AWT window title bar. */
-  public static void applySettingsTo(Window window) {
-    if (window == null) {
-      return;
-    }
-    Image settings = settingsIcon();
-    if (settings != null) {
-      window.setIconImage(settings);
-    }
-  }
-
   public static Image logo() {
     if (logoImage == null) {
       logoImage = load(LOGO_RESOURCE);
@@ -104,14 +80,7 @@ public final class AppIcons {
     return logoImage;
   }
 
-  public static Image settingsIcon() {
-    if (settingsImage == null) {
-      settingsImage = load(SETTINGS_RESOURCE);
-    }
-    return settingsImage;
-  }
-
-  private static List<Image> logoImages() {
+  public static List<Image> logoImages() {
     if (logoImages == null) {
       List<Image> images = new ArrayList<>(NEWT_ICON_RESOURCES.length);
       for (String path : NEWT_ICON_RESOURCES) {

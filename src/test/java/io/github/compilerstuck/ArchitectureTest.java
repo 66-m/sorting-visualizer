@@ -8,7 +8,7 @@ import com.tngtech.archunit.lang.ArchRule;
 
 /**
  * Architecture rules enforcing separation between core algorithm/model logic and UI/rendering
- * frameworks (Swing, AWT, Processing).
+ * frameworks (Swing, AWT, Processing, JavaFX).
  */
 @AnalyzeClasses(packages = "io.github.compilerstuck")
 class ArchitectureTest {
@@ -61,5 +61,46 @@ class ArchitectureTest {
           .should()
           .dependOnClassesThat()
           .resideInAnyPackage("processing..", "javax.swing..")
+          .allowEmptyShould(true);
+
+  @ArchTest
+  static final ArchRule algorithms_no_javafx =
+      noClasses()
+          .that()
+          .resideInAPackage("..sortingalgorithms..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("javafx..")
+          .allowEmptyShould(true);
+
+  @ArchTest
+  static final ArchRule model_no_javafx =
+      noClasses()
+          .that()
+          .resideInAPackage("..control.model..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("javafx..")
+          .allowEmptyShould(true);
+
+  @ArchTest
+  static final ArchRule shuffle_no_javafx =
+      noClasses()
+          .that()
+          .resideInAPackage("..control.shuffle..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("javafx..")
+          .allowEmptyShould(true);
+
+  /** Phase 2 view-models must stay headless (G9). Package reserved in Phase 1. */
+  @ArchTest
+  static final ArchRule settingsfx_vm_no_javafx =
+      noClasses()
+          .that()
+          .resideInAPackage("..control.ui.settingsfx.vm..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("javafx..")
           .allowEmptyShould(true);
 }

@@ -106,7 +106,8 @@ public record VisualConstraints(
       if (candidate < minSize) {
         break;
       }
-      candidate = square ? previousPerfectSquare(candidate - 1) : previousPerfectCube(candidate - 1);
+      candidate =
+          square ? previousPerfectSquare(candidate - 1) : previousPerfectCube(candidate - 1);
     }
 
     for (int candidate = upper; ; ) {

@@ -14,12 +14,24 @@ public final class MainControllerConfig {
   public static final int STANDARD_HEIGHT = 720;
   public static final int PORTRAIT_WIDTH = 576;
   public static final int PORTRAIT_HEIGHT = 1024;
+
   /** Minimum size when the visualization window is user-resizable (windowed mode). */
   public static final int MIN_WINDOW_WIDTH = 640;
+
   public static final int MIN_WINDOW_HEIGHT = 360;
+
   /** Minimum settings frame size so 1/4-area windows remain usable on small screens. */
   public static final int SETTINGS_MIN_WIDTH = 480;
+
   public static final int SETTINGS_MIN_HEIGHT = 360;
+
+  /**
+   * Fallback settings size when screen bounds are unavailable / before content is packed. Height
+   * fits the collapsed one-pager; live content height is packed in {@code SettingsFxController}.
+   */
+  public static final int SETTINGS_DEFAULT_WIDTH = 960;
+
+  public static final int SETTINGS_DEFAULT_HEIGHT = 560;
 
   // Frame rate and rendering
   public static final int TARGET_FRAME_RATE = 1000;
@@ -55,6 +67,6 @@ public final class MainControllerConfig {
   public static final float TABLE_COLUMN_WIDTH_RATIO = 1.0f / 7.0f;
   public static final float TABLE_TOP_ROW = 50.0f;
 
-  // Default configuration
-  public static final int DEFAULT_ARRAY_SIZE = 1280;
+  // Default configuration (delegates to SettingsDefaults — single source of truth)
+  public static final int DEFAULT_ARRAY_SIZE = SettingsDefaults.DEFAULT_ARRAY_SIZE;
 }

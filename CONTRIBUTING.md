@@ -52,7 +52,6 @@ Windows/macOS installers: run `jpackage` locally against the fat JAR (not covere
 - Prefer small, focused changes.
 - Run `./mvnw verify` before opening a PR.
 - Describe **why** the change exists and how you tested it (use the PR template).
-- Do not introduce Processing or Swing imports into `sortingalgorithms` / shuffle / model layers.
 
 ## Code style
 
