@@ -7,7 +7,6 @@ import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -18,9 +17,22 @@ public class Sphere extends Visualization {
     float squareRoot;
     static float aa = 0;
 
+    private int[] colorsRgb;
+    private float[] xCords, yCords, zCords;
+    private int bufferCapacity;
+
     public Sphere(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
         super(arrayController, colorGradient, sound, proc);
         name = "3D - Sphere";
+    }
+
+    private void ensureBuffers(int n) {
+        if (colorsRgb != null && bufferCapacity >= n) return;
+        bufferCapacity = n;
+        colorsRgb = new int[n];
+        xCords = new float[n];
+        yCords = new float[n];
+        zCords = new float[n];
     }
 
     @Override
@@ -38,11 +50,7 @@ public class Sphere extends Visualization {
         float m = 0;
         float n = 0;
 
-        ArrayList<Color> colors = new ArrayList<>();
-        //ArrayList<Float> sizes = new ArrayList<>();
-        ArrayList<Float> xCords = new ArrayList<>();
-        ArrayList<Float> yCords = new ArrayList<>();
-        ArrayList<Float> zCords = new ArrayList<>();
+        ensureBuffers(drawCount);
 
         for (int i = 0; i < drawCount; i++) {
 
@@ -97,10 +105,10 @@ public class Sphere extends Visualization {
             //sort for size
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-            zCords.add(z);
-            colors.add(color);
-            xCords.add(x);
-            yCords.add(y);
+            zCords[i] = z;
+            colorsRgb[i] = color.getRGB();
+            xCords[i] = x;
+            yCords[i] = y;
 
             if (m == squareRoot - 1) {
                 if (n == squareRoot - 1) {
@@ -114,11 +122,9 @@ public class Sphere extends Visualization {
             }
         }
 
-        for (int i = 0; i < colors.size(); i++) {
-            Color color = colors.get(i);
-
+        for (int i = 0; i < drawCount; i++) {
             proc.noStroke();
-            proc.fill(color.getRGB(), (float) (255.));
+            proc.fill(colorsRgb[i], (float) (255.));
 
 
             proc.pushMatrix();
@@ -127,7 +133,7 @@ public class Sphere extends Visualization {
             proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
 
             //set circle position
-            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            proc.translate(xCords[i], yCords[i], zCords[i]);
             proc.circle(0, 0, 3);
 
             proc.popMatrix();

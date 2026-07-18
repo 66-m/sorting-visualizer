@@ -20,27 +20,45 @@ public class Bars extends Visualization {
     public void update() {
         super.update();
 
-        int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
+        int n = arrayController.getLength();
+        int maxPrimitives = Math.max(1, Math.min(screenWidth, 2048));
+        int stride = LodStride.forLength(n, maxPrimitives);
+        int bucketCount = (n + stride - 1) / stride;
+        int rectWidth = Math.max(1, (screenWidth - (bucketCount - 1)) / bucketCount);
 
-        for (int i = 0; i < arrayController.getLength(); i++) {
-            Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+        for (int i = 0; i < n; i += stride) {
+            int bucketEnd = Math.min(i + stride, n);
+            int maxValuePlusOne = 0;
+            int colorIndex = i;
+            int soundIndex = -1;
 
-
-            int barHeight = (arrayController.get(i) + 1) * (screenHeight - 5) / arrayController.getLength();
-
-            if (arrayController.getMarker(i) == Marker.SET) {
-                sound.playSound(i);
+            for (int j = i; j < bucketEnd; j++) {
+                int valuePlusOne = arrayController.get(j) + 1;
+                if (valuePlusOne > maxValuePlusOne) {
+                    maxValuePlusOne = valuePlusOne;
+                    colorIndex = j;
+                }
+                if (arrayController.getMarker(j) == Marker.SET) {
+                    soundIndex = j;
+                }
             }
 
+            if (soundIndex >= 0) {
+                sound.playSound(soundIndex);
+            }
 
-            arrayController.setMarker(i, Marker.NORMAL);
+            Color color = colorGradient.getMarkerColor(arrayController.get(colorIndex), arrayController.getMarker(colorIndex));
+
+            for (int j = i; j < bucketEnd; j++) {
+                arrayController.setMarker(j, Marker.NORMAL);
+            }
+
+            int barHeight = maxValuePlusOne * (screenHeight - 5) / n;
 
             proc.stroke(color.getRGB());
             proc.fill(color.getRGB());
 
-
-            proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight, rectWidth, -1 * barHeight); //Classic bar
-
+            proc.rect(PApplet.map(i, 0, n, 0, screenWidth), screenHeight, rectWidth, -1 * barHeight); //Classic bar
         }
     }
 

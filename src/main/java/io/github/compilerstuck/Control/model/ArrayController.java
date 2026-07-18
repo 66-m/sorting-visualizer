@@ -21,6 +21,8 @@ public class ArrayController implements ArrayModel {
     private long writesAux;
     private double sortedPercentage;
     private int segments;
+    /** When true, {@link #update()} must recompute sorted% / segments. */
+    private volatile boolean metricsDirty = true;
     private double delay;
     private double realTime;
 
@@ -48,12 +50,17 @@ public class ArrayController implements ArrayModel {
         writesAux = 0;
         sortedPercentage = 1;
         segments = 1;
+        metricsDirty = true;
 
         //Initial Values
         for (int i = 0; i < size; i++) {
             array[i] = i;
             markers[i] = Marker.NORMAL;
         }
+    }
+
+    private void markMetricsDirty() {
+        metricsDirty = true;
     }
 
     @Override
@@ -128,6 +135,7 @@ public class ArrayController implements ArrayModel {
         writesAux = 0;
         sortedPercentage = 1;
         segments = 1;
+        metricsDirty = true;
     }
 
     public void resetArray() {
@@ -135,6 +143,7 @@ public class ArrayController implements ArrayModel {
             array[i] = i;
             markers[i] = Marker.NORMAL;
         }
+        markMetricsDirty();
     }
 
     @Override
@@ -167,6 +176,7 @@ public class ArrayController implements ArrayModel {
     public void set(int i, int value) {
         array[i] = value;
         writes += 1;
+        markMetricsDirty();
     }
 
     @Override
@@ -176,6 +186,7 @@ public class ArrayController implements ArrayModel {
         array[j] = swapOneValue;
         writes += 2;
         swaps += 1;
+        markMetricsDirty();
     }
 
     @Override
@@ -199,6 +210,9 @@ public class ArrayController implements ArrayModel {
     }
 
     public void update() {
+        if (!metricsDirty) {
+            return;
+        }
 
         double sortedCount = 0;
         int segmentStart = 0;
@@ -217,11 +231,18 @@ public class ArrayController implements ArrayModel {
 
         segments = sgmnts;
         sortedPercentage = sortedCount / length;
+        metricsDirty = false;
+    }
+
+    /** Package-visible for tests. */
+    boolean isMetricsDirty() {
+        return metricsDirty;
     }
 
     void shuffle() {
         if (cancellationToken.isCancelled()) return;
         shuffleStrategy.shuffle(this, processingContext, operationReporter, cancellationToken);
+        markMetricsDirty();
     }
 
     public void setProcessingContext(ProcessingContext processingContext) {

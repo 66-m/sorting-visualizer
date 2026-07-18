@@ -1,6 +1,8 @@
 package io.github.compilerstuck.Control;
 
+import io.github.compilerstuck.Control.config.DelayStrategy;
 import io.github.compilerstuck.Control.model.ArrayController;
+import io.github.compilerstuck.Control.model.FrameGate;
 import io.github.compilerstuck.Control.model.SortingSessionManager;
 import io.github.compilerstuck.Control.model.SortingStateManager;
 import io.github.compilerstuck.Control.render.RenderContext;
@@ -22,15 +24,26 @@ import java.util.logging.Logger;
 public final class AppContext {
     private static final Logger LOGGER = Logger.getLogger(AppContext.class.getName());
 
+    private static final int[] DELAY_TIME = {50, 10, 1, 1, 1};
+    private static final double[] DELAY_FACTOR = {1.0, 1.0, 1.0, 0.12, 0.02};
+    /** Speed levels 1–5 → steps per frame when step engine is enabled. */
+    private static final int[] STEPS_PER_FRAME = {1, 5, 25, 200, 2000};
+
     private final ArrayController arrayController;
     private final SortingStateManager stateManager;
     private final SortingSessionManager sessionManager;
+    private final FrameGate frameGate = new FrameGate();
     private Sound sound;
     private ColorGradient colorGradient;
     private Visualization visualization;
     private final List<SortingAlgorithm> algorithms = new ArrayList<>();
     private int size;
     private RenderContext renderContext;
+
+    /** Legacy sleep delay by default; enable via {@code -Dsv.stepEngine=true} or Settings. */
+    private boolean useStepEngine = Boolean.getBoolean("sv.stepEngine");
+    private int speedLevel = 3; // 1–5, default Normal
+    private int stepsPerFrame = STEPS_PER_FRAME[2];
 
     public AppContext(ArrayController arrayController, SortingStateManager stateManager,
                        SortingSessionManager sessionManager) {
@@ -49,6 +62,51 @@ public final class AppContext {
 
     public SortingSessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    public FrameGate getFrameGate() {
+        return frameGate;
+    }
+
+    public boolean isUseStepEngine() {
+        return useStepEngine;
+    }
+
+    public void setUseStepEngine(boolean useStepEngine) {
+        this.useStepEngine = useStepEngine;
+        applySpeedLevel();
+    }
+
+    public int getStepsPerFrame() {
+        return stepsPerFrame;
+    }
+
+    public void setStepsPerFrame(int stepsPerFrame) {
+        this.stepsPerFrame = Math.max(1, stepsPerFrame);
+    }
+
+    public int getSpeedLevel() {
+        return speedLevel;
+    }
+
+    /**
+     * Applies speed level 1–5: steps/frame in step-engine mode, delay time/factor in legacy mode.
+     */
+    public void setSpeedLevel(int level1to5) {
+        this.speedLevel = Math.max(1, Math.min(5, level1to5));
+        applySpeedLevel();
+    }
+
+    private void applySpeedLevel() {
+        int idx = speedLevel - 1;
+        if (useStepEngine) {
+            stepsPerFrame = STEPS_PER_FRAME[idx];
+            algorithms.forEach(a -> a.setDelayStrategy(DelayStrategy.ALWAYS));
+        } else {
+            setDelayTime(DELAY_TIME[idx]);
+            setDelayFactor(DELAY_FACTOR[idx]);
+            algorithms.forEach(a -> a.setDelayStrategy(DelayStrategy.DEFAULT));
+        }
     }
 
     public Sound getSound() {
@@ -136,6 +194,7 @@ public final class AppContext {
     }
 
     public void cancelSorting() {
+        frameGate.cancel();
         sessionManager.cancel();
     }
 
@@ -146,11 +205,13 @@ public final class AppContext {
                 algorithms.add(alg);
             }
         }
+        applySpeedLevel();
     }
 
     public void setAlgorithm(SortingAlgorithm algorithm) {
         algorithms.clear();
         algorithms.add(algorithm);
+        applySpeedLevel();
     }
 
     public void setDelayTime(int ms) {

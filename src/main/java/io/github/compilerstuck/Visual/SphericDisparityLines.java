@@ -7,7 +7,6 @@ import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -18,9 +17,22 @@ public class SphericDisparityLines extends Visualization {
     float squareRoot;
     static float aa = 0;
 
+    private int[] colorsRgb;
+    private float[] xCords, yCords, zCords;
+    private int bufferCapacity;
+
     public SphericDisparityLines(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
         super(arrayController, colorGradient, sound, proc);
         name = "3D - Spheric Disparity Lines";
+    }
+
+    private void ensureBuffers(int n) {
+        if (colorsRgb != null && bufferCapacity >= n) return;
+        bufferCapacity = n;
+        colorsRgb = new int[n];
+        xCords = new float[n];
+        yCords = new float[n];
+        zCords = new float[n];
     }
 
     @Override
@@ -38,11 +50,7 @@ public class SphericDisparityLines extends Visualization {
         float m = 0;
         float n = 0;
 
-        ArrayList<Color> colors = new ArrayList<>();
-        //ArrayList<Float> sizes = new ArrayList<>();
-        ArrayList<Float> xCords = new ArrayList<>();
-        ArrayList<Float> yCords = new ArrayList<>();
-        ArrayList<Float> zCords = new ArrayList<>();
+        ensureBuffers(drawCount);
 
         for (int i = 0; i < drawCount; i++) {
 
@@ -98,10 +106,10 @@ public class SphericDisparityLines extends Visualization {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
         
-            zCords.add(z);
-            colors.add(color);
-            xCords.add(x);
-            yCords.add(y);
+            zCords[i] = z;
+            colorsRgb[i] = color.getRGB();
+            xCords[i] = x;
+            yCords[i] = y;
 
             if (m == squareRoot - 1) {
                 if (n == squareRoot - 1) {
@@ -115,12 +123,10 @@ public class SphericDisparityLines extends Visualization {
             }
         }
 
-        for (int i = 0; i < colors.size(); i++) {
-            Color color = colors.get(i);
-
+        for (int i = 0; i < drawCount; i++) {
             //proc.stroke(color.getRGB());
-            proc.stroke(color.getRGB(), 255f);
-            proc.fill(color.getRGB(), 255f);
+            proc.stroke(colorsRgb[i], 255f);
+            proc.fill(colorsRgb[i], 255f);
 
 
             //Max size: 35
@@ -130,11 +136,11 @@ public class SphericDisparityLines extends Visualization {
             //set circle position
 
             int target = arrayController.get(i);
-            if (i == target || target < 0 || target >= colors.size()) {
-                proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            if (i == target || target < 0 || target >= drawCount) {
+                proc.translate(xCords[i], yCords[i], zCords[i]);
                 proc.circle(0, 0, 2);
             } else{
-                proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(target), yCords.get(target), zCords.get(target));
+                proc.line(xCords[i], yCords[i], zCords[i], xCords[target], yCords[target], zCords[target]);
             }
 
             proc.popMatrix();

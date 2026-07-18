@@ -20,16 +20,19 @@ public class ScatterPlotLinked extends Visualization {
     public void update() {
         super.update();
 
-        //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
+        int n = arrayController.getLength();
+        int maxPrimitives = Math.min(Math.max(screenWidth * 2, 1), 4096);
+        int stride = LodStride.forLength(n, maxPrimitives);
 
-        for (int i = 0; i < arrayController.getLength() - 1; i++) {
+        for (int i = 0; i < n - 1; i += stride) {
+            int next = Math.min(i + stride, n - 1);
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
             proc.stroke(color.getRGB());
             proc.fill(color.getRGB());
 
-            int barHeight1 = (arrayController.get(i) + 1) * (screenHeight - 5) / arrayController.getLength();
-            int barHeight2 = (arrayController.get(i % arrayController.getLength() + 1) + 1) * (screenHeight - 5) / arrayController.getLength();
+            int barHeight1 = (arrayController.get(i) + 1) * (screenHeight - 5) / n;
+            int barHeight2 = (arrayController.get(next) + 1) * (screenHeight - 5) / n;
 
             if (arrayController.getMarker(i) == Marker.SET) {
                 sound.playSound(i);
@@ -38,7 +41,7 @@ public class ScatterPlotLinked extends Visualization {
 
             arrayController.setMarker(i, Marker.NORMAL);
 
-            proc.line(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight - barHeight1, PApplet.map((i % arrayController.getLength() + 1), 0, arrayController.getLength(), 0, screenWidth), screenHeight - barHeight2);
+            proc.line(PApplet.map(i, 0, n, 0, screenWidth), screenHeight - barHeight1, PApplet.map(next, 0, n, 0, screenWidth), screenHeight - barHeight2);
 
         }
     }

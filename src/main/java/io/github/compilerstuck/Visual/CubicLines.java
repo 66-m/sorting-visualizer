@@ -7,7 +7,6 @@ import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -17,10 +16,23 @@ public class CubicLines extends Visualization {
     int radius;
     static float aa = 0;
 
+    private int[] colorsRgb;
+    private float[] xCords, yCords, zCords;
+    private int bufferCapacity;
+
     public CubicLines(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
         super(arrayController, colorGradient, sound, proc);
         name = "3D - Cubic Lines";
 
+    }
+
+    private void ensureBuffers(int n) {
+        if (colorsRgb != null && bufferCapacity >= n) return;
+        bufferCapacity = n;
+        colorsRgb = new int[n];
+        xCords = new float[n];
+        yCords = new float[n];
+        zCords = new float[n];
     }
 
     @Override
@@ -42,26 +54,17 @@ public class CubicLines extends Visualization {
         int yCnt = 0;
         int zCnt = 0;
 
-        ArrayList<Color> colors = new ArrayList<>();
-        ArrayList<Float> sizes = new ArrayList<>();
-        ArrayList<Float> xCords = new ArrayList<>();
-        ArrayList<Float> yCords = new ArrayList<>();
-        ArrayList<Float> zCords = new ArrayList<>();
+        ensureBuffers(drawCount);
 
         for (int i = 0; i < drawCount; i++) {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-            proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
 
             if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
                 sound.playSound(arrayController.get(i));
             }
 
             arrayController.setMarker(arrayController.get(i), Marker.NORMAL);
-
-            float barHeight = ((arrayController.getLength() / arrayController.getLength() * (arrayController.getLength() - 2f * Math.min(Math.min(Math.abs(i - arrayController.get(i)), Math.abs(i - arrayController.getLength() - arrayController.get(i))), Math.abs(i + arrayController.getLength() - arrayController.get(i))))));
 
             float xa = PApplet.map(xCnt, 0, xSize, -radius, radius);
             float ya = PApplet.map(yCnt, 0, xSize, -radius, radius);
@@ -73,13 +76,10 @@ public class CubicLines extends Visualization {
             float z = (float) (Math.sin(-10) * ya + Math.cos(-10) * zb);
             float y = (float) (Math.cos(-10) * ya - Math.sin(-10) * zb);
 
-            float size = PApplet.map(barHeight, 0, arrayController.getLength(), 0, radius*2/xSize);
-
-            zCords.add(z);
-            colors.add(color);
-            xCords.add(x);
-            yCords.add(y);
-            sizes.add(size);
+            zCords[i] = z;
+            colorsRgb[i] = color.getRGB();
+            xCords[i] = x;
+            yCords[i] = y;
 
             zCnt++;
             if (zCnt == xSize) {
@@ -94,11 +94,9 @@ public class CubicLines extends Visualization {
             }
         }
 
-        for (int i = 0; i < colors.size(); i++) {
-            Color color = colors.get(i);
-
-            proc.stroke(color.getRGB(), 255f);
-            proc.fill(color.getRGB(), 255f);
+        for (int i = 0; i < drawCount; i++) {
+            proc.stroke(colorsRgb[i], 255f);
+            proc.fill(colorsRgb[i], 255f);
 
 
             proc.pushMatrix();
@@ -108,11 +106,11 @@ public class CubicLines extends Visualization {
             proc.rotateY(0);
 
             int target = arrayController.get(i);
-            if (i == target || target < 0 || target >= colors.size()) {
-                proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            if (i == target || target < 0 || target >= drawCount) {
+                proc.translate(xCords[i], yCords[i], zCords[i]);
                 proc.circle(0, 0, 2);
             }else{
-                proc.line(xCords.get(i), yCords.get(i), zCords.get(i), xCords.get(target), yCords.get(target), zCords.get(target));
+                proc.line(xCords[i], yCords[i], zCords[i], xCords[target], yCords[target], zCords[target]);
             }
 
             proc.popMatrix();

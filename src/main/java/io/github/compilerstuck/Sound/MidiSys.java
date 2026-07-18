@@ -10,7 +10,11 @@ import javax.sound.midi.*;
 
 public class MidiSys extends Sound {
 
+    /** Minimum interval between note-ons (~60 Hz). */
+    static final long MIN_NOTE_INTERVAL_NANOS = 16_000_000L;
+
     private final MidiChannel synthesizerChannel;
+    private long lastNoteOnNanos;
 
 
     public MidiSys(ArrayModel arrayController) throws MidiUnavailableException {
@@ -37,7 +41,11 @@ public class MidiSys extends Sound {
     public void playSound(int index) {
 
         if (!isMuted && index >= 0 && arrayController.getMarker(index) == Marker.SET) {
-
+            long now = System.nanoTime();
+            if (now - lastNoteOnNanos < MIN_NOTE_INTERVAL_NANOS) {
+                return;
+            }
+            lastNoteOnNanos = now;
 
             synthesizerChannel.allSoundOff();
             synthesizerChannel.allNotesOff();

@@ -19,6 +19,8 @@ public final class MainControllerConfig {
 
     // Frame rate and rendering
     public static final int TARGET_FRAME_RATE = 1000;
+    /** Cap when FrameGate step engine is active so grants match display cadence. */
+    public static final int STEP_ENGINE_FRAME_RATE = 60;
     public static final int MAX_TEXT_SIZE = 50;
 
     // Timing (milliseconds)

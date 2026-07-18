@@ -415,15 +415,12 @@ public class Settings extends JFrame {
         return card;
     }
 
-    /** Speed slider with emoji labels. */
+    /** Speed slider: delay time/factor (legacy) or steps/frame (step engine). */
     private StyledCard createSpeedCard() {
         StyledCard card = ComponentFactory.createCard();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        final int[] DELAY_TIME = {50, 10, 1, 1, 1};
-        final double[] DELAY_FACTOR = {1.0, 1.0, 1.0, 0.12, 0.02};
-
-        speedSlider = ComponentFactory.createSlider(1, 5, 3);
+        speedSlider = ComponentFactory.createSlider(1, 5, app.getSpeedLevel());
         speedSlider.setSnapToTicks(true);
         speedSlider.setMajorTickSpacing(1);
         speedSlider.setToolTipText("Select animation speed level");
@@ -439,13 +436,17 @@ public class Settings extends JFrame {
         speedLabels.put(5, new JLabel("Max"));
         speedSlider.setLabelTable(speedLabels);
 
-        speedSlider.addChangeListener(e -> {
-            int level = speedSlider.getValue() - 1;
-            app.setDelayTime(DELAY_TIME[level]);
-            app.setDelayFactor(DELAY_FACTOR[level]);
-        });
+        speedSlider.addChangeListener(e -> app.setSpeedLevel(speedSlider.getValue()));
+
+        JCheckBox stepEngineCheckBox = ComponentFactory.createCheckBox("Step engine (experimental)");
+        stepEngineCheckBox.setSelected(app.isUseStepEngine());
+        stepEngineCheckBox.setToolTipText("Advance the sort via draw-frame credits instead of Thread.sleep");
+        stepEngineCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        stepEngineCheckBox.addActionListener(e -> app.setUseStepEngine(stepEngineCheckBox.isSelected()));
 
         card.add(speedSlider);
+        card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
+        card.add(stepEngineCheckBox);
         return card;
     }
 

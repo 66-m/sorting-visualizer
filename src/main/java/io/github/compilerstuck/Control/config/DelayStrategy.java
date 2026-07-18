@@ -33,4 +33,7 @@ public interface DelayStrategy {
         boolean factorOk = delayFactor >= 1.0 || Math.random() < delayFactor;
         return stepOk && factorOk;
     };
+
+    /** Always delay — used by the FrameGate step engine so each delay() consumes a credit. */
+    DelayStrategy ALWAYS = (arrayLength, delayFactor) -> true;
 }

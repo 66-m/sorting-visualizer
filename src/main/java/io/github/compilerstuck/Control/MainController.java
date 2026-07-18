@@ -1,6 +1,7 @@
 package io.github.compilerstuck.Control;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
+import io.github.compilerstuck.Control.config.DelayStrategy;
 import io.github.compilerstuck.Control.config.MainControllerConfig;
 import io.github.compilerstuck.Control.model.ArrayController;
 import io.github.compilerstuck.Control.model.SortingSessionManager;
@@ -149,6 +150,14 @@ public class MainController extends PApplet implements RenderContext {
 
     @Override
     public void delay(int ms) {
+        if (appContext != null && appContext.isUseStepEngine()) {
+            try {
+                appContext.getFrameGate().awaitStep();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return;
+        }
         super.delay(ms);
     }
 
@@ -316,12 +325,20 @@ public class MainController extends PApplet implements RenderContext {
             settings.setEnableInputs(true);
             settings.setEnableCancelButton(false);
         }
+
+        frameRate(MainControllerConfig.TARGET_FRAME_RATE);
+        if (appContext != null) {
+            appContext.getFrameGate().reset();
+        }
     }
 
     /**
      * Handles rendering and updates during active sorting.
      */
     private void handleActiveSort() {
+        if (appContext != null && appContext.isUseStepEngine()) {
+            appContext.getFrameGate().grant(appContext.getStepsPerFrame());
+        }
         currentVisualization().update();
         arrayController.update();
         
@@ -375,6 +392,17 @@ public class MainController extends PApplet implements RenderContext {
         // Keep local mirrors aligned with AppContext (Settings writes there).
         algorithms = new ArrayList<>(currentAlgorithms());
         visualization = currentVisualization();
+
+        if (appContext != null && appContext.isUseStepEngine()) {
+            appContext.getFrameGate().reset();
+            frameRate(MainControllerConfig.STEP_ENGINE_FRAME_RATE);
+            for (SortingAlgorithm alg : algorithms) {
+                alg.setDelayStrategy(DelayStrategy.ALWAYS);
+            }
+        } else {
+            frameRate(MainControllerConfig.TARGET_FRAME_RATE);
+        }
+
         sessionManager.startSortingSession(algorithms);
     }
 

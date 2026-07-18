@@ -7,7 +7,6 @@ import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -17,10 +16,25 @@ public class Cube extends Visualization {
     int radius;
     static float aa = 0;
 
+    private int[] colorsRgb;
+    private float[] xCords, yCords, zCords;
+    private float[] sizes;
+    private int bufferCapacity;
+
     public Cube(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
         super(arrayController, colorGradient, sound, proc);
         name = "3D - Cube";
 
+    }
+
+    private void ensureBuffers(int n) {
+        if (colorsRgb != null && bufferCapacity >= n) return;
+        bufferCapacity = n;
+        colorsRgb = new int[n];
+        xCords = new float[n];
+        yCords = new float[n];
+        zCords = new float[n];
+        sizes = new float[n];
     }
 
     @Override
@@ -42,18 +56,11 @@ public class Cube extends Visualization {
         int yCnt = 0;
         int zCnt = 0;
 
-        ArrayList<Color> colors = new ArrayList<>();
-        ArrayList<Float> sizes = new ArrayList<>();
-        ArrayList<Float> xCords = new ArrayList<>();
-        ArrayList<Float> yCords = new ArrayList<>();
-        ArrayList<Float> zCords = new ArrayList<>();
+        ensureBuffers(drawCount);
 
         for (int i = 0; i < drawCount; i++) {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-            proc.stroke(color.getRGB());
-            proc.fill(color.getRGB());
 
             if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
                 sound.playSound(arrayController.get(i));
@@ -75,11 +82,11 @@ public class Cube extends Visualization {
 
             float size = PApplet.map(barHeight, 0, arrayController.getLength(), 0, radius*2/xSize);
 
-            zCords.add(z);
-            colors.add(color);
-            xCords.add(x);
-            yCords.add(y);
-            sizes.add(size);
+            zCords[i] = z;
+            colorsRgb[i] = color.getRGB();
+            xCords[i] = x;
+            yCords[i] = y;
+            sizes[i] = size;
 
             zCnt++;
             if (zCnt == xSize) {
@@ -94,25 +101,23 @@ public class Cube extends Visualization {
             }
         }
 
-        for (int i = 0; i < colors.size(); i++) {
-            Color color = colors.get(i);
-
-            proc.stroke(color.getRGB(), 255f);
+        for (int i = 0; i < drawCount; i++) {
+            proc.stroke(colorsRgb[i], 255f);
             //proc.noStroke();
-            proc.fill(color.getRGB(), 120f);
+            proc.fill(colorsRgb[i], 120f);
 
 
             proc.pushMatrix();
             //set screen center
             proc.translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
             //set circle position
-            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            proc.translate(xCords[i], yCords[i], zCords[i]);
 
             //proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
             proc.rotateX(45);
             proc.rotateY(0);
             proc.rotateZ(-aa);
-            proc.box(sizes.get(i), sizes.get(i), sizes.get(i));
+            proc.box(sizes[i], sizes[i], sizes[i]);
             proc.popMatrix();
         }
     }
