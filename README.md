@@ -118,9 +118,4 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 
 Copyright (C) 2020–2026 Marcel Mauel
 
-Identities (kept separate on purpose):
-- In-app visualizer watermark: **CompilerStuck**
-- Copyright: **Marcel Mauel**
-- GitHub / Maven (`io.github.66-m`): **66-m**
-
 Licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). See [`LICENSE`](LICENSE).
