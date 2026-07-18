@@ -41,7 +41,7 @@ cd sorting-visualizer
 ./run                         # run with dependencies on the classpath
 ```
 
-Convenience scripts (Unix):
+Convenience scripts:
 
 | Command | What it does |
 |---------|----------------|
@@ -49,11 +49,11 @@ Convenience scripts (Unix):
 | `./build skip-tests` | Fast package (skips tests) |
 | `./build release` | Clean build + fat JAR (`-Prelease`) |
 | `./run` | Launch the local build |
-| `./run fullscreen` or `./run_fullscreen` | Launch in fullscreen |
+| `./run fullscreen` | Launch in fullscreen |
 | `./run fullscreen --display=2` | Fullscreen on display 2 (1-based; see below) |
-| `./run portrait` or `./run_portrait` | Launch in portrait window size |
+| `./run portrait` | Launch in portrait window size |
 
-Windows: use `mvnw.cmd` / `build.cmd` / `run.cmd` / `run_fullscreen.cmd` / `run_portrait.cmd` instead.
+Windows: use `build.cmd` / `run.cmd` the same way (e.g. `run.cmd fullscreen`). Or call `mvnw.cmd` directly.
 
 Displays are numbered starting at **1** (Processing / Java order). On Linux you can list them with `xrandr --listmonitors`. Example: laptop primary = `--display=1`, HDMI = `--display=2`.
 

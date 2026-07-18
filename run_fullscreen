@@ -1,3 +1,0 @@
-#!/bin/sh
-# Launch in fullscreen (same as: ./run fullscreen)
-exec ./run fullscreen

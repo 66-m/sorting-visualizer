@@ -1,3 +1,0 @@
-#!/bin/sh
-# Launch in portrait window size (same as: ./run portrait)
-exec ./run portrait
