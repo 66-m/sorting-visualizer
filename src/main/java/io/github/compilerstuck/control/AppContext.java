@@ -42,7 +42,7 @@ public final class AppContext {
   private int size;
   private RenderContext renderContext;
 
-  /** Step engine on by default; override via {@code -Dsv.stepEngine=} or Settings. */
+  /** Step engine is opt-in via {@code -Dsv.stepEngine=true} or Settings. */
   private boolean useStepEngine;
 
   private int speedLevel = 3; // 1–5, default Normal

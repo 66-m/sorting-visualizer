@@ -42,8 +42,7 @@ public final class SpeedPanel {
     JCheckBox stepEngineCheckBox = ComponentFactory.createCheckBox("Step engine");
     stepEngineCheckBox.setSelected(app.isUseStepEngine());
     stepEngineCheckBox.setToolTipText(
-        "Default: advance the sort via draw-frame credits. Uncheck for legacy Thread.sleep"
-            + " delay.");
+        "Optional: advance the sort via draw-frame credits instead of legacy per-step timing.");
     stepEngineCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
     stepEngineCheckBox.addActionListener(
         e -> app.setUseStepEngine(stepEngineCheckBox.isSelected()));
