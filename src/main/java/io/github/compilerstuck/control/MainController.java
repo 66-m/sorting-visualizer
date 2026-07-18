@@ -1,6 +1,9 @@
 package io.github.compilerstuck.control;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import com.jogamp.newt.event.WindowAdapter;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.opengl.GLWindow;
 import io.github.compilerstuck.control.catalog.AlgorithmCatalog;
 import io.github.compilerstuck.control.catalog.AlgorithmDescriptor;
 import io.github.compilerstuck.control.catalog.VisualizationCatalog;
@@ -14,6 +17,7 @@ import io.github.compilerstuck.control.model.SortingStateManager;
 import io.github.compilerstuck.control.render.ProcessingContext;
 import io.github.compilerstuck.control.render.ProcessingLoadedImage;
 import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.ResultsTableRenderer;
 import io.github.compilerstuck.control.ui.Settings;
 import io.github.compilerstuck.control.ui.TimeEstimateFormat;
@@ -32,6 +36,7 @@ import java.util.logging.Logger;
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
 import processing.core.PApplet;
+import processing.opengl.PJOGL;
 
 /**
  * Main controller for the sorting algorithm visualizer.
@@ -77,7 +82,7 @@ public class MainController extends PApplet implements RenderContext {
 
   private boolean fullScreen = false;
   private boolean portrait = false;
-  private Rectangle fullscreenBounds;
+  private Rectangle launchScreenBounds;
 
   /**
    * Entry point for the sorting visualizer application.
@@ -87,6 +92,8 @@ public class MainController extends PApplet implements RenderContext {
   public static void main(String[] passedArgs) {
     parseLaunchArgs(passedArgs);
     setupUITheme();
+    // Must run before any NEWT / Processing window is created.
+    AppIcons.installApplicationIcons();
 
     String[] appletArgs = new String[] {"io.github.compilerstuck.control.MainController"};
     PApplet.main(concat(appletArgs, passedArgs));
@@ -173,17 +180,27 @@ public class MainController extends PApplet implements RenderContext {
   /** Processing settings hook. Configures window size and rendering mode. */
   @Override
   public void settings() {
+    // OpenGL icons must be set here (Processing applies them on Windows via NEWT).
+    PJOGL.setIcon(
+        "icons/icon-16.png",
+        "icons/icon-32.png",
+        "icons/icon-48.png",
+        "icons/icon-64.png",
+        "icons/icon-128.png",
+        "icons/icon-256.png",
+        "logo.png");
     fullScreen = launchFullscreen;
     portrait = launchPortrait;
+    launchScreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
     if (fullScreen) {
       // Avoid Processing fullScreen(P3D): JOGL often picks the wrong size/monitor
       // when displays differ in resolution or are stacked vertically.
-      fullscreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
-      this.size(fullscreenBounds.width, fullscreenBounds.height, P3D);
+      this.size(launchScreenBounds.width, launchScreenBounds.height, P3D);
     } else if (portrait) {
-      this.size(MainControllerConfig.PORTRAIT_WIDTH, MainControllerConfig.PORTRAIT_HEIGHT, P3D);
+      Dimension portraitDim = FullscreenDisplay.portraitSize(launchScreenBounds);
+      this.size(portraitDim.width, portraitDim.height, P3D);
     } else {
-      this.size(MainControllerConfig.STANDARD_WIDTH, MainControllerConfig.STANDARD_HEIGHT, P3D);
+      this.size(launchScreenBounds.width, launchScreenBounds.height, P3D);
     }
     noSmooth();
   }
@@ -202,7 +219,10 @@ public class MainController extends PApplet implements RenderContext {
     initializeState();
 
     try {
-      settings = new Settings(appContext);
+      if (launchScreenBounds == null) {
+        launchScreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
+      }
+      settings = new Settings(appContext, launchScreenBounds);
     } catch (UnsupportedLookAndFeelException
         | ClassNotFoundException
         | InstantiationException
@@ -213,15 +233,19 @@ public class MainController extends PApplet implements RenderContext {
 
   /** Configures window size, position, and title. */
   private void configureWindow() {
+    if (launchScreenBounds == null) {
+      launchScreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
+    }
     if (fullScreen) {
-      if (fullscreenBounds == null) {
-        fullscreenBounds = FullscreenDisplay.resolveBounds(launchDisplay);
-      }
       // Never call JOGL setFullscreen on the animation thread — it aborts the sketch.
-      FullscreenDisplay.applyAsync(surface, fullscreenBounds);
+      FullscreenDisplay.applyAsync(surface, launchScreenBounds);
     } else {
-      centerWindowOnPrimaryScreen();
-      surface.setResizable(false);
+      placeWindowedOnLaunchScreen();
+      surface.setResizable(true);
+      applyWindowedMinSize();
+      if (!portrait) {
+        FullscreenDisplay.maximizeAsync(surface);
+      }
     }
 
     surface.setTitle("Sorting Algorithm Visualizer");
@@ -229,13 +253,40 @@ public class MainController extends PApplet implements RenderContext {
     textSize(MainControllerConfig.MAX_TEXT_SIZE); // Processing workaround
   }
 
-  private void centerWindowOnPrimaryScreen() {
-    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    Rectangle screen = ge.getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-    int w = portrait ? MainControllerConfig.PORTRAIT_WIDTH : MainControllerConfig.STANDARD_WIDTH;
-    int h = portrait ? MainControllerConfig.PORTRAIT_HEIGHT : MainControllerConfig.STANDARD_HEIGHT;
-    int x = screen.x + Math.max(0, (screen.width - w) / 2);
-    int y = screen.y + Math.max(0, (screen.height - h) / 2);
+  /** Clamps JOGL windowed resize so the canvas cannot shrink below the configured minimum. */
+  private void applyWindowedMinSize() {
+    Object nativeSurface = surface.getNative();
+    if (!(nativeSurface instanceof GLWindow glWindow)) {
+      return;
+    }
+    final int minW = MainControllerConfig.MIN_WINDOW_WIDTH;
+    final int minH = MainControllerConfig.MIN_WINDOW_HEIGHT;
+    glWindow.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowResized(WindowEvent e) {
+            int w = glWindow.getWidth();
+            int h = glWindow.getHeight();
+            if (w < minW || h < minH) {
+              glWindow.setSize(Math.max(w, minW), Math.max(h, minH));
+            }
+          }
+        });
+  }
+
+  private void placeWindowedOnLaunchScreen() {
+    int w;
+    int h;
+    if (portrait) {
+      Dimension portraitDim = FullscreenDisplay.portraitSize(launchScreenBounds);
+      w = portraitDim.width;
+      h = portraitDim.height;
+    } else {
+      w = launchScreenBounds.width;
+      h = launchScreenBounds.height;
+    }
+    int x = launchScreenBounds.x + Math.max(0, (launchScreenBounds.width - w) / 2);
+    int y = launchScreenBounds.y + Math.max(0, (launchScreenBounds.height - h) / 2);
     surface.setLocation(x, y);
   }
 

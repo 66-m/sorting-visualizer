@@ -33,7 +33,7 @@ java --enable-native-access=ALL-UNNAMED \
 
 Optional launch flags: `fullscreen`, `portrait`, `--display=N` (1-based). Example: `java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar fullscreen`.
 
-A visualization window and a settings window open together. Press **ESC** to quit.
+A visualization window and a settings window open together. In windowed mode the visualization starts maximized; settings opens about half screen wide with height fitted to the controls (capped at half screen tall), centered on the same display. Press **ESC** to quit.
 
 ## Build from source
 

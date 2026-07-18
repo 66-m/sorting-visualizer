@@ -21,15 +21,15 @@ public final class SpeedPanel {
     speedSlider.setMajorTickSpacing(1);
     speedSlider.setToolTipText("Select animation speed level");
     speedSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-    speedSlider.setPreferredSize(new Dimension(400, 55));
+    speedSlider.setPreferredSize(new Dimension(0, 55));
     speedSlider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
 
     java.util.Hashtable<Integer, JLabel> speedLabels = new java.util.Hashtable<>();
-    speedLabels.put(1, new JLabel("Very Slow"));
-    speedLabels.put(2, new JLabel("Slow"));
-    speedLabels.put(3, new JLabel("Normal"));
-    speedLabels.put(4, new JLabel("Fast"));
-    speedLabels.put(5, new JLabel("Max"));
+    speedLabels.put(1, label("Very Slow"));
+    speedLabels.put(2, label("Slow"));
+    speedLabels.put(3, label("Normal"));
+    speedLabels.put(4, label("Fast"));
+    speedLabels.put(5, label("Max"));
     speedSlider.setLabelTable(speedLabels);
 
     speedSlider.addChangeListener(
@@ -58,5 +58,12 @@ public final class SpeedPanel {
 
   public void setInputsEnabled(boolean enabled) {
     speedSlider.setEnabled(enabled);
+  }
+
+  private static JLabel label(String text) {
+    JLabel label = new JLabel(text);
+    label.setFont(UiTheme.FONT_SMALL);
+    label.setForeground(UiTheme.TEXT_SECONDARY);
+    return label;
   }
 }

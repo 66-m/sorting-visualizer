@@ -4,6 +4,7 @@ import io.github.compilerstuck.control.AppContext;
 import io.github.compilerstuck.control.catalog.AlgorithmCatalog;
 import io.github.compilerstuck.control.catalog.AlgorithmDescriptor;
 import io.github.compilerstuck.control.config.ShuffleType;
+import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.ComponentFactory;
 import io.github.compilerstuck.control.ui.JCheckBoxList;
 import io.github.compilerstuck.control.ui.StyledCard;
@@ -193,6 +194,7 @@ public final class SortingPanel {
         });
 
     JDialog runAllSettingDialog = new JDialog();
+    AppIcons.applyTo(runAllSettingDialog);
     runAllSettingDialog.addWindowListener(
         new java.awt.event.WindowAdapter() {
           @Override

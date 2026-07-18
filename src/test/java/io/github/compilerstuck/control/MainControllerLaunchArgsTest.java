@@ -71,4 +71,23 @@ class MainControllerLaunchArgsTest {
             > FullscreenDisplay.scoreMatch(bounds, 0, 0, 2560, 1440));
     assertEquals(-1, FullscreenDisplay.scoreMatch(bounds, 100, 200, 1920, 1080));
   }
+
+  @Test
+  @DisplayName("settingsSize is half width and half height (max bounds)")
+  void settingsSizeIsHalfScreenMax() {
+    Rectangle screen = new Rectangle(0, 0, 1920, 1080);
+    var size = FullscreenDisplay.settingsSize(screen);
+    assertEquals(960, size.width);
+    assertEquals(540, size.height);
+  }
+
+  @Test
+  @DisplayName("portraitSize fits within the screen at ~90% height")
+  void portraitSizeFitsScreen() {
+    Rectangle screen = new Rectangle(10, 20, 1920, 1080);
+    var size = FullscreenDisplay.portraitSize(screen);
+    assertTrue(size.width <= screen.width);
+    assertTrue(size.height <= screen.height);
+    assertTrue(size.height >= (int) (screen.height * 0.9) - 1);
+  }
 }

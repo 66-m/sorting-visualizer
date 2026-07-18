@@ -164,6 +164,7 @@ public class ComponentFactory {
             BorderFactory.createLineBorder(UiTheme.BORDER_COLOR, 1),
             BorderFactory.createEmptyBorder(2, 4, 2, 4)));
     box.setPreferredSize(new Dimension(150, UiTheme.INPUT_HEIGHT));
+    box.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
     box.setMaximumRowCount(15);
     return box;
   }
@@ -267,7 +268,7 @@ public class ComponentFactory {
     bar.setForeground(UiTheme.ACCENT_PRIMARY);
     bar.setBackground(UiTheme.BG_INPUT);
     bar.setBorder(null);
-    bar.setPreferredSize(new Dimension(400, 4));
+    bar.setPreferredSize(new Dimension(0, 4));
     bar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 4));
     bar.setStringPainted(false);
     return bar;

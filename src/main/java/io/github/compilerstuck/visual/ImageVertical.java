@@ -76,7 +76,6 @@ public class ImageVertical extends Visualization {
 
   public boolean setImg(String imagePath) {
     boolean imageFound = true;
-    proc.setResizable(false); // Enable window resizing
 
     try {
       img = proc.loadImage(imagePath);

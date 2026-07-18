@@ -241,6 +241,8 @@
                                         <argument>--enable-native-access=ALL-UNNAMED</argument>
                                         <argument>--java-options</argument>
                                         <argument>--add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED</argument>
+                                        <argument>--icon</argument>
+                                        <argument>${project.basedir}/images/logo.png</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

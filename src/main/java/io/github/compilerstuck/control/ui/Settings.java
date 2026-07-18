@@ -1,6 +1,7 @@
 package io.github.compilerstuck.control.ui;
 
 import io.github.compilerstuck.control.AppContext;
+import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.ui.settings.ActionBar;
 import io.github.compilerstuck.control.ui.settings.ArraySizePanel;
 import io.github.compilerstuck.control.ui.settings.DisplayPanel;
@@ -22,6 +23,7 @@ import javax.swing.*;
 public class Settings extends JFrame {
 
   private final AppContext app;
+  private final Rectangle launchScreenBounds;
 
   private ArraySizePanel arraySizePanel;
   private SortingPanel sortingPanel;
@@ -30,22 +32,27 @@ public class Settings extends JFrame {
   private DisplayPanel displayPanel;
   private ActionBar actionBar;
 
-  public Settings(AppContext app)
+  public Settings(AppContext app, Rectangle launchScreenBounds)
       throws UnsupportedLookAndFeelException,
           ClassNotFoundException,
           InstantiationException,
           IllegalAccessException {
     this.app = app;
+    this.launchScreenBounds =
+        launchScreenBounds != null
+            ? new Rectangle(launchScreenBounds)
+            : GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice()
+                .getDefaultConfiguration()
+                .getBounds();
     initialize();
   }
 
   public void initialize() {
     setTitle("Sorting Algorithm Visualizer - Settings");
+    AppIcons.applyTo(this);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setResizable(true);
-    setSize(1100, 640);
-    setMinimumSize(new Dimension(900, 580));
-    setLocationRelativeTo(null);
 
     addWindowListener(
         new WindowAdapter() {
@@ -55,8 +62,25 @@ public class Settings extends JFrame {
           }
         });
 
+    int targetWidth = Math.max(1, launchScreenBounds.width / 2);
+    int maxHeight = Math.max(1, launchScreenBounds.height / 2);
+
     JComponent mainPanel = createMainUI();
     setContentPane(mainPanel);
+    pack();
+
+    int h =
+        Math.min(
+            maxHeight, Math.max(MainControllerConfig.SETTINGS_MIN_HEIGHT, getPreferredSize().height));
+    setSize(targetWidth, h);
+    setMinimumSize(
+        new Dimension(
+            Math.min(MainControllerConfig.SETTINGS_MIN_WIDTH, targetWidth),
+            Math.min(MainControllerConfig.SETTINGS_MIN_HEIGHT, h)));
+    setLocation(
+        launchScreenBounds.x + Math.max(0, (launchScreenBounds.width - targetWidth) / 2),
+        launchScreenBounds.y + Math.max(0, (launchScreenBounds.height - h) / 2));
+
     setVisible(true);
   }
 
@@ -83,24 +107,71 @@ public class Settings extends JFrame {
     root.setBackground(UiTheme.BG_PRIMARY);
     root.setBorder(
         BorderFactory.createEmptyBorder(
-            UiTheme.SPACING_LG, UiTheme.SPACING_LG, 0, UiTheme.SPACING_LG));
+            UiTheme.SPACING_LG, UiTheme.SPACING_LG, UiTheme.SPACING_LG, UiTheme.SPACING_LG));
 
     root.add(createHeaderPanel(), BorderLayout.NORTH);
 
     JPanel columns = new JPanel(new GridLayout(1, 2, UiTheme.SPACING_LG, 0));
     columns.setBackground(UiTheme.BG_PRIMARY);
     columns.setBorder(BorderFactory.createEmptyBorder(UiTheme.SPACING_MD, 0, 0, 0));
+    columns.setAlignmentX(Component.LEFT_ALIGNMENT);
     columns.add(createLeftColumn(arraySizePanel, sortingPanel, speedPanel));
     columns.add(createRightColumn(visualizationPanel, gradientPanel, displayPanel, soundPanel));
+    columns.setMaximumSize(new Dimension(Integer.MAX_VALUE, columns.getPreferredSize().height));
 
-    JScrollPane scroll = new JScrollPane(columns);
+    JPanel actionPanel = actionBar.getPanel();
+    actionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    actionPanel.setMaximumSize(
+        new Dimension(Integer.MAX_VALUE, actionPanel.getPreferredSize().height));
+
+    ViewportWidthPanel stack = new ViewportWidthPanel();
+    stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
+    stack.setBackground(UiTheme.BG_PRIMARY);
+    stack.add(columns);
+    stack.add(actionPanel);
+
+    JScrollPane scroll = new JScrollPane(stack);
     scroll.setBorder(null);
     scroll.getViewport().setBackground(UiTheme.BG_PRIMARY);
     scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     root.add(scroll, BorderLayout.CENTER);
-    root.add(actionBar.getPanel(), BorderLayout.SOUTH);
     return root;
+  }
+
+  /**
+   * Scrollable panel that always matches the viewport width so child layouts reflow when the frame
+   * is resized, while still allowing a vertical scrollbar when content is taller than the window.
+   */
+  private static final class ViewportWidthPanel extends JPanel implements Scrollable {
+    ViewportWidthPanel() {
+      super();
+    }
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+      return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+      return 16;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+      return Math.max(visibleRect.height * 9 / 10, 1);
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+      return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+      return false;
+    }
   }
 
   private JPanel createLeftColumn(
@@ -113,8 +184,7 @@ public class Settings extends JFrame {
     StyledCard sortingCard = sorting.getCard();
     StyledCard speedCard = speed.getCard();
     for (StyledCard c : new StyledCard[] {arraySizeCard, sortingCard, speedCard}) {
-      c.setAlignmentX(Component.LEFT_ALIGNMENT);
-      c.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1000));
+      prepareCard(c);
     }
 
     col.add(SettingsUi.createSectionLabel("Array Size"));
@@ -125,7 +195,6 @@ public class Settings extends JFrame {
     col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
     col.add(SettingsUi.createSectionLabel("Speed"));
     col.add(speedCard);
-    col.add(Box.createVerticalGlue());
     return col;
   }
 
@@ -143,8 +212,7 @@ public class Settings extends JFrame {
     StyledCard displayCard = display.getCard();
     StyledCard soundCard = sound.getCard();
     for (StyledCard c : new StyledCard[] {vizCard, gradientCard, displayCard, soundCard}) {
-      c.setAlignmentX(Component.LEFT_ALIGNMENT);
-      c.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1000));
+      prepareCard(c);
     }
 
     col.add(SettingsUi.createSectionLabel("Visualization"));
@@ -158,8 +226,13 @@ public class Settings extends JFrame {
     col.add(Box.createVerticalStrut(UiTheme.SPACING_LG));
     col.add(SettingsUi.createSectionLabel("Sound"));
     col.add(soundCard);
-    col.add(Box.createVerticalGlue());
     return col;
+  }
+
+  private static void prepareCard(StyledCard card) {
+    card.setAlignmentX(Component.LEFT_ALIGNMENT);
+    Dimension pref = card.getPreferredSize();
+    card.setMaximumSize(new Dimension(Integer.MAX_VALUE, pref.height));
   }
 
   private JPanel createHeaderPanel() {

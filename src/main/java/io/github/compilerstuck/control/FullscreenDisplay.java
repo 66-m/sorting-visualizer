@@ -2,6 +2,8 @@ package io.github.compilerstuck.control;
 
 import com.jogamp.newt.MonitorDevice;
 import com.jogamp.newt.opengl.GLWindow;
+import io.github.compilerstuck.control.config.MainControllerConfig;
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -47,6 +49,43 @@ final class FullscreenDisplay {
   }
 
   /**
+   * Max settings frame size for a screen: half width × half height. Actual height is packed to
+   * content and capped by this height.
+   */
+  static Dimension settingsSize(Rectangle screen) {
+    return new Dimension(Math.max(1, screen.width / 2), Math.max(1, screen.height / 2));
+  }
+
+  /**
+   * Portrait window sized from the screen: ~90% of screen height, width from the design portrait
+   * aspect ratio, clamped to fit.
+   */
+  static Dimension portraitSize(Rectangle screen) {
+    int h = Math.max(1, (int) Math.round(screen.height * 0.9));
+    int w =
+        Math.max(
+            1,
+            Math.round(
+                h
+                    * (MainControllerConfig.PORTRAIT_WIDTH
+                        / (float) MainControllerConfig.PORTRAIT_HEIGHT)));
+    if (w > screen.width) {
+      w = screen.width;
+      h =
+          Math.max(
+              1,
+              Math.round(
+                  w
+                      * (MainControllerConfig.PORTRAIT_HEIGHT
+                          / (float) MainControllerConfig.PORTRAIT_WIDTH)));
+    }
+    if (h > screen.height) {
+      h = screen.height;
+    }
+    return new Dimension(w, h);
+  }
+
+  /**
    * Positions the surface immediately, then applies borderless/fullscreen after the Processing
    * animation thread has settled.
    */
@@ -69,6 +108,38 @@ final class FullscreenDisplay {
               }
             },
             "fullscreen-display-applier");
+    applier.setDaemon(true);
+    applier.start();
+  }
+
+  /** Maximizes the JOGL window after the animation thread has settled (windowed mode). */
+  static void maximizeAsync(PSurface surface) {
+    if (surface == null) {
+      return;
+    }
+    Thread applier =
+        new Thread(
+            () -> {
+              try {
+                Thread.sleep(APPLY_DELAY_MS);
+                Object nativeSurface = surface.getNative();
+                if (!(nativeSurface instanceof GLWindow glWindow)) {
+                  LOGGER.log(Level.INFO, "Native surface is not a GLWindow; skip maximize");
+                  return;
+                }
+                Thread previous = glWindow.setExclusiveContextThread(null);
+                try {
+                  glWindow.setMaximized(true, true);
+                } finally {
+                  glWindow.setExclusiveContextThread(previous);
+                }
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Failed to maximize visualization window", e);
+              }
+            },
+            "windowed-maximize-applier");
     applier.setDaemon(true);
     applier.start();
   }

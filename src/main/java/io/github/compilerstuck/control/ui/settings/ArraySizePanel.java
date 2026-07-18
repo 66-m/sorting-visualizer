@@ -47,6 +47,7 @@ public final class ArraySizePanel {
     arraySizeSlider.setMinorTickSpacing(maxSize / 8);
     arraySizeSlider.setMajorTickSpacing(maxSize / 4);
     arraySizeSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+    arraySizeSlider.setPreferredSize(new Dimension(0, 55));
     arraySizeSlider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
 
     arraySizeTextField = ComponentFactory.createTextField();
