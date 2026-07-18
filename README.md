@@ -18,7 +18,7 @@ See and hear sorting algorithms in real time — 22 algorithms, 30 visualization
 
 ## Requirements
 
-- **JDK 25+** — [jdk.java.net/25](https://jdk.java.net/25/)
+- **JDK 26+** — [jdk.java.net/26](https://jdk.java.net/26/)
 - A desktop environment with audio (MIDI) optional but recommended
 
 ## Quick start

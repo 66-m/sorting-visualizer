@@ -9,7 +9,7 @@ By submitting a contribution, you agree that your work is licensed under the sam
 
 ## Development setup
 
-- **JDK 25+**
+- **JDK 26+**
 - Clone and build:
 
 ```sh
