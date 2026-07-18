@@ -299,7 +299,7 @@ public class MainController extends PApplet implements RenderContext {
   @Override
   public void draw() {
     try {
-      if (stateManager.shouldShowResults()) {
+      if (stateManager.shouldShowResults() && stateManager.shouldShowComparisonTable()) {
         handleResultsDisplay();
       } else if (stateManager.shouldRestart()) {
         handleRestart();
@@ -317,19 +317,37 @@ public class MainController extends PApplet implements RenderContext {
     }
   }
 
-  /** Handles displaying results table after sorting completes. */
+  /**
+   * Draws the comparison results table. Completes session teardown once so Settings
+   * inputs are re-enabled while the table stays on screen.
+   */
   private void handleResultsDisplay() {
-    if (stateManager.shouldShowComparisonTable() && stateManager.shouldContinueExecution()) {
+    if (stateManager.shouldRestart()) {
+      // Keep showResults so the table remains visible; still unlock the Settings UI.
+      finishSession(false);
+    }
+    if (stateManager.shouldContinueExecution()) {
       printResults();
     }
   }
 
-  /** Handles restart/reset state after algorithms complete. */
+  /** Handles restart/reset state after algorithms complete (no comparison table). */
   private void handleRestart() {
+    finishSession(true);
+  }
+
+  /**
+   * Tears down an ended sorting session and re-enables Settings.
+   *
+   * @param clearResults when true, leave the results-table display mode
+   */
+  private void finishSession(boolean clearResults) {
     stateManager.setRunning(false);
     stateManager.setStartRequested(false);
     stateManager.setRestart(false);
-    stateManager.setShowResults(false);
+    if (clearResults) {
+      stateManager.setShowResults(false);
+    }
 
     sound.mute(true);
     sound.mute(false);
@@ -504,17 +522,10 @@ public class MainController extends PApplet implements RenderContext {
     stroke(255);
     fill(255);
 
-    int textSize =
-        (int)
-            (MainControllerConfig.TEXT_Y_OFFSET / MainControllerConfig.WINDOW_RATIO_WIDTH * width);
-    int textXPosition =
-        (int)
-            (MainControllerConfig.TEXT_X_OFFSET / MainControllerConfig.WINDOW_RATIO_WIDTH * width);
+    int textSize = MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_Y_OFFSET, width);
+    int textXPosition = MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_X_OFFSET, width);
     int lineHeight =
-        (int)
-            (MainControllerConfig.LINE_HEIGHT_OFFSET
-                / MainControllerConfig.WINDOW_RATIO_WIDTH
-                * width);
+        MainControllerConfig.scaleToWidth(MainControllerConfig.LINE_HEIGHT_OFFSET, width);
     textSize(textSize);
 
     String[] labels = {
@@ -815,7 +826,7 @@ public class MainController extends PApplet implements RenderContext {
 
   @Override
   public void textSize(int size) {
-    super.textSize(size);
+    super.textSize(Math.max(1, size));
   }
 
   @Override

@@ -34,6 +34,14 @@ public final class MainControllerConfig {
   public static final int FONT_SIZE_RATIO = 20;
   public static final int WINDOW_RATIO_WIDTH = 1280;
 
+  /**
+   * Scales a design-time pixel value (at {@link #WINDOW_RATIO_WIDTH}) to the current canvas width.
+   * Always at least 1 so Processing {@code textSize} never receives 0.
+   */
+  public static int scaleToWidth(float designPx, int width) {
+    return Math.max(1, Math.round(designPx / (float) WINDOW_RATIO_WIDTH * width));
+  }
+
   // Text positioning
   public static final float TEXT_X_OFFSET = 5.0f;
   public static final float TEXT_Y_OFFSET = 23.0f;

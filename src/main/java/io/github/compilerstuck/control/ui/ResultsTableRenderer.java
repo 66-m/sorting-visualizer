@@ -19,11 +19,7 @@ public final class ResultsTableRenderer {
     int width = ctx.getWidth();
     int height = ctx.getHeight();
 
-    ctx.textSize(
-        (int)
-            (MainControllerConfig.FONT_SIZE_RATIO
-                / MainControllerConfig.WINDOW_RATIO_WIDTH
-                * width));
+    ctx.textSize(MainControllerConfig.scaleToWidth(MainControllerConfig.FONT_SIZE_RATIO, width));
     ctx.background(MainControllerConfig.RESULTS_TABLE_BACKGROUND);
     ctx.fill(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
     ctx.stroke(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
@@ -46,11 +42,7 @@ public final class ResultsTableRenderer {
 
   private void drawHeaders(RenderContext ctx, int width) {
     float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
-    int textY =
-        (int)
-            (MainControllerConfig.FONT_SIZE_RATIO
-                / MainControllerConfig.WINDOW_RATIO_WIDTH
-                * width);
+    int textY = MainControllerConfig.scaleToWidth(MainControllerConfig.FONT_SIZE_RATIO, width);
 
     ctx.text("Alg. name", columnWidth * 0 + 10, textY);
     ctx.text("Elements", columnWidth * 1 + columnWidth / 2 + 5, textY);

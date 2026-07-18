@@ -1,6 +1,7 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.config.Brand;
+import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.LoadedImage;
 import io.github.compilerstuck.control.render.RenderContext;
@@ -65,7 +66,7 @@ public class ImageVertical extends Visualization {
     proc.updatePixels();
 
     proc.fill(255);
-    proc.textSize((int) (25. / 1280 * screenWidth));
+    proc.textSize(MainControllerConfig.scaleToWidth(25, screenWidth));
     proc.text(
         Brand.WATERMARK,
         screenWidth - (int) (175. / 1280 * screenWidth),
