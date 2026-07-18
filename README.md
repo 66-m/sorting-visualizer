@@ -26,10 +26,12 @@ See and hear sorting algorithms in real time — 22 algorithms, 30 visualization
 Download [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) from the latest release, then:
 
 ```sh
-java --enable-native-access=ALL-UNNAMED -jar sorting-visualizer.jar
+java --enable-native-access=ALL-UNNAMED \
+  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
+  -jar sorting-visualizer.jar
 ```
 
-Optional launch flags: `fullscreen`, `portrait`, `--display=N` (1-based). Example: `java --enable-native-access=ALL-UNNAMED -jar sorting-visualizer.jar fullscreen`.
+Optional launch flags: `fullscreen`, `portrait`, `--display=N` (1-based). Example: `java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar fullscreen`.
 
 A visualization window and a settings window open together. Press **ESC** to quit.
 
@@ -63,7 +65,9 @@ Release fat JAR (same layout as GitHub Releases):
 
 ```sh
 ./mvnw clean package -Prelease
-java --enable-native-access=ALL-UNNAMED -jar target/sorting-visualizer-jar-with-dependencies.jar
+java --enable-native-access=ALL-UNNAMED \
+  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
+  -jar target/sorting-visualizer-jar-with-dependencies.jar
 ```
 
 `-Prelease` also writes a CycloneDX SBOM to `target/bom.json`.

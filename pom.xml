@@ -84,6 +84,10 @@
                         <manifest>
                             <mainClass>io.github.compilerstuck.control.MainController</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <!-- SoftSynthesizer low-latency open via MidiSys reflection -->
+                            <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -193,6 +197,9 @@
                                         <manifest>
                                             <mainClass>io.github.compilerstuck.control.MainController</mainClass>
                                         </manifest>
+                                        <manifestEntries>
+                                            <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
+                                        </manifestEntries>
                                     </archive>
                                     <appendAssemblyId>true</appendAssemblyId>
                                     <descriptorRefs>
@@ -230,6 +237,10 @@
                                         <argument>${project.build.directory}/jpackage</argument>
                                         <argument>--app-version</argument>
                                         <argument>${project.version}</argument>
+                                        <argument>--java-options</argument>
+                                        <argument>--enable-native-access=ALL-UNNAMED</argument>
+                                        <argument>--java-options</argument>
+                                        <argument>--add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
