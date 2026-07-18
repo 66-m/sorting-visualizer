@@ -1,0 +1,49 @@
+package io.github.compilerstuck.visual;
+
+import io.github.compilerstuck.control.model.ArrayModel;
+import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.sound.Sound;
+import io.github.compilerstuck.visual.gradient.ColorGradient;
+
+import java.awt.*;
+import processing.core.PApplet;
+
+public class ScatterPlotLinked extends Visualization {
+
+
+    public ScatterPlotLinked(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
+        super(arrayController, colorGradient, sound, proc);
+        name = "Scatter Plot Linked";
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        int n = arrayController.getLength();
+        int maxPrimitives = Math.min(Math.max(screenWidth * 2, 1), 4096);
+        int stride = LodStride.forLength(n, maxPrimitives);
+
+        for (int i = 0; i < n - 1; i += stride) {
+            int next = Math.min(i + stride, n - 1);
+            Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+
+            proc.stroke(color.getRGB());
+            proc.fill(color.getRGB());
+
+            int barHeight1 = (arrayController.get(i) + 1) * (screenHeight - 5) / n;
+            int barHeight2 = (arrayController.get(next) + 1) * (screenHeight - 5) / n;
+
+            if (arrayController.getMarker(i) == Marker.SET) {
+                sound.playSound(i);
+            }
+
+
+            arrayController.setMarker(i, Marker.NORMAL);
+
+            proc.line(PApplet.map(i, 0, n, 0, screenWidth), screenHeight - barHeight1, PApplet.map(next, 0, n, 0, screenWidth), screenHeight - barHeight2);
+
+        }
+    }
+
+}

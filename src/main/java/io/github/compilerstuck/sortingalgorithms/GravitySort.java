@@ -1,0 +1,62 @@
+package io.github.compilerstuck.sortingalgorithms;
+
+import io.github.compilerstuck.control.model.ArrayModel;
+
+public class GravitySort extends SortingAlgorithm {
+
+    public GravitySort(ArrayModel arrayController) {
+        super(arrayController);
+        this.name = "Gravity Sort";
+        alternativeSize = arrayController.getLength();
+        delayTime = 2;
+    }
+
+    public void sort() {
+        report(name);
+        startTime = System.nanoTime();
+
+        int max = arrayController.get(0);
+        for (int i = 1; i < arrayController.getLength() && !isCancelled(); i++)
+            if (arrayController.get(i) > max) {
+                max = arrayController.get(i);
+                arrayController.addComparisons(1);
+            }
+
+        int[][] abacus = new int[arrayController.getLength()][max];
+        for (int i = 0; i < arrayController.getLength() && !isCancelled(); i++) {
+            for (int j = 0; j < arrayController.get(i); j++) {
+                arrayController.addComparisons(1);
+                abacus[i][abacus[0].length - j - 1] = 1;
+                arrayController.addWritesAux(1);
+            }
+        }
+        //apply gravity
+        for (int i = 0; i < abacus[0].length && !isCancelled(); i++) {
+            for (int j = 0; j < abacus.length && !isCancelled(); j++) {
+                if (abacus[j][i] == 1) {
+                    //Drop it
+                    int droppos = j;
+                    while (droppos + 1 < abacus.length && abacus[droppos][i] == 1)
+                        droppos++;
+                    if (abacus[droppos][i] == 0) {
+                        abacus[j][i] = 0;
+                        abacus[droppos][i] = 1;
+                        arrayController.addWritesAux(2);
+                    }
+                }
+            }
+
+            int count;
+            for (int x = 0; x < abacus.length && !isCancelled(); x++) {
+                count = 0;
+                for (int y = 0; y < abacus[0].length; y++)
+                    count += abacus[x][y];
+                arrayController.set(x, count);
+            }
+
+            delay(new int[]{arrayController.getLength() - i - 1});
+        }
+
+    }
+
+}

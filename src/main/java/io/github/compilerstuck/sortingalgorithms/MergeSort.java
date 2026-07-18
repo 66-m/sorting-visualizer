@@ -1,0 +1,88 @@
+package io.github.compilerstuck.sortingalgorithms;
+
+import io.github.compilerstuck.control.model.ArrayModel;
+
+public class MergeSort extends SortingAlgorithm {
+
+    public MergeSort(ArrayModel arrayController) {
+        super(arrayController);
+        this.name = "Merge Sort";
+        alternativeSize = arrayController.getLength();
+    }
+
+    public void sort() {
+        report(name);
+        startTime = System.nanoTime();
+
+        sort(arrayController, 0, arrayController.getLength() - 1);
+
+        arrayController.addRealTime(System.nanoTime() - startTime);
+
+    }
+
+    private void sort(ArrayModel arrayController, int l, int r) {
+        if (l < r && !isCancelled()) {
+            int m = (l + r) / 2;
+
+            sort(arrayController, l, m);
+            sort(arrayController, m + 1, r);
+
+            merge(arrayController, l, m, r);
+        }
+    }
+
+    private void merge(ArrayModel arrayController, int l, int m, int r) {
+
+        int n1 = m - l + 1;
+        int n2 = r - m;
+
+        int[] L = new int[n1];
+        int[] R = new int[n2];
+
+        for (int i = 0; i < n1 && !isCancelled(); ++i) {
+            L[i] = arrayController.get(l + i);
+        }
+        arrayController.addWritesAux(n1);
+        for (int j = 0; j < n2 && !isCancelled(); ++j) {
+            R[j] = arrayController.get(m + 1 + j);
+        }
+        arrayController.addWritesAux(n2);
+
+        int i = 0, j = 0;
+
+        int k = l;
+        while (i < n1 && j < n2 && !isCancelled()) {
+            if (L[i] <= R[j]) {
+                arrayController.set(k, L[i]);
+                i++;
+            } else {
+                arrayController.set(k, R[j]);
+                j++;
+            }
+            k++;
+
+            arrayController.addComparisons(1);
+            
+            delay(new int[]{k});
+        }
+
+        k = copyRemainingElements(arrayController, n1, L, i, k);
+
+        copyRemainingElements(arrayController, n2, R, j, k);
+    }
+
+    private int copyRemainingElements(ArrayModel arrayController, int n1, int[] l, int i, int k) {
+        while (i < n1 && !isCancelled()) {
+            arrayController.set(k, l[i]);
+
+            arrayController.addWritesAux(1);
+
+            delay(new int[]{k});
+
+            i++;
+            k++;
+        }
+        return k;
+    }
+
+}

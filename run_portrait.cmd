@@ -1,1 +1,1 @@
-java -cp ".\target\sorting-visualizer.jar;.\target\dependency\*" io.github.compilerstuck.Control.MainController portrait
+java -cp ".\target\sorting-visualizer.jar;.\target\dependency\*" io.github.compilerstuck.control.MainController portrait

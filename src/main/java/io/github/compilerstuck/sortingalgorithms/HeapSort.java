@@ -1,0 +1,58 @@
+package io.github.compilerstuck.sortingalgorithms;
+
+import io.github.compilerstuck.control.model.ArrayModel;
+
+public class HeapSort extends SortingAlgorithm {
+
+    public HeapSort(ArrayModel arrayController) {
+        super(arrayController);
+        this.name = "Heap Sort";
+        alternativeSize = arrayController.getLength();
+    }
+
+    public void sort() {
+        report(name);
+        startTime = System.nanoTime();
+
+        int n = arrayController.getLength();
+
+        for (int i = n / 2 - 1; i >= 0 && !isCancelled(); i--)
+            heapify(arrayController, n, i);
+
+        for (int i = n - 1; i >= 0 && !isCancelled(); i--) {
+            int temp = arrayController.get(0);
+            arrayController.set(0, arrayController.get(i));
+            arrayController.set(i, temp);
+
+            delay(new int[]{i, 0});
+
+            heapify(arrayController, i, 0);
+        }
+
+        arrayController.addRealTime(System.nanoTime() - startTime);
+    }
+
+    private void heapify(ArrayModel arrayController, int n, int i) {
+        int largest = i;
+        int l = 2 * i + 1;
+        int r = 2 * i + 2;
+
+        if (l < n && arrayController.get(l) > arrayController.get(largest))
+            largest = l;
+        arrayController.addComparisons(1);
+
+        if (r < n && arrayController.get(r) > arrayController.get(largest))
+            largest = r;
+        arrayController.addComparisons(1);
+
+        if (largest != i && !isCancelled()) {
+            arrayController.swap(i, largest);
+
+            delay(new int[]{i, largest});
+
+            heapify(arrayController, n, largest);
+        }
+
+    }
+
+}

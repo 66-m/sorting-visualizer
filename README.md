@@ -45,7 +45,8 @@ Convenience scripts (Unix):
 
 | Command | What it does |
 |---------|----------------|
-| `./build` | Fast package (skips tests) |
+| `./build` | Package with tests |
+| `./build skip-tests` | Fast package (skips tests) |
 | `./build release` | Clean build + fat JAR (`-Prelease`) |
 | `./run` | Launch the local build |
 | `./run fullscreen` or `./run_fullscreen` | Launch in fullscreen |
