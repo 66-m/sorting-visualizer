@@ -8,6 +8,7 @@ import io.github.compilerstuck.control.model.SortingSessionManager;
 import io.github.compilerstuck.control.model.SortingStateManager;
 import io.github.compilerstuck.control.render.RenderContext;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
+import io.github.compilerstuck.sound.SilentSound;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.Visualization;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
@@ -41,8 +42,8 @@ public final class AppContext {
   private int size;
   private RenderContext renderContext;
 
-  /** Legacy sleep delay by default; enable via {@code -Dsv.stepEngine=true} or Settings. */
-  private boolean useStepEngine = Boolean.getBoolean("sv.stepEngine");
+  /** Step engine on by default; override via {@code -Dsv.stepEngine=} or Settings. */
+  private boolean useStepEngine;
 
   private int speedLevel = 3; // 1–5, default Normal
   private int stepsPerFrame = STEPS_PER_FRAME[2];
@@ -58,6 +59,13 @@ public final class AppContext {
     this.preferences = preferences != null ? preferences : UserPreferences.load();
     this.size = this.preferences.getArraySize();
     this.speedLevel = this.preferences.getSpeedLevel();
+    String stepEngineProp = System.getProperty("sv.stepEngine");
+    if (stepEngineProp != null) {
+      this.useStepEngine = Boolean.parseBoolean(stepEngineProp);
+    } else {
+      this.useStepEngine = this.preferences.isUseStepEngine();
+    }
+    applySpeedLevel();
   }
 
   public UserPreferences getPreferences() {
@@ -70,6 +78,7 @@ public final class AppContext {
     if (sound != null) {
       preferences.setMuted(sound.isMuted());
     }
+    preferences.setUseStepEngine(useStepEngine);
     preferences.save();
   }
 
@@ -95,6 +104,8 @@ public final class AppContext {
 
   public void setUseStepEngine(boolean useStepEngine) {
     this.useStepEngine = useStepEngine;
+    preferences.setUseStepEngine(useStepEngine);
+    preferences.save();
     applySpeedLevel();
   }
 
@@ -135,7 +146,7 @@ public final class AppContext {
   }
 
   public void setSound(Sound sound) {
-    this.sound = sound;
+    this.sound = sound != null ? sound : new SilentSound(arrayController);
   }
 
   public ColorGradient getColorGradient() {

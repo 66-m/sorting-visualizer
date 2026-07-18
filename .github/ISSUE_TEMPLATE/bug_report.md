@@ -23,7 +23,7 @@ A clear description of the bug.
 - OS:
 - JDK version (`java -version`):
 - App version / commit:
-- Launch flags (fullscreen / portrait / display / `-Dsv.stepEngine`):
+- Launch flags (fullscreen / portrait / display / `-Dsv.stepEngine=false` to disable step engine):
 
 ## Logs / screenshots
 

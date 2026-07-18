@@ -1,11 +1,9 @@
 package io.github.compilerstuck.control.ui;
 
 import java.awt.*;
+import javax.swing.UIManager;
 
-/**
- * UI theme constants for the application. 2025 design system: Tailwind CSS Zinc neutrals + Indigo
- * accent. Inspired by Shadcn UI / Vercel / Linear visual language.
- */
+/** Light UI tokens (Zinc neutrals + indigo accent) shared by Swing Settings panels and FlatLaf. */
 public class UiTheme {
 
   // ── Backgrounds (Zinc scale) ──────────────────────────────────────────────
@@ -92,4 +90,33 @@ public class UiTheme {
   // ── Card styling ──────────────────────────────────────────────────────────
   public static final int BORDER_RADIUS = 8;
   public static final int BORDER_WIDTH = 1;
+
+  /** Maps this palette onto FlatLaf / Swing {@link UIManager} client properties. */
+  public static void applyLookAndFeelDefaults() {
+    UIManager.put("@accentColor", ACCENT_PRIMARY);
+    UIManager.put("Component.focusColor", BORDER_FOCUS);
+    UIManager.put("Component.accentColor", ACCENT_PRIMARY);
+    UIManager.put("Component.borderColor", BORDER_COLOR);
+    UIManager.put("Button.default.background", BUTTON_PRIMARY);
+    UIManager.put("Button.default.foreground", BUTTON_PRIMARY_FG);
+    UIManager.put("Button.background", BUTTON_SECONDARY);
+    UIManager.put("Button.foreground", TEXT_PRIMARY);
+    UIManager.put("Panel.background", BG_PRIMARY);
+    UIManager.put("Panel.foreground", TEXT_PRIMARY);
+    UIManager.put("ScrollPane.background", BG_PRIMARY);
+    UIManager.put("Viewport.background", BG_PRIMARY);
+    UIManager.put("Label.foreground", TEXT_PRIMARY);
+    UIManager.put("CheckBox.foreground", TEXT_PRIMARY);
+    UIManager.put("CheckBox.background", BG_PRIMARY);
+    UIManager.put("ComboBox.background", BG_INPUT);
+    UIManager.put("ComboBox.foreground", TEXT_PRIMARY);
+    UIManager.put("TextField.background", BG_INPUT);
+    UIManager.put("TextField.foreground", TEXT_PRIMARY);
+    UIManager.put("List.background", BG_SECONDARY);
+    UIManager.put("List.foreground", TEXT_PRIMARY);
+    UIManager.put("List.selectionBackground", ACCENT_LIGHT);
+    UIManager.put("List.selectionForeground", TEXT_PRIMARY);
+    UIManager.put("ToolTip.background", BG_SECONDARY);
+    UIManager.put("ToolTip.foreground", TEXT_PRIMARY);
+  }
 }

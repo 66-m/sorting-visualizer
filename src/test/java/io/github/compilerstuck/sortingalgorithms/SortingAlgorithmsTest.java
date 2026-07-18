@@ -2,41 +2,18 @@ package io.github.compilerstuck.sortingalgorithms;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.compilerstuck.control.MainController;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.ProcessingContext;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import processing.core.PApplet;
 
 class SortingAlgorithmsTest {
-
-  /**
-   * Minimal stub implementation of the Processing runtime used by the visualizer. Most of the
-   * sorting code only ever calls {@code delay(int)}, so we provide a no-op implementation to avoid
-   * starting a real graphics context during tests.
-   */
-  static class DummyProcessing extends PApplet implements ProcessingContext {
-    @Override
-    public void delay(int ms) {
-      // do nothing, keep tests fast
-    }
-  }
-
-  @BeforeAll
-  static void setupMainController() {
-    // set static processing field so that algorithms don't hit NPE if they
-    // accidentally call it even though we disable delays in the tests.
-    MainController.processing = new DummyProcessing();
-  }
 
   /**
    * Create a random permutation of 0..size-1. Using a fixed seed ensures deterministic behaviour

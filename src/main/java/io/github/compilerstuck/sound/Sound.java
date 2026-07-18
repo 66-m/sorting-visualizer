@@ -1,10 +1,8 @@
 package io.github.compilerstuck.sound;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import processing.core.PApplet;
 
 public abstract class Sound {
-  protected PApplet proc;
   ArrayModel arrayController;
   protected boolean isMuted;
 

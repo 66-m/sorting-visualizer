@@ -1,11 +1,14 @@
 package io.github.compilerstuck.control.config;
 
+import java.util.Random;
+
 /**
  * Strategy that decides whether a visualisation delay should fire for a given sort step.
  *
  * <p>The default implementation ({@link #DEFAULT}) uses the probabilistic approach already present
  * in {@code SortingAlgorithm}: always delay for small arrays, and delay proportionally otherwise,
- * scaled by {@code delayFactor}.
+ * scaled by {@code delayFactor}. Prefer {@link #random(Random)} in tests for deterministic
+ * behaviour.
  */
 public interface DelayStrategy {
 
@@ -22,19 +25,30 @@ public interface DelayStrategy {
   int DEFAULT_THRESHOLD = 2000;
 
   /**
-   * The default probabilistic strategy: fires on every element for small arrays; fires
-   * proportionally less often as array size grows past the threshold, and always respects {@code
-   * delayFactor}.
+   * The default probabilistic strategy backed by an internal {@link Random}. Prefer {@link
+   * #random(Random)} in tests.
    */
-  DelayStrategy DEFAULT =
-      (arrayLength, delayFactor) -> {
-        boolean stepOk =
-            arrayLength <= DEFAULT_THRESHOLD
-                || Math.random() < (double) DEFAULT_THRESHOLD / arrayLength;
-        boolean factorOk = delayFactor >= 1.0 || Math.random() < delayFactor;
-        return stepOk && factorOk;
-      };
+  DelayStrategy DEFAULT = random(new Random());
 
   /** Always delay — used by the FrameGate step engine so each delay() consumes a credit. */
   DelayStrategy ALWAYS = (arrayLength, delayFactor) -> true;
+
+  /** Never delay — useful for tests that want to disable probabilistic delays. */
+  static DelayStrategy never() {
+    return (arrayLength, delayFactor) -> false;
+  }
+
+  /**
+   * Probabilistic strategy: fires on every element for small arrays; fires proportionally less
+   * often as array size grows past the threshold, and always respects {@code delayFactor}.
+   */
+  static DelayStrategy random(Random rng) {
+    return (arrayLength, delayFactor) -> {
+      boolean stepOk =
+          arrayLength <= DEFAULT_THRESHOLD
+              || rng.nextDouble() < (double) DEFAULT_THRESHOLD / arrayLength;
+      boolean factorOk = delayFactor >= 1.0 || rng.nextDouble() < delayFactor;
+      return stepOk && factorOk;
+    };
+  }
 }

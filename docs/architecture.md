@@ -63,11 +63,13 @@ flowchart TB
 
 | Piece | Role |
 |-------|------|
-| `AppContext` | Size, speed, step engine, algorithm/visual/sound/gradient accessors for Settings |
+| `AppContext` | Composition façade for Settings: size, speed, step engine, algorithm/visual/sound/gradient |
 | `AlgorithmCatalog` / `VisualizationCatalog` | Stable IDs + factories; Settings builds instances from these |
-| `FrameGate` | Optional steps-per-frame engine (`-Dsv.stepEngine=true` or Settings checkbox) |
+| `FrameGate` | Steps-per-frame engine (on by default; disable in Settings or `-Dsv.stepEngine=false`) |
 | `RenderContext` | Processing drawing API without casts in visuals |
 | `CancellationToken` | Cooperative cancel from UI → session → algorithms |
+
+Settings and UI panels depend on **`AppContext` only**. `MainController` is the Processing entry / composition root and keeps bootstrap statics (`processing`, `sound`, `app`) plus `shutdown()` / `cancelSorting()`.
 
 ## Build & run
 

@@ -1,14 +1,6 @@
 package io.github.compilerstuck.control.config;
 
-/**
- * Distinct product identities — do not collapse these into one string.
- *
- * <ul>
- *   <li>{@link #WATERMARK} — in-app visualizer branding
- *   <li>{@link #COPYRIGHT_HOLDER} — legal copyright
- *   <li>{@link #GITHUB_ORG} — GitHub org / Maven groupId coordinate
- * </ul>
- */
+/** Product strings used in-app, in copyright notices, and for GitHub/Maven coordinates. */
 public final class Brand {
   private Brand() {}
 

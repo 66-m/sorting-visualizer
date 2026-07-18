@@ -14,6 +14,7 @@ public final class UserPreferences {
   private static final String KEY_ARRAY_SIZE = "arraySize";
   private static final String KEY_SPEED = "speedLevel";
   private static final String KEY_MUTED = "muted";
+  private static final String KEY_STEP_ENGINE = "useStepEngine";
 
   public static final String DEFAULT_ALGORITHM_ID = "quicksort-middle";
   public static final String DEFAULT_VISUALIZATION_ID = "bars";
@@ -25,6 +26,7 @@ public final class UserPreferences {
   private int arraySize = DEFAULT_ARRAY_SIZE;
   private int speedLevel = DEFAULT_SPEED_LEVEL;
   private boolean muted = false;
+  private boolean useStepEngine = true;
 
   public static UserPreferences load() {
     UserPreferences prefs = new UserPreferences();
@@ -34,6 +36,7 @@ public final class UserPreferences {
     prefs.arraySize = clampSize(node.getInt(KEY_ARRAY_SIZE, DEFAULT_ARRAY_SIZE));
     prefs.speedLevel = clampSpeed(node.getInt(KEY_SPEED, DEFAULT_SPEED_LEVEL));
     prefs.muted = node.getBoolean(KEY_MUTED, false);
+    prefs.useStepEngine = node.getBoolean(KEY_STEP_ENGINE, true);
     return prefs;
   }
 
@@ -44,6 +47,7 @@ public final class UserPreferences {
     node.putInt(KEY_ARRAY_SIZE, arraySize);
     node.putInt(KEY_SPEED, speedLevel);
     node.putBoolean(KEY_MUTED, muted);
+    node.putBoolean(KEY_STEP_ENGINE, useStepEngine);
   }
 
   public String getAlgorithmId() {
@@ -84,6 +88,14 @@ public final class UserPreferences {
 
   public void setMuted(boolean muted) {
     this.muted = muted;
+  }
+
+  public boolean isUseStepEngine() {
+    return useStepEngine;
+  }
+
+  public void setUseStepEngine(boolean useStepEngine) {
+    this.useStepEngine = useStepEngine;
   }
 
   private static int clampSize(int size) {

@@ -23,6 +23,8 @@ public class SortingSessionManager {
   private final ArrayController arrayController;
   private final Sound sound;
   private final SortingStateManager stateManager;
+  private final int delayBetweenMs;
+  private final int delayAfterMs;
 
   private final List<String> comparisons = new ArrayList<>();
   private final List<String> realTime = new ArrayList<>();
@@ -36,9 +38,25 @@ public class SortingSessionManager {
 
   public SortingSessionManager(
       ArrayController arrayController, Sound sound, SortingStateManager stateManager) {
+    this(
+        arrayController,
+        sound,
+        stateManager,
+        MainControllerConfig.DELAY_BETWEEN_ALGORITHMS,
+        MainControllerConfig.DELAY_AFTER_SORT_RESULT);
+  }
+
+  public SortingSessionManager(
+      ArrayController arrayController,
+      Sound sound,
+      SortingStateManager stateManager,
+      int delayBetweenMs,
+      int delayAfterMs) {
     this.arrayController = arrayController;
     this.sound = sound;
     this.stateManager = stateManager;
+    this.delayBetweenMs = delayBetweenMs;
+    this.delayAfterMs = delayAfterMs;
   }
 
   /**
@@ -137,7 +155,7 @@ public class SortingSessionManager {
 
     sound.mute(true);
     try {
-      Thread.sleep(MainControllerConfig.DELAY_BETWEEN_ALGORITHMS);
+      Thread.sleep(delayBetweenMs);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       LOGGER.log(Level.WARNING, "Thread interrupted during delay", e);
@@ -161,7 +179,7 @@ public class SortingSessionManager {
   private void pauseAfterAlgorithm() {
     sound.mute(true);
     try {
-      Thread.sleep(MainControllerConfig.DELAY_AFTER_SORT_RESULT);
+      Thread.sleep(delayAfterMs);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       LOGGER.log(Level.WARNING, "Thread interrupted during result pause", e);

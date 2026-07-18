@@ -39,22 +39,20 @@ import processing.core.PApplet;
  * <p>Manages the Processing display loop, user interaction, and coordinates between visualization,
  * sound, algorithm execution, and UI settings.
  *
- * <p>Note: This class maintains some static fields for backwards compatibility with the Settings UI
- * and algorithm infrastructure. Access to these is coordinated through synchronized accessors.
+ * <p>Composition root: {@link #main} / {@link #setup} wires {@link AppContext}; Settings and UI
+ * panels use {@link AppContext} only. Residual statics ({@link #processing}, {@link #sound}, {@link
+ * #app}) exist for Processing bootstrap and shutdown — not as a Settings service locator.
  */
 public class MainController extends PApplet implements RenderContext {
   private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
 
-  // Static reference for backwards compatibility with Settings UI
+  /** Set in {@link #setup} to this instance (Processing bootstrap). */
   public static ProcessingContext processing;
 
   /** Non-null after {@link #initializeComponents()}; never assign null. */
   public static Sound sound = new SilentSound(null);
 
-  /**
-   * Interim static reference to the live {@link AppContext}, for collaborators that still can't
-   * easily be given an instance reference. Prefer instance access where possible.
-   */
+  /** Live {@link AppContext} after {@link #initializeState()}; preferred API for UI and tests. */
   public static AppContext app;
 
   // Launch flags parsed from CLI before the PApplet is constructed
@@ -156,13 +154,7 @@ public class MainController extends PApplet implements RenderContext {
     } catch (UnsupportedLookAndFeelException e) {
       LOGGER.log(Level.WARNING, "Failed to set FlatLightLaf look and feel", e);
     }
-    UIManager.put("@accentColor", UiTheme.ACCENT_PRIMARY);
-    UIManager.put("Component.focusColor", UiTheme.BORDER_FOCUS);
-    UIManager.put("Component.accentColor", UiTheme.ACCENT_PRIMARY);
-    UIManager.put("Button.default.background", UiTheme.BUTTON_PRIMARY);
-    UIManager.put("Button.default.foreground", UiTheme.BUTTON_PRIMARY_FG);
-    UIManager.put("Panel.background", UiTheme.BG_PRIMARY);
-    UIManager.put("ScrollPane.background", UiTheme.BG_PRIMARY);
+    UiTheme.applyLookAndFeelDefaults();
   }
 
   @Override
@@ -204,7 +196,7 @@ public class MainController extends PApplet implements RenderContext {
   public void setup() {
     configureWindow();
 
-    processing = this; // Static reference for backwards compatibility
+    processing = this;
 
     initializeComponents();
     initializeState();
@@ -318,8 +310,8 @@ public class MainController extends PApplet implements RenderContext {
   }
 
   /**
-   * Draws the comparison results table. Completes session teardown once so Settings
-   * inputs are re-enabled while the table stays on screen.
+   * Draws the comparison results table. Completes session teardown once so Settings inputs are
+   * re-enabled while the table stays on screen.
    */
   private void handleResultsDisplay() {
     if (stateManager.shouldRestart()) {
@@ -470,8 +462,12 @@ public class MainController extends PApplet implements RenderContext {
     }
   }
 
-  /** Cancels the active sorting session (token + continue flag). */
+  /** Cancels the active sorting session via {@link AppContext} when available. */
   public static void cancelSorting() {
+    if (app != null) {
+      app.cancelSorting();
+      return;
+    }
     if (processing instanceof MainController controller) {
       if (controller.sessionManager != null) {
         controller.sessionManager.cancel();
@@ -509,7 +505,7 @@ public class MainController extends PApplet implements RenderContext {
   private void printResults() {
     resultsTableRenderer.render(
         this,
-        algorithms,
+        currentAlgorithms(),
         sessionManager.getComparisons(),
         sessionManager.getRealTime(),
         sessionManager.getSwaps(),
@@ -523,7 +519,8 @@ public class MainController extends PApplet implements RenderContext {
     fill(255);
 
     int textSize = MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_Y_OFFSET, width);
-    int textXPosition = MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_X_OFFSET, width);
+    int textXPosition =
+        MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_X_OFFSET, width);
     int lineHeight =
         MainControllerConfig.scaleToWidth(MainControllerConfig.LINE_HEIGHT_OFFSET, width);
     textSize(textSize);
@@ -544,266 +541,6 @@ public class MainController extends PApplet implements RenderContext {
 
     for (int i = 0; i < labels.length; i++) {
       text(labels[i], textXPosition, lineHeight * (i + 1));
-    }
-  }
-
-  /**
-   * Sets the current operation name for display.
-   *
-   * @param operation the operation name to display
-   */
-  public static void setCurrentOperation(String operation) {
-    if (processing instanceof MainController controller) {
-      controller.stateManager.setCurrentOperation(operation);
-    }
-  }
-
-  // Static accessor methods for backwards compatibility with Settings UI
-  // These delegate to instance state or maintain static references
-
-  /**
-   * Sets the color gradient for all visualizations.
-   *
-   * @param newColorGradient the new color gradient to apply
-   */
-  public static void setColorGradient(ColorGradient newColorGradient) {
-    if (processing instanceof MainController controller) {
-      controller.colorGradient = newColorGradient;
-      if (controller.appContext != null) {
-        controller.appContext.setColorGradient(newColorGradient);
-      } else {
-        controller.colorGradient.updateGradient(controller.size);
-        controller.visualization.updateColorGradient(newColorGradient);
-      }
-    }
-  }
-
-  /**
-   * Updates the array size and resizes all related components.
-   *
-   * @param newSize the new array size
-   */
-  public static void updateArraySize(int newSize) {
-    if (processing instanceof MainController controller) {
-      if (controller.stateManager != null && controller.stateManager.isRunning()) {
-        LOGGER.log(Level.WARNING, "Ignoring array resize to {0} while a sort is active", newSize);
-        return;
-      }
-      controller.size = newSize;
-      controller.colorGradient.updateGradient(newSize);
-      controller.visualization.updateColorGradient(controller.colorGradient);
-
-      for (SortingAlgorithm alg : controller.algorithms) {
-        if (alg.getAlternativeSize() == controller.arrayController.getLength()) {
-          alg.setAlternativeSize(newSize);
-        }
-      }
-      controller.arrayController.resize(newSize);
-    }
-  }
-
-  /**
-   * Sets the visualization implementation.
-   *
-   * @param viz the new visualization to use
-   */
-  public static void setVisualization(Visualization viz) {
-    if (processing instanceof MainController controller) {
-      controller.visualization = viz;
-      if (controller.appContext != null) {
-        controller.appContext.setVisualization(viz);
-      } else if (viz != null) {
-        viz.updateColorGradient(controller.colorGradient);
-      }
-    }
-  }
-
-  /**
-   * Gets the current array size.
-   *
-   * @return the array size
-   */
-  public static int getSize() {
-    if (processing instanceof MainController controller) {
-      return controller.size;
-    }
-    return 0;
-  }
-
-  /**
-   * Sets the array size.
-   *
-   * @param newSize the new array size
-   */
-  public static void setSize(int newSize) {
-    if (processing instanceof MainController controller) {
-      controller.size = newSize;
-    }
-  }
-
-  /**
-   * Directfieldaccess to array controller.
-   *
-   * @return the array controller instance
-   */
-  public static ArrayController getArrayController() {
-    if (processing instanceof MainController controller) {
-      return controller.arrayController;
-    }
-    return null;
-  }
-
-  /**
-   * Gets the list of registered algorithms.
-   *
-   * @return the algorithms list
-   */
-  public static ArrayList<SortingAlgorithm> getAlgorithms() {
-    if (processing instanceof MainController controller) {
-      return new ArrayList<>(controller.algorithms);
-    }
-    return new ArrayList<>();
-  }
-
-  /**
-   * Sets which algorithms to run (selects only those marked as selected).
-   *
-   * @param algorithmList list of algorithms to consider
-   */
-  public static void setAlgorithms(ArrayList<SortingAlgorithm> algorithmList) {
-    if (processing instanceof MainController controller) {
-      controller.algorithms.clear();
-      for (SortingAlgorithm alg : algorithmList) {
-        if (alg.isSelected()) {
-          controller.algorithms.add(alg);
-        }
-      }
-      if (controller.appContext != null) {
-        controller.appContext.setAlgorithms(algorithmList);
-      }
-    }
-  }
-
-  /**
-   * Sets a single algorithm to run.
-   *
-   * @param algorithm the algorithm to run
-   */
-  public static void setAlgorithm(SortingAlgorithm algorithm) {
-    if (processing instanceof MainController controller) {
-      controller.algorithms.clear();
-      controller.algorithms.add(algorithm);
-      if (controller.appContext != null) {
-        controller.appContext.setAlgorithm(algorithm);
-      }
-    }
-  }
-
-  /**
-   * Requests to start the sorting process.
-   *
-   * @param shouldStart true to request start
-   */
-  public static void setStart(boolean shouldStart) {
-    if (processing instanceof MainController controller) {
-      controller.stateManager.setStartRequested(shouldStart);
-    }
-  }
-
-  /**
-   * Checks if sorting is currently running.
-   *
-   * @return true if active
-   */
-  public static boolean isRunning() {
-    if (processing instanceof MainController controller) {
-      return controller.stateManager.isRunning();
-    }
-    return false;
-  }
-
-  /**
-   * Gets sound system.
-   *
-   * @return the sound instance
-   */
-  public static Sound getSound() {
-    return sound;
-  }
-
-  /**
-   * Sets the sound instance. {@code null} is coerced to {@link SilentSound} so callers never
-   * observe a null sound reference.
-   *
-   * @param soundSystem the sound to use, or null for silent
-   */
-  public static void setSound(Sound soundSystem) {
-    if (soundSystem == null) {
-      ArrayController ac = getArrayController();
-      sound = new SilentSound(ac);
-    } else {
-      sound = soundSystem;
-    }
-  }
-
-  /**
-   * Gets current color gradient.
-   *
-   * @return the color gradient
-   */
-  public static ColorGradient getColorGradient() {
-    if (processing instanceof MainController controller) {
-      return controller.colorGradient;
-    }
-    return null;
-  }
-
-  /**
-   * Sets whether to show the comparison table.
-   *
-   * @param show true to show table
-   */
-  public static void setShowComparisonTable(boolean show) {
-    if (processing instanceof MainController controller) {
-      controller.stateManager.setShowComparisonTable(show);
-    }
-  }
-
-  /**
-   * Sets whether to print on-screen measurements.
-   *
-   * @param print true to print
-   */
-  public static void setPrintMeasurements(boolean print) {
-    if (processing instanceof MainController controller) {
-      controller.stateManager.setPrintMeasurements(print);
-    }
-  }
-
-  /**
-   * Sets the animation delay factor for all algorithms. A value of 1.0 means every step fires a
-   * delay; lower values reduce frame rate.
-   *
-   * @param factor the delay factor (0 < factor <= 1)
-   */
-  public static void setDelayFactor(double factor) {
-    if (processing instanceof MainController controller) {
-      for (SortingAlgorithm alg : controller.algorithms) {
-        alg.setDelayFactor(factor);
-      }
-    }
-  }
-
-  /**
-   * Sets the animation delay time in milliseconds for all algorithms.
-   *
-   * @param ms the delay in milliseconds
-   */
-  public static void setDelayTime(int ms) {
-    if (processing instanceof MainController controller) {
-      for (SortingAlgorithm alg : controller.algorithms) {
-        alg.setDelayTime(ms);
-      }
     }
   }
 

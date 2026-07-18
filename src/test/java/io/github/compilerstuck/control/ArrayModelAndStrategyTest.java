@@ -3,6 +3,7 @@ package io.github.compilerstuck.control;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.compilerstuck.control.config.DelayStrategy;
+import io.github.compilerstuck.control.config.ShuffleStrategy;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.CancellationToken;
@@ -13,10 +14,13 @@ import io.github.compilerstuck.control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.ReverseShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.SortedShuffleStrategy;
 import io.github.compilerstuck.visual.Marker;
+import java.util.Arrays;
+import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /** Unit tests for ArrayModel, DelayStrategy, and ShuffleStrategy. */
@@ -32,8 +36,38 @@ class ArrayModelAndStrategyTest {
 
   @BeforeEach
   void setUp() {
-    MainController.processing = NO_OP_CTX;
     controller = new ArrayController(10);
+  }
+
+  private static int[] identity(int length) {
+    int[] expected = new int[length];
+    for (int i = 0; i < length; i++) {
+      expected[i] = i;
+    }
+    return expected;
+  }
+
+  private static int[] sortedCopy(int[] values) {
+    int[] copy = values.clone();
+    Arrays.sort(copy);
+    return copy;
+  }
+
+  private static void assertMultisetPreserved(ArrayController model) {
+    assertArrayEquals(identity(model.getLength()), sortedCopy(model.getArray()));
+  }
+
+  private static ShuffleStrategy strategyFor(ShuffleType type) {
+    return switch (type) {
+      case RANDOM -> new RandomShuffleStrategy();
+      case REVERSE -> new ReverseShuffleStrategy();
+      case ALMOST_SORTED -> new AlmostSortedShuffleStrategy();
+      case SORTED -> new SortedShuffleStrategy();
+    };
+  }
+
+  private static void shuffle(ArrayController model, ShuffleStrategy strategy) {
+    strategy.shuffle(model, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
   }
 
   // -----------------------------------------------------------------------
@@ -140,6 +174,25 @@ class ArrayModelAndStrategyTest {
   }
 
   @Test
+  @DisplayName("DelayStrategy.never() never delays")
+  void neverStrategyNeverDelays() {
+    DelayStrategy never = DelayStrategy.never();
+    for (int i = 0; i < 1000; i++) {
+      assertFalse(never.shouldDelay(10, 1.0));
+      assertFalse(never.shouldDelay(4000, 1.0));
+    }
+  }
+
+  @Test
+  @DisplayName("DelayStrategy.random(Random) is deterministic with fixed seed")
+  void randomStrategyUsesSuppliedRng() {
+    Random rng = new Random(42);
+    DelayStrategy strategy = DelayStrategy.random(rng);
+    assertTrue(strategy.shouldDelay(10, 1.0));
+    assertFalse(strategy.shouldDelay(10, 0.0));
+  }
+
+  @Test
   @DisplayName("DelayStrategy.DEFAULT fires proportionally for large arrays")
   void defaultStrategyProportionalForLargeArrays() {
     // arrayLength = 4000 (> DEFAULT_THRESHOLD=2000), factor=1.0
@@ -161,18 +214,15 @@ class ArrayModelAndStrategyTest {
   @Test
   @DisplayName("RandomShuffleStrategy produces a permutation (same elements)")
   void randomShuffleIsPermutation() {
-    new RandomShuffleStrategy()
-        .shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
-    int sum = 0;
-    for (int i = 0; i < controller.getLength(); i++) sum += controller.get(i);
-    assertEquals(45, sum, "Sum of 0..9 should be 45 regardless of order");
+    shuffle(controller, new RandomShuffleStrategy());
+    assertMultisetPreserved(controller);
   }
 
   @Test
   @DisplayName("ReverseShuffleStrategy reverses the array")
   void reverseShuffleReversesArray() {
-    new ReverseShuffleStrategy()
-        .shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
+    shuffle(controller, new ReverseShuffleStrategy());
+    assertMultisetPreserved(controller);
     for (int i = 0; i < controller.getLength(); i++) {
       assertEquals(
           controller.getLength() - 1 - i,
@@ -184,20 +234,26 @@ class ArrayModelAndStrategyTest {
   @Test
   @DisplayName("AlmostSortedShuffleStrategy keeps elements as a permutation")
   void almostSortedShuffleIsPermutation() {
-    new AlmostSortedShuffleStrategy()
-        .shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
-    int sum = 0;
-    for (int i = 0; i < controller.getLength(); i++) sum += controller.get(i);
-    assertEquals(45, sum);
+    shuffle(controller, new AlmostSortedShuffleStrategy());
+    assertMultisetPreserved(controller);
   }
 
   @Test
   @DisplayName("SortedShuffleStrategy leaves the array sorted")
   void sortedShuffleLeavesSorted() {
     // The array starts sorted; SortedShuffle should not swap anything
-    new SortedShuffleStrategy()
-        .shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
+    shuffle(controller, new SortedShuffleStrategy());
+    assertMultisetPreserved(controller);
     assertTrue(controller.isSorted());
+  }
+
+  @ParameterizedTest(name = "shuffle preserves multiset for {0}")
+  @EnumSource(ShuffleType.class)
+  @DisplayName("every ShuffleType preserves the 0..n-1 multiset")
+  void everyShuffleTypePreservesMultiset(ShuffleType type) {
+    ArrayController model = new ArrayController(100);
+    shuffle(model, strategyFor(type));
+    assertArrayEquals(identity(100), sortedCopy(model.getArray()));
   }
 
   @ParameterizedTest(name = "setShuffleType({0}) wires the correct strategy")

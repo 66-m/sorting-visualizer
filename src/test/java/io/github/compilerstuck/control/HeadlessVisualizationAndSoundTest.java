@@ -21,7 +21,6 @@ class HeadlessVisualizationAndSoundTest {
 
   @BeforeEach
   void setUp() {
-    MainController.setSize(10);
     controller = new ArrayController(10);
     renderCtx = new HeadlessRenderContext(200, 100);
     sound = new HeadlessSound(controller);
