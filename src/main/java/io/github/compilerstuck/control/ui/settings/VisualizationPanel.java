@@ -14,25 +14,26 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalInt;
+import java.util.function.IntConsumer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /** Visualization type picker and image-file button. */
 public final class VisualizationPanel {
+  private static final int MIN_ARRAY_SIZE = 3;
+  private static final int MAX_ARRAY_SIZE = 20000;
+
   private final AppContext app;
-  private final Component dialogParent;
 
   private final List<VisualizationDescriptor> visualizationDescriptors;
   private final ArrayList<Visualization> visualizationList;
   private final JComboBox<String> visualizationListComboBox;
   private final JButton buttonSetImg;
   private final StyledCard card;
-  private int previousVisualizationIndex = 0;
+  private IntConsumer sizeDisplaySync = size -> {};
 
-  public VisualizationPanel(AppContext app, Component dialogParent) {
+  public VisualizationPanel(AppContext app) {
     this.app = app;
-    this.dialogParent = dialogParent;
 
     card = ComponentFactory.createCard();
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -59,58 +60,16 @@ public final class VisualizationPanel {
         new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
     visualizationListComboBox.setSelectedIndex(
         VisualizationCatalog.indexOfId(app.getPreferences().getVisualizationId()));
-    previousVisualizationIndex = visualizationListComboBox.getSelectedIndex();
 
     buttonSetImg = ComponentFactory.createSmallButton("Select Image");
     buttonSetImg.setVisible(false);
     buttonSetImg.setAlignmentX(Component.LEFT_ALIGNMENT);
     buttonSetImg.addActionListener(e -> selectImageFile());
 
-    visualizationListComboBox.addActionListener(
-        e -> {
-          int index = visualizationListComboBox.getSelectedIndex();
-          VisualConstraints constraints = visualizationDescriptors.get(index).constraints();
+    visualizationListComboBox.addActionListener(e -> applySelectedVisualization());
 
-          if (!constraints.requiresImage()) {
-            OptionalInt proposed = constraints.proposeSize(app.getSize());
-            if (proposed.isPresent()) {
-              int choice =
-                  JOptionPane.showConfirmDialog(
-                      dialogParent,
-                      "This visualization works best with "
-                          + proposed.getAsInt()
-                          + " elements instead of "
-                          + app.getSize()
-                          + ". Use "
-                          + proposed.getAsInt()
-                          + "?",
-                      "Adjust array size",
-                      JOptionPane.YES_NO_OPTION);
-              if (choice == JOptionPane.YES_OPTION) {
-                app.updateArraySize(proposed.getAsInt());
-              } else {
-                visualizationListComboBox.setSelectedIndex(previousVisualizationIndex);
-                return;
-              }
-            }
-          }
-
-          previousVisualizationIndex = index;
-          Visualization visualization = visualizationList.get(index);
-          app.setVisualization(visualization);
-          app.setVisualizationId(visualizationDescriptors.get(index).id());
-          boolean isImage = constraints.requiresImage();
-          buttonSetImg.setVisible(isImage);
-          buttonSetImg.setEnabled(isImage);
-        });
-
-    // Sync restored visualization without firing size-confirm dialogs
-    int restored = previousVisualizationIndex;
-    Visualization restoredViz = visualizationList.get(restored);
-    app.setVisualization(restoredViz);
-    VisualConstraints restoredConstraints = visualizationDescriptors.get(restored).constraints();
-    buttonSetImg.setVisible(restoredConstraints.requiresImage());
-    buttonSetImg.setEnabled(restoredConstraints.requiresImage());
+    // Sync restored visualization without resizing again if already valid
+    applySelectedVisualization();
 
     card.add(visualizationListComboBox);
     card.add(Box.createVerticalStrut(UiTheme.SPACING_SM));
@@ -119,6 +78,11 @@ public final class VisualizationPanel {
 
   public StyledCard getCard() {
     return card;
+  }
+
+  /** Called when a constrained visualization auto-fits the array size. */
+  public void setSizeDisplaySync(IntConsumer sizeDisplaySync) {
+    this.sizeDisplaySync = sizeDisplaySync != null ? sizeDisplaySync : size -> {};
   }
 
   public VisualConstraints currentConstraints() {
@@ -131,6 +95,29 @@ public final class VisualizationPanel {
 
   public void setInputsEnabled(boolean enabled) {
     visualizationListComboBox.setEnabled(enabled);
+  }
+
+  private void applySelectedVisualization() {
+    int index = visualizationListComboBox.getSelectedIndex();
+    if (index < 0 || index >= visualizationDescriptors.size()) {
+      return;
+    }
+
+    VisualConstraints constraints = visualizationDescriptors.get(index).constraints();
+    if (!constraints.requiresImage()) {
+      int fitted = constraints.fitSize(app.getSize(), MIN_ARRAY_SIZE, MAX_ARRAY_SIZE);
+      if (fitted != app.getSize()) {
+        app.updateArraySize(fitted);
+        sizeDisplaySync.accept(fitted);
+      }
+    }
+
+    Visualization visualization = visualizationList.get(index);
+    app.setVisualization(visualization);
+    app.setVisualizationId(visualizationDescriptors.get(index).id());
+    boolean isImage = constraints.requiresImage();
+    buttonSetImg.setVisible(isImage);
+    buttonSetImg.setEnabled(isImage);
   }
 
   private void selectImageFile() {

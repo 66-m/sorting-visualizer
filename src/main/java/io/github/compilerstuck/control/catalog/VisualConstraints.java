@@ -1,7 +1,5 @@
 package io.github.compilerstuck.control.catalog;
 
-import java.util.OptionalInt;
-
 /** Describes the array-size constraints a visualization imposes, if any. */
 public record VisualConstraints(
     boolean requiresPerfectSquare, boolean requiresPerfectCube, boolean requiresImage) {
@@ -41,17 +39,104 @@ public record VisualConstraints(
     return root * root * root;
   }
 
+  public static int previousPerfectSquare(int n) {
+    int root = (int) Math.floor(Math.sqrt(Math.max(n, 0)));
+    if (root < 1) {
+      return 1;
+    }
+    return root * root;
+  }
+
+  public static int previousPerfectCube(int n) {
+    int root = (int) Math.floor(Math.cbrt(Math.max(n, 0)));
+    if (root < 1) {
+      return 1;
+    }
+    return root * root * root;
+  }
+
   /**
-   * Proposes a valid array size for the given current size, or empty if the current size already
-   * satisfies (or has no) constraints.
+   * Returns {@code current} if it already satisfies constraints; otherwise the nearest valid size
+   * clamped to {@code [minSize, maxSize]}. Ties prefer the smaller (clipped) size. Image visuals
+   * and unconstrained visuals only clamp to the range.
    */
-  public OptionalInt proposeSize(int current) {
-    if (requiresPerfectCube && !isPerfectCube(current)) {
-      return OptionalInt.of(nextPerfectCube(current));
+  public int fitSize(int current, int minSize, int maxSize) {
+    int lo = Math.min(minSize, maxSize);
+    int hi = Math.max(minSize, maxSize);
+    int clamped = Math.max(lo, Math.min(hi, current));
+
+    if (requiresImage || (!requiresPerfectSquare && !requiresPerfectCube)) {
+      return clamped;
     }
-    if (requiresPerfectSquare && !isPerfectSquare(current)) {
-      return OptionalInt.of(nextPerfectSquare(current));
+
+    if (requiresPerfectCube) {
+      return nearestPerfectCube(clamped, lo, hi);
     }
-    return OptionalInt.empty();
+    return nearestPerfectSquare(clamped, lo, hi);
+  }
+
+  private static int nearestPerfectSquare(int n, int minSize, int maxSize) {
+    if (isPerfectSquare(n) && n >= minSize && n <= maxSize) {
+      return n;
+    }
+    int lower = previousPerfectSquare(n);
+    int upper = nextPerfectSquare(n);
+    return pickNearestInRange(n, lower, upper, minSize, maxSize, true);
+  }
+
+  private static int nearestPerfectCube(int n, int minSize, int maxSize) {
+    if (isPerfectCube(n) && n >= minSize && n <= maxSize) {
+      return n;
+    }
+    int lower = previousPerfectCube(n);
+    int upper = nextPerfectCube(n);
+    return pickNearestInRange(n, lower, upper, minSize, maxSize, false);
+  }
+
+  private static int pickNearestInRange(
+      int target, int lower, int upper, int minSize, int maxSize, boolean square) {
+    Integer bestLower = null;
+    Integer bestUpper = null;
+
+    for (int candidate = lower; candidate >= 1; ) {
+      if (candidate <= maxSize && candidate >= minSize) {
+        bestLower = candidate;
+        break;
+      }
+      if (candidate < minSize) {
+        break;
+      }
+      candidate = square ? previousPerfectSquare(candidate - 1) : previousPerfectCube(candidate - 1);
+    }
+
+    for (int candidate = upper; ; ) {
+      if (candidate <= maxSize && candidate >= minSize) {
+        bestUpper = candidate;
+        break;
+      }
+      if (candidate > maxSize) {
+        candidate = square ? previousPerfectSquare(maxSize) : previousPerfectCube(maxSize);
+        if (candidate >= minSize && candidate <= maxSize) {
+          bestUpper = candidate;
+        }
+        break;
+      }
+      candidate = square ? nextPerfectSquare(candidate + 1) : nextPerfectCube(candidate + 1);
+    }
+
+    if (bestLower == null && bestUpper == null) {
+      // Fallback: smallest valid size in range
+      return square ? nextPerfectSquare(minSize) : nextPerfectCube(minSize);
+    }
+    if (bestLower == null) {
+      return bestUpper;
+    }
+    if (bestUpper == null) {
+      return bestLower;
+    }
+    int dLower = Math.abs(target - bestLower);
+    int dUpper = Math.abs(target - bestUpper);
+    // Prefer smaller on ties ("clip").
+    return dUpper < dLower ? bestUpper : bestLower;
   }
 }

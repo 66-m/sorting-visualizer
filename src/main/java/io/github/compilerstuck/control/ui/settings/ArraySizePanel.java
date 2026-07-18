@@ -6,7 +6,6 @@ import io.github.compilerstuck.control.ui.ComponentFactory;
 import io.github.compilerstuck.control.ui.StyledCard;
 import io.github.compilerstuck.control.ui.UiTheme;
 import java.awt.*;
-import java.util.OptionalInt;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.swing.*;
@@ -16,7 +15,6 @@ import javax.swing.event.DocumentListener;
 /** Array size slider, text field, and apply button. */
 public final class ArraySizePanel {
   private final AppContext app;
-  private final Component dialogParent;
   private final Supplier<VisualConstraints> constraintsSupplier;
   private final Consumer<Boolean> setRunEnabled;
 
@@ -24,16 +22,16 @@ public final class ArraySizePanel {
   private final JTextField arraySizeTextField;
   private final JButton arraySizeOkButton;
   private final StyledCard card;
+  private final int minSize = 3;
   private final int maxSize = 20000;
   private final Color errorColor = new Color(244, 67, 54);
+  private boolean syncingDisplay;
 
   public ArraySizePanel(
       AppContext app,
-      Component dialogParent,
       Supplier<VisualConstraints> constraintsSupplier,
       Consumer<Boolean> setRunEnabled) {
     this.app = app;
-    this.dialogParent = dialogParent;
     this.constraintsSupplier = constraintsSupplier;
     this.setRunEnabled = setRunEnabled;
 
@@ -71,17 +69,14 @@ public final class ArraySizePanel {
     Color normalColor = UiTheme.TEXT_PRIMARY;
     arraySizeSlider.addChangeListener(
         e -> {
-          if (arraySizeSlider.getValue() <= 3) {
-            setRunEnabled.accept(false);
-            arraySizeSlider.setValue(3);
-            arraySizeTextField.setText("3");
-            arraySizeTextField.setForeground(errorColor);
-          } else {
-            applyArraySize(arraySizeSlider.getValue());
-            arraySizeTextField.setText(String.valueOf(arraySizeSlider.getValue()));
-            arraySizeTextField.setForeground(normalColor);
-            setRunEnabled.accept(true);
+          if (syncingDisplay) {
+            return;
           }
+          int fitted = fit(arraySizeSlider.getValue());
+          applyArraySize(fitted);
+          syncDisplayedSize(fitted);
+          arraySizeTextField.setForeground(fitted >= minSize ? normalColor : errorColor);
+          setRunEnabled.accept(fitted > minSize);
           arraySizeOkButton.setEnabled(false);
         });
 
@@ -136,43 +131,36 @@ public final class ArraySizePanel {
     arraySizeTextField.setEnabled(enabled);
   }
 
+  /** Updates slider and text field without re-applying size (e.g. after a visualization change). */
+  public void syncDisplayedSize(int size) {
+    syncingDisplay = true;
+    try {
+      arraySizeSlider.setValue(size);
+      arraySizeTextField.setText(String.valueOf(size));
+    } finally {
+      syncingDisplay = false;
+    }
+  }
+
   private void validateAndApplySize() {
     String text = arraySizeTextField.getText();
     if (text.matches("[0-9]+") && text.length() < 6) {
       int value = Integer.parseInt(text);
-      if (value > maxSize) {
-        arraySizeSlider.setValue(maxSize);
-      } else if (value < 3) {
-        arraySizeSlider.setValue(3);
-      } else {
-        arraySizeSlider.setValue(value);
-      }
+      int fitted = fit(value);
+      syncDisplayedSize(fitted);
+      applyArraySize(fitted);
     }
   }
 
-  private void applyArraySize(int requestedSize) {
+  private void applyArraySize(int size) {
+    app.updateArraySize(size);
+  }
+
+  private int fit(int requestedSize) {
     VisualConstraints constraints = constraintsSupplier.get();
-    if (constraints != null && !constraints.requiresImage()) {
-      OptionalInt proposed = constraints.proposeSize(requestedSize);
-      if (proposed.isPresent()) {
-        int choice =
-            JOptionPane.showConfirmDialog(
-                dialogParent,
-                "The selected visualization works best with "
-                    + proposed.getAsInt()
-                    + " elements instead of "
-                    + requestedSize
-                    + ". Use "
-                    + proposed.getAsInt()
-                    + "?",
-                "Adjust array size",
-                JOptionPane.YES_NO_OPTION);
-        if (choice == JOptionPane.YES_OPTION) {
-          app.updateArraySize(proposed.getAsInt());
-          return;
-        }
-      }
+    if (constraints == null) {
+      return Math.max(minSize, Math.min(maxSize, requestedSize));
     }
-    app.updateArraySize(requestedSize);
+    return constraints.fitSize(requestedSize, minSize, maxSize);
   }
 }

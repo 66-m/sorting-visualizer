@@ -92,7 +92,7 @@ public class Settings extends JFrame {
 
   private JComponent createMainUI() {
     sortingPanel = new SortingPanel(app, this);
-    visualizationPanel = new VisualizationPanel(app, this);
+    visualizationPanel = new VisualizationPanel(app);
     speedPanel = new SpeedPanel(app);
     actionBar =
         new ActionBar(
@@ -102,7 +102,9 @@ public class Settings extends JFrame {
             sortingPanel::getSelectedAlgorithmIndex);
     arraySizePanel =
         new ArraySizePanel(
-            app, this, visualizationPanel::currentConstraints, actionBar::setRunEnabled);
+            app, visualizationPanel::currentConstraints, actionBar::setRunEnabled);
+    visualizationPanel.setSizeDisplaySync(arraySizePanel::syncDisplayedSize);
+    arraySizePanel.syncDisplayedSize(app.getSize());
 
     GradientPanel gradientPanel = new GradientPanel(app);
     displayPanel =
