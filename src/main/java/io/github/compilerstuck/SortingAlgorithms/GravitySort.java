@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class GravitySort extends SortingAlgorithm {
 
@@ -13,18 +12,18 @@ public class GravitySort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int max = arrayController.get(0);
-        for (int i = 1; i < arrayController.getLength() && run; i++)
+        for (int i = 1; i < arrayController.getLength() && !isCancelled(); i++)
             if (arrayController.get(i) > max) {
                 max = arrayController.get(i);
                 arrayController.addComparisons(1);
             }
 
         int[][] abacus = new int[arrayController.getLength()][max];
-        for (int i = 0; i < arrayController.getLength() && run; i++) {
+        for (int i = 0; i < arrayController.getLength() && !isCancelled(); i++) {
             for (int j = 0; j < arrayController.get(i); j++) {
                 arrayController.addComparisons(1);
                 abacus[i][abacus[0].length - j - 1] = 1;
@@ -32,8 +31,8 @@ public class GravitySort extends SortingAlgorithm {
             }
         }
         //apply gravity
-        for (int i = 0; i < abacus[0].length && run; i++) {
-            for (int j = 0; j < abacus.length && run; j++) {
+        for (int i = 0; i < abacus[0].length && !isCancelled(); i++) {
+            for (int j = 0; j < abacus.length && !isCancelled(); j++) {
                 if (abacus[j][i] == 1) {
                     //Drop it
                     int droppos = j;
@@ -48,7 +47,7 @@ public class GravitySort extends SortingAlgorithm {
             }
 
             int count;
-            for (int x = 0; x < abacus.length && run; x++) {
+            for (int x = 0; x < abacus.length && !isCancelled(); x++) {
                 count = 0;
                 for (int y = 0; y < abacus[0].length; y++)
                     count += abacus[x][y];

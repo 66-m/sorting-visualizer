@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class AmericanFlagSort extends SortingAlgorithm {
 
@@ -19,9 +18,8 @@ public class AmericanFlagSort extends SortingAlgorithm {
         this.delayTime = 10;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         final int M = arrayController.getLength();
@@ -32,11 +30,11 @@ public class AmericanFlagSort extends SortingAlgorithm {
             arrayController.addWritesAux(1);
         }
         int[] start = new int[M];
-        for (int i = 1; i < M && run; i++) {
+        for (int i = 1; i < M && !isCancelled(); i++) {
             start[i] = start[i - 1] + count[i - 1];
             arrayController.addWritesAux(1);
         }
-        for (int b = 0; b < M && run; b++) {
+        for (int b = 0; b < M && !isCancelled(); b++) {
             while (count[b] > 0) {
                 int origin = start[b];
                 int from = origin;
@@ -53,11 +51,10 @@ public class AmericanFlagSort extends SortingAlgorithm {
                     
                     delay(new int[]{to});
 
-                } while (from != origin && run);
+                } while (from != origin && !isCancelled());
             }
 
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
     }

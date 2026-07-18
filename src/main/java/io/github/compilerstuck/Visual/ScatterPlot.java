@@ -41,9 +41,9 @@ public class ScatterPlot extends Visualization {
             float y = screenHeight - barHeight;
 
             
-            ((PApplet)proc).pushMatrix();
-            ((PApplet)proc).circle(x, y, 3); //Classic
-            ((PApplet)proc).popMatrix();
+            proc.pushMatrix();
+            proc.circle(x, y, 3); //Classic
+            proc.popMatrix();
 
         }
     }

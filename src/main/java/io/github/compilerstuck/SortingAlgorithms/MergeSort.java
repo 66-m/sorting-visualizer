@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class MergeSort extends SortingAlgorithm {
 
@@ -12,7 +11,7 @@ public class MergeSort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         sort(arrayController, 0, arrayController.getLength() - 1);
@@ -21,9 +20,8 @@ public class MergeSort extends SortingAlgorithm {
 
     }
 
-
     private void sort(ArrayModel arrayController, int l, int r) {
-        if (l < r && run) {
+        if (l < r && !isCancelled()) {
             int m = (l + r) / 2;
 
             sort(arrayController, l, m);
@@ -41,20 +39,19 @@ public class MergeSort extends SortingAlgorithm {
         int[] L = new int[n1];
         int[] R = new int[n2];
 
-        for (int i = 0; i < n1 && run; ++i) {
+        for (int i = 0; i < n1 && !isCancelled(); ++i) {
             L[i] = arrayController.get(l + i);
         }
         arrayController.addWritesAux(n1);
-        for (int j = 0; j < n2 && run; ++j) {
+        for (int j = 0; j < n2 && !isCancelled(); ++j) {
             R[j] = arrayController.get(m + 1 + j);
         }
         arrayController.addWritesAux(n2);
 
-
         int i = 0, j = 0;
 
         int k = l;
-        while (i < n1 && j < n2 && run) {
+        while (i < n1 && j < n2 && !isCancelled()) {
             if (L[i] <= R[j]) {
                 arrayController.set(k, L[i]);
                 i++;
@@ -75,7 +72,7 @@ public class MergeSort extends SortingAlgorithm {
     }
 
     private int copyRemainingElements(ArrayModel arrayController, int n1, int[] l, int i, int k) {
-        while (i < n1 && run) {
+        while (i < n1 && !isCancelled()) {
             arrayController.set(k, l[i]);
 
             arrayController.addWritesAux(1);

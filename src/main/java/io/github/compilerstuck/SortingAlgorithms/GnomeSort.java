@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class GnomeSort extends SortingAlgorithm {
 
@@ -19,16 +18,14 @@ public class GnomeSort extends SortingAlgorithm {
         delayFactor = 1. / 50;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         delayFactor = 1. / (arrayController.getLength()/40);
 
         int index = 0;
-        while (index < arrayController.getLength() && run) {
-
+        while (index < arrayController.getLength() && !isCancelled()) {
 
             if (index == 0)
                 index++;
@@ -41,7 +38,6 @@ public class GnomeSort extends SortingAlgorithm {
                 delay(new int[]{index});
             }
             arrayController.addComparisons(1);
-
 
         }
 

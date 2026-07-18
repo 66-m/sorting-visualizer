@@ -50,3 +50,5 @@ Thumbs.db
 
 # Local executables (Windows build/run artifacts)
 *.exe
+
+.cursor/

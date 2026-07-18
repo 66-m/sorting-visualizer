@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 import java.util.Arrays;
 
@@ -19,16 +18,15 @@ public class PigeonholeSort extends SortingAlgorithm {
         this.alternativeSize = alternativeSize;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int min = arrayController.get(0);
         int max = arrayController.get(0);
         int range, i, index;
 
-        for (int a = 0; a < arrayController.getLength() && run; a++) {
+        for (int a = 0; a < arrayController.getLength() && !isCancelled(); a++) {
             if (arrayController.get(a) > max)
                 max = arrayController.get(a);
             if (arrayController.get(a) < min)
@@ -43,21 +41,20 @@ public class PigeonholeSort extends SortingAlgorithm {
         Arrays.fill(phole, 0);
         arrayController.addWritesAux(range);
 
-        for(i = 0; i < arrayController.getLength() && run; i++) {
+        for(i = 0; i < arrayController.getLength() && !isCancelled(); i++) {
             phole[arrayController.get(i) - min]++;
             arrayController.addWritesAux(range);
         }
 
         index = 0;
 
-        for (i = 0; i < range && run; i++) {
+        for (i = 0; i < range && !isCancelled(); i++) {
             while (phole[i] --> 0) {
                 arrayController.set(index++, i + min);
                 
                 delay(new int[]{index - 1});
             }
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
     }

@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class QuickSortDualPivot extends SortingAlgorithm {
 
@@ -20,7 +19,7 @@ public class QuickSortDualPivot extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         sort(arrayController, 0, arrayController.getLength() - 1);
@@ -29,7 +28,7 @@ public class QuickSortDualPivot extends SortingAlgorithm {
     }
 
     private void sort(ArrayModel arrayController, int left, int right) {
-        if (right > left && run) {
+        if (right > left && !isCancelled()) {
             // Choose outermost elements as pivots
             if (arrayController.get(left) > arrayController.get(right)) {
                 arrayController.swap(left, right);
@@ -41,7 +40,7 @@ public class QuickSortDualPivot extends SortingAlgorithm {
 
             // Partition A according to invariant below
             int l = left + 1, g = right - 1, k = l;
-            while (k <= g && run) {
+            while (k <= g && !isCancelled()) {
                 if (arrayController.get(k) < p) {
                     arrayController.swap(k, l);
                     
@@ -49,7 +48,7 @@ public class QuickSortDualPivot extends SortingAlgorithm {
 
                     ++l;
                 } else if (arrayController.get(k) >= q) {
-                    while (arrayController.get(g) > q && k < g && run) {
+                    while (arrayController.get(g) > q && k < g && !isCancelled()) {
                         --g;
                         arrayController.addComparisons(1);
                     }
@@ -79,7 +78,6 @@ public class QuickSortDualPivot extends SortingAlgorithm {
             arrayController.swap(right, g);
             
             delay(new int[]{left, right, l, g});
-
 
             // Recursively sort partitions
             sort(arrayController, left, l - 1);

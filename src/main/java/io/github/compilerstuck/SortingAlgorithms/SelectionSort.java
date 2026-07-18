@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class SelectionSort extends SortingAlgorithm {
 
@@ -12,17 +11,16 @@ public class SelectionSort extends SortingAlgorithm {
         delayTime = 10;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int n = arrayController.getLength();
 
-        for (int i = 0; i < n && run; i++) {
+        for (int i = 0; i < n && !isCancelled(); i++) {
 
             int min_index = i;
-            for (int j = i + 1; j < n && run; j++) {
+            for (int j = i + 1; j < n && !isCancelled(); j++) {
                 if (arrayController.get(j) < arrayController.get(min_index)) {
                     min_index = j;
                 }
@@ -33,9 +31,7 @@ public class SelectionSort extends SortingAlgorithm {
 
             delay(new int[]{i, min_index});
 
-
         }
-
 
     }
 

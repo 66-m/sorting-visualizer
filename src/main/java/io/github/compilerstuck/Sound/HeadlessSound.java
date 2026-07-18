@@ -3,21 +3,10 @@ package io.github.compilerstuck.Sound;
 import io.github.compilerstuck.Control.model.ArrayModel;
 
 /**
- * No-op sound implementation used when audio output is not desired (e.g. in
- * tests or headless runs).
+ * No-op sound for tests and headless runs. Delegates to {@link SilentSound}.
  */
-public class HeadlessSound extends Sound {
+public class HeadlessSound extends SilentSound {
     public HeadlessSound(ArrayModel arrayController) {
         super(arrayController);
-    }
-
-    @Override
-    public void playSound(int value) {
-        // nothing
-    }
-
-    @Override
-    public void mute(boolean mute) {
-        // ignore
     }
 }

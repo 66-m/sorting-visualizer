@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 import java.util.Arrays;
 
@@ -13,9 +12,8 @@ public class CountingSort extends SortingAlgorithm {
         alternativeSize = arrayController.getLength();
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
         int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
         int[] counter = new int[max + 1];
@@ -29,7 +27,7 @@ public class CountingSort extends SortingAlgorithm {
         delayTime = 5;
 
         int ndx = 0;
-        for (int i = 0; i < counter.length && run; i++) {
+        for (int i = 0; i < counter.length && !isCancelled(); i++) {
             while (0 < counter[i]) {
                 arrayController.addComparisons(1);
                 
@@ -40,7 +38,6 @@ public class CountingSort extends SortingAlgorithm {
                 arrayController.addWritesAux(1);
             }
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
 

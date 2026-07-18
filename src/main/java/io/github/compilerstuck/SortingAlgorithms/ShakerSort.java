@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class ShakerSort extends SortingAlgorithm {
 
@@ -20,17 +19,17 @@ public class ShakerSort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         boolean swapped = true;
         int start = 0;
         int end = arrayController.getLength();
 
-        while (swapped && run) {
+        while (swapped && !isCancelled()) {
             swapped = false;
 
-            for (int i = start; i < end - 1 && run; ++i) {
+            for (int i = start; i < end - 1 && !isCancelled(); ++i) {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
@@ -48,7 +47,7 @@ public class ShakerSort extends SortingAlgorithm {
 
             end = end - 1;
 
-            for (int i = end - 1; i >= start && run; i--) {
+            for (int i = end - 1; i >= start && !isCancelled(); i--) {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
@@ -61,7 +60,6 @@ public class ShakerSort extends SortingAlgorithm {
 
             start = start + 1;
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
 

@@ -42,8 +42,7 @@ class HeadlessVisualizationAndSoundTest {
     @Test
     @DisplayName("HeadlessSound does nothing when playSound is called")
     void headlessSoundNoOp() {
-        sound.playSound(5);
-        // no exception and nothing to verify - simply ensure method exists
-        assertTrue(true);
+        assertDoesNotThrow(() -> sound.playSound(5));
+        assertDoesNotThrow(() -> sound.mute(true));
     }
 }

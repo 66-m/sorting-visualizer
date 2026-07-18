@@ -47,7 +47,7 @@ public class Phyllotaxis extends Visualization {
             float x = (float) (r * cos(a));
             float y = (float) (r * sin(a));
 
-            ((PApplet)proc).circle(screenWidth / 2f + x, screenHeight / 2f + y, 5); //Swirl dots
+            proc.circle(screenWidth / 2f + x, screenHeight / 2f + y, 5); //Swirl dots
 
         }
     }

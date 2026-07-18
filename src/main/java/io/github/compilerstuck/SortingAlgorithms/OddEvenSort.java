@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class OddEvenSort extends SortingAlgorithm {
 
@@ -19,21 +18,20 @@ public class OddEvenSort extends SortingAlgorithm {
         delayFactor = 1. / 55;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         delayFactor = 1. / (arrayController.getLength()/36);
 
         boolean isSorted = false; // Initially array is unsorted
 
-        while (!isSorted && run) {
+        while (!isSorted && !isCancelled()) {
             isSorted = true;
             //int temp = 0;
 
             // Perform Bubble sort on odd indexed element
-            for (int i = 1; i <= arrayController.getLength() - 2 && run; i = i + 2) {
+            for (int i = 1; i <= arrayController.getLength() - 2 && !isCancelled(); i = i + 2) {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     isSorted = false;
@@ -44,7 +42,7 @@ public class OddEvenSort extends SortingAlgorithm {
             }
 
             // Perform Bubble sort on even indexed element
-            for (int i = 0; i <= arrayController.getLength() - 2 && run; i = i + 2) {
+            for (int i = 0; i <= arrayController.getLength() - 2 && !isCancelled(); i = i + 2) {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     isSorted = false;

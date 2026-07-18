@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class CycleSort extends SortingAlgorithm {
 
@@ -19,12 +18,11 @@ public class CycleSort extends SortingAlgorithm {
         delayTime = 8;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
-        for (int cycle_start = 0; cycle_start <= arrayController.getLength() - 2 && run; cycle_start++) {
+        for (int cycle_start = 0; cycle_start <= arrayController.getLength() - 2 && !isCancelled(); cycle_start++) {
             int item = arrayController.get(cycle_start);
 
             int pos = cycle_start;
@@ -43,7 +41,6 @@ public class CycleSort extends SortingAlgorithm {
             }
             arrayController.addComparisons(1);
 
-
             if (pos != cycle_start) {
                 int temp = item;
                 item = arrayController.get(pos);
@@ -52,7 +49,7 @@ public class CycleSort extends SortingAlgorithm {
 
             delay(new int[]{pos});
 
-            while (pos != cycle_start && run) {
+            while (pos != cycle_start && !isCancelled()) {
                 pos = cycle_start;
 
                 for (int i = cycle_start + 1; i < arrayController.getLength(); i++) {
@@ -77,7 +74,6 @@ public class CycleSort extends SortingAlgorithm {
                 arrayController.addComparisons(1);
             }
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
     }

@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 import java.util.Random;
 
@@ -25,7 +24,7 @@ public class TimSort extends SortingAlgorithm {
         for (int i = 1 + left; i <= right; i++) {
             int temp = arrayController.get(i);
             int j = i - 1;
-            while (j >= left && arrayController.get(j) > temp && run) {
+            while (j >= left && arrayController.get(j) > temp && !isCancelled()) {
                 arrayController.addComparisons(1);
                 arrayController.set(j + 1, arrayController.get(j));
 
@@ -61,7 +60,7 @@ public class TimSort extends SortingAlgorithm {
         int j = 0;
         int k = l;
 
-        while (i < len1 && j < len2 && run) {
+        while (i < len1 && j < len2 && !isCancelled()) {
             if (left[i] <= right[j]) {
                 arrayController.set(k, left[i]);
                 
@@ -79,7 +78,7 @@ public class TimSort extends SortingAlgorithm {
             k++;
         }
 
-        while (i < len1 && run) {
+        while (i < len1 && !isCancelled()) {
             arrayController.set(k, left[i]);
             
             delay(new int[]{k});
@@ -87,7 +86,7 @@ public class TimSort extends SortingAlgorithm {
             k++;
             i++;
         }
-        while (j < len2 && run) {
+        while (j < len2 && !isCancelled()) {
             arrayController.set(k, right[j]);
             
             delay(new int[]{k});
@@ -99,16 +98,16 @@ public class TimSort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
-        for (int i = 0; i < arrayController.getLength() && run; i += RUN) {
+        for (int i = 0; i < arrayController.getLength() && !isCancelled(); i += RUN) {
             insertionSort(i, Math.min((i + 31), (arrayController.getLength() - 1)));
         }
 
-        for (int size = RUN; size < arrayController.getLength() && run; size = 2 * size) {
+        for (int size = RUN; size < arrayController.getLength() && !isCancelled(); size = 2 * size) {
 
-            for (int left = 0; left < arrayController.getLength() && run; left += 2 * size) {
+            for (int left = 0; left < arrayController.getLength() && !isCancelled(); left += 2 * size) {
                 int right = Math.min((left + 2 * size - 1), (arrayController.getLength() - 1));
                 int mid = Math.min(left + size - 1, right);
 
@@ -117,6 +116,5 @@ public class TimSort extends SortingAlgorithm {
         }
         arrayController.addRealTime(System.nanoTime() - startTime);
     }
-
 
 }

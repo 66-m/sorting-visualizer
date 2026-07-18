@@ -26,7 +26,7 @@ public class Hoops extends Visualization {
 
             proc.stroke(color.getRGB());
 
-            ((PApplet)proc).noFill();
+            proc.noFill();
 
             if (arrayController.getMarker(i) == Marker.SET) {
                 sound.playSound(i);

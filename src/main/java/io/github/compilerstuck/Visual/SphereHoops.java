@@ -28,8 +28,8 @@ public class SphereHoops extends Visualization {
         //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
         int radius = (int) (Math.min(screenHeight, screenWidth) / 1.5);
 
-        angle -= PApplet.PI / (15 * ((PApplet)proc).frameRate);
-        ((PApplet)proc).lights();
+        angle -= PApplet.PI / (15 * proc.frameRate());
+        proc.lights();
 
 
         for (int i = 0; i < arrayController.getLength(); i++) {
@@ -47,23 +47,23 @@ public class SphereHoops extends Visualization {
 
             proc.stroke(color.getRGB());
             //proc.fill(color.getRGB());
-            ((PApplet)proc).noFill();
+            proc.noFill();
 
 
             //proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight, rectWidth, -1 * barHeight); //Classic bar
 
-            ((PApplet)proc).pushMatrix();
+            proc.pushMatrix();
 
-            ((PApplet)proc).translate((float) screenWidth / 2, (float) (screenHeight / 2), -(int) (Math.min(screenHeight, screenWidth) / 10));
+            proc.translate((float) screenWidth / 2, (float) (screenHeight / 2), -(int) (Math.min(screenHeight, screenWidth) / 10));
 
-            ((PApplet)proc).rotateX(PConstants.PI/3);
-            //((PApplet)proc).rotateX(angle);
+            proc.rotateX(PConstants.PI/3);
+            //proc.rotateX(angle);
 
-            ((PApplet)proc).translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
+            proc.translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
 
-            ((PApplet)proc).circle(0, 0, sphere_wi);
+            proc.circle(0, 0, sphere_wi);
 
-            ((PApplet)proc).popMatrix();
+            proc.popMatrix();
 
         }
     }

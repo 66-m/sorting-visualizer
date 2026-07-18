@@ -1,6 +1,8 @@
 package io.github.compilerstuck.Control.config;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.model.CancellationToken;
+import io.github.compilerstuck.Control.model.OperationReporter;
 import io.github.compilerstuck.Control.render.ProcessingContext;
 
 /**
@@ -18,8 +20,10 @@ public interface ShuffleStrategy {
      * {@code ctx.delay(ms)} at appropriate intervals to produce a visible
      * animation.
      *
-     * @param model the array to operate on
-     * @param ctx   the Processing context used for frame delays
+     * @param model    the array to operate on
+     * @param ctx      the Processing context used for frame delays
+     * @param reporter reports progress labels for the UI
+     * @param token    cancellation signal; stop early when cancelled
      */
-    void shuffle(ArrayModel model, ProcessingContext ctx);
+    void shuffle(ArrayModel model, ProcessingContext ctx, OperationReporter reporter, CancellationToken token);
 }

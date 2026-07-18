@@ -1,10 +1,10 @@
 package io.github.compilerstuck.Control.shuffle;
 
-import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Control.config.ShuffleStrategy;
-import io.github.compilerstuck.Control.MainController;
-import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.model.CancellationToken;
+import io.github.compilerstuck.Control.model.OperationReporter;
+import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Visual.Marker;
 
 /**
@@ -13,14 +13,14 @@ import io.github.compilerstuck.Visual.Marker;
 public class RandomShuffleStrategy implements ShuffleStrategy {
 
     @Override
-    public void shuffle(ArrayModel model, ProcessingContext ctx) {
+    public void shuffle(ArrayModel model, ProcessingContext ctx, OperationReporter reporter, CancellationToken token) {
         int length = model.getLength();
-        for (int i = 0; i < length && SortingAlgorithm.isRun(); i++) {
+        for (int i = 0; i < length && !token.isCancelled(); i++) {
             int j = (int) (Math.random() * length);
             model.swap(i, j);
             model.setMarker(i, Marker.SET);
             model.setMarker(j, Marker.SET);
-            MainController.setCurrentOperation("Shuffling.. " + (int) ((double) i / (length - 1) * 100) + "%");
+            reporter.report("Shuffling.. " + (int) ((double) i / (length - 1) * 100) + "%");
             maybeDelay(ctx, i, length);
         }
     }

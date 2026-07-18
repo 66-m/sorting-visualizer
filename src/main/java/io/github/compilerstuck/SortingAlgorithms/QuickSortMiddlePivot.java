@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
 
 public class QuickSortMiddlePivot extends SortingAlgorithm {
@@ -13,7 +12,7 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
         sort(arrayController, 0, arrayController.getLength() - 1);
         arrayController.addRealTime(System.nanoTime() - startTime);
@@ -34,14 +33,14 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
 
         // make left < pivot and right > pivot
         int i = start, j = end;
-        while (i <= j && run) {
-            while (arrayController.get(i) < pivot && run) {
+        while (i <= j && !isCancelled()) {
+            while (arrayController.get(i) < pivot && !isCancelled()) {
                 i++;
                 arrayController.addComparisons(1);
             }
             arrayController.addComparisons(1);
 
-            while (arrayController.get(j) > pivot && run) {
+            while (arrayController.get(j) > pivot && !isCancelled()) {
                 j--;
                 arrayController.addComparisons(1);
             }
@@ -60,10 +59,10 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
         }
 
         // recursively sort two sub parts
-        if (start < j && run)
+        if (start < j && !isCancelled())
             sort(arrayController, start, j);
 
-        if (end > i && run)
+        if (end > i && !isCancelled())
             sort(arrayController, i, end);
     }
 }

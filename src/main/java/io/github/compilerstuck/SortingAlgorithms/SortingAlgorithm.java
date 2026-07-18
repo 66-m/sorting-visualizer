@@ -1,8 +1,9 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
-import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.config.DelayStrategy;
-import io.github.compilerstuck.Control.MainController;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.model.CancellationToken;
+import io.github.compilerstuck.Control.model.OperationReporter;
 import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Visual.Marker;
 
@@ -13,17 +14,18 @@ public abstract class SortingAlgorithm {
     protected boolean delay;
     protected int delayTime = 1; //ms
     protected int alternativeSize;
-    protected static boolean run = true;
     protected boolean selected = true;
     protected long startTime;
     protected double delayFactor = 1.;
     private DelayStrategy delayStrategy = DelayStrategy.DEFAULT;
+    protected OperationReporter operationReporter = OperationReporter.NOOP;
+    protected CancellationToken cancellationToken = CancellationToken.alwaysActive();
 
 
     ArrayModel arrayController;
 
     public SortingAlgorithm(ArrayModel arrayController) {
-        this(arrayController, MainController.processing);
+        this(arrayController, ms -> { /* no-op delay */ });
     }
 
     public SortingAlgorithm(ArrayModel arrayController, ProcessingContext proc) {
@@ -50,13 +52,26 @@ public abstract class SortingAlgorithm {
         return alternativeSize;
     }
 
-
-    public static boolean isRun() {
-        return run;
+    public void setProcessingContext(ProcessingContext proc) {
+        this.proc = proc != null ? proc : ms -> { /* no-op */ };
     }
 
-    public static void setRun(boolean run) {
-        SortingAlgorithm.run = run;
+    public void setOperationReporter(OperationReporter operationReporter) {
+        this.operationReporter = operationReporter != null ? operationReporter : OperationReporter.NOOP;
+    }
+
+    protected void report(String operation) {
+        operationReporter.report(operation);
+    }
+
+    public void setCancellationToken(CancellationToken cancellationToken) {
+        this.cancellationToken = cancellationToken != null
+                ? cancellationToken
+                : CancellationToken.alwaysActive();
+    }
+
+    protected boolean isCancelled() {
+        return cancellationToken.isCancelled();
     }
 
     public void setSelected(boolean selected){this.selected = selected;}
@@ -76,6 +91,9 @@ public abstract class SortingAlgorithm {
     }
 
     public void delay(int[] markers) {
+        if (isCancelled()) {
+            return;
+        }
         if (delay && delayStrategy.shouldDelay(arrayController.getLength(), delayFactor)) {
             arrayController.addRealTime(System.nanoTime() - startTime);
 

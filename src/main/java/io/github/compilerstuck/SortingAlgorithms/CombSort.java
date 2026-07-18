@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class CombSort extends SortingAlgorithm {
 
@@ -19,9 +18,8 @@ public class CombSort extends SortingAlgorithm {
         delayFactor = 0.25;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int n = arrayController.getLength();
@@ -30,12 +28,12 @@ public class CombSort extends SortingAlgorithm {
 
         boolean swapped = true;
 
-        while (gap != 1 || swapped && run) {
+        while (gap != 1 || swapped && !isCancelled()) {
             gap = getNextGap(gap);
 
             swapped = false;
 
-            for (int i = 0; i < n - gap && run; i++) {
+            for (int i = 0; i < n - gap && !isCancelled(); i++) {
                 if (arrayController.get(i) > arrayController.get(i + gap)) {
                     arrayController.swap(i, i + gap);
 
@@ -47,7 +45,6 @@ public class CombSort extends SortingAlgorithm {
                 arrayController.addComparisons(1);
             }
         }
-
 
         arrayController.addRealTime(System.nanoTime() - startTime);
     }

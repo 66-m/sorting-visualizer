@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class InsertionSort extends SortingAlgorithm {
 
@@ -20,18 +19,17 @@ public class InsertionSort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int n = arrayController.getLength();
 
-        for (int i = 1; i < n && run; ++i) {
+        for (int i = 1; i < n && !isCancelled(); ++i) {
 
             int x = arrayController.get(i);
             int j = i - 1;
 
-
-            while (j >= 0 && arrayController.get(j) > x && run) {
+            while (j >= 0 && arrayController.get(j) > x && !isCancelled()) {
 
                 arrayController.set(j + 1, arrayController.get(j));
 

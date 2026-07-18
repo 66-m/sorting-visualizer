@@ -1,11 +1,13 @@
 package io.github.compilerstuck.Visual.Gradient;
 
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Visual.Marker;
 
 import java.awt.*;
 
 public class ColorGradient {
+
+    /** Default gradient size used when none is supplied; matches the app's default array size. */
+    public static final int DEFAULT_SIZE = 1024;
 
     private Color color1;
     private Color color2;
@@ -14,11 +16,15 @@ public class ColorGradient {
     protected Color[] colorGradient;
 
     public ColorGradient(Color color1, Color color2, Color markerSetColor, String name) {
+        this(color1, color2, markerSetColor, name, DEFAULT_SIZE);
+    }
+
+    public ColorGradient(Color color1, Color color2, Color markerSetColor, String name, int size) {
         this.color1 = color1;
         this.color2 = color2;
         this.markerSetColor = markerSetColor;
         this.name = name;
-        this.colorGradient = this.getColorGradient(MainController.getSize());
+        this.colorGradient = this.getColorGradient(size);
     }
 
     protected Color[] getColorGradient(int size) {

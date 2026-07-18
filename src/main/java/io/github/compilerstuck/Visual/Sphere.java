@@ -3,7 +3,6 @@ package io.github.compilerstuck.Visual;
 import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.render.RenderContext;
 import processing.core.PApplet;
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -28,19 +27,13 @@ public class Sphere extends Visualization {
     public void update() {
         super.update();
         
-        ((PApplet)proc).lights();
-        
-        if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
+        proc.lights();
 
-//            code to update for non perfect squares
-            int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1)); //next lower
+        int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
+        squareRoot = nextN;
+        int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
 
-            MainController.updateArraySize(nextN * nextN); // Update arraySize
-        }
-
-        squareRoot = (int) Math.pow(arrayController.getLength(), 1 / 2.);
-
-        aa -= PApplet.PI / (10 * ((PApplet)proc).frameRate);
+        aa -= PApplet.PI / (10 * proc.frameRate());
 
         float m = 0;
         float n = 0;
@@ -51,7 +44,7 @@ public class Sphere extends Visualization {
         ArrayList<Float> yCords = new ArrayList<>();
         ArrayList<Float> zCords = new ArrayList<>();
 
-        for (int i = 0; i < arrayController.getLength(); i++) {
+        for (int i = 0; i < drawCount; i++) {
 
 
             if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
@@ -121,24 +114,23 @@ public class Sphere extends Visualization {
             }
         }
 
-        for (int i = 0; i < arrayController.getLength(); i++) {
-            if (colors.size() != arrayController.getLength()) return;
+        for (int i = 0; i < colors.size(); i++) {
             Color color = colors.get(i);
 
-            ((PApplet)proc).noStroke();
-            ((PApplet)proc).fill(color.getRGB(), (float) (255.));
+            proc.noStroke();
+            proc.fill(color.getRGB(), (float) (255.));
 
 
-            ((PApplet)proc).pushMatrix();
+            proc.pushMatrix();
 
             //set screen center
-            ((PApplet)proc).translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
+            proc.translate((float) screenWidth / 2, (float) screenHeight / 2, -(int) (min(screenHeight, screenWidth) / 10));
 
             //set circle position
-            ((PApplet)proc).translate(xCords.get(i), yCords.get(i), zCords.get(i));
-            ((PApplet)proc).circle(0, 0, 3);
+            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            proc.circle(0, 0, 3);
 
-            ((PApplet)proc).popMatrix();
+            proc.popMatrix();
         }
     }
 

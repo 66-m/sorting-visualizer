@@ -3,7 +3,6 @@ package io.github.compilerstuck.Visual;
 import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.render.RenderContext;
 import processing.core.PApplet;
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -28,19 +27,17 @@ public class Cube extends Visualization {
     public void update() {
         super.update();
 
-        ((PApplet)proc).lights();
+        proc.lights();
         
         radius = (int) (min(screenHeight, screenWidth) / 3.5);
 
-        if (Math.pow((floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1)), 3) != arrayController.getLength()) {
-//            code to update for non perfect squares
-            int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1)); //next lower
-            MainController.updateArraySize(nextN * nextN * nextN); // Update arraySize
+        aa -= PApplet.PI / (10 * proc.frameRate());
+
+        int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
+        if (xSize < 1) {
+            xSize = 1;
         }
-
-        aa -= PApplet.PI / (10 * ((PApplet)proc).frameRate);
-
-        int xSize = (int) (Math.pow(arrayController.getLength(), 1 / 3.) + 0.1);
+        int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
         int xCnt = 0;
         int yCnt = 0;
         int zCnt = 0;
@@ -51,12 +48,12 @@ public class Cube extends Visualization {
         ArrayList<Float> yCords = new ArrayList<>();
         ArrayList<Float> zCords = new ArrayList<>();
 
-        for (int i = 0; i < arrayController.getLength(); i++) {
+        for (int i = 0; i < drawCount; i++) {
 
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
-            ((PApplet)proc).stroke(color.getRGB());
-            ((PApplet)proc).fill(color.getRGB());
+            proc.stroke(color.getRGB());
+            proc.fill(color.getRGB());
 
             if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
                 sound.playSound(arrayController.get(i));
@@ -97,27 +94,26 @@ public class Cube extends Visualization {
             }
         }
 
-        for (int i = 0; i < arrayController.getLength(); i++) {
-            if (colors.size() != arrayController.getLength()) return;
+        for (int i = 0; i < colors.size(); i++) {
             Color color = colors.get(i);
 
-            ((PApplet)proc).stroke(color.getRGB(), 255f);
-            //((PApplet)proc).noStroke();
-            ((PApplet)proc).fill(color.getRGB(), 120f);
+            proc.stroke(color.getRGB(), 255f);
+            //proc.noStroke();
+            proc.fill(color.getRGB(), 120f);
 
 
-            ((PApplet)proc).pushMatrix();
+            proc.pushMatrix();
             //set screen center
-            ((PApplet)proc).translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
+            proc.translate((float) screenWidth / 2, (float) screenHeight / 2 -(int) (min(screenHeight, screenWidth) / 10), -(int) (min(screenHeight, screenWidth) / 10));
             //set circle position
-            ((PApplet)proc).translate(xCords.get(i), yCords.get(i), zCords.get(i));
+            proc.translate(xCords.get(i), yCords.get(i), zCords.get(i));
 
             //proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
-            ((PApplet)proc).rotateX(45);
-            ((PApplet)proc).rotateY(0);
-            ((PApplet)proc).rotateZ(-aa);
-            ((PApplet)proc).box(sizes.get(i), sizes.get(i), sizes.get(i));
-            ((PApplet)proc).popMatrix();
+            proc.rotateX(45);
+            proc.rotateY(0);
+            proc.rotateZ(-aa);
+            proc.box(sizes.get(i), sizes.get(i), sizes.get(i));
+            proc.popMatrix();
         }
     }
 

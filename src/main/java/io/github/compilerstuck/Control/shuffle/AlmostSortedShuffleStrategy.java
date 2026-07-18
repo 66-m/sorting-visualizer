@@ -1,10 +1,10 @@
 package io.github.compilerstuck.Control.shuffle;
 
-import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Control.config.ShuffleStrategy;
-import io.github.compilerstuck.Control.MainController;
-import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
+import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.model.CancellationToken;
+import io.github.compilerstuck.Control.model.OperationReporter;
+import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Visual.Marker;
 
 /**
@@ -14,16 +14,16 @@ import io.github.compilerstuck.Visual.Marker;
 public class AlmostSortedShuffleStrategy implements ShuffleStrategy {
 
     @Override
-    public void shuffle(ArrayModel model, ProcessingContext ctx) {
+    public void shuffle(ArrayModel model, ProcessingContext ctx, OperationReporter reporter, CancellationToken token) {
         int length = model.getLength();
         int swaps = length / 10;
-        for (int i = 0; i < swaps && SortingAlgorithm.isRun(); i++) {
+        for (int i = 0; i < swaps && !token.isCancelled(); i++) {
             int a = (int) (Math.random() * length);
             int b = (int) (Math.random() * length);
             model.swap(a, b);
             model.setMarker(a, Marker.SET);
             model.setMarker(b, Marker.SET);
-            MainController.setCurrentOperation("Shuffling (almost).. " + (int) ((double) i / (swaps - 1) * 100) + "%");
+            reporter.report("Shuffling (almost).. " + (int) ((double) i / (swaps - 1) * 100) + "%");
             RandomShuffleStrategy.maybeDelay(ctx, i, length);
         }
     }

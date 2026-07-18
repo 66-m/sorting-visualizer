@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class DoubleSelectionSort extends SortingAlgorithm {
 
@@ -12,15 +11,14 @@ public class DoubleSelectionSort extends SortingAlgorithm {
         delayTime = 10;
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
-        for (int i = 0, j = arrayController.getLength() - 1; i < j && run; i++, j--) {
+        for (int i = 0, j = arrayController.getLength() - 1; i < j && !isCancelled(); i++, j--) {
             int min = arrayController.get(i), max = arrayController.get(i);
             int min_i = i, max_i = i;
-            for (int k = i; k <= j && run; k++) {
+            for (int k = i; k <= j && !isCancelled(); k++) {
                 if (arrayController.get(k) > max) {
                     max = arrayController.get(k);
                     max_i = k;

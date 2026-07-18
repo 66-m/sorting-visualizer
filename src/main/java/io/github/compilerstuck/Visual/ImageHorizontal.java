@@ -1,15 +1,13 @@
 package io.github.compilerstuck.Visual;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
+import io.github.compilerstuck.Control.render.LoadedImage;
 import io.github.compilerstuck.Control.render.RenderContext;
-import processing.core.PApplet;
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
-import processing.core.PImage;
 
 public class ImageHorizontal extends Visualization {
-    private PImage img;
+    private LoadedImage img;
 
     public ImageHorizontal(ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
         super(arrayController, colorGradient, sound, proc);
@@ -22,28 +20,9 @@ public class ImageHorizontal extends Visualization {
         this.screenHeight = proc.getHeight();
         this.screenWidth = proc.getWidth();
 
-        if(arrayController.getLength()>img.pixelHeight){
-            MainController.updateArraySize(img.pixelHeight);
-        }
-        else if (img.pixelHeight % arrayController.getLength() > 0) {
-            int newWindowHeight = img.pixelHeight;
-            int max = img.pixelHeight;
-
-            // Find the next highest value that divides the image hight without a remainder
-            for (int i = arrayController.getLength(); i <= max; i++) {
-                if (img.pixelHeight % i == 0) {
-                    newWindowHeight = i;
-                    break;
-                }
-            }
-
-            // Update the array size and resize the window
-            MainController.updateArraySize(newWindowHeight);
-        }
-
         proc.background(15);
 
-        ((PApplet)proc).loadPixels();
+        proc.loadPixels();
         img.loadPixels();
 
         int imgPartWidth = screenHeight / arrayController.getLength();
@@ -54,13 +33,13 @@ public class ImageHorizontal extends Visualization {
             for (int y = pos; y < pos + imgPartWidth; y++) {
 
                 for (int x = 0; x < screenWidth; x++) {
-                    int realLoc = x + (y - pos + i * imgPartWidth) * img.pixelWidth;
-                    int loc = x + y * img.pixelWidth;
+                    int realLoc = x + (y - pos + i * imgPartWidth) * img.pixelWidth();
+                    int loc = x + y * img.pixelWidth();
 
 
-                    float r = ((PApplet)proc).red(img.pixels[loc]);
-                    float g = ((PApplet)proc).green(img.pixels[loc]);
-                    float b = ((PApplet)proc).blue(img.pixels[loc]);
+                    float r = proc.red(img.pixels()[loc]);
+                    float g = proc.green(img.pixels()[loc]);
+                    float b = proc.blue(img.pixels()[loc]);
 
                     // If Marker.SET is set, set the pixel to white
                     if (arrayController.getMarker(i) == Marker.SET) {
@@ -69,7 +48,7 @@ public class ImageHorizontal extends Visualization {
                         b = 255;
                     }
 
-                    ((PApplet)proc).pixels[realLoc] = ((PApplet)proc).color(r, g, b);
+                    proc.pixels()[realLoc] = proc.color(r, g, b);
                 }
 
             }
@@ -84,7 +63,7 @@ public class ImageHorizontal extends Visualization {
 
         }
 
-        ((PApplet)proc).updatePixels();
+        proc.updatePixels();
 
         proc.fill(255);
         proc.textSize((int) (25. / 1280 * screenWidth));
@@ -94,10 +73,10 @@ public class ImageHorizontal extends Visualization {
 
     public boolean setImg(String imagePath) {
         boolean imageFound = true;
-        ((PApplet)proc).getSurface().setResizable(false); // Enable window resizing
+        proc.setResizable(false); // Enable window resizing
 
         try {
-            img = ((PApplet)proc).loadImage(imagePath);
+            img = proc.loadImage(imagePath);
 
             // Resize the image to match the window size
             img.resize(proc.getWidth(), proc.getHeight());

@@ -29,6 +29,7 @@ public class SortingSessionManager {
     private final List<Integer> timestamps = new ArrayList<>();
 
     private Thread executionThread;
+    private volatile CancellationToken cancellationToken = CancellationToken.alwaysActive();
 
     public SortingSessionManager(ArrayController arrayController, Sound sound, SortingStateManager stateManager) {
         this.arrayController = arrayController;
@@ -49,9 +50,34 @@ public class SortingSessionManager {
         // Clear previous results
         clearMeasurements();
 
+        CancellationToken token = new CancellationToken();
+        this.cancellationToken = token;
+        stateManager.setContinueExecution(true);
+
+        OperationReporter reporter = stateManager::setCurrentOperation;
+        arrayController.setCancellationToken(token);
+        arrayController.setOperationReporter(reporter);
+
+        for (SortingAlgorithm algorithm : algorithms) {
+            algorithm.setCancellationToken(token);
+            algorithm.setOperationReporter(reporter);
+        }
+
         executionThread = new Thread(() -> executeSortingAlgorithms(algorithms));
         executionThread.setName("SortingThread");
         executionThread.start();
+    }
+
+    /**
+     * Cancels the active session token and stops further algorithm execution.
+     */
+    public void cancel() {
+        cancellationToken.cancel();
+        stateManager.setContinueExecution(false);
+    }
+
+    public CancellationToken getCancellationToken() {
+        return cancellationToken;
     }
 
     /**
@@ -62,7 +88,7 @@ public class SortingSessionManager {
             int startTime = (int) (System.currentTimeMillis() / 1000L);
 
             for (SortingAlgorithm algorithm : algorithms) {
-                if (!stateManager.shouldContinueExecution()) {
+                if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
                     LOGGER.log(Level.INFO, "Sorting session cancelled by user");
                     break;
                 }
@@ -71,7 +97,7 @@ public class SortingSessionManager {
                 prepareForAlgorithm(algorithm);
                 executeAlgorithm(algorithm);
 
-                if (!stateManager.shouldContinueExecution()) {
+                if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
                     break;
                 }
 
@@ -79,7 +105,8 @@ public class SortingSessionManager {
                 pauseAfterAlgorithm();
             }
 
-            if (stateManager.shouldContinueExecution() && stateManager.shouldShowComparisonTable()) {
+            if (stateManager.shouldContinueExecution() && !cancellationToken.isCancelled()
+                    && stateManager.shouldShowComparisonTable()) {
                 stateManager.setShowResults(true);
             }
 
@@ -102,7 +129,7 @@ public class SortingSessionManager {
 
         arrayController.shuffle();
 
-        if (!stateManager.shouldContinueExecution()) {
+        if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
             return;
         }
 

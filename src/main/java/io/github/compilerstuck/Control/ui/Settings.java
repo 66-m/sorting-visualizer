@@ -1,13 +1,19 @@
 package io.github.compilerstuck.Control.ui;
 
-import io.github.compilerstuck.Control.MainController;
+import io.github.compilerstuck.Control.AppContext;
+import io.github.compilerstuck.Control.catalog.AlgorithmCatalog;
+import io.github.compilerstuck.Control.catalog.AlgorithmDescriptor;
+import io.github.compilerstuck.Control.catalog.VisualConstraints;
+import io.github.compilerstuck.Control.catalog.VisualizationCatalog;
+import io.github.compilerstuck.Control.catalog.VisualizationDescriptor;
 import io.github.compilerstuck.Control.config.ShuffleType;
-import io.github.compilerstuck.Control.render.RenderContext;
-import io.github.compilerstuck.SortingAlgorithms.*;
-import io.github.compilerstuck.Visual.*;
+import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
+import io.github.compilerstuck.Visual.ImageHorizontal;
+import io.github.compilerstuck.Visual.ImageVertical;
+import io.github.compilerstuck.Visual.Marker;
+import io.github.compilerstuck.Visual.Visualization;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import io.github.compilerstuck.Visual.Gradient.MultiGradient;
-import processing.core.PApplet;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -18,7 +24,8 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
+import java.util.OptionalInt;
 
 /**
  * Modernized Settings UI for the Sorting Algorithm Visualizer.
@@ -31,7 +38,7 @@ import java.util.Objects;
  */
 public class Settings extends JFrame {
 
-    protected PApplet proc;
+    private final AppContext app;
 
     // UI Components
     private JSlider speedSlider;
@@ -59,6 +66,7 @@ public class Settings extends JFrame {
     private JProgressBar progressBarArray;
     
     // Data
+    private List<VisualizationDescriptor> visualizationDescriptors;
     private ArrayList<SortingAlgorithm> algorithmList;
     private ArrayList<ColorGradient> gradientList;
     private ArrayList<ShuffleType> shuffleTypes;
@@ -67,14 +75,14 @@ public class Settings extends JFrame {
     // State
     private final Color errorColor = new Color(244, 67, 54);
     private int maxSize = 20000;
+    private int previousVisualizationIndex = 0;
 
-    public Settings() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public Settings(AppContext app) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        this.app = app;
         initialize();
     }
 
     public void initialize() {
-        proc = (PApplet) MainController.processing;
-
         // Configure window
         setTitle("Sorting Algorithm Visualizer - Settings");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -87,7 +95,7 @@ public class Settings extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                MainController.shutdown();
+                app.shutdown();
             }
         });
 
@@ -214,7 +222,7 @@ public class Settings extends JFrame {
         StyledCard card = ComponentFactory.createCard();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        int arraySize = MainController.getSize();
+        int arraySize = app.getSize();
         arraySizeSlider = ComponentFactory.createSlider(0, maxSize, arraySize);
         arraySizeSlider.setPaintTicks(true);
         arraySizeSlider.setPaintLabels(true);
@@ -249,7 +257,7 @@ public class Settings extends JFrame {
                 arraySizeTextField.setText("3");
                 arraySizeTextField.setForeground(errorColor);
             } else {
-                MainController.updateArraySize(arraySizeSlider.getValue());
+                applyArraySize(arraySizeSlider.getValue());
                 arraySizeTextField.setText(String.valueOf(arraySizeSlider.getValue()));
                 arraySizeTextField.setForeground(normalColor);
                 runButton.setEnabled(true);
@@ -300,35 +308,51 @@ public class Settings extends JFrame {
         }
     }
 
+    /**
+     * Applies the requested array size, confirming with the user when the
+     * currently selected visualization requires a different size (e.g. a
+     * perfect square/cube for grid-based visuals).
+     */
+    private void applyArraySize(int requestedSize) {
+        VisualConstraints constraints = currentVisualizationConstraints();
+        if (constraints != null && !constraints.requiresImage()) {
+            OptionalInt proposed = constraints.proposeSize(requestedSize);
+            if (proposed.isPresent()) {
+                int choice = JOptionPane.showConfirmDialog(this,
+                        "The selected visualization works best with " + proposed.getAsInt()
+                                + " elements instead of " + requestedSize + ". Use " + proposed.getAsInt() + "?",
+                        "Adjust array size", JOptionPane.YES_NO_OPTION);
+                if (choice == JOptionPane.YES_OPTION) {
+                    app.updateArraySize(proposed.getAsInt());
+                    return;
+                }
+            }
+        }
+        app.updateArraySize(requestedSize);
+    }
+
+    private VisualConstraints currentVisualizationConstraints() {
+        if (visualizationDescriptors == null || visualizationListComboBox == null) {
+            return null;
+        }
+        int index = visualizationListComboBox.getSelectedIndex();
+        if (index < 0 || index >= visualizationDescriptors.size()) {
+            return null;
+        }
+        return visualizationDescriptors.get(index).constraints();
+    }
+
     /** Sorting: algorithm combo + run-all row + shuffle combo, all in one card. */
     private StyledCard createSortingCard() {
         StyledCard card = ComponentFactory.createCard();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        algorithmList = new ArrayList<>(Arrays.asList(
-                new QuickSortMiddlePivot(MainController.getArrayController()),
-                new MergeSort(MainController.getArrayController()),
-                new HeapSort(MainController.getArrayController()),
-                new RadixLSDSortBase10(MainController.getArrayController()),
-                new ShellSort(MainController.getArrayController()),
-                new CycleSort(MainController.getArrayController()),
-                new SelectionSort(MainController.getArrayController()),
-                new GnomeSort(MainController.getArrayController()),
-                new GravitySort(MainController.getArrayController()),
-                new CountingSort(MainController.getArrayController()),
-                new DoubleSelectionSort(MainController.getArrayController()),
-                new InsertionSort(MainController.getArrayController()),
-                new OddEvenSort(MainController.getArrayController()),
-                new CombSort(MainController.getArrayController()),
-                new BubbleSort(MainController.getArrayController()),
-                new QuickSortDualPivot(MainController.getArrayController()),
-                new ShakerSort(MainController.getArrayController()),
-                new BucketSort(MainController.getArrayController()),
-                new AmericanFlagSort(MainController.getArrayController()),
-                new PigeonholeSort(MainController.getArrayController()),
-                new TimSort(MainController.getArrayController()),
-                new BogoSort(MainController.getArrayController())
-        ));
+        algorithmList = new ArrayList<>();
+        for (AlgorithmDescriptor descriptor : AlgorithmCatalog.all()) {
+            SortingAlgorithm alg = descriptor.factory().apply(app.getArrayController(), app.getRenderContext());
+            alg.setOperationReporter(app.getStateManager()::setCurrentOperation);
+            algorithmList.add(alg);
+        }
 
         algorithmListComboBox = ComponentFactory.createComboBox();
         for (SortingAlgorithm algorithm : algorithmList) {
@@ -340,7 +364,7 @@ public class Settings extends JFrame {
 
         final int[] selectedAlgorithmIndex = {0};
         algorithmListComboBox.addActionListener(e -> {
-            MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+            app.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
             selectedAlgorithmIndex[0] = algorithmListComboBox.getSelectedIndex();
         });
 
@@ -380,7 +404,7 @@ public class Settings extends JFrame {
         shuffleListBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         shuffleListBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
         shuffleListBox.addActionListener(e ->
-                MainController.getArrayController().setShuffleType(shuffleTypes.get(shuffleListBox.getSelectedIndex()))
+                app.getArrayController().setShuffleType(shuffleTypes.get(shuffleListBox.getSelectedIndex()))
         );
 
         card.add(algorithmListComboBox);
@@ -417,8 +441,8 @@ public class Settings extends JFrame {
 
         speedSlider.addChangeListener(e -> {
             int level = speedSlider.getValue() - 1;
-            MainController.setDelayTime(DELAY_TIME[level]);
-            MainController.setDelayFactor(DELAY_FACTOR[level]);
+            app.setDelayTime(DELAY_TIME[level]);
+            app.setDelayFactor(DELAY_FACTOR[level]);
         });
 
         card.add(speedSlider);
@@ -430,38 +454,12 @@ public class Settings extends JFrame {
         StyledCard card = ComponentFactory.createCard();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        visualizationList = new ArrayList<>(Arrays.asList(
-                new Bars(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new ScatterPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new ScatterPlotLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new NumberPlot(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityGraph(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityGraphMirrored(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new HorizontalPyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new ColorGradientGraph(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Circle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityCircle(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityCircleScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityCircleScatterLinked(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityChords(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparitySquareScatter(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new SwirlDots(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Phyllotaxis(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new ImageVertical(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new ImageHorizontal(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Hoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new MorphingShell(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Sphere(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new SphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new SphericDisparityLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparitySphereHoops(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Cube(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new CubicLines(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Pyramid(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new Plane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new DisparityPlane(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing),
-                new MosaicSquares(MainController.getArrayController(), MainController.getColorGradient(), MainController.getSound(), (RenderContext) MainController.processing)
-        ));
+        visualizationDescriptors = VisualizationCatalog.all();
+        visualizationList = new ArrayList<>();
+        for (VisualizationDescriptor descriptor : visualizationDescriptors) {
+            visualizationList.add(descriptor.factory().create(
+                    app.getArrayController(), app.getColorGradient(), app.getSound(), app.getRenderContext()));
+        }
 
         visualizationListComboBox = ComponentFactory.createComboBox();
         for (Visualization visualization : visualizationList) {
@@ -469,11 +467,31 @@ public class Settings extends JFrame {
         }
         visualizationListComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         visualizationListComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
+        previousVisualizationIndex = visualizationListComboBox.getSelectedIndex();
         visualizationListComboBox.addActionListener(e -> {
             int index = visualizationListComboBox.getSelectedIndex();
+            VisualConstraints constraints = visualizationDescriptors.get(index).constraints();
+
+            if (!constraints.requiresImage()) {
+                OptionalInt proposed = constraints.proposeSize(app.getSize());
+                if (proposed.isPresent()) {
+                    int choice = JOptionPane.showConfirmDialog(this,
+                            "This visualization works best with " + proposed.getAsInt()
+                                    + " elements instead of " + app.getSize() + ". Use " + proposed.getAsInt() + "?",
+                            "Adjust array size", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        app.updateArraySize(proposed.getAsInt());
+                    } else {
+                        visualizationListComboBox.setSelectedIndex(previousVisualizationIndex);
+                        return;
+                    }
+                }
+            }
+
+            previousVisualizationIndex = index;
             Visualization visualization = visualizationList.get(index);
-            MainController.setVisualization(visualization);
-            boolean isImage = visualization instanceof ImageHorizontal || visualization instanceof ImageVertical;
+            app.setVisualization(visualization);
+            boolean isImage = constraints.requiresImage();
             buttonSetImg.setVisible(isImage);
             buttonSetImg.setEnabled(isImage);
         });
@@ -516,10 +534,10 @@ public class Settings extends JFrame {
         gradientListComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         gradientListComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, UiTheme.INPUT_HEIGHT));
 
-        Color color1 = MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL);
+        Color color1 = app.getColorGradient().getMarkerColor(0, Marker.NORMAL);
         colorChoose1 = ComponentFactory.createColorSwatch(color1);
 
-        Color color2 = MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL);
+        Color color2 = app.getColorGradient().getMarkerColor(app.getSize() - 1, Marker.NORMAL);
         colorChoose2 = ComponentFactory.createColorSwatch(color2);
 
         JPanel swatchRow = new JPanel();
@@ -533,10 +551,10 @@ public class Settings extends JFrame {
 
         gradientListComboBox.addActionListener(e -> {
             ColorGradient selected = gradientList.get(gradientListComboBox.getSelectedIndex());
-            selected.updateGradient(MainController.getSize());
-            MainController.setColorGradient(selected);
-            colorChoose1.setBackground(MainController.getColorGradient().getMarkerColor(0, Marker.NORMAL));
-            colorChoose2.setBackground(MainController.getColorGradient().getMarkerColor(MainController.getSize() - 1, Marker.NORMAL));
+            selected.updateGradient(app.getSize());
+            app.setColorGradient(selected);
+            colorChoose1.setBackground(app.getColorGradient().getMarkerColor(0, Marker.NORMAL));
+            colorChoose2.setBackground(app.getColorGradient().getMarkerColor(app.getSize() - 1, Marker.NORMAL));
         });
 
         MouseListener ml = new java.awt.event.MouseAdapter() {
@@ -584,13 +602,13 @@ public class Settings extends JFrame {
         showMeasurementsCheckBox = ComponentFactory.createCheckBox("Show measurements");
         showMeasurementsCheckBox.setSelected(true);
         showMeasurementsCheckBox.addActionListener(e ->
-                MainController.setPrintMeasurements(showMeasurementsCheckBox.isSelected()));
+                app.setPrintMeasurements(showMeasurementsCheckBox.isSelected()));
         showMeasurementsCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         comparisonTableCheckBox = ComponentFactory.createCheckBox("Show comparison table");
         comparisonTableCheckBox.addActionListener(e -> {
-            MainController.setShowComparisonTable(comparisonTableCheckBox.isSelected());
-            if (!MainController.isRunning() && cancelButton.isEnabled()) cancelButton.setEnabled(false);
+            app.setShowComparisonTable(comparisonTableCheckBox.isSelected());
+            if (!app.isRunning() && cancelButton.isEnabled()) cancelButton.setEnabled(false);
         });
         comparisonTableCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -607,7 +625,7 @@ public class Settings extends JFrame {
 
         muteCheckBox = ComponentFactory.createCheckBox("Enable sound effects");
         muteCheckBox.setSelected(true);
-        muteCheckBox.addChangeListener(e -> MainController.sound.setIsMuted(!muteCheckBox.isSelected()));
+        muteCheckBox.addChangeListener(e -> app.getSound().setIsMuted(!muteCheckBox.isSelected()));
         muteCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         card.add(muteCheckBox);
@@ -624,18 +642,18 @@ public class Settings extends JFrame {
         runButton = ComponentFactory.createPrimaryButton("RUN");
         runButton.addActionListener(e -> {
             if (runAllCheckBox.isSelected()) {
-                MainController.setAlgorithms(algorithmList);
+                app.setAlgorithms(algorithmList);
             } else {
-                MainController.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
+                app.setAlgorithm(algorithmList.get(algorithmListComboBox.getSelectedIndex()));
             }
-            MainController.setStart(true);
+            app.setStart(true);
             cancelButton.setEnabled(true);
         });
 
         cancelButton = ComponentFactory.createSecondaryButton("Cancel");
         cancelButton.setEnabled(false);
         cancelButton.addActionListener(e -> {
-            SortingAlgorithm.setRun(false);
+            app.cancelSorting();
             cancelButton.setEnabled(false);
         });
 
@@ -744,15 +762,13 @@ public class Settings extends JFrame {
             String imagePath = selectedFile.getAbsolutePath();
 
             int index = visualizationListComboBox.getSelectedIndex();
-            ImageVertical imageVertical = (ImageVertical) visualizationList.get(16);
-            ImageHorizontal imageHorizontal = (ImageHorizontal) visualizationList.get(17);
-            imageHorizontal.setImg(imagePath);
-            imageVertical.setImg(imagePath);
-
-            if (Objects.equals(visualizationList.get(index).getName(), "Image - Vertical Sorting")) {
-                MainController.setVisualization(imageVertical);
-            } else {
-                MainController.setVisualization(imageHorizontal);
+            Visualization selectedVisualization = visualizationList.get(index);
+            if (selectedVisualization instanceof ImageVertical imageVertical) {
+                imageVertical.setImg(imagePath);
+                app.setVisualization(imageVertical);
+            } else if (selectedVisualization instanceof ImageHorizontal imageHorizontal) {
+                imageHorizontal.setImg(imagePath);
+                app.setVisualization(imageHorizontal);
             }
         }
     }

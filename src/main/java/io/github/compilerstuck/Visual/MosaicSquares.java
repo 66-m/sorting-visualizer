@@ -2,7 +2,6 @@ package io.github.compilerstuck.Visual;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.render.RenderContext;
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -23,19 +22,15 @@ public class MosaicSquares extends Visualization {
     public void update() {
         super.update();
 
-        if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
-            int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1)); // next lower
-
-            MainController.updateArraySize(nextN * nextN); // Update arraySize
-        }
-
-        float squareRoot = (int) Math.pow(arrayController.getLength(), 1 / 2.);
+        int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
+        float squareRoot = nextN;
+        int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
 
         float tileDimX = screenWidth / squareRoot;
         float tileDimY = screenHeight / squareRoot;
 
 
-        for (int i = 0; i < arrayController.getLength(); i++) {
+        for (int i = 0; i < drawCount; i++) {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
 

@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class HeapSort extends SortingAlgorithm {
 
@@ -12,15 +11,15 @@ public class HeapSort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int n = arrayController.getLength();
 
-        for (int i = n / 2 - 1; i >= 0 && run; i--)
+        for (int i = n / 2 - 1; i >= 0 && !isCancelled(); i--)
             heapify(arrayController, n, i);
 
-        for (int i = n - 1; i >= 0 && run; i--) {
+        for (int i = n - 1; i >= 0 && !isCancelled(); i--) {
             int temp = arrayController.get(0);
             arrayController.set(0, arrayController.get(i));
             arrayController.set(i, temp);
@@ -46,7 +45,7 @@ public class HeapSort extends SortingAlgorithm {
             largest = r;
         arrayController.addComparisons(1);
 
-        if (largest != i && run) {
+        if (largest != i && !isCancelled()) {
             arrayController.swap(i, largest);
 
             delay(new int[]{i, largest});

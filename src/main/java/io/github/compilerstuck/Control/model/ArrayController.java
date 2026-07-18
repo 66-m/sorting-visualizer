@@ -1,13 +1,12 @@
 package io.github.compilerstuck.Control.model;
 
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Control.config.ShuffleStrategy;
 import io.github.compilerstuck.Control.config.ShuffleType;
+import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Control.shuffle.AlmostSortedShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.ReverseShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.SortedShuffleStrategy;
-import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Visual.Marker;
 
 public class ArrayController implements ArrayModel {
@@ -26,6 +25,9 @@ public class ArrayController implements ArrayModel {
     private double realTime;
 
     private ShuffleStrategy shuffleStrategy;
+    private OperationReporter operationReporter = OperationReporter.NOOP;
+    private CancellationToken cancellationToken = CancellationToken.alwaysActive();
+    private ProcessingContext processingContext = ms -> { /* no-op */ };
 
 
     public ArrayController(int size) {
@@ -218,8 +220,14 @@ public class ArrayController implements ArrayModel {
     }
 
     void shuffle() {
-        if (!SortingAlgorithm.isRun()) return;
-        shuffleStrategy.shuffle(this, MainController.processing);
+        if (cancellationToken.isCancelled()) return;
+        shuffleStrategy.shuffle(this, processingContext, operationReporter, cancellationToken);
+    }
+
+    public void setProcessingContext(ProcessingContext processingContext) {
+        this.processingContext = processingContext != null
+                ? processingContext
+                : ms -> { /* no-op */ };
     }
 
     public void setShuffleType(ShuffleType shuffleType) {
@@ -229,6 +237,16 @@ public class ArrayController implements ArrayModel {
             case ALMOST_SORTED -> new AlmostSortedShuffleStrategy();
             case SORTED -> new SortedShuffleStrategy();
         };
+    }
+
+    public void setOperationReporter(OperationReporter operationReporter) {
+        this.operationReporter = operationReporter != null ? operationReporter : OperationReporter.NOOP;
+    }
+
+    public void setCancellationToken(CancellationToken cancellationToken) {
+        this.cancellationToken = cancellationToken != null
+                ? cancellationToken
+                : CancellationToken.alwaysActive();
     }
 
 }

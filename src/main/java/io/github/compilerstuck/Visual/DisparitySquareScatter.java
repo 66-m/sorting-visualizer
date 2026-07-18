@@ -2,7 +2,6 @@ package io.github.compilerstuck.Visual;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.render.RenderContext;
-import processing.core.PApplet;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 
@@ -30,7 +29,7 @@ public class DisparitySquareScatter extends Visualization {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
             //proc.stroke(color.getRGB());
-            ((PApplet)proc).noStroke();
+            proc.noStroke();
             proc.fill(color.getRGB());
 
             if (arrayController.getMarker(i) == Marker.SET) {
@@ -63,7 +62,7 @@ public class DisparitySquareScatter extends Visualization {
             x *= barHeight;
             y *= barHeight;
 
-            ((PApplet)proc).circle(centerX + x, centerY + y, 6);
+            proc.circle(centerX + x, centerY + y, 6);
         }
     }
 }

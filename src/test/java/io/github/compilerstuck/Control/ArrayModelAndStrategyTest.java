@@ -3,12 +3,13 @@ package io.github.compilerstuck.Control;
 import io.github.compilerstuck.Control.config.DelayStrategy;
 import io.github.compilerstuck.Control.config.ShuffleType;
 import io.github.compilerstuck.Control.model.ArrayController;
+import io.github.compilerstuck.Control.model.CancellationToken;
+import io.github.compilerstuck.Control.model.OperationReporter;
 import io.github.compilerstuck.Control.render.ProcessingContext;
 import io.github.compilerstuck.Control.shuffle.AlmostSortedShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.ReverseShuffleStrategy;
 import io.github.compilerstuck.Control.shuffle.SortedShuffleStrategy;
-import io.github.compilerstuck.SortingAlgorithms.SortingAlgorithm;
 import io.github.compilerstuck.Visual.Marker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +31,6 @@ class ArrayModelAndStrategyTest {
 
     @BeforeEach
     void setUp() {
-        SortingAlgorithm.setRun(true);
         MainController.processing = NO_OP_CTX;
         controller = new ArrayController(10);
     }
@@ -160,7 +160,7 @@ class ArrayModelAndStrategyTest {
     @Test
     @DisplayName("RandomShuffleStrategy produces a permutation (same elements)")
     void randomShuffleIsPermutation() {
-        new RandomShuffleStrategy().shuffle(controller, NO_OP_CTX);
+        new RandomShuffleStrategy().shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
         int sum = 0;
         for (int i = 0; i < controller.getLength(); i++) sum += controller.get(i);
         assertEquals(45, sum, "Sum of 0..9 should be 45 regardless of order");
@@ -169,7 +169,7 @@ class ArrayModelAndStrategyTest {
     @Test
     @DisplayName("ReverseShuffleStrategy reverses the array")
     void reverseShuffleReversesArray() {
-        new ReverseShuffleStrategy().shuffle(controller, NO_OP_CTX);
+        new ReverseShuffleStrategy().shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
         for (int i = 0; i < controller.getLength(); i++) {
             assertEquals(controller.getLength() - 1 - i, controller.get(i),
                     "Index " + i + " should be " + (controller.getLength() - 1 - i));
@@ -179,7 +179,7 @@ class ArrayModelAndStrategyTest {
     @Test
     @DisplayName("AlmostSortedShuffleStrategy keeps elements as a permutation")
     void almostSortedShuffleIsPermutation() {
-        new AlmostSortedShuffleStrategy().shuffle(controller, NO_OP_CTX);
+        new AlmostSortedShuffleStrategy().shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
         int sum = 0;
         for (int i = 0; i < controller.getLength(); i++) sum += controller.get(i);
         assertEquals(45, sum);
@@ -189,7 +189,7 @@ class ArrayModelAndStrategyTest {
     @DisplayName("SortedShuffleStrategy leaves the array sorted")
     void sortedShuffleLeavesSorted() {
         // The array starts sorted; SortedShuffle should not swap anything
-        new SortedShuffleStrategy().shuffle(controller, NO_OP_CTX);
+        new SortedShuffleStrategy().shuffle(controller, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
         assertTrue(controller.isSorted());
     }
 

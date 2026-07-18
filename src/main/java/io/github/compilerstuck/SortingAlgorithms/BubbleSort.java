@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 public class BubbleSort extends SortingAlgorithm {
 
@@ -13,7 +12,6 @@ public class BubbleSort extends SortingAlgorithm {
         delayTime = 1;
     }
 
-
     public BubbleSort(ArrayModel arrayController, int alternativeSize) {
         super(arrayController);
         this.name = "Bubble Sort";
@@ -24,14 +22,14 @@ public class BubbleSort extends SortingAlgorithm {
     }
 
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
 
         int n = arrayController.getLength();
         boolean swapped;
         do {
             swapped = false;
-            for (int i = 0; i < n - 1 && run; ++i) {
+            for (int i = 0; i < n - 1 && !isCancelled(); ++i) {
                 if (arrayController.get(i) > arrayController.get(i + 1)) {
                     arrayController.swap(i, i + 1);
                     swapped = true;
@@ -40,13 +38,10 @@ public class BubbleSort extends SortingAlgorithm {
                 }
                 arrayController.addComparisons(1);
 
-
             }
 
-
             n = n - 1;
-        } while (swapped && run);
-
+        } while (swapped && !isCancelled());
 
         arrayController.addRealTime(System.nanoTime() - startTime);
 

@@ -3,7 +3,6 @@ package io.github.compilerstuck.Visual;
 import io.github.compilerstuck.Control.model.ArrayModel;
 import io.github.compilerstuck.Control.render.RenderContext;
 import processing.core.PApplet;
-import io.github.compilerstuck.Control.MainController;
 import io.github.compilerstuck.Sound.Sound;
 import io.github.compilerstuck.Visual.Gradient.ColorGradient;
 import processing.core.PConstants;
@@ -32,20 +31,14 @@ public class DisparityPlane extends Visualization {
         //int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
         int radius = (int) (Math.min(screenHeight, screenWidth) / 1.2);
 
-        angle += PApplet.PI / (15 * ((PApplet)proc).frameRate);
-        ((PApplet)proc).lights();
+        angle += PApplet.PI / (15 * proc.frameRate());
+        proc.lights();
 
-        if (Math.pow(floor(Math.pow(arrayController.getLength(), 1 / 2.)), 2.) != arrayController.getLength()) {
+        int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
+        squareRoot = nextN;
+        int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
 
-            //            code to update for non perfect squares
-                        int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1)); //next lower
-            
-                        MainController.updateArraySize(nextN * nextN); // Update arraySize
-                    }     
-
-        squareRoot = (int) Math.pow(arrayController.getLength(), 1 / 2.);
-
-        for (int i = 0; i < arrayController.getLength(); i++) {
+        for (int i = 0; i < drawCount; i++) {
             Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
 
@@ -65,21 +58,21 @@ public class DisparityPlane extends Visualization {
 
             //Classic bar: proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight, rectWidth, -1 * barHeight);
 
-            ((PApplet)proc).pushMatrix();
+            proc.pushMatrix();
 
-            ((PApplet)proc).translate((float) screenWidth / 2, (float) (screenHeight / 2.5), -(int) (Math.min(screenHeight, screenWidth) / 10));
+            proc.translate((float) screenWidth / 2, (float) (screenHeight / 2.5), -(int) (Math.min(screenHeight, screenWidth) / 10));
 
-            ((PApplet)proc).rotateX(PConstants.PI/3);
-            ((PApplet)proc).rotateZ(angle);
+            proc.rotateX(PConstants.PI/3);
+            proc.rotateZ(angle);
 
-            // Pyramid: ((PApplet)proc).translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
+            // Pyramid: proc.translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));          
 
-            ((PApplet)proc).translate(-radius/2 + (int)floor(i/squareRoot) * tileDim, -radius/2 +  i%squareRoot * tileDim, barHeight);  
+            proc.translate(-radius/2 + (int)floor(i/squareRoot) * tileDim, -radius/2 +  i%squareRoot * tileDim, barHeight);  
 
             
             proc.rect(-tileDim/2, -tileDim/2, tileDim, tileDim);
 
-            ((PApplet)proc).popMatrix();
+            proc.popMatrix();
 
         }
     }

@@ -1,7 +1,6 @@
 package io.github.compilerstuck.SortingAlgorithms;
 
 import io.github.compilerstuck.Control.model.ArrayModel;
-import io.github.compilerstuck.Control.MainController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +21,18 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
         this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
     }
 
-
     public void sort() {
-        MainController.setCurrentOperation(name);
+        report(name);
         startTime = System.nanoTime();
-
 
         @SuppressWarnings("unchecked")
         List<Integer>[] bucket = new List[RADIX];
-        for (int i = 0; i < bucket.length && run; i++) {
+        for (int i = 0; i < bucket.length && !isCancelled(); i++) {
             bucket[i] = new ArrayList<>();
         }
         boolean maxLength = false;
         int tmp, placement = 1;
-        while (!maxLength && run) {
+        while (!maxLength && !isCancelled()) {
             maxLength = true;
             for (Integer i : arrayController.getArray()) {
                 tmp = i / placement;
@@ -46,14 +43,14 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
             }
 
             int[] buckA = new int[RADIX];
-            for (int i = 0; i < RADIX && run; i++) {
-                for (int j = i - 1; j >= 0 && run; j--) {
+            for (int i = 0; i < RADIX && !isCancelled(); i++) {
+                for (int j = i - 1; j >= 0 && !isCancelled(); j--) {
                     buckA[i] += bucket[j].size();
                 }
             }
 
-            for (int i = 0; i < arrayController.getLength() && run; i++) {
-                for (int j = 0; j < RADIX && run; j++) {
+            for (int i = 0; i < arrayController.getLength() && !isCancelled(); i++) {
+                for (int j = 0; j < RADIX && !isCancelled(); j++) {
                     if (bucket[j].size() <= i) {
                         bucket[j].clear();
                         continue;

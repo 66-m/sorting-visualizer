@@ -1,160 +1,101 @@
 <div align="center">
 
-  <img src="images/logo.png" alt="Logo" width="160" height="160">
+<img src="images/logo.png" alt="Logo" width="140" height="140">
 
-  <h1>Sorting Algorithm Visualizer</h1>
+# Sorting Algorithm Visualizer
 
-  <p>Visualize and audiolize sorting algorithms in real time — with 22 algorithms, 30 visualizations, and full 3D support.</p>
+See and hear sorting algorithms in real time — 22 algorithms, 30 visualizations (including 3D), live metrics, and MIDI audio.
 
-  [![Java CI with Maven](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Latest Release](https://img.shields.io/github/v/release/66-m/sorting-visualizer)](https://github.com/66-m/sorting-visualizer/releases/latest)
+[![CI](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Latest Release](https://img.shields.io/github/v/release/66-m/sorting-visualizer)](https://github.com/66-m/sorting-visualizer/releases/latest)
 
-  <br/>
+[Download](https://github.com/66-m/sorting-visualizer/releases/latest) · [Issues](https://github.com/66-m/sorting-visualizer/issues)
 
-  [**Download latest release »**](https://github.com/66-m/sorting-visualizer/releases/latest)
-  &nbsp;·&nbsp;
-  [Report a bug or request a feature](https://github.com/66-m/sorting-visualizer/issues)
-
-  <br/>
-
-  <img src="images/demo.png" alt="Program demo" width="80%">
+<img src="images/demo.png" alt="Demo screenshot" width="85%">
 
 </div>
 
----
+## Requirements
 
-## Table of Contents
+- **JDK 25+** — [jdk.java.net/25](https://jdk.java.net/25/)
+- A desktop environment with audio (MIDI) optional but recommended
 
-- [Getting Started](#getting-started)
-- [Building from Source](#building-from-source)
-- [Features](#features)
-  - [Sorting Algorithms](#sorting-algorithms)
-  - [Visualizations](#visualizations)
-  - [Controls & Settings](#controls--settings)
-- [Acknowledgements](#acknowledgements)
+## Quick start
 
----
-
-## Getting Started
-
-Download the [prebuilt JAR](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with:
+Download [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) from the latest release, then:
 
 ```sh
 java -jar sorting-visualizer.jar
 ```
 
-> **Requires Java 25 or later.** Download from [jdk.java.net/25](https://jdk.java.net/25/).
+A visualization window and a settings window open together. Press **ESC** to quit.
 
----
-
-## Building from Source
-
-**Requirements:**
-- JDK 25 or later — [download here](https://jdk.java.net/25/)
-- Ensure your [JAVA_HOME environment variable](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) is set
-
-**Clone and build:**
+## Build from source
 
 ```sh
 git clone https://github.com/66-m/sorting-visualizer.git
 cd sorting-visualizer
 
-# Build (using bundled Maven wrapper — recommended)
-./mvnw clean package
-# or use the convenience script:
-./build
+./mvnw clean package          # build + tests
+./run                         # run with dependencies on the classpath
 ```
 
-**Run:**
+Convenience scripts (Unix):
+
+| Command | What it does |
+|---------|----------------|
+| `./build` | Fast package (skips tests) |
+| `./build release` | Clean build + fat JAR (`-Prelease`) |
+| `./run` | Launch the local build |
+| `./run fullscreen` or `./run_fullscreen` | Launch in fullscreen |
+| `./run fullscreen --display=2` | Fullscreen on display 2 (1-based; see below) |
+| `./run portrait` or `./run_portrait` | Launch in portrait window size |
+
+Windows: use `mvnw.cmd` / `build.cmd` / `run.cmd` / `run_fullscreen.cmd` / `run_portrait.cmd` instead.
+
+Displays are numbered starting at **1** (Processing / Java order). On Linux you can list them with `xrandr --listmonitors`. Example: laptop primary = `--display=1`, HDMI = `--display=2`.
+
+Release fat JAR (same layout as GitHub Releases):
 
 ```sh
-java -jar target/sorting-visualizer.jar
-# or:
-./run
+./mvnw clean package -Prelease
+java -jar target/sorting-visualizer-jar-with-dependencies.jar
 ```
-
-> The `build` and `run` helper scripts are provided for Unix-like systems.
-
----
 
 ## Features
 
-### Sorting Algorithms
-
-22 algorithms available:
+### Algorithms (22)
 
 | | | |
 |---|---|---|
-| Quick Sort (Middle Pivot) | Quick Sort (Dual Pivot) | Merge Sort |
-| Shell Sort | Selection Sort | Double Selection Sort |
-| Insertion Sort | Heap Sort | Gravity Sort |
-| Radix Sort (LSD, Base 10) | Gnome Sort | Comb Sort |
-| Odd Even Sort | Bubble Sort | Cocktail Shaker Sort |
-| Cycle Sort | Counting Sort | American Flag Sort |
-| Bucket Sort | Pigeonhole Sort | Tim Sort |
-| Bogo Sort | | |
+| Quick Sort (middle / dual pivot) | Merge Sort | Heap Sort |
+| Shell Sort | Tim Sort | Insertion Sort |
+| Selection / Double Selection | Bubble / Cocktail Shaker | Comb Sort |
+| Gnome / Odd-Even / Cycle | Counting / Bucket / Pigeonhole | Radix LSD (base 10) |
+| American Flag Sort | Gravity Sort | Bogo Sort |
 
-**Algorithm run options:**
-- Run all algorithms in sequence
-- Change the execution order
-- Select which algorithms to include
+Run one algorithm, or run a custom selection **in order** and optionally show a comparison table afterward.
 
-### Visualizations
+### Visualizations (30)
 
-30 visualizations including 3D models:
+**2D** — bars, scatter (linked), number plot, disparity graphs, pyramids, circles & chords, swirl / phyllotaxis, hoops, mosaic, morphing shell, image vertical/horizontal, and more.
 
-<details>
-<summary>2D Visualizations (20)</summary>
+**3D** — sphere, sphere hoops, spheric disparity lines, cube, cubic lines, pyramid, plane, disparity plane / sphere hoops.
 
-- Bars
-- Scatter Plot / Scatter Plot Linked
-- Number Plot
-- Disparity Graph / Disparity Graph Mirrored
-- Horizontal Pyramid
-- Color Gradient Graph
-- Circle
-- Disparity Circle / Disparity Circle Scatter / Disparity Circle Scatter Linked
-- Disparity Chords
-- Disparity Square Scatter
-- Swirl Dots
-- Phyllotaxis
-- Image Vertical / Image Horizontal
-- Hoops
-- Morphing Shell
-- Mosaic Squares
+### Controls
 
-</details>
+| Control | Options |
+|---------|---------|
+| Array | Size up to 20 000; shuffle: random, reverse, almost sorted, sorted |
+| Speed | Five animation speed levels |
+| Appearance | Gradient presets + custom colors |
+| Sound | MIDI tones mapped to values; mute anytime |
+| Metrics | Sorted %, comparisons, swaps, main/aux writes, estimated time |
+| Session | Cancel mid-run; optional end-of-run comparison table |
 
-<details>
-<summary>3D Visualizations (10)</summary>
+## License
 
-- Sphere
-- Sphere Hoops
-- Spheric Disparity Lines
-- Disparity Sphere Hoops
-- Cube
-- Cubic Lines
-- Pyramid
-- Plane
-- Disparity Plane
+Copyright (C) 2020–2026 Marcel Mauel
 
-</details>
-
-### Controls & Settings
-
-- **Array:** Configurable size and shuffle type (Random, Reverse, Almost Sorted, Sorted)
-- **Color gradients:** Choose from presets or create your own
-- **Speed:** Adjustable animation speed
-- **Sound:** Toggle mute at any time
-- **Live measurements:** sorted %, comparisons, swaps, array writes, auxiliary writes, estimated real time
-- **Comparison table:** Optionally display a summary after all algorithms have run
-- **Cancel:** Stop execution at any time
-
----
-
-## Acknowledgements
-
-Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and for inspiring this project.
-
-Thanks to [@micycle1](https://github.com/micycle1) for his mirror of the processing4 core library, making it available for Maven.
+Licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). See [`LICENSE`](LICENSE).
