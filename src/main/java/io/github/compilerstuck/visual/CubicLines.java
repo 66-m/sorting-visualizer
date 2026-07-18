@@ -12,12 +12,25 @@ import processing.core.PApplet;
 
 public class CubicLines extends Visualization {
 
+  private static final float SIN_TILT = (float) Math.sin(-10);
+  private static final float COS_TILT = (float) Math.cos(-10);
+
   int radius;
   static float aa = 0;
 
+  private final ColorBatch colorBatch = new ColorBatch();
+
   private int[] colorsRgb;
+  private float[] baseX, baseY, baseZ;
   private float[] xCords, yCords, zCords;
   private int bufferCapacity;
+  private int latticeXSize = -1;
+  private int latticeRadius = -1;
+  private int latticeDrawCount = -1;
+
+  private long cachedRevision = Long.MIN_VALUE;
+  private int cachedDrawCount = -1;
+  private ColorGradient cachedGradient;
 
   public CubicLines(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -29,57 +42,32 @@ public class CubicLines extends Visualization {
     if (colorsRgb != null && bufferCapacity >= n) return;
     bufferCapacity = n;
     colorsRgb = new int[n];
+    baseX = new float[n];
+    baseY = new float[n];
+    baseZ = new float[n];
     xCords = new float[n];
     yCords = new float[n];
     zCords = new float[n];
+    latticeXSize = -1;
+    latticeRadius = -1;
+    latticeDrawCount = -1;
   }
 
-  @Override
-  public void update() {
-    super.update();
-
-    proc.lights();
-
-    radius = (int) (min(screenHeight, screenWidth) / 3.5);
-
-    aa -= PApplet.PI / (10 * proc.frameRate());
-
-    int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
-    if (xSize < 1) {
-      xSize = 1;
+  private void rebuildLattice(int drawCount, int xSize, int radius) {
+    if (latticeDrawCount == drawCount && latticeXSize == xSize && latticeRadius == radius) {
+      return;
     }
-    int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
+    latticeDrawCount = drawCount;
+    latticeXSize = xSize;
+    latticeRadius = radius;
+
     int xCnt = 0;
     int yCnt = 0;
     int zCnt = 0;
-
-    ensureBuffers(drawCount);
-
     for (int i = 0; i < drawCount; i++) {
-
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
-        sound.playSound(arrayController.get(i));
-      }
-
-      arrayController.setMarker(arrayController.get(i), Marker.NORMAL);
-
-      float xa = PApplet.map(xCnt, 0, xSize, -radius, radius);
-      float ya = PApplet.map(yCnt, 0, xSize, -radius, radius);
-      float za = PApplet.map(zCnt, 0, xSize, -radius, radius);
-
-      float zb = (float) (Math.sin(aa) * xa + Math.cos(aa) * za);
-      float x = (float) ((float) Math.cos(aa) * xa - Math.sin(aa) * za);
-
-      float z = (float) (Math.sin(-10) * ya + Math.cos(-10) * zb);
-      float y = (float) (Math.cos(-10) * ya - Math.sin(-10) * zb);
-
-      zCords[i] = z;
-      colorsRgb[i] = color.getRGB();
-      xCords[i] = x;
-      yCords[i] = y;
+      baseX[i] = PApplet.map(xCnt, 0, xSize, -radius, radius);
+      baseY[i] = PApplet.map(yCnt, 0, xSize, -radius, radius);
+      baseZ[i] = PApplet.map(zCnt, 0, xSize, -radius, radius);
 
       zCnt++;
       if (zCnt == xSize) {
@@ -93,29 +81,86 @@ public class CubicLines extends Visualization {
         }
       }
     }
+  }
+
+  private void ensureColors(int drawCount) {
+    long rev = arrayController.getVisualRevision();
+    if (cachedRevision == rev && cachedDrawCount == drawCount && cachedGradient == colorGradient) {
+      return;
+    }
+    for (int i = 0; i < drawCount; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+
+      if (arrayController.getMarker(value) == Marker.SET) {
+        sound.playSound(value);
+      }
+
+      arrayController.setMarker(value, Marker.NORMAL);
+
+      colorsRgb[i] = color.getRGB();
+    }
+    cachedRevision = rev;
+    cachedDrawCount = drawCount;
+    cachedGradient = colorGradient;
+  }
+
+  @Override
+  public void update() {
+    super.update();
+
+    proc.lights();
+
+    int screenMin = min(screenHeight, screenWidth);
+    radius = (int) (screenMin / 3.5);
+    float centerY = (float) screenHeight / 2 - (int) (screenMin / 10);
+    float centerZ = -(int) (screenMin / 10);
+
+    aa -= PApplet.PI / (10 * proc.frameRate());
+    float sinAa = (float) Math.sin(aa);
+    float cosAa = (float) Math.cos(aa);
+
+    int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
+    if (xSize < 1) {
+      xSize = 1;
+    }
+    int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
+
+    ensureBuffers(drawCount);
+    rebuildLattice(drawCount, xSize, radius);
+    ensureColors(drawCount);
 
     for (int i = 0; i < drawCount; i++) {
-      proc.stroke(colorsRgb[i], 255f);
-      proc.fill(colorsRgb[i], 255f);
+      float xa = baseX[i];
+      float ya = baseY[i];
+      float za = baseZ[i];
 
-      proc.pushMatrix();
+      float zb = sinAa * xa + cosAa * za;
+      float x = cosAa * xa - sinAa * za;
+      float z = SIN_TILT * ya + COS_TILT * zb;
+      float y = COS_TILT * ya - SIN_TILT * zb;
 
-      proc.translate(
-          (float) screenWidth / 2,
-          (float) screenHeight / 2 - (int) (min(screenHeight, screenWidth) / 10),
-          -(int) (min(screenHeight, screenWidth) / 10));
+      xCords[i] = x;
+      yCords[i] = y;
+      zCords[i] = z;
+    }
 
-      proc.rotateY(0);
+    proc.pushMatrix();
+    proc.translate((float) screenWidth / 2, centerY, centerZ);
+    colorBatch.reset();
+    for (int i = 0; i < drawCount; i++) {
+      colorBatch.strokeAndFill(proc, colorsRgb[i]);
 
       int target = arrayController.get(i);
       if (i == target || target < 0 || target >= drawCount) {
+        proc.pushMatrix();
         proc.translate(xCords[i], yCords[i], zCords[i]);
         proc.circle(0, 0, 2);
+        proc.popMatrix();
       } else {
         proc.line(xCords[i], yCords[i], zCords[i], xCords[target], yCords[target], zCords[target]);
       }
-
-      proc.popMatrix();
     }
+    proc.popMatrix();
   }
 }

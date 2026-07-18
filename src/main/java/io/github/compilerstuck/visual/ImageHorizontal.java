@@ -9,6 +9,8 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 
 public class ImageHorizontal extends Visualization {
+  private static final int WHITE = 0xFFFFFFFF;
+
   private LoadedImage img;
 
   public ImageHorizontal(
@@ -28,35 +30,28 @@ public class ImageHorizontal extends Visualization {
     proc.loadPixels();
     img.loadPixels();
 
-    int imgPartWidth = screenHeight / arrayController.getLength();
+    int length = arrayController.getLength();
+    int imgPartWidth = screenHeight / length;
+    int[] src = img.pixels();
+    int[] dst = proc.pixels();
+    int pixelWidth = img.pixelWidth();
 
-    for (int i = 0; i < arrayController.getLength(); i += 1) {
+    for (int i = 0; i < length; i++) {
       int pos = arrayController.get(i) * imgPartWidth;
+      boolean highlight = arrayController.getMarker(i) == Marker.SET;
 
       for (int y = pos; y < pos + imgPartWidth; y++) {
-
-        for (int x = 0; x < screenWidth; x++) {
-          int realLoc = x + (y - pos + i * imgPartWidth) * img.pixelWidth();
-          int loc = x + y * img.pixelWidth();
-
-          float r = proc.red(img.pixels()[loc]);
-          float g = proc.green(img.pixels()[loc]);
-          float b = proc.blue(img.pixels()[loc]);
-
-          // If Marker.SET is set, set the pixel to white
-          if (arrayController.getMarker(i) == Marker.SET) {
-            r = 255;
-            g = 255;
-            b = 255;
+        int srcRow = y * pixelWidth;
+        int dstRow = (y - pos + i * imgPartWidth) * pixelWidth;
+        if (highlight) {
+          for (int x = 0; x < screenWidth; x++) {
+            dst[dstRow + x] = WHITE;
           }
-
-          proc.pixels()[realLoc] = proc.color(r, g, b);
+        } else {
+          System.arraycopy(src, srcRow, dst, dstRow, screenWidth);
         }
       }
-      if (arrayController.getMarker(i) == Marker.SET) {
-        sound.playSound(i);
-      }
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (highlight) {
         sound.playSound(i);
       }
       arrayController.setMarker(i, Marker.NORMAL);
@@ -78,10 +73,7 @@ public class ImageHorizontal extends Visualization {
 
     try {
       img = proc.loadImage(imagePath);
-
-      // Resize the image to match the window size
       img.resize(proc.getWidth(), proc.getHeight());
-
     } catch (Exception e) {
       imageFound = false;
     }

@@ -9,6 +9,15 @@ import java.awt.*;
 public class DisparityChords extends Visualization {
 
   int radius;
+  private final PhaseLut phaseLut = new PhaseLut();
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private int[] endX;
+  private int[] endY;
+  private int cacheLength = -1;
+  private int cacheRadius = -1;
+  private int cacheCenterX = -1;
+  private int cacheCenterY = -1;
 
   public DisparityChords(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -16,19 +25,50 @@ public class DisparityChords extends Visualization {
     name = "Disparity Chords";
   }
 
+  private void rebuildRingPositions(int length, int radius, int centerX, int centerY) {
+    if (cacheLength == length
+        && cacheRadius == radius
+        && cacheCenterX == centerX
+        && cacheCenterY == centerY) {
+      return;
+    }
+    cacheLength = length;
+    cacheRadius = radius;
+    cacheCenterX = centerX;
+    cacheCenterY = centerY;
+
+    if (endX == null || endX.length < length) {
+      endX = new int[length];
+      endY = new int[length];
+    }
+
+    phaseLut.ensure(length, 1.0);
+    float[] sin = phaseLut.sin();
+    float[] cos = phaseLut.cos();
+    for (int i = 0; i < length; i++) {
+      endX[i] = centerX + (int) (radius * sin[i]);
+      endY[i] = centerY - (int) (radius * cos[i]);
+    }
+  }
+
   @Override
   public void update() {
     super.update();
 
+    int length = arrayController.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
+    int centerX = screenWidth / 2;
+    int centerY = screenHeight / 2;
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    rebuildRingPositions(length, radius, centerX, centerY);
 
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+    proc.noFill();
+    colorBatch.reset();
 
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
+    for (int i = 0; i < length; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int rgb = color.getRGB();
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -36,19 +76,16 @@ public class DisparityChords extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      double phase = 2 * Math.PI * i / arrayController.getLength();
-      int x = (screenWidth / 2) + (int) (radius * Math.sin(phase));
-      int y = (screenHeight / 2) - (int) (radius * Math.cos(phase));
+      int x = endX[i];
+      int y = endY[i];
+      int x2 = endX[value];
+      int y2 = endY[value];
 
-      // original position phase
-      double phase2 = 2 * Math.PI * arrayController.get(i) / arrayController.getLength();
-      int x2 = (screenWidth / 2) + (int) (radius * Math.sin(phase2));
-      int y2 = (screenHeight / 2) - (int) (radius * Math.cos(phase2));
-
-      // line from phase to org pos - make a small dot if its at same
       if (x == x2 && y == y2) {
+        colorBatch.strokeAndFill(proc, rgb);
         proc.ellipse(x, y, 1, 1);
       } else {
+        colorBatch.stroke(proc, rgb);
         proc.line(x, y, x2, y2);
       }
     }

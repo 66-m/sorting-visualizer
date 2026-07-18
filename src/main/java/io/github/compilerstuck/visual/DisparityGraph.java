@@ -5,9 +5,17 @@ import io.github.compilerstuck.control.render.RenderContext;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.*;
-import processing.core.PApplet;
 
 public class DisparityGraph extends Visualization {
+
+  private final IndexXCache indexXCache = new IndexXCache();
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private long cachedRevision = Long.MIN_VALUE;
+  private int cachedWidth = -1;
+  private int cachedHeight = -1;
+  private int cachedLength = -1;
+  private int[] barHeights;
 
   public DisparityGraph(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -15,33 +23,49 @@ public class DisparityGraph extends Visualization {
     name = "Disparity Graph";
   }
 
+  private void ensureHeights(int length, double heightFactor) {
+    long rev = arrayController.getVisualRevision();
+    if (cachedRevision == rev
+        && cachedWidth == screenWidth
+        && cachedHeight == screenHeight
+        && cachedLength == length) {
+      return;
+    }
+    if (barHeights == null || barHeights.length < length) {
+      barHeights = new int[length];
+    }
+    for (int i = 0; i < length; i++) {
+      int value = arrayController.get(i);
+      barHeights[i] =
+          (int)
+              (heightFactor
+                  * (length
+                      - 2
+                          * Math.min(
+                              Math.min(Math.abs(i - value), Math.abs(i - length - value)),
+                              Math.abs(i + length - value))));
+    }
+    cachedRevision = rev;
+    cachedWidth = screenWidth;
+    cachedHeight = screenHeight;
+    cachedLength = length;
+  }
+
   @Override
   public void update() {
     super.update();
 
-    int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
+    int length = arrayController.getLength();
+    int rectWidth = (screenWidth - (length - 1)) / length;
+    double heightFactor = (screenHeight - 10.) / length;
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    indexXCache.ensure(length, screenWidth);
+    float[] xs = indexXCache.xs();
+    ensureHeights(length, heightFactor);
 
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
-
-      int barHeight =
-          (int)
-              (((screenHeight - 10.)
-                  / arrayController.getLength()
-                  * (arrayController.getLength()
-                      - 2
-                          * Math.min(
-                              Math.min(
-                                  Math.abs(i - arrayController.get(i)),
-                                  Math.abs(
-                                      i - arrayController.getLength() - arrayController.get(i))),
-                              Math.abs(
-                                  i + arrayController.getLength() - arrayController.get(i))))));
+    colorBatch.reset();
+    for (int i = 0; i < length; i++) {
+      Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -49,11 +73,8 @@ public class DisparityGraph extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      proc.rect(
-          PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth),
-          screenHeight,
-          rectWidth,
-          -1 * barHeight); // DisparityGraph
+      colorBatch.strokeAndFill(proc, color.getRGB());
+      proc.rect(xs[i], screenHeight, rectWidth, -1 * barHeights[i]);
     }
   }
 }

@@ -12,28 +12,60 @@ public class Pyramid extends Visualization {
 
   float angle = 0;
 
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private float[] zOffsets;
+  private int[] barHeights;
+  private int[] colorsRgb;
+  private int zOffsetLength = -1;
+  private int zOffsetRadius = -1;
+
+  private long cachedRevision = Long.MIN_VALUE;
+  private int cachedWidth = -1;
+  private int cachedHeight = -1;
+  private int cachedLength = -1;
+  private int cachedRadius = -1;
+  private ColorGradient cachedGradient;
+
   public Pyramid(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
     super(arrayController, colorGradient, sound, proc);
     name = "3D - Pyramid";
   }
 
-  @Override
-  public void update() {
-    super.update();
+  private void rebuildZOffsets(int length, int radius) {
+    if (zOffsetLength == length && zOffsetRadius == radius) {
+      return;
+    }
+    zOffsetLength = length;
+    zOffsetRadius = radius;
+    if (zOffsets == null || zOffsets.length < length) {
+      zOffsets = new float[length];
+    }
+    for (int i = 0; i < length; i++) {
+      zOffsets[i] = radius / 2 - PApplet.map(i, 0, length, 0, radius);
+    }
+  }
 
-    // int rectWidth = (screenWidth - (arrayController.getLength() - 1)) /
-    // arrayController.getLength();
-    int radius = (int) (Math.min(screenHeight, screenWidth) / 1.7);
+  private void ensureBarHeightsAndColors(int length, int radius) {
+    long rev = arrayController.getVisualRevision();
+    if (cachedRevision == rev
+        && cachedWidth == screenWidth
+        && cachedHeight == screenHeight
+        && cachedLength == length
+        && cachedRadius == radius
+        && cachedGradient == colorGradient) {
+      return;
+    }
+    if (barHeights == null || barHeights.length < length) {
+      barHeights = new int[length];
+      colorsRgb = new int[length];
+    }
+    for (int i = 0; i < length; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
 
-    angle -= PApplet.PI / (15 * proc.frameRate());
-    proc.lights();
-
-    for (int i = 0; i < arrayController.getLength(); i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      int barHeight = (arrayController.get(i) + 1) * (radius - 5) / arrayController.getLength();
+      barHeights[i] = (value + 1) * (radius - 5) / length;
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -41,27 +73,48 @@ public class Pyramid extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
+      colorsRgb[i] = color.getRGB();
+    }
+    cachedRevision = rev;
+    cachedWidth = screenWidth;
+    cachedHeight = screenHeight;
+    cachedLength = length;
+    cachedRadius = radius;
+    cachedGradient = colorGradient;
+  }
 
-      // proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight,
-      // rectWidth, -1 * barHeight); //Classic bar
+  @Override
+  public void update() {
+    super.update();
+
+    int screenMin = Math.min(screenHeight, screenWidth);
+    int radius = (int) (screenMin / 1.7);
+    int length = arrayController.getLength();
+    float centerY = (float) (screenHeight / 2.5);
+    float centerZ = -(int) (screenMin / 10);
+
+    angle -= PApplet.PI / (15 * proc.frameRate());
+    proc.lights();
+
+    rebuildZOffsets(length, radius);
+    ensureBarHeightsAndColors(length, radius);
+
+    proc.pushMatrix();
+    proc.translate((float) screenWidth / 2, centerY, centerZ);
+    proc.rotateX(PConstants.PI / 3);
+    proc.rotateZ(angle);
+
+    colorBatch.reset();
+    for (int i = 0; i < length; i++) {
+      int barHeight = barHeights[i];
+      colorBatch.strokeAndFill(proc, colorsRgb[i]);
 
       proc.pushMatrix();
-
-      proc.translate(
-          (float) screenWidth / 2,
-          (float) (screenHeight / 2.5),
-          -(int) (Math.min(screenHeight, screenWidth) / 10));
-
-      proc.rotateX(PConstants.PI / 3);
-      proc.rotateZ(angle);
-
-      proc.translate(0, 0, radius / 2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));
-
+      proc.translate(0, 0, zOffsets[i]);
       proc.rect(-barHeight / 2, -barHeight / 2, barHeight, barHeight);
-
       proc.popMatrix();
     }
+
+    proc.popMatrix();
   }
 }

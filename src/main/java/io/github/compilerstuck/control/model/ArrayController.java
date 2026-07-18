@@ -24,6 +24,9 @@ public class ArrayController implements ArrayModel {
   /** When true, {@link #update()} must recompute sorted% / segments. */
   private volatile boolean metricsDirty = true;
 
+  /** Bumped on content mutations and {@link Marker#SET}; see {@link #getVisualRevision()}. */
+  private volatile long visualRevision;
+
   private double delay;
   private double realTime;
 
@@ -54,6 +57,7 @@ public class ArrayController implements ArrayModel {
     sortedPercentage = 1;
     segments = 1;
     metricsDirty = true;
+    bumpVisualRevision();
 
     // Initial Values
     for (int i = 0; i < size; i++) {
@@ -64,6 +68,15 @@ public class ArrayController implements ArrayModel {
 
   private void markMetricsDirty() {
     metricsDirty = true;
+  }
+
+  private void bumpVisualRevision() {
+    visualRevision++;
+  }
+
+  @Override
+  public long getVisualRevision() {
+    return visualRevision;
   }
 
   @Override
@@ -141,6 +154,7 @@ public class ArrayController implements ArrayModel {
       markers[i] = Marker.NORMAL;
     }
     markMetricsDirty();
+    bumpVisualRevision();
   }
 
   @Override
@@ -150,12 +164,22 @@ public class ArrayController implements ArrayModel {
 
   @Override
   public void setMarker(int i, Marker m) {
+    if (markers[i] != m) {
+      bumpVisualRevision();
+    }
     markers[i] = m;
   }
 
   public void resetMarkers() {
+    boolean changed = false;
     for (int i = 0; i < length; i++) {
-      markers[i] = Marker.NORMAL;
+      if (markers[i] != Marker.NORMAL) {
+        markers[i] = Marker.NORMAL;
+        changed = true;
+      }
+    }
+    if (changed) {
+      bumpVisualRevision();
     }
   }
 
@@ -174,6 +198,7 @@ public class ArrayController implements ArrayModel {
     array[i] = value;
     writes += 1;
     markMetricsDirty();
+    bumpVisualRevision();
   }
 
   @Override
@@ -184,6 +209,7 @@ public class ArrayController implements ArrayModel {
     writes += 2;
     swaps += 1;
     markMetricsDirty();
+    bumpVisualRevision();
   }
 
   @Override
@@ -238,6 +264,7 @@ public class ArrayController implements ArrayModel {
     if (cancellationToken.isCancelled()) return;
     shuffleStrategy.shuffle(this, processingContext, operationReporter, cancellationToken);
     markMetricsDirty();
+    bumpVisualRevision();
   }
 
   public void setProcessingContext(ProcessingContext processingContext) {

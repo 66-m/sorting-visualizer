@@ -10,7 +10,21 @@ import processing.core.PConstants;
 
 public class DisparitySphereHoops extends Visualization {
 
-  float angle = 0;
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private float[] wiBase;
+  private float[] zOffsets;
+  private int[] sphereWi;
+  private int[] colorsRgb;
+  private int cacheLength = -1;
+  private int cacheRadius = -1;
+
+  private long cachedRevision = Long.MIN_VALUE;
+  private int cachedWidth = -1;
+  private int cachedHeight = -1;
+  private int cachedLength = -1;
+  private int cachedRadius = -1;
+  private ColorGradient cachedGradient;
 
   public DisparitySphereHoops(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -18,39 +32,49 @@ public class DisparitySphereHoops extends Visualization {
     name = "3D - Disparity Sphere Hoops";
   }
 
-  @Override
-  public void update() {
-    super.update();
+  private void rebuildGeometry(int length, int radius) {
+    if (cacheLength == length && cacheRadius == radius) {
+      return;
+    }
+    cacheLength = length;
+    cacheRadius = radius;
+    if (wiBase == null || wiBase.length < length) {
+      wiBase = new float[length];
+      zOffsets = new float[length];
+      sphereWi = new int[length];
+      colorsRgb = new int[length];
+    }
+    for (int i = 0; i < length; i++) {
+      wiBase[i] = (float) Math.sqrt(1 - Math.pow((((float) i / length) * 2 - 1), 2));
+      zOffsets[i] = radius / 2 - PApplet.map(i, 0, length, 0, radius);
+    }
+  }
 
-    // int rectWidth = (screenWidth - (arrayController.getLength() - 1)) /
-    // arrayController.getLength();
-    int radius = (int) (Math.min(screenHeight, screenWidth) / 1.1);
-
-    angle -= PApplet.PI / (15 * proc.frameRate());
-    proc.lights();
-
-    for (int i = 0; i < arrayController.getLength(); i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+  private void ensureSphereWiAndColors(int length, int radius) {
+    long rev = arrayController.getVisualRevision();
+    if (cachedRevision == rev
+        && cachedWidth == screenWidth
+        && cachedHeight == screenHeight
+        && cachedLength == length
+        && cachedRadius == radius
+        && cachedGradient == colorGradient) {
+      return;
+    }
+    for (int i = 0; i < length; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
 
       float barHeight =
           -(float)
               ((1f
-                  / arrayController.getLength()
-                  * (arrayController.getLength()
+                  / length
+                  * (length
                       - 2
                           * Math.min(
-                              Math.min(
-                                  Math.abs(i - arrayController.get(i)),
-                                  Math.abs(
-                                      i - arrayController.getLength() - arrayController.get(i))),
-                              Math.abs(
-                                  i + arrayController.getLength() - arrayController.get(i))))));
-      float wi =
-          (float) Math.sqrt(1 - Math.pow((((float) i / arrayController.getLength()) * 2 - 1), 2))
-              * barHeight;
-
-      int sphere_wi = (int) PApplet.map(wi, 0, 1, 0, radius);
+                              Math.min(Math.abs(i - value), Math.abs(i - length - value)),
+                              Math.abs(i + length - value)))));
+      float wi = wiBase[i] * barHeight;
+      sphereWi[i] = (int) PApplet.map(wi, 0, 1, 0, radius);
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -58,28 +82,45 @@ public class DisparitySphereHoops extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
-      proc.noFill();
+      colorsRgb[i] = color.getRGB();
+    }
+    cachedRevision = rev;
+    cachedWidth = screenWidth;
+    cachedHeight = screenHeight;
+    cachedLength = length;
+    cachedRadius = radius;
+    cachedGradient = colorGradient;
+  }
 
-      // proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight,
-      // rectWidth, -1 * barHeight); //Classic bar
+  @Override
+  public void update() {
+    super.update();
+
+    int screenMin = Math.min(screenHeight, screenWidth);
+    int radius = (int) (screenMin / 1.1);
+    int length = arrayController.getLength();
+    float centerZ = -(int) (screenMin / 10);
+
+    proc.lights();
+
+    rebuildGeometry(length, radius);
+    ensureSphereWiAndColors(length, radius);
+
+    proc.noFill();
+    proc.pushMatrix();
+    proc.translate((float) screenWidth / 2, (float) (screenHeight / 2), centerZ);
+    proc.rotateX(PConstants.PI / 3);
+
+    colorBatch.reset();
+    for (int i = 0; i < length; i++) {
+      colorBatch.stroke(proc, colorsRgb[i]);
 
       proc.pushMatrix();
-
-      proc.translate(
-          (float) screenWidth / 2,
-          (float) (screenHeight / 2),
-          -(int) (Math.min(screenHeight, screenWidth) / 10));
-
-      proc.rotateX(PConstants.PI / 3);
-      // proc.rotateY(angle);
-
-      proc.translate(0, 0, radius / 2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));
-
-      proc.circle(0, 0, sphere_wi);
-
+      proc.translate(0, 0, zOffsets[i]);
+      proc.circle(0, 0, sphereWi[i]);
       proc.popMatrix();
     }
+
+    proc.popMatrix();
   }
 }

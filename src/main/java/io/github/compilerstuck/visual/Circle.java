@@ -9,6 +9,16 @@ import java.awt.*;
 public class Circle extends Visualization {
 
   int radius;
+  private final PhaseLut phaseLut = new PhaseLut();
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private int[] endX;
+  private int[] endY;
+  private int[] frameColors;
+  private int cacheLength = -1;
+  private int cacheRadius = -1;
+  private int cacheCenterX = -1;
+  private int cacheCenterY = -1;
 
   public Circle(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -16,31 +26,65 @@ public class Circle extends Visualization {
     name = "Circle";
   }
 
+  private void rebuildEndpoints(int length, int radius, int centerX, int centerY) {
+    if (cacheLength == length
+        && cacheRadius == radius
+        && cacheCenterX == centerX
+        && cacheCenterY == centerY) {
+      return;
+    }
+    cacheLength = length;
+    cacheRadius = radius;
+    cacheCenterX = centerX;
+    cacheCenterY = centerY;
+
+    if (endX == null || endX.length < length) {
+      endX = new int[length];
+      endY = new int[length];
+    }
+
+    phaseLut.ensure(length, 1.0);
+    float[] sin = phaseLut.sin();
+    float[] cos = phaseLut.cos();
+    for (int i = 0; i < length; i++) {
+      endX[i] = centerX + (int) (radius * sin[i]);
+      endY[i] = centerY - (int) (radius * cos[i]);
+    }
+  }
+
   @Override
   public void update() {
     super.update();
 
+    int length = arrayController.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
+    int centerX = screenWidth / 2;
+    int centerY = screenHeight / 2;
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    rebuildEndpoints(length, radius, centerX, centerY);
 
+    if (frameColors == null || frameColors.length < length) {
+      frameColors = new int[length];
+    }
+
+    for (int i = 0; i < length; i++) {
       Color color =
           colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
+      frameColors[i] = color.getRGB();
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
       arrayController.setMarker(i, Marker.NORMAL);
+    }
 
-      double phase = 2 * Math.PI * i / arrayController.getLength();
-      int x = (screenWidth / 2) + (int) (radius * Math.sin(phase));
-      int y = (screenHeight / 2) - (int) (radius * Math.cos(phase));
+    proc.noFill();
+    colorBatch.reset();
 
-      proc.line(screenWidth / 2, screenHeight / 2, x, y);
+    for (int i = 0; i < length; i++) {
+      colorBatch.stroke(proc, frameColors[i]);
+      proc.line(centerX, centerY, endX[i], endY[i]);
     }
   }
 }

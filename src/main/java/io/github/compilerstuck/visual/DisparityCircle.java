@@ -9,6 +9,13 @@ import java.awt.*;
 public class DisparityCircle extends Visualization {
 
   int radius;
+  private final PhaseLut phaseLut = new PhaseLut();
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private float[] scaledSin;
+  private float[] scaledCos;
+  private int cacheLength = -1;
+  private int cacheRadius = -1;
 
   public DisparityCircle(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -16,19 +23,45 @@ public class DisparityCircle extends Visualization {
     name = "Disparity Circle";
   }
 
+  private void rebuildScaledDirections(int length, int radius) {
+    if (cacheLength == length && cacheRadius == radius) {
+      return;
+    }
+    cacheLength = length;
+    cacheRadius = radius;
+
+    if (scaledSin == null || scaledSin.length < length) {
+      scaledSin = new float[length];
+      scaledCos = new float[length];
+    }
+
+    phaseLut.ensure(length, 1.0);
+    float[] sin = phaseLut.sin();
+    float[] cos = phaseLut.cos();
+    for (int i = 0; i < length; i++) {
+      scaledSin[i] = radius * sin[i];
+      scaledCos[i] = radius * cos[i];
+    }
+  }
+
   @Override
   public void update() {
     super.update();
 
+    int length = arrayController.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
+    int centerX = screenWidth / 2;
+    int centerY = screenHeight / 2;
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    rebuildScaledDirections(length, radius);
 
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+    proc.noFill();
+    colorBatch.reset();
 
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
+    for (int i = 0; i < length; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int rgb = color.getRGB();
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -38,22 +71,19 @@ public class DisparityCircle extends Visualization {
 
       double barHeight =
           ((screenHeight - 0.1)
-                  / arrayController.getLength()
-                  * (arrayController.getLength()
+                  / length
+                  * (length
                       - 2
                           * Math.min(
-                              Math.min(
-                                  Math.abs(i - arrayController.get(i)),
-                                  Math.abs(
-                                      i - arrayController.getLength() - arrayController.get(i))),
-                              Math.abs(i + arrayController.getLength() - arrayController.get(i)))))
+                              Math.min(Math.abs(i - value), Math.abs(i - length - value)),
+                              Math.abs(i + length - value))))
               / (screenHeight);
 
-      double phase = 2 * Math.PI * i / arrayController.getLength();
-      int x = (screenWidth / 2) + (int) (radius * barHeight * Math.sin(phase));
-      int y = (screenHeight / 2) - (int) (radius * barHeight * Math.cos(phase));
+      int x = centerX + (int) (barHeight * scaledSin[i]);
+      int y = centerY - (int) (barHeight * scaledCos[i]);
 
-      proc.line(screenWidth / 2, screenHeight / 2, x, y); // Swirl dots
+      colorBatch.stroke(proc, rgb);
+      proc.line(centerX, centerY, x, y);
     }
   }
 }

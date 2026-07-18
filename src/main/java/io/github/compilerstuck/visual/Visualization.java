@@ -34,6 +34,11 @@ public abstract class Visualization {
     this.colorGradient = colorGradient;
   }
 
+  /** True when array/markers changed since {@code cachedRevision} (for animated visuals). */
+  protected static boolean contentChanged(long cachedRevision, ArrayModel model) {
+    return cachedRevision != model.getVisualRevision();
+  }
+
   public void update() {
     screenHeight = proc.getHeight();
     screenWidth = proc.getWidth();

@@ -5,9 +5,11 @@ import io.github.compilerstuck.control.render.RenderContext;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.*;
-import processing.core.PApplet;
 
 public class ColorGradientGraph extends Visualization {
+
+  private final IndexXCache indexXCache = new IndexXCache();
+  private final ColorBatch colorBatch = new ColorBatch();
 
   public ColorGradientGraph(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -19,15 +21,17 @@ public class ColorGradientGraph extends Visualization {
   public void update() {
     super.update();
 
-    int rectWidth = (screenWidth - (arrayController.getLength() - 1)) / arrayController.getLength();
+    int length = arrayController.getLength();
+    int rectWidth = (screenWidth - (length - 1)) / length;
+    int negHeight = -screenHeight;
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    indexXCache.ensure(length, screenWidth);
+    float[] xs = indexXCache.xs();
 
+    colorBatch.reset();
+    for (int i = 0; i < length; i++) {
       Color color =
           colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -35,11 +39,8 @@ public class ColorGradientGraph extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      proc.rect(
-          PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth),
-          screenHeight,
-          rectWidth,
-          -1 * screenHeight); // Classic
+      colorBatch.strokeAndFill(proc, color.getRGB());
+      proc.rect(xs[i], screenHeight, rectWidth, negHeight);
     }
   }
 }

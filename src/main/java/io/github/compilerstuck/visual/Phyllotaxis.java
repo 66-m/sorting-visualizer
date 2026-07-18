@@ -15,26 +15,78 @@ public class Phyllotaxis extends Visualization {
   int radius;
   int c;
 
+  private float[] angleCos;
+  private float[] angleSin;
+  private float[] mappedRadius;
+  private final ColorBatch colorBatch = new ColorBatch();
+  private int angleLength = -1;
+  private int radiusLutLength = -1;
+  private int radiusLutC = -1;
+  private int radiusLutScreenMin = -1;
+
   public Phyllotaxis(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
     super(arrayController, colorGradient, sound, proc);
     name = "Phyllotaxis";
   }
 
+  private void rebuildAngles(int length) {
+    if (angleLength == length) {
+      return;
+    }
+    angleLength = length;
+    if (angleCos == null || angleCos.length < length) {
+      angleCos = new float[length];
+      angleSin = new float[length];
+    }
+    float step = radians(180.5f);
+    for (int i = 0; i < length; i++) {
+      float a = i * step;
+      angleCos[i] = (float) cos(a);
+      angleSin[i] = (float) sin(a);
+    }
+  }
+
+  private void rebuildMappedRadius(int length, int c, int screenMin) {
+    if (radiusLutLength == length && radiusLutC == c && radiusLutScreenMin == screenMin) {
+      return;
+    }
+    radiusLutLength = length;
+    radiusLutC = c;
+    radiusLutScreenMin = screenMin;
+
+    if (mappedRadius == null || mappedRadius.length < length) {
+      mappedRadius = new float[length];
+    }
+
+    float maxR = c * (float) sqrt(length);
+    float mapMax = screenMin / 2f - 20;
+    for (int value = 0; value < length; value++) {
+      float r = (float) (c * sqrt(value));
+      mappedRadius[value] = PApplet.map(r, 0f, maxR, 0, mapMax);
+    }
+  }
+
   @Override
   public void update() {
     super.update();
 
-    radius = (int) (Math.min(screenHeight, screenWidth) / 2.5);
-    c = Math.min(screenHeight, screenWidth) / 70;
+    int length = arrayController.getLength();
+    int screenMin = Math.min(screenHeight, screenWidth);
+    radius = (int) (screenMin / 2.5);
+    c = screenMin / 70;
+    float centerX = screenWidth / 2f;
+    float centerY = screenHeight / 2f;
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    rebuildAngles(length);
+    rebuildMappedRadius(length, c, screenMin);
 
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+    colorBatch.reset();
 
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
+    for (int i = 0; i < length; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int rgb = color.getRGB();
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -42,19 +94,12 @@ public class Phyllotaxis extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      float a = i * radians((float) 180.5);
-      float r = (float) (c * sqrt(arrayController.get(i)));
-      r =
-          PApplet.map(
-              r,
-              (float) 0,
-              (float) (c * sqrt(arrayController.getLength())),
-              0,
-              Math.min(screenHeight, (float) screenWidth) / 2 - 20);
-      float x = (float) (r * cos(a));
-      float y = (float) (r * sin(a));
+      float r = mappedRadius[value];
+      float x = r * angleCos[i];
+      float y = r * angleSin[i];
 
-      proc.circle(screenWidth / 2f + x, screenHeight / 2f + y, 5); // Swirl dots
+      colorBatch.strokeAndFill(proc, rgb);
+      proc.circle(centerX + x, centerY + y, 5);
     }
   }
 }

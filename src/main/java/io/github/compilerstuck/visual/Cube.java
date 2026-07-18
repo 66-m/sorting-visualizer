@@ -12,13 +12,32 @@ import processing.core.PApplet;
 
 public class Cube extends Visualization {
 
+  private static final float SIN_TILT = (float) Math.sin(-10);
+  private static final float COS_TILT = (float) Math.cos(-10);
+
   int radius;
   static float aa = 0;
 
+  private final ColorBatch colorBatch = new ColorBatch();
+
   private int[] colorsRgb;
+  private float[] baseX, baseY, baseZ;
   private float[] xCords, yCords, zCords;
   private float[] sizes;
   private int bufferCapacity;
+  private int latticeXSize = -1;
+  private int latticeRadius = -1;
+  private int latticeDrawCount = -1;
+
+  private long cachedRevision = Long.MIN_VALUE;
+  private int cachedWidth = -1;
+  private int cachedHeight = -1;
+  private int cachedDrawCount = -1;
+  private int cachedLength = -1;
+  private float cachedMaxBoxSize = -1;
+  private ColorGradient cachedGradient;
+  private int lastFillRgb;
+  private boolean hasFillAlpha;
 
   public Cube(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -30,70 +49,33 @@ public class Cube extends Visualization {
     if (colorsRgb != null && bufferCapacity >= n) return;
     bufferCapacity = n;
     colorsRgb = new int[n];
+    baseX = new float[n];
+    baseY = new float[n];
+    baseZ = new float[n];
     xCords = new float[n];
     yCords = new float[n];
     zCords = new float[n];
     sizes = new float[n];
+    latticeXSize = -1;
+    latticeRadius = -1;
+    latticeDrawCount = -1;
   }
 
-  @Override
-  public void update() {
-    super.update();
-
-    proc.lights();
-
-    radius = (int) (min(screenHeight, screenWidth) / 3.5);
-
-    aa -= PApplet.PI / (10 * proc.frameRate());
-
-    int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
-    if (xSize < 1) {
-      xSize = 1;
+  private void rebuildLattice(int drawCount, int xSize, int radius) {
+    if (latticeDrawCount == drawCount && latticeXSize == xSize && latticeRadius == radius) {
+      return;
     }
-    int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
+    latticeDrawCount = drawCount;
+    latticeXSize = xSize;
+    latticeRadius = radius;
+
     int xCnt = 0;
     int yCnt = 0;
     int zCnt = 0;
-
-    ensureBuffers(drawCount);
-
     for (int i = 0; i < drawCount; i++) {
-
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      if (arrayController.getMarker(arrayController.get(i)) == Marker.SET) {
-        sound.playSound(arrayController.get(i));
-      }
-
-      arrayController.setMarker(arrayController.get(i), Marker.NORMAL);
-
-      float barHeight =
-          ((arrayController.getLength()
-              - 2f
-                  * Math.min(
-                      Math.min(
-                          Math.abs(i - arrayController.get(i)),
-                          Math.abs(i - arrayController.getLength() - arrayController.get(i))),
-                      Math.abs(i + arrayController.getLength() - arrayController.get(i)))));
-
-      float xa = PApplet.map(xCnt, 0, xSize, -radius, radius);
-      float ya = PApplet.map(yCnt, 0, xSize, -radius, radius);
-      float za = PApplet.map(zCnt, 0, xSize, -radius, radius);
-
-      float zb = (float) (Math.sin(aa) * xa + Math.cos(aa) * za);
-      float x = (float) ((float) Math.cos(aa) * xa - Math.sin(aa) * za);
-
-      float z = (float) (Math.sin(-10) * ya + Math.cos(-10) * zb);
-      float y = (float) (Math.cos(-10) * ya - Math.sin(-10) * zb);
-
-      float size = PApplet.map(barHeight, 0, arrayController.getLength(), 0, radius * 2 / xSize);
-
-      zCords[i] = z;
-      colorsRgb[i] = color.getRGB();
-      xCords[i] = x;
-      yCords[i] = y;
-      sizes[i] = size;
+      baseX[i] = PApplet.map(xCnt, 0, xSize, -radius, radius);
+      baseY[i] = PApplet.map(yCnt, 0, xSize, -radius, radius);
+      baseZ[i] = PApplet.map(zCnt, 0, xSize, -radius, radius);
 
       zCnt++;
       if (zCnt == xSize) {
@@ -107,27 +89,111 @@ public class Cube extends Visualization {
         }
       }
     }
+  }
+
+  private void ensureSizesAndColors(int drawCount, int length, float maxBoxSize) {
+    long rev = arrayController.getVisualRevision();
+    if (cachedRevision == rev
+        && cachedWidth == screenWidth
+        && cachedHeight == screenHeight
+        && cachedDrawCount == drawCount
+        && cachedLength == length
+        && cachedMaxBoxSize == maxBoxSize
+        && cachedGradient == colorGradient) {
+      return;
+    }
+    for (int i = 0; i < drawCount; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+
+      if (arrayController.getMarker(value) == Marker.SET) {
+        sound.playSound(value);
+      }
+
+      arrayController.setMarker(value, Marker.NORMAL);
+
+      float barHeight =
+          (length
+              - 2f
+                  * Math.min(
+                      Math.min(
+                          Math.abs(i - value), Math.abs(i - length - value)),
+                      Math.abs(i + length - value)));
+
+      colorsRgb[i] = color.getRGB();
+      sizes[i] = PApplet.map(barHeight, 0, length, 0, maxBoxSize);
+    }
+    cachedRevision = rev;
+    cachedWidth = screenWidth;
+    cachedHeight = screenHeight;
+    cachedDrawCount = drawCount;
+    cachedLength = length;
+    cachedMaxBoxSize = maxBoxSize;
+    cachedGradient = colorGradient;
+  }
+
+  @Override
+  public void update() {
+    super.update();
+
+    proc.lights();
+
+    int screenMin = min(screenHeight, screenWidth);
+    radius = (int) (screenMin / 3.5);
+    float centerY = (float) screenHeight / 2 - (int) (screenMin / 10);
+    float centerZ = -(int) (screenMin / 10);
+
+    aa -= PApplet.PI / (10 * proc.frameRate());
+    float sinAa = (float) Math.sin(aa);
+    float cosAa = (float) Math.cos(aa);
+
+    int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
+    if (xSize < 1) {
+      xSize = 1;
+    }
+    int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
+    int length = arrayController.getLength();
+    float maxBoxSize = radius * 2 / xSize;
+
+    ensureBuffers(drawCount);
+    rebuildLattice(drawCount, xSize, radius);
+    ensureSizesAndColors(drawCount, length, maxBoxSize);
 
     for (int i = 0; i < drawCount; i++) {
-      proc.stroke(colorsRgb[i], 255f);
-      // proc.noStroke();
-      proc.fill(colorsRgb[i], 120f);
+      float xa = baseX[i];
+      float ya = baseY[i];
+      float za = baseZ[i];
+
+      float zb = sinAa * xa + cosAa * za;
+      float x = cosAa * xa - sinAa * za;
+      float z = SIN_TILT * ya + COS_TILT * zb;
+      float y = COS_TILT * ya - SIN_TILT * zb;
+
+      xCords[i] = x;
+      yCords[i] = y;
+      zCords[i] = z;
+    }
+
+    proc.pushMatrix();
+    proc.translate((float) screenWidth / 2, centerY, centerZ);
+    colorBatch.reset();
+    hasFillAlpha = false;
+    for (int i = 0; i < drawCount; i++) {
+      int rgb = colorsRgb[i];
+      colorBatch.stroke(proc, rgb);
+      if (!hasFillAlpha || rgb != lastFillRgb) {
+        proc.fill(rgb, 120f);
+        lastFillRgb = rgb;
+        hasFillAlpha = true;
+      }
 
       proc.pushMatrix();
-      // set screen center
-      proc.translate(
-          (float) screenWidth / 2,
-          (float) screenHeight / 2 - (int) (min(screenHeight, screenWidth) / 10),
-          -(int) (min(screenHeight, screenWidth) / 10));
-      // set circle position
       proc.translate(xCords[i], yCords[i], zCords[i]);
-
-      // proc.ellipse(0, 0, sizes.get(i), sizes.get(i));
       proc.rotateX(45);
-      proc.rotateY(0);
       proc.rotateZ(-aa);
       proc.box(sizes[i], sizes[i], sizes[i]);
       proc.popMatrix();
     }
+    proc.popMatrix();
   }
 }

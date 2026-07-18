@@ -15,49 +15,79 @@ public class DisparityPlane extends Visualization {
   float angle = 0;
   float squareRoot;
 
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private float[] tileX, tileY;
+  private int[] colorsRgb;
+  private int[] barHeights;
+  private int tileDrawCount = -1;
+  private int tileGridSize = -1;
+  private int tileRadius = -1;
+  private float cachedTileDim;
+
+  private long cachedRevision = Long.MIN_VALUE;
+  private int cachedWidth = -1;
+  private int cachedHeight = -1;
+  private int cachedDrawCount = -1;
+  private int cachedLength = -1;
+  private int cachedQuarterHeight = -1;
+  private ColorGradient cachedGradient;
+
   public DisparityPlane(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
     super(arrayController, colorGradient, sound, proc);
     name = "3D - Disparity Plane";
   }
 
-  @Override
-  public void update() {
-    super.update();
-
-    // int rectWidth = (screenWidth - (arrayController.getLength() - 1)) /
-    // arrayController.getLength();
-    int radius = (int) (Math.min(screenHeight, screenWidth) / 1.2);
-
-    angle += PApplet.PI / (15 * proc.frameRate());
-    proc.lights();
-
-    int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
-    squareRoot = nextN;
-    int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
-
+  private void rebuildTiles(int drawCount, int gridSize, int radius, float tileDim) {
+    if (tileDrawCount == drawCount
+        && tileGridSize == gridSize
+        && tileRadius == radius
+        && cachedTileDim == tileDim) {
+      return;
+    }
+    tileDrawCount = drawCount;
+    tileGridSize = gridSize;
+    tileRadius = radius;
+    cachedTileDim = tileDim;
+    if (tileX == null || tileX.length < drawCount) {
+      tileX = new float[drawCount];
+      tileY = new float[drawCount];
+      colorsRgb = new int[drawCount];
+      barHeights = new int[drawCount];
+    }
+    float sq = gridSize;
     for (int i = 0; i < drawCount; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      tileX[i] = -radius / 2 + (int) floor(i / sq) * tileDim;
+      tileY[i] = -radius / 2 + i % sq * tileDim;
+    }
+  }
 
-      int barHeight =
-          screenHeight / 4
+  private void ensureBarHeightsAndColors(int drawCount, int length, int quarterHeight) {
+    long rev = arrayController.getVisualRevision();
+    if (cachedRevision == rev
+        && cachedWidth == screenWidth
+        && cachedHeight == screenHeight
+        && cachedDrawCount == drawCount
+        && cachedLength == length
+        && cachedQuarterHeight == quarterHeight
+        && cachedGradient == colorGradient) {
+      return;
+    }
+    for (int i = 0; i < drawCount; i++) {
+      int value = arrayController.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+
+      barHeights[i] =
+          quarterHeight
               - (int)
-                  (((screenHeight / 4 - 10.)
-                      / arrayController.getLength()
-                      * (arrayController.getLength()
+                  (((quarterHeight - 10.)
+                      / length
+                      * (length
                           - 2
                               * Math.min(
-                                  Math.min(
-                                      Math.abs(i - arrayController.get(i)),
-                                      Math.abs(
-                                          i
-                                              - arrayController.getLength()
-                                              - arrayController.get(i))),
-                                  Math.abs(
-                                      i + arrayController.getLength() - arrayController.get(i))))));
-
-      float tileDim = radius / squareRoot;
+                                  Math.min(Math.abs(i - value), Math.abs(i - length - value)),
+                                  Math.abs(i + length - value)))));
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -65,33 +95,55 @@ public class DisparityPlane extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      proc.stroke(color.getRGB());
-      proc.fill(color.getRGB());
+      colorsRgb[i] = color.getRGB();
+    }
+    cachedRevision = rev;
+    cachedWidth = screenWidth;
+    cachedHeight = screenHeight;
+    cachedDrawCount = drawCount;
+    cachedLength = length;
+    cachedQuarterHeight = quarterHeight;
+    cachedGradient = colorGradient;
+  }
 
-      // Classic bar: proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth),
-      // screenHeight, rectWidth, -1 * barHeight);
+  @Override
+  public void update() {
+    super.update();
+
+    int screenMin = Math.min(screenHeight, screenWidth);
+    int radius = (int) (screenMin / 1.2);
+    int length = arrayController.getLength();
+    float centerY = (float) (screenHeight / 2.5);
+    float centerZ = -(int) (screenMin / 10);
+    int quarterHeight = screenHeight / 4;
+
+    angle += PApplet.PI / (15 * proc.frameRate());
+    proc.lights();
+
+    int nextN = (int) (floor(Math.pow(length, 1 / 2.) + 0.1));
+    squareRoot = nextN;
+    int drawCount = Math.min(length, nextN * nextN);
+    float tileDim = radius / squareRoot;
+
+    rebuildTiles(drawCount, nextN, radius, tileDim);
+    ensureBarHeightsAndColors(drawCount, length, quarterHeight);
+    float halfTile = tileDim / 2f;
+
+    proc.pushMatrix();
+    proc.translate((float) screenWidth / 2, centerY, centerZ);
+    proc.rotateX(PConstants.PI / 3);
+    proc.rotateZ(angle);
+
+    colorBatch.reset();
+    for (int i = 0; i < drawCount; i++) {
+      colorBatch.strokeAndFill(proc, colorsRgb[i]);
 
       proc.pushMatrix();
-
-      proc.translate(
-          (float) screenWidth / 2,
-          (float) (screenHeight / 2.5),
-          -(int) (Math.min(screenHeight, screenWidth) / 10));
-
-      proc.rotateX(PConstants.PI / 3);
-      proc.rotateZ(angle);
-
-      // Pyramid: proc.translate(0, 0, radius/2 - PApplet.map(i, 0, arrayController.getLength(), 0,
-      // radius));
-
-      proc.translate(
-          -radius / 2 + (int) floor(i / squareRoot) * tileDim,
-          -radius / 2 + i % squareRoot * tileDim,
-          barHeight);
-
-      proc.rect(-tileDim / 2, -tileDim / 2, tileDim, tileDim);
-
+      proc.translate(tileX[i], tileY[i], barHeights[i]);
+      proc.rect(-halfTile, -halfTile, tileDim, tileDim);
       proc.popMatrix();
     }
+
+    proc.popMatrix();
   }
 }

@@ -10,7 +10,12 @@ import processing.core.PConstants;
 
 public class SphereHoops extends Visualization {
 
-  float angle = 0;
+  private final ColorBatch colorBatch = new ColorBatch();
+
+  private float[] hoopWidths;
+  private float[] zOffsets;
+  private int cacheLength = -1;
+  private int cacheRadius = -1;
 
   public SphereHoops(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
@@ -18,25 +23,45 @@ public class SphereHoops extends Visualization {
     name = "3D - Sphere Hoops";
   }
 
+  private void rebuildGeometry(int length, int radius) {
+    if (cacheLength == length && cacheRadius == radius) {
+      return;
+    }
+    cacheLength = length;
+    cacheRadius = radius;
+    if (hoopWidths == null || hoopWidths.length < length) {
+      hoopWidths = new float[length];
+      zOffsets = new float[length];
+    }
+    for (int i = 0; i < length; i++) {
+      float wi = (float) Math.sqrt(1 - Math.pow((((float) i / length) * 2 - 1), 2));
+      hoopWidths[i] = (int) PApplet.map(wi, 0, 1, 0, radius);
+      zOffsets[i] = radius / 2 - PApplet.map(i, 0, length, 0, radius);
+    }
+  }
+
   @Override
   public void update() {
     super.update();
 
-    // int rectWidth = (screenWidth - (arrayController.getLength() - 1)) /
-    // arrayController.getLength();
-    int radius = (int) (Math.min(screenHeight, screenWidth) / 1.5);
+    int screenMin = Math.min(screenHeight, screenWidth);
+    int radius = (int) (screenMin / 1.5);
+    int length = arrayController.getLength();
+    float centerZ = -(int) (screenMin / 10);
 
-    angle -= PApplet.PI / (15 * proc.frameRate());
     proc.lights();
 
-    for (int i = 0; i < arrayController.getLength(); i++) {
+    rebuildGeometry(length, radius);
+
+    proc.noFill();
+    proc.pushMatrix();
+    proc.translate((float) screenWidth / 2, (float) (screenHeight / 2), centerZ);
+    proc.rotateX(PConstants.PI / 3);
+
+    colorBatch.reset();
+    for (int i = 0; i < length; i++) {
       Color color =
           colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
-
-      float wi =
-          (float) Math.sqrt(1 - Math.pow((((float) i / arrayController.getLength()) * 2 - 1), 2));
-
-      int sphere_wi = (int) PApplet.map(wi, 0, 1, 0, radius);
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -44,28 +69,14 @@ public class SphereHoops extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      proc.stroke(color.getRGB());
-      // proc.fill(color.getRGB());
-      proc.noFill();
-
-      // proc.rect(PApplet.map(i, 0, arrayController.getLength(), 0, screenWidth), screenHeight,
-      // rectWidth, -1 * barHeight); //Classic bar
+      colorBatch.stroke(proc, color.getRGB());
 
       proc.pushMatrix();
-
-      proc.translate(
-          (float) screenWidth / 2,
-          (float) (screenHeight / 2),
-          -(int) (Math.min(screenHeight, screenWidth) / 10));
-
-      proc.rotateX(PConstants.PI / 3);
-      // proc.rotateX(angle);
-
-      proc.translate(0, 0, radius / 2 - PApplet.map(i, 0, arrayController.getLength(), 0, radius));
-
-      proc.circle(0, 0, sphere_wi);
-
+      proc.translate(0, 0, zOffsets[i]);
+      proc.circle(0, 0, hoopWidths[i]);
       proc.popMatrix();
     }
+
+    proc.popMatrix();
   }
 }

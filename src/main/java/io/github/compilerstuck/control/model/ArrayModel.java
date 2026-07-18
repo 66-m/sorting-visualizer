@@ -58,4 +58,11 @@ public interface ArrayModel {
    * Consumers should not modify the returned array except via the ArrayModel API.
    */
   int[] getArray();
+
+  /**
+   * Monotonic counter bumped when array contents change ({@code set}/{@code swap}/resize/reset) or
+   * when a marker value changes. Visuals can use this to skip idle recomputation. Setting a marker
+   * to the same value it already has does not bump the counter.
+   */
+  long getVisualRevision();
 }
