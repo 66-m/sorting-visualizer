@@ -6,4 +6,7 @@ if [ ! -f ./target/sorting-visualizer.jar ]; then
     exit 1
 fi
 
-java --enable-native-access=ALL-UNNAMED -cp "target/sorting-visualizer.jar:target/dependency/*" io.github.compilerstuck.control.MainController "$@"
+java --enable-native-access=ALL-UNNAMED \
+  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
+  -cp "target/sorting-visualizer.jar:target/dependency/*" \
+  io.github.compilerstuck.control.MainController "$@"
