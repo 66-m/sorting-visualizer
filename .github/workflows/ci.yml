@@ -17,16 +17,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 26
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - name: Build, Spotless, and test
-        run: |
-          mvn --batch-mode clean verify
+          cache: maven
+      - name: Spotless check
+        run: mvn --batch-mode spotless:check
+      - name: Build and test
+        run: mvn --batch-mode clean verify -Dspotless.check.skip=true
 
   sbom:
     runs-on: ubuntu-latest
@@ -37,13 +32,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 26
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-sbom-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          cache: maven
       - name: Generate CycloneDX SBOM
         run: mvn --batch-mode -Prelease package -DskipTests
       - name: Upload SBOM
