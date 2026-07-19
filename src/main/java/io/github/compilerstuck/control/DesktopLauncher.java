@@ -48,6 +48,6 @@ public final class DesktopLauncher {
       config.setMaximized(true);
     }
 
-    new Lwjgl3Application(new SortingVisualizerGame(bounds), config);
+    new Lwjgl3Application(new SortingVisualizerGame(), config);
   }
 }

@@ -37,7 +37,7 @@ Pass any of these after the JAR name (order does not matter; `fullscreen` wins o
 |------|--------|
 | `fullscreen` | Fullscreen visualization on the chosen display |
 | `portrait` | Tall portrait window (~9:16) |
-| `--display=N` | Use display `N` (1-based; default is the primary) |
+| `--display=N` | Visualization on display `N` (1-based; default is display 2 when multiple monitors exist, otherwise the primary). Settings always opens centered on the primary screen. |
 
 ```sh
 java --enable-native-access=ALL-UNNAMED \

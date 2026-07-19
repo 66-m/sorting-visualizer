@@ -1,11 +1,11 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
-import atlantafx.base.controls.ToggleSwitch;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 
-/** Sound effects toggle bound to {@link SoundViewModel}. */
+/** Sound effects checkbox bound to {@link SoundViewModel}. */
 public final class SoundSection {
 
   public static final String ROOT_ID = "section-sound";
@@ -13,9 +13,9 @@ public final class SoundSection {
   private SoundSection() {}
 
   public static Node build(SoundViewModel vm) {
-    ToggleSwitch toggle = new ToggleSwitch(SettingsStrings.SOUND_EFFECTS);
-    toggle.setSelected(vm.isSoundEnabled());
-    toggle
+    CheckBox soundEffects = new CheckBox(SettingsStrings.SOUND_EFFECTS);
+    soundEffects.setSelected(vm.isSoundEnabled());
+    soundEffects
         .selectedProperty()
         .addListener(
             (obs, old, selected) -> {
@@ -29,19 +29,19 @@ public final class SoundSection {
             boolean enabled = Boolean.TRUE.equals(evt.getNewValue());
             VmBindings.runFx(
                 () -> {
-                  if (toggle.isSelected() != enabled) {
-                    toggle.setSelected(enabled);
+                  if (soundEffects.isSelected() != enabled) {
+                    soundEffects.setSelected(enabled);
                   }
                 });
           }
         });
     VmBindings.bindInputsEnabled(
-        toggle,
+        soundEffects,
         vm::isInputsEnabled,
         vm::addPropertyChangeListener,
         SoundViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(toggle);
+    VBox root = new VBox(soundEffects);
     root.setId(ROOT_ID);
     return root;
   }

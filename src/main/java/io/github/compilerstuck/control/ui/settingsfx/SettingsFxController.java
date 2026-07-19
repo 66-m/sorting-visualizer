@@ -12,7 +12,6 @@ import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SpeedViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.VisualizationViewModel;
-import java.awt.Rectangle;
 import java.net.URL;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -20,13 +19,14 @@ import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -51,11 +51,6 @@ public final class SettingsFxController {
   private Button cancelButton;
   private boolean contentReady;
 
-  /** Cap for packed stage height (typically ~90% of launch screen). */
-  private int maxStageHeight = MainControllerConfig.SETTINGS_DEFAULT_HEIGHT;
-
-  private Rectangle launchBounds;
-
   private SoundViewModel soundVm;
   private SpeedViewModel speedVm;
   private DisplayViewModel displayVm;
@@ -71,15 +66,16 @@ public final class SettingsFxController {
   private SettingsFxController() {}
 
   /**
-   * Opens the Settings window chrome immediately (placeholder content). Call as soon as launch
-   * bounds are known so the Stage appears while libGDX / AppContext init finishes.
+   * Opens the Settings window chrome immediately (placeholder content). Call early so the Stage
+   * appears on the primary screen while libGDX / AppContext init finishes.
    */
-  public static void prepare(Rectangle launchScreenBounds) {
+  public static void prepare() {
     Platform.runLater(
         () -> {
           SettingsFxController ctrl = instance();
-          ctrl.ensureChrome(launchScreenBounds);
+          ctrl.ensureChrome();
           ctrl.raiseAndShow();
+          ctrl.centerOnPrimaryScreen();
           LOGGER.info("SettingsFx Stage prepared (placeholder)");
         });
   }
@@ -87,15 +83,15 @@ public final class SettingsFxController {
   /**
    * Replaces the placeholder with live {@link AppContext} wiring. Must be called after bootstrap.
    */
-  public static void show(Rectangle launchScreenBounds, AppContext appContext) {
+  public static void show(AppContext appContext) {
     Objects.requireNonNull(appContext, "appContext");
     Platform.runLater(
         () -> {
           SettingsFxController ctrl = instance();
-          ctrl.ensureChrome(launchScreenBounds);
+          ctrl.ensureChrome();
           ctrl.ensureContent(appContext);
           ctrl.raiseAndShow();
-          ctrl.packStageToContent();
+          ctrl.centerOnPrimaryScreen();
           LOGGER.info("SettingsFx Stage shown");
         });
   }
@@ -170,12 +166,11 @@ public final class SettingsFxController {
   }
 
   /** Creates and sizes the Stage with a lightweight placeholder scene (no section graph). */
-  private void ensureChrome(Rectangle launchScreenBounds) {
+  private void ensureChrome() {
     if (stage != null) {
       return;
     }
 
-    launchBounds = launchScreenBounds;
     stage = new Stage();
     stage.setTitle(SettingsStrings.WINDOW_TITLE);
     stage.setScene(placeholderScene());
@@ -186,23 +181,18 @@ public final class SettingsFxController {
     stage.setMinWidth(MainControllerConfig.SETTINGS_MIN_WIDTH);
     stage.setMinHeight(MainControllerConfig.SETTINGS_MIN_HEIGHT);
 
-    int width =
-        launchScreenBounds != null
-            ? Math.max(MainControllerConfig.SETTINGS_MIN_WIDTH, launchScreenBounds.width / 2)
-            : MainControllerConfig.SETTINGS_DEFAULT_WIDTH;
-    maxStageHeight =
-        launchScreenBounds != null
-            ? Math.max(
-                MainControllerConfig.SETTINGS_MIN_HEIGHT,
-                (int) Math.round(launchScreenBounds.height * 0.9))
-            : MainControllerConfig.SETTINGS_DEFAULT_HEIGHT;
-    int height = Math.min(MainControllerConfig.SETTINGS_DEFAULT_HEIGHT, maxStageHeight);
-    if (launchScreenBounds != null) {
-      stage.setX(launchScreenBounds.x + Math.max(0, (launchScreenBounds.width - width) / 2.0));
-      stage.setY(launchScreenBounds.y + Math.max(0, (launchScreenBounds.height - height) / 2.0));
-    }
+    Rectangle2D visual = primaryVisualBounds();
+    double width =
+        Math.max(
+            MainControllerConfig.SETTINGS_MIN_WIDTH,
+            visual.getWidth() * MainControllerConfig.SETTINGS_SCREEN_FRACTION);
+    double height =
+        Math.max(
+            MainControllerConfig.SETTINGS_MIN_HEIGHT,
+            visual.getHeight() * MainControllerConfig.SETTINGS_SCREEN_FRACTION);
     stage.setWidth(width);
     stage.setHeight(height);
+    centerOnPrimaryScreen();
 
     stage.setOnCloseRequest(
         e -> {
@@ -221,33 +211,20 @@ public final class SettingsFxController {
   }
 
   /**
-   * Shrinks (or grows) the stage to the form's preferred height so the one-pager has no large empty
-   * band under the sections. Width stays half-screen; height is clamped to {@link #maxStageHeight}.
+   * Centers the Settings stage on the primary monitor using JavaFX visual bounds. AWT screen
+   * rectangles do not match JavaFX coordinates on multi-monitor / HiDPI Linux.
    */
-  private void packStageToContent() {
-    if (stage == null || stage.getScene() == null || !contentReady) {
+  private void centerOnPrimaryScreen() {
+    if (stage == null) {
       return;
     }
-    Parent root = stage.getScene().getRoot();
-    double width = stage.getWidth();
-    root.applyCss();
-    root.autosize();
-    root.resize(width, root.prefHeight(width));
-    root.layout();
+    Rectangle2D visual = primaryVisualBounds();
+    stage.setX(visual.getMinX() + Math.max(0, (visual.getWidth() - stage.getWidth()) / 2.0));
+    stage.setY(visual.getMinY() + Math.max(0, (visual.getHeight() - stage.getHeight()) / 2.0));
+  }
 
-    double prefH = root.prefHeight(width);
-    double frameChrome = 0;
-    if (stage.isShowing() && stage.getScene().getHeight() > 0) {
-      frameChrome = stage.getHeight() - stage.getScene().getHeight();
-    }
-    // Small slack so sub-pixel layout does not force a scrollbar on a fresh open.
-    int height = (int) Math.ceil(prefH + frameChrome + 4);
-    height = Math.max(MainControllerConfig.SETTINGS_MIN_HEIGHT, Math.min(height, maxStageHeight));
-    stage.setHeight(height);
-
-    if (launchBounds != null) {
-      stage.setY(launchBounds.y + Math.max(0, (launchBounds.height - height) / 2.0));
-    }
+  private static Rectangle2D primaryVisualBounds() {
+    return Screen.getPrimary().getVisualBounds();
   }
 
   private void ensureContent(AppContext appContext) {

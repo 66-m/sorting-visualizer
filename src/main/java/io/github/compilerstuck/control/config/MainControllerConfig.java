@@ -26,12 +26,15 @@ public final class MainControllerConfig {
   public static final int SETTINGS_MIN_HEIGHT = 360;
 
   /**
-   * Fallback settings size when screen bounds are unavailable / before content is packed. Height
-   * fits the collapsed one-pager; live content height is packed in {@code SettingsFxController}.
+   * Fallback settings size when the primary screen is unavailable. Live size is 3/4 of {@code
+   * Screen.getPrimary().getVisualBounds()} in {@code SettingsFxController}.
    */
   public static final int SETTINGS_DEFAULT_WIDTH = 960;
 
   public static final int SETTINGS_DEFAULT_HEIGHT = 560;
+
+  /** Settings window default size as a fraction of the screen it opens on. */
+  public static final double SETTINGS_SCREEN_FRACTION = 0.75;
 
   // Frame rate and rendering (display cadence; sort pacing uses FrameGate)
   public static final int TARGET_FRAME_RATE = 60;

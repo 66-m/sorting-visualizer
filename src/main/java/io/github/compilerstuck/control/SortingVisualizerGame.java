@@ -29,7 +29,6 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.ConfigurableVisualization;
 import io.github.compilerstuck.visual.Visualization;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,8 +41,6 @@ import javax.sound.midi.MidiUnavailableException;
  */
 public final class SortingVisualizerGame extends Game {
   private static final Logger LOGGER = Logger.getLogger(SortingVisualizerGame.class.getName());
-
-  private final Rectangle launchScreenBounds;
 
   private ArrayController arrayController;
   private SnapshotPublisher snapshotPublisher;
@@ -67,10 +64,6 @@ public final class SortingVisualizerGame extends Game {
   private int lastPublishedProgress = -1;
   private float progressPublishAccum;
 
-  public SortingVisualizerGame(Rectangle launchScreenBounds) {
-    this.launchScreenBounds = launchScreenBounds;
-  }
-
   @Override
   public void create() {
     AppAssets loadedAssets = new AppAssets();
@@ -79,7 +72,7 @@ public final class SortingVisualizerGame extends Game {
     imageRepository = new GdxImageRepository();
     renderSystem = new GdxRenderSystem(assets);
 
-    SettingsFxController.prepare(launchScreenBounds);
+    SettingsFxController.prepare();
 
     UserPreferences prefs = UserPreferences.load();
     int size = prefs.getArraySize();
@@ -142,7 +135,7 @@ public final class SortingVisualizerGame extends Game {
     resultsScreen = new ResultsScreen(this);
     setScreen(visualizerScreen);
 
-    SettingsFxController.show(launchScreenBounds, appContext);
+    SettingsFxController.show(appContext);
   }
 
   public AppContext appContext() {

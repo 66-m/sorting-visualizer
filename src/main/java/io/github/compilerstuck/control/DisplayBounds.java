@@ -8,8 +8,9 @@ import java.awt.Rectangle;
 import java.util.logging.Logger;
 
 /**
- * Resolves monitor bounds and portrait window size without a graphics backend. Shared by the libGDX
- * launcher and Settings placement.
+ * Resolves monitor bounds and portrait window size for the libGDX visualization window (AWT).
+ * Settings placement uses JavaFX {@code Screen.getPrimary().getVisualBounds()} instead — AWT and
+ * JavaFX coordinates can disagree on multi-monitor / HiDPI Linux.
  */
 public final class DisplayBounds {
   private static final Logger LOGGER = Logger.getLogger(DisplayBounds.class.getName());
@@ -17,17 +18,18 @@ public final class DisplayBounds {
   private DisplayBounds() {}
 
   /**
-   * Resolves the pixel bounds of a monitor.
+   * Resolves the pixel bounds of a monitor for the visualization window.
    *
    * @param displayIndex 1-based display index, or {@code <= 0} for the default (display 2 when more
-   *     than one monitor is available, otherwise the primary)
+   *     than one monitor is available so the primary stays free for Settings, otherwise the
+   *     primary)
    */
   public static Rectangle resolveBounds(int displayIndex) {
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     GraphicsDevice[] devices = ge.getScreenDevices();
     int index = displayIndex;
     if (index <= 0) {
-      // Prefer the secondary monitor when present so the primary stays free for other work.
+      // Prefer the secondary monitor when present so Settings can own the primary.
       index = devices.length > 1 ? 2 : 0;
     }
     GraphicsDevice device = ge.getDefaultScreenDevice();
