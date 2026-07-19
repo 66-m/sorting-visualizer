@@ -17,19 +17,26 @@ public final class DisplayBounds {
   private DisplayBounds() {}
 
   /**
-   * @param displayIndex 1-based display index, or {@code <= 0} for the primary
+   * @param displayIndex 1-based display index, or {@code <= 0} for the default (display 2 when more
+   *     than one monitor is available, otherwise the primary)
    */
   public static Rectangle resolveBounds(int displayIndex) {
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     GraphicsDevice[] devices = ge.getScreenDevices();
+    int index = displayIndex;
+    if (index <= 0) {
+      // Prefer the secondary monitor when present so the primary stays free for other work.
+      index = devices.length > 1 ? 2 : 0;
+    }
     GraphicsDevice device = ge.getDefaultScreenDevice();
-    if (displayIndex > 0 && displayIndex <= devices.length) {
-      device = devices[displayIndex - 1];
-    } else if (displayIndex > 0) {
+    if (index > 0 && index <= devices.length) {
+      device = devices[index - 1];
+    } else if (index > 0) {
+      final int requested = index;
       LOGGER.warning(
           () ->
               "Display "
-                  + displayIndex
+                  + requested
                   + " not found ("
                   + devices.length
                   + " available); using primary");

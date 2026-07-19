@@ -26,7 +26,6 @@ public final class VisualizerScreen implements Screen {
   private final HudRenderer hudRenderer = new HudRenderer();
   private final PerfOverlay perfOverlay = new PerfOverlay();
   private final PerfOverlayContext perfContext = new PerfOverlayContext();
-  private int perfLogFrameCounter;
 
   public VisualizerScreen(SortingVisualizerGame game) {
     this.game = game;
@@ -94,25 +93,6 @@ public final class VisualizerScreen implements Screen {
       }
 
       renderSystem.endFrame();
-
-      if (game.perfStatsEnabled()) {
-        perfLogFrameCounter++;
-        if (perfLogFrameCounter >= 60) {
-          perfLogFrameCounter = 0;
-          LOGGER.info(
-              renderSystem.lastFrameStats().summaryLine()
-                  + String.format(
-                      " %dx%d N=%d viz=%s %s steps=%d path3d=%s path2d=%s",
-                      perfContext.width,
-                      perfContext.height,
-                      perfContext.arrayLength,
-                      perfContext.visualization.isEmpty() ? "?" : perfContext.visualization,
-                      perfContext.running ? "running" : "idle",
-                      perfContext.stepsPerFrame,
-                      perfContext.legacy3d ? "legacy" : "instanced",
-                      perfContext.legacy2d ? "legacy" : "geo"));
-        }
-      }
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Error during visualizer render", e);
       // A failed frame must not leave the sort worker blocked forever in awaitStep().
