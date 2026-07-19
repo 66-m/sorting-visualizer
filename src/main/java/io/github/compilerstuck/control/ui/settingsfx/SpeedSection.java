@@ -11,7 +11,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-/** Speed level slider with live value (disabled while running — G5). */
+/** Speed level slider with live value (disabled while running, G5). */
 public final class SpeedSection {
 
   public static final String ROOT_ID = "section-speed";

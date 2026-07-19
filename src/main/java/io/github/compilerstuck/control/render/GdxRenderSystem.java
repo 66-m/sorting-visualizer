@@ -199,6 +199,11 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     return lastFrameStats;
   }
 
+  @Override
+  public int framesPerSecond() {
+    return lastFrameStats.fps;
+  }
+
   /** {@code true} when the hardware-instanced 3D path is active. */
   public boolean usesInstancing() {
     return useInstancing;
@@ -615,7 +620,7 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
       Gdx.gl.glDepthMask(false);
     }
     // Convex boxes: cull back faces so translucent fills do not blend far faces in mesh order.
-    // Scoped to boxes only — quads may be viewed from either side.
+    // Scoped to boxes only; quads may be viewed from either side.
     boolean cullWasEnabled = Gdx.gl.glIsEnabled(GL20.GL_CULL_FACE);
     Gdx.gl.glEnable(GL20.GL_CULL_FACE);
     Gdx.gl.glCullFace(GL20.GL_BACK);

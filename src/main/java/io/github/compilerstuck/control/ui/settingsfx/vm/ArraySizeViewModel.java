@@ -16,6 +16,7 @@ public final class ArraySizeViewModel {
   public static final String PROP_VALIDATION_MESSAGE = "validationMessage";
   public static final String PROP_CAN_RUN = "canRun";
   public static final String PROP_INPUTS_ENABLED = "inputsEnabled";
+  public static final String PROP_FPS_WARNING = "fpsWarning";
 
   private final AppContext app;
   private final Supplier<VisualConstraints> constraintsSupplier;
@@ -26,6 +27,7 @@ public final class ArraySizeViewModel {
   private boolean textValid = true;
   private String validationMessage = "";
   private boolean inputsEnabled = true;
+  private boolean fpsWarning;
 
   public ArraySizeViewModel(AppContext app, Supplier<VisualConstraints> constraintsSupplier) {
     this.app = app;
@@ -70,7 +72,7 @@ public final class ArraySizeViewModel {
     boolean oldValid = textValid;
     String oldMsg = validationMessage;
     text = raw == null ? "" : raw;
-    if (text.matches("[0-9]+") && text.length() < 6) {
+    if (text.matches("[0-9]+") && text.length() <= 6) {
       textValid = true;
       validationMessage = "";
     } else {
@@ -111,6 +113,10 @@ public final class ArraySizeViewModel {
     return inputsEnabled;
   }
 
+  public boolean isFpsWarning() {
+    return fpsWarning;
+  }
+
   public void setInputsEnabled(boolean enabled) {
     if (inputsEnabled == enabled) {
       return;
@@ -118,6 +124,32 @@ public final class ArraySizeViewModel {
     boolean old = inputsEnabled;
     inputsEnabled = enabled;
     pcs.firePropertyChange(PROP_INPUTS_ENABLED, old, enabled);
+    if (!enabled) {
+      setFpsWarning(false);
+    }
+  }
+
+  /**
+   * Samples current canvas FPS while the user is choosing size (idle). Shows a warning when FPS is
+   * known and below {@link SettingsDefaults#ARRAY_SIZE_FPS_WARNING_THRESHOLD}. Ignored while a sort
+   * is running (inputs disabled).
+   */
+  public void refreshFpsWarning() {
+    if (!inputsEnabled) {
+      setFpsWarning(false);
+      return;
+    }
+    int fps = app.getFramesPerSecond();
+    setFpsWarning(fps > 0 && fps < SettingsDefaults.ARRAY_SIZE_FPS_WARNING_THRESHOLD);
+  }
+
+  private void setFpsWarning(boolean warn) {
+    if (fpsWarning == warn) {
+      return;
+    }
+    boolean old = fpsWarning;
+    fpsWarning = warn;
+    pcs.firePropertyChange(PROP_FPS_WARNING, old, warn);
   }
 
   private void applyFitted(int fitted) {

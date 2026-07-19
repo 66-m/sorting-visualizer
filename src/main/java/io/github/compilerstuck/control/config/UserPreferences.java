@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
  * io/github/compilerstuck/sorting-visualizer}.
  *
  * <p>Phase 4 adds keys additively (shuffle, run-all, gradient, display, image path). Missing keys
- * resolve to {@link SettingsDefaults} — {@code defaultsVersion} stays at 1 (no semantic migration).
+ * resolve to {@link SettingsDefaults}; {@code defaultsVersion} stays at 1 (no semantic migration).
  */
 public final class UserPreferences {
 

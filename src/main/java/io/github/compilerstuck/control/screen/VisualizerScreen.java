@@ -70,7 +70,7 @@ public final class VisualizerScreen implements Screen {
         game.publishThenDraw(frameDelta);
       } else if (stateManager.isRunning()) {
         if (stateManager.isFrameGateSuspended()) {
-          // Worker is in a timed pause (not consuming credits) — keep animating without pacing.
+          // Worker is in a timed pause (not consuming credits); keep animating without pacing.
           game.publishThenDraw(frameDelta);
         } else {
           handleActiveSort(frameDelta);
@@ -82,7 +82,7 @@ public final class VisualizerScreen implements Screen {
       renderSystem.endWorld();
 
       hudRenderer.drawWatermark(renderSystem);
-      // Peek only — requestedStart() would consume a Run click made during a slow draw.
+      // Peek only; requestedStart() would consume a Run click made during a slow draw.
       if (stateManager.shouldPrintMeasurements()
           && (stateManager.isRunning() || !stateManager.isStartRequested())) {
         hudRenderer.drawMeasurements(renderSystem, stateManager, arrayController);

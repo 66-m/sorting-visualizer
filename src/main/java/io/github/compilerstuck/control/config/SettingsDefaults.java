@@ -15,7 +15,7 @@ public final class SettingsDefaults {
   public static final int DEFAULT_SPEED_LEVEL = 3;
   public static final boolean DEFAULT_MUTED = false;
 
-  /** Phase 4 additive defaults (missing prefs keys resolve to these — no version bump). */
+  /** Phase 4 additive defaults (missing prefs keys resolve to these, no version bump). */
   public static final ShuffleType DEFAULT_SHUFFLE_TYPE = ShuffleType.RANDOM;
 
   public static final boolean DEFAULT_PRINT_MEASUREMENTS = true;
@@ -32,7 +32,10 @@ public final class SettingsDefaults {
   public static final String DEFAULT_VISUAL_SETTINGS_BY_ID = "{}";
 
   public static final int ARRAY_SIZE_MIN = 3;
-  public static final int ARRAY_SIZE_MAX = 50_000;
+  public static final int ARRAY_SIZE_MAX = 100_000;
+
+  /** Warn in Settings when idle preview FPS falls below this while choosing array size. */
+  public static final int ARRAY_SIZE_FPS_WARNING_THRESHOLD = 24;
   public static final int SPEED_LEVEL_MIN = 1;
   public static final int SPEED_LEVEL_MAX = 5;
 

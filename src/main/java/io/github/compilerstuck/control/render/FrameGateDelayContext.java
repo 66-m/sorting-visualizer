@@ -2,7 +2,7 @@ package io.github.compilerstuck.control.render;
 
 import io.github.compilerstuck.control.model.FrameGate;
 
-/** {@link DelayContext} backed by {@link FrameGate} — no graphics dependency. */
+/** {@link DelayContext} backed by {@link FrameGate}; no graphics dependency. */
 public final class FrameGateDelayContext implements DelayContext {
   private final FrameGate frameGate;
 

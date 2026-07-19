@@ -18,7 +18,7 @@ import org.junit.jupiter.api.TestFactory;
 
 /**
  * Headless smoke test: every live visualization must construct and run one {@code render} without
- * throwing ({@link FakeRenderSystem} — no GPU).
+ * throwing ({@link FakeRenderSystem}, no GPU).
  */
 class VisualizationCatalogSmokeTest {
 

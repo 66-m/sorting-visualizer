@@ -73,4 +73,42 @@ class ArraySizeViewModelTest {
     vm.setSizeFromSlider(SettingsDefaults.ARRAY_SIZE_MIN);
     assertFalse(vm.canRun());
   }
+
+  @Test
+  void fpsWarningWhenIdlePreviewBelowThreshold() {
+    fx.renderSystem.setFramesPerSecond(20);
+    vm.refreshFpsWarning();
+    assertTrue(vm.isFpsWarning());
+
+    fx.renderSystem.setFramesPerSecond(30);
+    vm.refreshFpsWarning();
+    assertFalse(vm.isFpsWarning());
+  }
+
+  @Test
+  void fpsWarningClearedWhileInputsDisabled() {
+    fx.renderSystem.setFramesPerSecond(15);
+    vm.refreshFpsWarning();
+    assertTrue(vm.isFpsWarning());
+
+    vm.setInputsEnabled(false);
+    assertFalse(vm.isFpsWarning());
+    vm.refreshFpsWarning();
+    assertFalse(vm.isFpsWarning());
+  }
+
+  @Test
+  void fpsWarningIgnoresUnknownZeroFps() {
+    fx.renderSystem.setFramesPerSecond(0);
+    vm.refreshFpsWarning();
+    assertFalse(vm.isFpsWarning());
+  }
+
+  @Test
+  void acceptsMaxArraySizeText() {
+    vm.setText(String.valueOf(SettingsDefaults.ARRAY_SIZE_MAX));
+    assertTrue(vm.isTextValid());
+    assertTrue(vm.applyText());
+    assertEquals(SettingsDefaults.ARRAY_SIZE_MAX, vm.getSize());
+  }
 }

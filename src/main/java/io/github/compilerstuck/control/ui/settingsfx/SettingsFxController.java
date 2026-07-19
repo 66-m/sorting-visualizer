@@ -32,7 +32,7 @@ import javafx.util.Duration;
 
 /**
  * Owns the JavaFX Settings {@link Stage}, view-models, section binding, and action bar. Not an
- * {@link javafx.application.Application} subclass — classpath launcher (Phase 0).
+ * {@link javafx.application.Application} subclass: classpath launcher (Phase 0).
  *
  * <p>Window close shuts down Settings and the canvas via {@link AppContext#shutdown()}.
  */

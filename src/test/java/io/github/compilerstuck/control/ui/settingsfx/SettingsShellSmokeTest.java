@@ -88,7 +88,7 @@ class SettingsShellSmokeTest extends ApplicationTest {
   @Test
   void wiredShellPreferredHeightFitsCollapsedOnePager() {
     var root = lookup(".root").queryParent();
-    // Scene in start() is 720×560; form pref height should sit near that band — not the old 780.
+    // Scene in start() is 720×560; form pref height should sit near that band, not the old 780.
     double pref = root.prefHeight(960);
     assertTrue(pref >= 420 && pref <= 700, "unexpected prefHeight=" + pref);
   }

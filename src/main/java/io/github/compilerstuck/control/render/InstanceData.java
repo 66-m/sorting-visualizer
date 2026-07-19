@@ -7,7 +7,7 @@ package io.github.compilerstuck.control.render;
  * <p>{@link #pos} and {@link #eulerRad} are Y-up world units (World3D, scene center).
  */
 public final class InstanceData {
-  public float[] pos; // x,y,z — World3D Y-up
+  public float[] pos; // x,y,z; World3D Y-up
   public float[] scale; // sx,sy,sz
   public float[] eulerRad; // rotX,rotY,rotZ in Y-up world radians
   public int[] argb;

@@ -57,7 +57,7 @@ public final class ResultsScreen implements Screen {
         game.finishSession(false);
       }
 
-      // Run was pressed while viewing results — hand off to the visualizer idle path.
+      // Run was pressed while viewing results; hand off to the visualizer idle path.
       if (stateManager.isStartRequested()) {
         stateManager.setShowResults(false);
         game.showVisualizer();

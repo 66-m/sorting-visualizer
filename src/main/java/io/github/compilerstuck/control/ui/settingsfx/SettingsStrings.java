@@ -3,7 +3,7 @@ package io.github.compilerstuck.control.ui.settingsfx;
 /** UI strings for the JavaFX Settings shell (i18n-ready constants; English only for v1). */
 public final class SettingsStrings {
 
-  public static final String WINDOW_TITLE = "Sorting Algorithm Visualizer — Settings";
+  public static final String WINDOW_TITLE = "Sorting Algorithm Visualizer - Settings";
   public static final String TITLE = "Settings";
   public static final String LOADING = "Loading..";
 
@@ -18,6 +18,8 @@ public final class SettingsStrings {
 
   public static final String ALGORITHM = "Algorithm";
   public static final String SIZE = "Size";
+  public static final String ARRAY_SIZE_FPS_WARNING =
+      "Preview is below 24 FPS at this size. Sorting will be even heavier, consider fewer elements.";
   public static final String LEVEL = "Level";
   public static final String PRESET = "Preset";
   public static final String IMAGE = "Image";
@@ -74,7 +76,7 @@ public final class SettingsStrings {
   public static final String RUN_ALL_ORDER_COUNT = "%d selected";
   public static final String RUN_ALL_ORDER_COUNT_ONE = "1 selected";
   public static final String RUN_ALL_ORDER_EMPTY = "Select at least one algorithm to run.";
-  public static final String RUN_ALL_ORDER_SKIPPED = "—";
+  public static final String RUN_ALL_ORDER_SKIPPED = "-";
   public static final String RUN_ALL_ORDER_DRAG_TOOLTIP = "Drag to reorder";
   public static final String DONE = "Done";
   public static final String SELECT_ALL = "Select all";

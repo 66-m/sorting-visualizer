@@ -70,7 +70,7 @@ public final class JavaFxBootstrap {
       scene.getStylesheets().add(css.toExternalForm());
     }
 
-    // applyCss alone does not build ComboBox/ColorPicker popup skins — those only load on show().
+    // applyCss alone does not build ComboBox/ColorPicker popup skins; those only load on show().
     Stage warm = new Stage(StageStyle.UTILITY);
     warm.setOpacity(0);
     warm.setX(-20_000);

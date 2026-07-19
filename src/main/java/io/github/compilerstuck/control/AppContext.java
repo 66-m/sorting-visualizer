@@ -256,6 +256,11 @@ public final class AppContext {
     this.renderSystem = renderSystem;
   }
 
+  /** Recent canvas FPS, or {@code 0} if graphics are not wired yet. */
+  public int getFramesPerSecond() {
+    return renderSystem != null ? renderSystem.framesPerSecond() : 0;
+  }
+
   public DelayContext getDelayContext() {
     return delayContext;
   }
@@ -369,7 +374,7 @@ public final class AppContext {
 
   /**
    * Load and resize an image on the caller thread (render thread for GDX texture upload). Validates
-   * nothing about the filesystem — Settings VM does NIO checks first.
+   * nothing about the filesystem; Settings VM does NIO checks first.
    */
   public boolean loadImageForVisualization(ImageSourceVisualization viz, String path) {
     if (viz == null || imageRepository == null || renderSystem == null) {

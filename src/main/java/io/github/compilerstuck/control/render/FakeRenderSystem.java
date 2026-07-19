@@ -24,10 +24,20 @@ public final class FakeRenderSystem implements RenderSystem {
   private int[] remapScratch;
   private int lastArgbRevision = Integer.MIN_VALUE;
   private int lastRemapRevision = Integer.MIN_VALUE;
+  private int framesPerSecond;
 
   public FakeRenderSystem(int width, int height) {
     this.width = width;
     this.height = height;
+  }
+
+  public void setFramesPerSecond(int framesPerSecond) {
+    this.framesPerSecond = Math.max(0, framesPerSecond);
+  }
+
+  @Override
+  public int framesPerSecond() {
+    return framesPerSecond;
   }
 
   public void resetCounts() {

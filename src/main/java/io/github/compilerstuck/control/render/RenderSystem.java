@@ -5,7 +5,7 @@ import io.github.compilerstuck.control.render.asset.ImageStripRemap;
 
 /**
  * Idiomatic libGDX draw surface for visualizations: batched 2D + instanced-style 3D. Owned by the
- * app frame pipeline — visuals submit geometry; they do not manage cameras, batches, or HUD.
+ * app frame pipeline: visuals submit geometry; they do not manage cameras, batches, or HUD.
  *
  * <p>World2D: bottom-left Y-up. World3D: center Y-up. Overlay ({@link #drawText}, {@link
  * #drawArgbPixels}): top-left Y-down screen pixels.
@@ -31,6 +31,11 @@ public interface RenderSystem {
   int getHeight();
 
   float deltaTime();
+
+  /** Recent frames-per-second estimate, or {@code 0} if unknown / unavailable. */
+  default int framesPerSecond() {
+    return 0;
+  }
 
   /**
    * Active authoring space for subsequent world 2D/3D draws. Overlay text/pixels ignore this and

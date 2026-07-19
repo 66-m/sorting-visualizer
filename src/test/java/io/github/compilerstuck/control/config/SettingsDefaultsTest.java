@@ -23,7 +23,8 @@ class SettingsDefaultsTest {
     assertEquals("{}", SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
 
     assertEquals(3, SettingsDefaults.ARRAY_SIZE_MIN);
-    assertEquals(50_000, SettingsDefaults.ARRAY_SIZE_MAX);
+    assertEquals(100_000, SettingsDefaults.ARRAY_SIZE_MAX);
+    assertEquals(24, SettingsDefaults.ARRAY_SIZE_FPS_WARNING_THRESHOLD);
     assertEquals(1, SettingsDefaults.SPEED_LEVEL_MIN);
     assertEquals(5, SettingsDefaults.SPEED_LEVEL_MAX);
 
@@ -33,7 +34,7 @@ class SettingsDefaultsTest {
   @Test
   void clampsMatchPreviousRanges() {
     assertEquals(3, SettingsDefaults.clampArraySize(0));
-    assertEquals(50_000, SettingsDefaults.clampArraySize(99_999));
+    assertEquals(100_000, SettingsDefaults.clampArraySize(999_999));
     assertEquals(1280, SettingsDefaults.clampArraySize(1280));
 
     assertEquals(1, SettingsDefaults.clampSpeedLevel(0));

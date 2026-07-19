@@ -84,6 +84,6 @@ public final class MainControllerConfig {
   public static final float TABLE_COLUMN_WIDTH_RATIO = 1.0f / 7.0f;
   public static final float TABLE_TOP_ROW = 50.0f;
 
-  // Default configuration (delegates to SettingsDefaults — single source of truth)
+  // Default configuration (delegates to SettingsDefaults, single source of truth)
   public static final int DEFAULT_ARRAY_SIZE = SettingsDefaults.DEFAULT_ARRAY_SIZE;
 }

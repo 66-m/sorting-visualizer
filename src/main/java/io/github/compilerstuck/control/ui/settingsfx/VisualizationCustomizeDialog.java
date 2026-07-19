@@ -169,7 +169,7 @@ public final class VisualizationCustomizeDialog {
               });
         });
 
-    // Close — same dirty confirmation as the window X.
+    // Close: same dirty confirmation as the window X.
     Button closeButton = (Button) dialog.getDialogPane().lookupButton(closeType);
     closeButton.addEventFilter(
         javafx.event.ActionEvent.ACTION,

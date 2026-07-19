@@ -19,7 +19,7 @@
   -fx-opacity: 0;
 }
 
-/* —— Run Deck shell —— */
+/* --- Run Deck shell --- */
 .settings-title {
   -fx-font-size: 1.35em;
   -fx-font-weight: bold;
@@ -68,12 +68,17 @@
   -fx-font-size: 0.85em;
 }
 
+.settings-inline-warning {
+  -fx-text-fill: -color-warning-fg;
+  -fx-font-size: 0.85em;
+}
+
 .settings-inline-success {
   -fx-text-fill: -color-success-fg;
   -fx-font-size: 0.85em;
 }
 
-/* —— Run-all order dialog —— */
+/* --- Run-all order dialog --- */
 .run-all-order-dialog {
   -fx-padding: 10 14 10 14;
 }
@@ -164,7 +169,7 @@
   -fx-spacing: 2;
 }
 
-/* —— Visualization Customize dialog —— */
+/* --- Visualization Customize dialog --- */
 .customize-dialog {
   -fx-padding: 10 14 10 14;
 }

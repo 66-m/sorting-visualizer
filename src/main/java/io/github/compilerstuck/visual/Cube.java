@@ -81,7 +81,7 @@ public class Cube extends Visualization implements ConfigurableVisualization {
       return;
     }
     settings = cube;
-    // Scene scale affects lattice radius — force rebuild on next frame.
+    // Scene scale affects lattice radius; force rebuild on next frame.
     latticeXSize = -1;
     latticeRadius = -1;
     latticeDrawCount = -1;

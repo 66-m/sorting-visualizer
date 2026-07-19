@@ -208,7 +208,7 @@ public class SortingSessionManager {
   /**
    * Mutes and sleeps while telling the render thread to draw without FrameGate pacing. Draining
    * alone is not enough: during the sleep {@code isRunning} stays true, so the next frame would
-   * grant fresh credits that nobody consumes until the sleep ends — freezing the view for the whole
+   * grant fresh credits that nobody consumes until the sleep ends, freezing the view for the whole
    * pause.
    */
   private void sleepWithoutStepCredits(int delayMs, String interruptLog) {

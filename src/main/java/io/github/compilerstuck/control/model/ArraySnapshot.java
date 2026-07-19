@@ -40,7 +40,7 @@ public final class ArraySnapshot implements ArrayModel {
   }
 
   /**
-   * Returns the snapshot values buffer. Do not mutate — owned by {@link SnapshotPublisher} and
+   * Returns the snapshot values buffer. Do not mutate; owned by {@link SnapshotPublisher} and
    * reused across publishes.
    */
   @Override

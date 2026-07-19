@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * Versioned JSON codec for clipboard envelopes and the prefs map of per-visualization settings.
- * Hand-rolled (no JSON library) — only the shapes this app emits/accepts.
+ * Hand-rolled (no JSON library); only the shapes this app emits/accepts.
  */
 public final class VisualizationSettingsCodec {
 

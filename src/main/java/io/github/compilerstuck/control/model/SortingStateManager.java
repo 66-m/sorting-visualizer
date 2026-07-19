@@ -18,7 +18,7 @@ public class SortingStateManager {
 
   /**
    * True while the sort worker is sleeping between phases (post-shuffle / post-sort). Render must
-   * draw without granting FrameGate credits — the worker is not consuming steps.
+   * draw without granting FrameGate credits; the worker is not consuming steps.
    */
   private final AtomicBoolean frameGateSuspended = new AtomicBoolean(false);
 

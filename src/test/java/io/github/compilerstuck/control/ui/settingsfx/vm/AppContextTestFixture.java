@@ -48,7 +48,7 @@ public final class AppContextTestFixture {
     gradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red");
     gradient.updateGradient(arraySize);
 
-    // Fresh instance (do not load machine prefs — keeps tests hermetic).
+    // Fresh instance (do not load machine prefs; keeps tests hermetic).
     preferences = new UserPreferences();
     preferences.setArraySize(arraySize);
     preferences.setAlgorithmId(SettingsDefaults.DEFAULT_ALGORITHM_ID);

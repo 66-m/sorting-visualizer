@@ -24,7 +24,7 @@ import javafx.scene.layout.VBox;
 /**
  * Draft editor for {@link CubeSettings}.
  *
- * <p>Layout: sectioned form on a 4-column grid — label | control | value | reset — so every row
+ * <p>Layout: sectioned form on a 4-column grid (label | control | value | reset) so every row
  * shares the same alignment and density.
  */
 public final class CubeCustomizePanel implements VisualizationCustomizePanel {

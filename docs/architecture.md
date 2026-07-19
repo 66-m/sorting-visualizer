@@ -4,11 +4,11 @@ Versioned overview of the Sorting Algorithm Visualizer desktop app (libGDX rende
 
 ## Style
 
-- **Monolith** — single Maven module, single JVM process
-- **Dual toolkit UI** — libGDX/LWJGL3 canvas (`SortingVisualizerGame` + Screens + `GdxRenderSystem`) + JavaFX Settings (`SettingsFxController` / AtlantaFX Primer Light)
-- **Worker thread** — algorithms run in `SortingSessionManager`; draw loop on the libGDX render thread
-- **Ports** — `ArrayModel` (working + published snapshot), `DelayContext` / `FrameGate` (pacing + idle fence), `RenderSystem`, `Sound`, catalogs
-- **Snapshots** — `SnapshotPublisher` copies working → published after `FrameGate.awaitIdle()`; visuals never write markers
+- **Monolith**: single Maven module, single JVM process
+- **Dual toolkit UI**: libGDX/LWJGL3 canvas (`SortingVisualizerGame` + Screens + `GdxRenderSystem`) + JavaFX Settings (`SettingsFxController` / AtlantaFX Primer Light)
+- **Worker thread**: algorithms run in `SortingSessionManager`; draw loop on the libGDX render thread
+- **Ports**: `ArrayModel` (working + published snapshot), `DelayContext` / `FrameGate` (pacing + idle fence), `RenderSystem`, `Sound`, catalogs
+- **Snapshots**: `SnapshotPublisher` copies working → published after `FrameGate.awaitIdle()`; visuals never write markers
 
 Toolkit coexistence: bootstrap JavaFX with `Platform.startup` **before** `Lwjgl3Application`; Settings close or canvas Esc → full shutdown.
 
@@ -79,7 +79,7 @@ flowchart TB
 | `GeometryBatch2D` | Colored circle quads + low-seg ellipse lines (Phase 8) |
 | `RenderSystem` | Idiomatic draw API: `fillRects` / `fillCircles` / `drawBoxes` / `drawImageRemap` / … |
 | `HudRenderer` | Overlay watermark and metrics (after world pass; counters from working controller) |
-| `FrameGateDelayContext` | Algorithm pacing — no graphics types |
+| `FrameGateDelayContext` | Algorithm pacing; no graphics types |
 | `VisualizationCatalog` | All visualizations with size/image constraints |
 | `FrameGate` | Steps-per-frame engine + `awaitIdle` publish fence |
 | `ConfigurableVisualization` | Optional per-viz settings (`CubeSettings` today); Customize dialog drafts then Apply |

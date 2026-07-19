@@ -2,6 +2,9 @@ package io.github.compilerstuck.control.ui.settingsfx;
 
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import io.github.compilerstuck.control.ui.settingsfx.vm.ArraySizeViewModel;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -12,11 +15,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /** Array size slider + live value + validated text field. */
 public final class ArraySizeSection {
 
   public static final String ROOT_ID = "section-array-size";
+  public static final String FPS_WARNING_ID = "array-size-fps-warning";
+
+  private static final Duration FPS_POLL_INTERVAL = Duration.millis(500);
 
   private ArraySizeSection() {}
 
@@ -28,7 +35,7 @@ public final class ArraySizeSection {
         new Slider(SettingsDefaults.ARRAY_SIZE_MIN, SettingsDefaults.ARRAY_SIZE_MAX, vm.getSize());
     slider.setMaxWidth(Double.MAX_VALUE);
     slider.setBlockIncrement(1);
-    slider.setMajorTickUnit(5000);
+    slider.setMajorTickUnit(10_000);
     slider.setShowTickMarks(false);
     slider
         .valueProperty()
@@ -49,7 +56,7 @@ public final class ArraySizeSection {
     header.setAlignment(Pos.CENTER_LEFT);
 
     TextField text = new TextField(vm.getText());
-    text.setPrefColumnCount(6);
+    text.setPrefColumnCount(7);
     text.textProperty()
         .addListener(
             (obs, old, v) -> {
@@ -66,6 +73,17 @@ public final class ArraySizeSection {
     error.getStyleClass().add("settings-inline-error");
     error.setVisible(!vm.isTextValid());
     error.setManaged(!vm.isTextValid());
+
+    Label fpsWarning = new Label(SettingsStrings.ARRAY_SIZE_FPS_WARNING);
+    fpsWarning.setId(FPS_WARNING_ID);
+    fpsWarning.getStyleClass().add("settings-inline-warning");
+    fpsWarning.setWrapText(true);
+    fpsWarning.setVisible(vm.isFpsWarning());
+    fpsWarning.setManaged(vm.isFpsWarning());
+
+    Timeline fpsPoll =
+        new Timeline(new KeyFrame(FPS_POLL_INTERVAL, e -> vm.refreshFpsWarning()));
+    fpsPoll.setCycleCount(Animation.INDEFINITE);
 
     vm.addPropertyChangeListener(
         evt -> {
@@ -98,6 +116,23 @@ public final class ArraySizeSection {
           } else if (ArraySizeViewModel.PROP_VALIDATION_MESSAGE.equals(prop)) {
             String msg = String.valueOf(evt.getNewValue());
             VmBindings.runFx(() -> error.setText(msg == null ? "" : msg));
+          } else if (ArraySizeViewModel.PROP_FPS_WARNING.equals(prop)) {
+            boolean warn = Boolean.TRUE.equals(evt.getNewValue());
+            VmBindings.runFx(
+                () -> {
+                  fpsWarning.setVisible(warn);
+                  fpsWarning.setManaged(warn);
+                });
+          } else if (ArraySizeViewModel.PROP_INPUTS_ENABLED.equals(prop)) {
+            boolean enabled = Boolean.TRUE.equals(evt.getNewValue());
+            VmBindings.runFx(
+                () -> {
+                  if (enabled) {
+                    fpsPoll.play();
+                  } else {
+                    fpsPoll.stop();
+                  }
+                });
           }
         });
 
@@ -121,8 +156,17 @@ public final class ArraySizeSection {
     precision.setAlignment(Pos.CENTER_LEFT);
     HBox.setHgrow(text, Priority.ALWAYS);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, header, slider, precision, error);
+    VBox root = new VBox(SettingsLayout.GAP_SM, header, slider, precision, error, fpsWarning);
     root.setId(ROOT_ID);
+    root.sceneProperty()
+        .addListener(
+            (obs, oldScene, newScene) -> {
+              if (newScene != null && vm.isInputsEnabled()) {
+                fpsPoll.play();
+              } else {
+                fpsPoll.stop();
+              }
+            });
     return root;
   }
 

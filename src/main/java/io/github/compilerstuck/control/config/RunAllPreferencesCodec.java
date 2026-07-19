@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 /**
  * Serializes run-all order/selection as {@code id:0|1,id:0|1,...}. Malformed tokens are skipped
- * with a warning — never throws.
+ * with a warning; never throws.
  */
 public final class RunAllPreferencesCodec {
 

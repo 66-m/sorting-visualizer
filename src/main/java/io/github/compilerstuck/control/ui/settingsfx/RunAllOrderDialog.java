@@ -293,7 +293,7 @@ public final class RunAllOrderDialog {
             onChanged.run();
           }
         } catch (NumberFormatException ignored) {
-          // Invalid payload — ignore drop.
+          // Invalid payload; ignore drop.
         }
       }
       e.setDropCompleted(success);
