@@ -226,13 +226,13 @@ public class Cube extends Visualization implements ConfigurableVisualization {
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
-    int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
+    int xSize = (int) floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1);
     if (xSize < 1) {
       xSize = 1;
     }
     int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
     int length = arrayController.getLength();
-    float maxBoxSize = radius * 2 / xSize;
+    float maxBoxSize = radius * 2f / xSize;
 
     ensureBuffers(drawCount);
     rebuildLattice(drawCount, xSize, radius);

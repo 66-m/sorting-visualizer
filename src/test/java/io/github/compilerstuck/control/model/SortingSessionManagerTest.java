@@ -205,8 +205,8 @@ class SortingSessionManagerTest {
 
     List<Boolean> muteCalls = sound.getMuteCalls();
     assertTrue(muteCalls.size() >= 2, "expected mute calls during prepare");
-    assertEquals(Boolean.TRUE, muteCalls.get(0));
-    assertEquals(Boolean.FALSE, muteCalls.get(1));
+    assertEquals(true, muteCalls.get(0));
+    assertEquals(false, muteCalls.get(1));
   }
 
   private static void awaitUntilRunning(UntilCancelledAlgorithm algorithm) {

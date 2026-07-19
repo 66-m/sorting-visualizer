@@ -37,7 +37,11 @@ public final class RunAllPreferencesCodec {
     if (raw == null || raw.isBlank()) {
       return result;
     }
-    for (String token : raw.split(",")) {
+    int start = 0;
+    while (start <= raw.length()) {
+      int comma = raw.indexOf(',', start);
+      String token = comma < 0 ? raw.substring(start) : raw.substring(start, comma);
+      start = comma < 0 ? raw.length() + 1 : comma + 1;
       String trimmed = token.trim();
       if (trimmed.isEmpty()) {
         continue;

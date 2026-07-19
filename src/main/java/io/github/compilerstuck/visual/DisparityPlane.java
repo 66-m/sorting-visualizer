@@ -63,8 +63,8 @@ public class DisparityPlane extends Visualization {
     }
     float sq = gridSize;
     for (int i = 0; i < drawCount; i++) {
-      tileX[i] = -radius / 2 + (int) floor(i / sq) * tileDim;
-      tileY[i] = -radius / 2 + i % sq * tileDim;
+      tileX[i] = -radius / 2f + (int) floor(i / sq) * tileDim;
+      tileY[i] = -radius / 2f + i % sq * tileDim;
     }
   }
 
@@ -86,13 +86,13 @@ public class DisparityPlane extends Visualization {
       barHeights[i] =
           quarterHeight
               - (int)
-                  (((quarterHeight - 10.)
+                  ((quarterHeight - 10.)
                       / length
                       * (length
                           - 2
                               * Math.min(
                                   Math.min(Math.abs(i - value), Math.abs(i - length - value)),
-                                  Math.abs(i + length - value)))));
+                                  Math.abs(i + length - value))));
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
@@ -121,7 +121,7 @@ public class DisparityPlane extends Visualization {
 
     angle += (float) (Math.PI / 15) * delta;
 
-    int nextN = (int) (floor(Math.pow(length, 1 / 2.) + 0.1));
+    int nextN = (int) floor(Math.pow(length, 1 / 2.) + 0.1);
     squareRoot = nextN;
     int drawCount = Math.min(length, nextN * nextN);
     float tileDim = radius / squareRoot;

@@ -16,6 +16,7 @@ public class CombSort extends SortingAlgorithm {
     this.alternativeSize = alternativeSize;
   }
 
+  @Override
   public void sort() {
     report(name);
 
@@ -25,7 +26,7 @@ public class CombSort extends SortingAlgorithm {
 
     boolean swapped = true;
 
-    while (gap != 1 || swapped && !isCancelled()) {
+    while (gap != 1 || (swapped && !isCancelled())) {
       gap = getNextGap(gap);
 
       swapped = false;

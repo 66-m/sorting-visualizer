@@ -523,6 +523,7 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
    * Overlay blit. When {@code contentRevision} matches the last upload for this size, skips CPU→GPU
    * upload and redraws the cached texture ({@code pixelUploads} stays unchanged).
    */
+  @Override
   public void drawArgbPixels(int[] argb, int width, int height, int contentRevision) {
     if (argb == null || width <= 0 || height <= 0 || argb.length < width * height) {
       return;

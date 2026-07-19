@@ -11,6 +11,7 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
     sort(arrayController, 0, arrayController.getLength() - 1);

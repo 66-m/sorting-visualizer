@@ -51,7 +51,7 @@ public final class AppContext {
 
   private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
   private int stepsPerFrame =
-      SettingsDefaults.STEPS_PER_FRAME[SettingsDefaults.DEFAULT_SPEED_LEVEL - 1];
+      SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
   private boolean perfStatsEnabled;
 
   public AppContext(
@@ -164,7 +164,7 @@ public final class AppContext {
   }
 
   private void applySpeedLevel() {
-    stepsPerFrame = SettingsDefaults.STEPS_PER_FRAME[speedLevel - 1];
+    stepsPerFrame = SettingsDefaults.stepsPerFrame(speedLevel);
   }
 
   public Sound getSound() {

@@ -81,7 +81,7 @@ public class DisparityCircleScatter extends Visualization {
                           * Math.min(
                               Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                               Math.abs(i + length - value))))
-              / (screenHeight);
+              / screenHeight;
 
       int o = i * 3;
       xyd[o] = centerX + (int) (barHeight * scaledSin[i]);

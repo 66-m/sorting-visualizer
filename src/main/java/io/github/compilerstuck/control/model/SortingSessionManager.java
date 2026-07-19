@@ -123,14 +123,14 @@ public class SortingSessionManager {
         }
 
         recordTimestamp(startTime);
-        prepareForAlgorithm(algorithm);
+        prepareForAlgorithm();
         executeAlgorithm(algorithm);
 
         if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
           break;
         }
 
-        recordMeasurements(algorithm);
+        recordMeasurements();
         pauseAfterAlgorithm();
       }
 
@@ -159,7 +159,7 @@ public class SortingSessionManager {
     timestamps.add((int) (System.currentTimeMillis() / 1000L) - startTime);
   }
 
-  private void prepareForAlgorithm(SortingAlgorithm algorithm) {
+  private void prepareForAlgorithm() {
     sound.mute(true);
     sound.mute(false);
 
@@ -192,7 +192,7 @@ public class SortingSessionManager {
     }
   }
 
-  private void recordMeasurements(SortingAlgorithm algorithm) {
+  private void recordMeasurements() {
     comparisons.add(Long.toString(arrayController.getComparisons()));
     realTime.add(Double.toString(arrayController.getRealTime()));
     swaps.add(Long.toString(arrayController.getSwaps()));

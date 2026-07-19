@@ -66,7 +66,7 @@ public class DisparitySquareScatter extends Visualization {
   @Override
   public void update(float delta) {
     int length = arrayController.getLength();
-    sideLength = (int) (Math.min(screenHeight, screenWidth) / 2.4) * 2;
+    sideLength = (int) ((Math.min(screenHeight, screenWidth) / 2.4) * 2);
     int sideLengthX = screenWidth;
     int sideLengthY = screenHeight;
     int centerX = screenWidth / 2;
@@ -95,7 +95,7 @@ public class DisparitySquareScatter extends Visualization {
                           * Math.min(
                               Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                               Math.abs(i + length - value))))
-              / (screenHeight);
+              / screenHeight;
 
       int o = i * 3;
       xyd[o] = centerX + (int) (baseX[i] * barHeight);

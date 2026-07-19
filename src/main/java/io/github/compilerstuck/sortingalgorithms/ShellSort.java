@@ -11,6 +11,7 @@ public class ShellSort extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
 

@@ -3,6 +3,7 @@ package io.github.compilerstuck.control.ui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 class TimeEstimateFormatTest {
@@ -17,7 +18,7 @@ class TimeEstimateFormatTest {
   @Test
   void doesNotUseScientificNotation() {
     String formatted = TimeEstimateFormat.format(76_589_211_840_000.0);
-    assertFalse(formatted.toUpperCase().contains("E"));
+    assertFalse(formatted.toUpperCase(Locale.ROOT).contains("E"));
     assertEquals("76589211,84", formatted);
   }
 }

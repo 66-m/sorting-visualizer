@@ -1,6 +1,5 @@
 package io.github.compilerstuck.control.config;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -29,7 +28,11 @@ class SettingsDefaultsTest {
     assertEquals(1, SettingsDefaults.SPEED_LEVEL_MIN);
     assertEquals(5, SettingsDefaults.SPEED_LEVEL_MAX);
 
-    assertArrayEquals(new int[] {1, 5, 25, 200, 2000}, SettingsDefaults.STEPS_PER_FRAME);
+    assertEquals(1, SettingsDefaults.stepsPerFrame(1));
+    assertEquals(5, SettingsDefaults.stepsPerFrame(2));
+    assertEquals(25, SettingsDefaults.stepsPerFrame(3));
+    assertEquals(200, SettingsDefaults.stepsPerFrame(4));
+    assertEquals(2000, SettingsDefaults.stepsPerFrame(5));
   }
 
   @Test

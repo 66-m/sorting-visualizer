@@ -14,7 +14,6 @@ public class MorphingShell extends Visualization {
 
   int radius;
   private float aa = 0;
-  private float angle = 0;
 
   private final InstanceData spheres = new InstanceData();
 
@@ -105,7 +104,6 @@ public class MorphingShell extends Visualization {
     float halfW = screenWidth * 0.5f;
 
     aa += (float) (Math.PI / 10) * delta;
-    angle += (float) (Math.PI / 7.5) * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 

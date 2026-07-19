@@ -92,14 +92,14 @@ class SortingAlgorithmsTest {
           algoClass.getConstructor(ArrayModel.class).newInstance(controller);
       algorithm.setDelay(false);
       algorithm.sort();
-      String type;
-      switch (idx) {
-        case 0 -> type = "random";
-        case 1 -> type = "sorted";
-        case 2 -> type = "reverse";
-        case 3 -> type = "duplicates";
-        default -> type = "unknown";
-      }
+      String type =
+          switch (idx) {
+            case 0 -> "random";
+            case 1 -> "sorted";
+            case 2 -> "reverse";
+            case 3 -> "duplicates";
+            default -> "unknown";
+          };
       assertTrue(
           controller.isSorted(),
           algoClass.getSimpleName() + " failed to sort " + type + " dataset");

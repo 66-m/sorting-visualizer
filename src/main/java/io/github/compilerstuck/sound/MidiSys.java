@@ -4,6 +4,7 @@ import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.visual.Marker;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,7 @@ public class MidiSys extends Sound {
     synthesizerChannel = synthesizer.getChannels()[10];
 
     for (Instrument i : synthesizer.getLoadedInstruments())
-      if (i.getName().toLowerCase().trim().contains("square")) {
+      if (i.getName().toLowerCase(Locale.ROOT).trim().contains("square")) {
         synthesizerChannel.programChange(i.getPatch().getProgram());
         break;
       }

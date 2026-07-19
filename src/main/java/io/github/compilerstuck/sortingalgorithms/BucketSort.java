@@ -11,10 +11,11 @@ public class BucketSort extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
 
-    int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
+    int max = Arrays.stream(arrayController.getArray()).max().getAsInt();
     int[] bucket = new int[max + 1];
     for (int i = 0; i <= max && !isCancelled(); i++) {
       bucket[i] = 0;

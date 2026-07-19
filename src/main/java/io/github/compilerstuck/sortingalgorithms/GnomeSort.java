@@ -16,6 +16,7 @@ public class GnomeSort extends SortingAlgorithm {
     this.alternativeSize = alternativeArrSize;
   }
 
+  @Override
   public void sort() {
     report(name);
 

@@ -42,7 +42,8 @@
                         <arg>-XDcompilePolicy=simple</arg>
                         <arg>--should-stop=ifError=FLOW</arg>
                         <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
-                        <arg>-Xplugin:ErrorProne</arg>
+                        <!-- Identity (==) caches and GL singleton statics are intentional. -->
+                        <arg>-Xplugin:ErrorProne -Xep:ReferenceEquality:OFF -Xep:StaticAssignmentInConstructor:OFF</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
@@ -80,6 +81,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -96,6 +98,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>

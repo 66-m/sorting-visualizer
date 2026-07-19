@@ -8,6 +8,7 @@ import io.github.compilerstuck.control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.ReverseShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.SortedShuffleStrategy;
 import io.github.compilerstuck.visual.Marker;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ArrayController implements ArrayModel {
   private int[] array;
@@ -25,7 +26,7 @@ public class ArrayController implements ArrayModel {
   private volatile boolean metricsDirty = true;
 
   /** Bumped on content mutations and {@link Marker#SET}; see {@link #getVisualRevision()}. */
-  private volatile long visualRevision;
+  private final AtomicLong visualRevision = new AtomicLong();
 
   private double delay;
   private double realTime;
@@ -71,12 +72,12 @@ public class ArrayController implements ArrayModel {
   }
 
   private void bumpVisualRevision() {
-    visualRevision++;
+    visualRevision.incrementAndGet();
   }
 
   @Override
   public long getVisualRevision() {
-    return visualRevision;
+    return visualRevision.get();
   }
 
   @Override
@@ -128,10 +129,12 @@ public class ArrayController implements ArrayModel {
     return array;
   }
 
+  @Override
   public long getWritesAux() {
     return writesAux;
   }
 
+  @Override
   public void addWritesAux(int n) {
     this.writesAux += n;
   }

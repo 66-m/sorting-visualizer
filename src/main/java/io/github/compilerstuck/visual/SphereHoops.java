@@ -43,7 +43,7 @@ public class SphereHoops extends Visualization {
     for (int i = 0; i < length; i++) {
       float wi = (float) Math.sqrt(1 - Math.pow((((float) i / length) * 2 - 1), 2));
       hoopWidths[i] = (int) VisMath.map(wi, 0, 1, 0, radius);
-      zOffsets[i] = radius / 2 - VisMath.map(i, 0, length, 0, radius);
+      zOffsets[i] = radius / 2f - VisMath.map(i, 0, length, 0, radius);
     }
   }
 

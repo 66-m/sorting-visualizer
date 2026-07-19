@@ -10,6 +10,7 @@ public class HeapSort extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
 

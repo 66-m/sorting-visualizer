@@ -57,8 +57,8 @@ public class Plane extends Visualization {
     }
     float sq = gridSize;
     for (int i = 0; i < drawCount; i++) {
-      tileX[i] = -radius / 2 + (int) floor(i / sq) * tileDim;
-      tileY[i] = -radius / 2 + i % sq * tileDim;
+      tileX[i] = -radius / 2f + (int) floor(i / sq) * tileDim;
+      tileY[i] = -radius / 2f + i % sq * tileDim;
     }
   }
 
@@ -91,7 +91,7 @@ public class Plane extends Visualization {
 
     angle += (float) (Math.PI / 15) * delta;
 
-    int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
+    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
     float tileDim = radius / squareRoot;

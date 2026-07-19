@@ -99,7 +99,7 @@ public abstract class SortingAlgorithm {
     if (!timing) {
       return;
     }
-    arrayController.addRealTime(System.nanoTime() - startTime);
+    arrayController.addRealTime((double) (System.nanoTime() - startTime));
     timing = false;
     startTime = 0;
   }
@@ -116,7 +116,7 @@ public abstract class SortingAlgorithm {
       if (!timing) {
         beginTiming();
       } else {
-        arrayController.addRealTime(System.nanoTime() - startTime);
+        arrayController.addRealTime((double) (System.nanoTime() - startTime));
       }
 
       for (int i : markers) {

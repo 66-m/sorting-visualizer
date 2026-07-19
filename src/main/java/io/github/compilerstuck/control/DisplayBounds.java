@@ -17,6 +17,8 @@ public final class DisplayBounds {
   private DisplayBounds() {}
 
   /**
+   * Resolves the pixel bounds of a monitor.
+   *
    * @param displayIndex 1-based display index, or {@code <= 0} for the default (display 2 when more
    *     than one monitor is available, otherwise the primary)
    */

@@ -43,7 +43,7 @@ public final class SettingsDefaults {
   public static final int SPEED_LEVEL_MAX = 5;
 
   /** Speed levels 1–5 → steps granted per draw frame. */
-  public static final int[] STEPS_PER_FRAME = {1, 5, 25, 200, 2000};
+  private static final int[] STEPS_PER_FRAME = {1, 5, 25, 200, 2000};
 
   private SettingsDefaults() {}
 
@@ -53,5 +53,11 @@ public final class SettingsDefaults {
 
   public static int clampSpeedLevel(int level) {
     return Math.max(SPEED_LEVEL_MIN, Math.min(SPEED_LEVEL_MAX, level));
+  }
+
+  /** Steps granted per draw frame for a clamped speed level (1–5). */
+  public static int stepsPerFrame(int speedLevel) {
+    int level = clampSpeedLevel(speedLevel);
+    return STEPS_PER_FRAME[level - 1];
   }
 }

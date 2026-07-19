@@ -11,9 +11,10 @@ public class CountingSort extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
-    int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
+    int max = Arrays.stream(arrayController.getArray()).max().getAsInt();
     int[] counter = new int[max + 1];
     for (int i : arrayController.getArray()) {
       counter[i]++;

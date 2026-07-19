@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public final class AppAssets implements Disposable {
   public static final String FONT_PATH = "fonts/LiberationSans-Regular.ttf";
-  public static final int[] FONT_SIZES = {16, 20, 28};
+  private static final int[] FONT_SIZES = {16, 20, 28};
 
   private final FreeTypeFontGenerator fontGenerator;
   private final Map<Integer, BitmapFont> fonts = new HashMap<>();

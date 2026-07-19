@@ -48,7 +48,7 @@ public class Pyramid extends Visualization {
       zOffsets = new float[length];
     }
     for (int i = 0; i < length; i++) {
-      zOffsets[i] = radius / 2 - VisMath.map(i, 0, length, 0, radius);
+      zOffsets[i] = radius / 2f - VisMath.map(i, 0, length, 0, radius);
     }
   }
 

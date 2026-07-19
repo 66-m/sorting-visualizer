@@ -10,6 +10,7 @@ public class SelectionSort extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
 

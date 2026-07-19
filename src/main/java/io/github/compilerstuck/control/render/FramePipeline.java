@@ -16,6 +16,8 @@ public final class FramePipeline {
   }
 
   /**
+   * Returns true if this call newly entered {@link RenderPass#WORLD_2D}.
+   *
    * @return true if this call newly entered {@link RenderPass#WORLD_2D}
    */
   public boolean enterWorld2D() {
@@ -27,6 +29,8 @@ public final class FramePipeline {
   }
 
   /**
+   * Returns true if this call newly entered {@link RenderPass#WORLD_3D}.
+   *
    * @return true if this call newly entered {@link RenderPass#WORLD_3D}
    */
   public boolean enterWorld3D() {
@@ -38,6 +42,8 @@ public final class FramePipeline {
   }
 
   /**
+   * Returns true if this call newly entered {@link RenderPass#OVERLAY}.
+   *
    * @return true if this call newly entered {@link RenderPass#OVERLAY}
    */
   public boolean enterOverlay() {

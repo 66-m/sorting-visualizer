@@ -64,6 +64,7 @@ public abstract class Visualization {
    * @deprecated use {@link #update(float)}
    */
   @Deprecated
+  @SuppressWarnings("InlineMeSuggester")
   public void update() {
     update(1f / 60f);
   }

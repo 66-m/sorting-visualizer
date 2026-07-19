@@ -268,8 +268,8 @@ public final class VisualizationSettingsCodec {
         return switch (c) {
           case '{' -> parseObject();
           case '"' -> parseString();
-          case 't' -> parseLiteral("true", Boolean.TRUE);
-          case 'f' -> parseLiteral("false", Boolean.FALSE);
+          case 't' -> parseLiteral("true", true);
+          case 'f' -> parseLiteral("false", false);
           case 'n' -> parseLiteral("null", null);
           case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> parseNumber();
           default -> throw new IllegalArgumentException("Unexpected '" + c + "'");

@@ -58,7 +58,7 @@ public class MosaicSquares extends Visualization {
 
   @Override
   public void update(float delta) {
-    int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
+    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
     float squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
 

@@ -124,7 +124,7 @@ public class CubicLines extends Visualization {
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
-    int xSize = (int) (floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1));
+    int xSize = (int) floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1);
     if (xSize < 1) {
       xSize = 1;
     }

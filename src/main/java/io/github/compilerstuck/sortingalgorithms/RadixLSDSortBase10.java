@@ -20,6 +20,7 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
     this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
   }
 
+  @Override
   public void sort() {
     report(name);
 

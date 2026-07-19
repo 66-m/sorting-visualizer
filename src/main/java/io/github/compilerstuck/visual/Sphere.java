@@ -107,13 +107,13 @@ public class Sphere extends Visualization {
       }
 
       float barHeight =
-          (((float) 100000
+          100000f
               / length
               * (length
                   - 2
                       * Math.min(
                           Math.min(Math.abs(i - value), Math.abs(i - length - value)),
-                          Math.abs(i + length - value)))));
+                          Math.abs(i + length - value)));
 
       pointRadii[i] = (int) VisMath.map(barHeight, 0, 100000, 0, maxRadius);
 
@@ -131,7 +131,7 @@ public class Sphere extends Visualization {
 
   @Override
   public void update(float delta) {
-    int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
+    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
     int length = arrayController.getLength();

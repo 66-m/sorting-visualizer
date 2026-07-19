@@ -17,6 +17,7 @@ public class PigeonholeSort extends SortingAlgorithm {
     this.alternativeSize = alternativeSize;
   }
 
+  @Override
   public void sort() {
     report(name);
 

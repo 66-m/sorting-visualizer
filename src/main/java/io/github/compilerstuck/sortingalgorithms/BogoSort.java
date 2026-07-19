@@ -21,6 +21,7 @@ public class BogoSort extends SortingAlgorithm {
     this.alternativeSize = alternativeSize;
   }
 
+  @Override
   public void sort() {
     trycnt = 0;
     report(name);

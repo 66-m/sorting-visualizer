@@ -97,6 +97,7 @@ public class TimSort extends SortingAlgorithm {
     }
   }
 
+  @Override
   public void sort() {
     report(name);
 

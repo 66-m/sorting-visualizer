@@ -16,6 +16,7 @@ public class OddEvenSort extends SortingAlgorithm {
     this.alternativeSize = alternativeSize;
   }
 
+  @Override
   public void sort() {
     report(name);
 

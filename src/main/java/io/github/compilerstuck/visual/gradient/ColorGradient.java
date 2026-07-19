@@ -31,7 +31,7 @@ public class ColorGradient {
     for (int i = 0; i < size; i++) {
       double scalingFactor;
 
-      scalingFactor = (double) i / (size);
+      scalingFactor = (double) i / size;
       int r = (int) (color1.getRed() + (color2.getRed() - color1.getRed()) * scalingFactor);
       int g = (int) (color1.getGreen() + (color2.getGreen() - color1.getGreen()) * scalingFactor);
       int b = (int) (color1.getBlue() + (color2.getBlue() - color1.getBlue()) * scalingFactor);

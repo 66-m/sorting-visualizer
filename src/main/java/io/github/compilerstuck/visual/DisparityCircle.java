@@ -81,7 +81,7 @@ public class DisparityCircle extends Visualization {
                           * Math.min(
                               Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                               Math.abs(i + length - value))))
-              / (screenHeight);
+              / screenHeight;
 
       int x = centerX + (int) (barHeight * scaledSin[i]);
       int y = centerY + (int) (barHeight * scaledCos[i]);

@@ -4,6 +4,7 @@ import io.github.compilerstuck.control.AppContext;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +79,7 @@ public final class DisplayViewModel {
     }
     try {
       Path target = path;
-      if (target != null && !target.toString().toLowerCase().endsWith(".csv")) {
+      if (target != null && !target.toString().toLowerCase(Locale.ROOT).endsWith(".csv")) {
         target = Path.of(target + ".csv");
       }
       app.getSessionManager().exportCsv(target, app.getAlgorithms());

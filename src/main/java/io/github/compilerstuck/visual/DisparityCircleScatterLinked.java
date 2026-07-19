@@ -60,7 +60,7 @@ public class DisparityCircleScatterLinked extends Visualization {
                     * Math.min(
                         Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                         Math.abs(i + length - value))))
-        / (screenHeight);
+        / screenHeight;
   }
 
   @Override

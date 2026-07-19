@@ -10,6 +10,7 @@ public class DoubleSelectionSort extends SortingAlgorithm {
     alternativeSize = arrayController.getLength();
   }
 
+  @Override
   public void sort() {
     report(name);
 

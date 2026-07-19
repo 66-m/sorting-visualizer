@@ -52,8 +52,8 @@ public class DisparitySphereHoops extends Visualization {
       colorsRgb = new int[length];
     }
     for (int i = 0; i < length; i++) {
-      wiBase[i] = (float) Math.sqrt(1 - Math.pow((((float) i / length) * 2 - 1), 2));
-      zOffsets[i] = radius / 2 - VisMath.map(i, 0, length, 0, radius);
+      wiBase[i] = (float) Math.sqrt(1 - Math.pow((float) i / length * 2 - 1, 2));
+      zOffsets[i] = radius / 2f - VisMath.map(i, 0, length, 0, radius);
     }
   }
 
@@ -73,13 +73,13 @@ public class DisparitySphereHoops extends Visualization {
 
       float barHeight =
           -(float)
-              ((1f
+              (1f
                   / length
                   * (length
                       - 2
                           * Math.min(
                               Math.min(Math.abs(i - value), Math.abs(i - length - value)),
-                              Math.abs(i + length - value)))));
+                              Math.abs(i + length - value))));
       float wi = wiBase[i] * barHeight;
       sphereWi[i] = (int) VisMath.map(wi, 0, 1, 0, radius);
 
