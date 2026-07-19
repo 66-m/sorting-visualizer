@@ -8,19 +8,16 @@ public class AmericanFlagSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "American Flag Sort";
     alternativeSize = arrayController.getLength();
-    this.delayTime = 10;
   }
 
   public AmericanFlagSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "American Flag Sort";
     this.alternativeSize = alternativeSize;
-    this.delayTime = 10;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     final int M = arrayController.getLength();
 
@@ -54,7 +51,5 @@ public class AmericanFlagSort extends SortingAlgorithm {
         } while (from != origin && !isCancelled());
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

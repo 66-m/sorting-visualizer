@@ -18,9 +18,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 /**
- * Bootstraps the JavaFX toolkit once for the Settings rebuild (Phase 1). Call {@link #start()} from
- * {@code MainController.main} before {@code PApplet.main}, and {@link #shutdown()} from the real
- * app shutdown path. See Phase 0 findings for the proven call order.
+ * Bootstraps the JavaFX toolkit once for Settings. Call {@link #start()} from {@code
+ * DesktopLauncher.main} before {@code Lwjgl3Application}, and {@link #shutdown()} from the real app
+ * shutdown path.
  */
 public final class JavaFxBootstrap {
 
@@ -40,8 +40,8 @@ public final class JavaFxBootstrap {
   }
 
   /**
-   * Theme + first CSS/control classload. Runs on the FX thread while {@code PApplet.main} boots
-   * JOGL/NEWT on the caller thread so Settings' first real Scene is cheaper.
+   * Theme + first CSS/control classload. Runs on the FX thread while the libGDX window boots on the
+   * caller thread so Settings' first real Scene is cheaper.
    */
   private static void onToolkitStarted() {
     Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());

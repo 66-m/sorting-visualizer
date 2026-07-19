@@ -14,16 +14,29 @@ public class SortingStateManager {
   private final AtomicBoolean showComparisonTable = new AtomicBoolean(false);
   private final AtomicBoolean printMeasurements = new AtomicBoolean(true);
   private final AtomicBoolean shouldContinueExecution = new AtomicBoolean(true);
+  private final AtomicBoolean shuffling = new AtomicBoolean(false);
+
+  /**
+   * True while the sort worker is sleeping between phases (post-shuffle / post-sort). Render must
+   * draw without granting FrameGate credits — the worker is not consuming steps.
+   */
+  private final AtomicBoolean frameGateSuspended = new AtomicBoolean(false);
 
   private volatile String currentOperation = "Waiting";
 
   /**
-   * Checks if the user requested to start the sort.
+   * One-shot consume of a start request. Prefer {@link #isStartRequested()} for read-only checks
+   * (e.g. HUD) so a click is not discarded mid-frame.
    *
    * @return true if start was requested
    */
   public boolean requestedStart() {
     return userInitiatedStart.getAndSet(false);
+  }
+
+  /** Non-consuming peek of the start-request flag. */
+  public boolean isStartRequested() {
+    return userInitiatedStart.get();
   }
 
   public void setStartRequested(boolean value) {
@@ -78,6 +91,24 @@ public class SortingStateManager {
     shouldContinueExecution.set(value);
   }
 
+  /** True while the session worker is inside a shuffle animation. */
+  public boolean isShuffling() {
+    return shuffling.get();
+  }
+
+  public void setShuffling(boolean value) {
+    shuffling.set(value);
+  }
+
+  /** True while the worker sleeps and will not consume FrameGate credits. */
+  public boolean isFrameGateSuspended() {
+    return frameGateSuspended.get();
+  }
+
+  public void setFrameGateSuspended(boolean value) {
+    frameGateSuspended.set(value);
+  }
+
   public String getCurrentOperation() {
     return currentOperation;
   }
@@ -92,6 +123,8 @@ public class SortingStateManager {
     isRunning.set(false);
     showResults.set(false);
     shouldRestart.set(false);
+    shuffling.set(false);
+    frameGateSuspended.set(false);
     currentOperation = "Waiting";
   }
 }

@@ -1,22 +1,22 @@
 package io.github.compilerstuck.sortingalgorithms;
 
-import io.github.compilerstuck.control.config.DelayStrategy;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.model.CancellationToken;
 import io.github.compilerstuck.control.model.OperationReporter;
-import io.github.compilerstuck.control.render.ProcessingContext;
+import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.visual.Marker;
 
 public abstract class SortingAlgorithm {
-  protected ProcessingContext proc;
+  protected DelayContext proc;
   protected String name;
   protected boolean delay;
-  protected int delayTime = 1; // ms
   protected int alternativeSize;
   protected boolean selected = true;
-  protected long startTime;
-  protected double delayFactor = 1.;
-  private DelayStrategy delayStrategy = DelayStrategy.DEFAULT;
+
+  /** NanoTime at the start of the current behind-the-scenes work slice; 0 if not timing. */
+  private long startTime;
+
+  private boolean timing;
   protected OperationReporter operationReporter = OperationReporter.NOOP;
   protected CancellationToken cancellationToken = CancellationToken.alwaysActive();
 
@@ -25,12 +25,12 @@ public abstract class SortingAlgorithm {
   public SortingAlgorithm(ArrayModel arrayController) {
     this(
         arrayController,
-        ms -> {
+        () -> {
           /* no-op delay */
         });
   }
 
-  public SortingAlgorithm(ArrayModel arrayController, ProcessingContext proc) {
+  public SortingAlgorithm(ArrayModel arrayController, DelayContext proc) {
     this.proc = proc;
     this.arrayController = arrayController;
     delay = true;
@@ -54,11 +54,11 @@ public abstract class SortingAlgorithm {
     return alternativeSize;
   }
 
-  public void setProcessingContext(ProcessingContext proc) {
+  public void setDelayContext(DelayContext proc) {
     this.proc =
         proc != null
             ? proc
-            : ms -> {
+            : () -> {
               /* no-op */
             };
   }
@@ -88,30 +88,42 @@ public abstract class SortingAlgorithm {
     return selected;
   }
 
-  public void setDelayTime(int delayTime) {
-    this.delayTime = delayTime;
+  /** Starts behind-the-scenes timing for a sort run (excludes visual FrameGate waits). */
+  public void beginTiming() {
+    startTime = System.nanoTime();
+    timing = true;
   }
 
-  public void setDelayFactor(double delayFactor) {
-    this.delayFactor = delayFactor;
+  /** Flushes the current work slice into {@link ArrayModel#getRealTime()} and stops timing. */
+  public void endTiming() {
+    if (!timing) {
+      return;
+    }
+    arrayController.addRealTime(System.nanoTime() - startTime);
+    timing = false;
+    startTime = 0;
   }
 
-  public void setDelayStrategy(DelayStrategy delayStrategy) {
-    this.delayStrategy = delayStrategy;
-  }
-
+  /**
+   * Records CPU work since the last step, then waits for a FrameGate credit. Visual wait time is
+   * not included in {@link ArrayModel#getRealTime()}.
+   */
   public void delay(int[] markers) {
     if (isCancelled()) {
       return;
     }
-    if (delay && delayStrategy.shouldDelay(arrayController.getLength(), delayFactor)) {
-      arrayController.addRealTime(System.nanoTime() - startTime);
+    if (delay) {
+      if (!timing) {
+        beginTiming();
+      } else {
+        arrayController.addRealTime(System.nanoTime() - startTime);
+      }
 
       for (int i : markers) {
         arrayController.setMarker(i, Marker.SET);
       }
 
-      proc.delay(delayTime);
+      proc.delay();
       startTime = System.nanoTime();
     }
   }

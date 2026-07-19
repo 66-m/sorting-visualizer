@@ -8,21 +8,16 @@ public class BubbleSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Bubble Sort";
     alternativeSize = arrayController.getLength();
-    this.delayFactor = 1. / 120;
-    delayTime = 1;
   }
 
   public BubbleSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Bubble Sort";
     this.alternativeSize = alternativeSize;
-    this.delayFactor = 1. / 120;
-    delayTime = 1;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int n = arrayController.getLength();
     boolean swapped;
@@ -40,7 +35,5 @@ public class BubbleSort extends SortingAlgorithm {
 
       n = n - 1;
     } while (swapped && !isCancelled());
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

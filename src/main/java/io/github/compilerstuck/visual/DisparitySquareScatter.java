@@ -1,10 +1,11 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
+import java.awt.Color;
 
 public class DisparitySquareScatter extends Visualization {
 
@@ -12,15 +13,21 @@ public class DisparitySquareScatter extends Visualization {
 
   private int[] baseX;
   private int[] baseY;
-  private final ColorBatch colorBatch = new ColorBatch();
   private int cacheLength = -1;
   private int cacheSideX = -1;
   private int cacheSideY = -1;
+  private float[] xyd;
+  private int[] argb;
 
   public DisparitySquareScatter(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Disparity Square Scatter";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void rebuildPerimeter(int length, int sideLengthX, int sideLengthY) {
@@ -57,9 +64,7 @@ public class DisparitySquareScatter extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int length = arrayController.getLength();
     sideLength = (int) (Math.min(screenHeight, screenWidth) / 2.4) * 2;
     int sideLengthX = screenWidth;
@@ -69,19 +74,18 @@ public class DisparitySquareScatter extends Visualization {
 
     rebuildPerimeter(length, sideLengthX, sideLengthY);
 
-    proc.noStroke();
-    colorBatch.reset();
+    if (xyd == null || xyd.length < length * 3) {
+      xyd = new float[length * 3];
+      argb = new int[length];
+    }
 
     for (int i = 0; i < length; i++) {
       int value = arrayController.get(i);
       Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
-      int rgb = color.getRGB();
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
-
-      arrayController.setMarker(i, Marker.NORMAL);
 
       double barHeight =
           ((screenHeight - 10.)
@@ -93,11 +97,12 @@ public class DisparitySquareScatter extends Visualization {
                               Math.abs(i + length - value))))
               / (screenHeight);
 
-      int x = (int) (baseX[i] * barHeight);
-      int y = (int) (baseY[i] * barHeight);
-
-      colorBatch.fill(proc, rgb);
-      proc.circle(centerX + x, centerY + y, 6);
+      int o = i * 3;
+      xyd[o] = centerX + (int) (baseX[i] * barHeight);
+      xyd[o + 1] = centerY + (int) (baseY[i] * barHeight);
+      xyd[o + 2] = 6;
+      argb[i] = color.getRGB();
     }
+    rs.fillCircles(xyd, argb, length);
   }
 }

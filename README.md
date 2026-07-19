@@ -4,7 +4,7 @@
 
 # Sorting Algorithm Visualizer
 
-See and hear sorting algorithms in real time - 22 algorithms, 30 visualizations (including 3D), live metrics, and MIDI audio.
+See and hear sorting algorithms in real time - 22 algorithms, 30 visualizations on **libGDX**, live metrics, and MIDI audio.
 
 [![CI](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -28,8 +28,7 @@ java --enable-native-access=ALL-UNNAMED \
   -jar sorting-visualizer.jar
 ```
 
-**Settings** is a JavaFX window (AtlantaFX). Closing Settings or pressing **Esc** on the canvas quits the app.
-
+**Settings** is a JavaFX window (AtlantaFX). The visualization canvas is **libGDX** (`GdxRenderSystem`: batched 2D + ModelBatch 3D). Closing Settings or pressing **Esc** on the canvas quits the app.
 ### Launch flags
 
 Pass any of these after the JAR name (order does not matter; `fullscreen` wins over `portrait`):
@@ -80,8 +79,8 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 | Control | Options |
 |---------|---------|
 | Array | Size up to 20 000; shuffle: random, reverse, almost sorted, sorted |
-| Sorting | Algorithm picker, run-all with inline reorder, shuffle type |
-| Speed | Five levels; optional step engine |
+| Sorting | Algorithm picker, run-all with drag-reorder dialog, shuffle type |
+| Speed | Five levels (steps per frame) |
 | Appearance | Gradient presets + custom colors |
 | Visualization | 30 modes; image path with validation for image viz |
 | Sound | MIDI tones mapped to values; mute anytime |

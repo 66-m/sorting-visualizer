@@ -1,6 +1,7 @@
 package io.github.compilerstuck.control.model;
 
 import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.ui.TimeEstimateFormat;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.Sound;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class SortingSessionManager {
 
   private Thread executionThread;
   private volatile CancellationToken cancellationToken = CancellationToken.alwaysActive();
+  private volatile FrameGate frameGate;
 
   public SortingSessionManager(
       ArrayController arrayController, Sound sound, SortingStateManager stateManager) {
@@ -57,6 +59,14 @@ public class SortingSessionManager {
     this.stateManager = stateManager;
     this.delayBetweenMs = delayBetweenMs;
     this.delayAfterMs = delayAfterMs;
+  }
+
+  /**
+   * Wires the pacing gate so session end can unblock the render thread's {@link
+   * FrameGate#awaitIdle()}.
+   */
+  public void setFrameGate(FrameGate frameGate) {
+    this.frameGate = frameGate;
   }
 
   /**
@@ -135,6 +145,12 @@ public class SortingSessionManager {
       LOGGER.log(Level.SEVERE, "Error during sorting session execution", e);
       stateManager.setRestart(true);
     } finally {
+      stateManager.setFrameGateSuspended(false);
+      // Drop unused step credits so the render thread cannot deadlock in awaitIdle().
+      FrameGate gate = frameGate;
+      if (gate != null) {
+        gate.drain();
+      }
       stateManager.setRunning(false);
     }
   }
@@ -147,25 +163,33 @@ public class SortingSessionManager {
     sound.mute(true);
     sound.mute(false);
 
-    arrayController.shuffle();
+    stateManager.setShuffling(true);
+    try {
+      arrayController.shuffle();
+    } finally {
+      stateManager.setShuffling(false);
+      // Drop unused shuffle credits so awaitIdle cannot stall during the inter-phase sleep.
+      FrameGate gate = frameGate;
+      if (gate != null) {
+        gate.drain();
+      }
+    }
 
     if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
       return;
     }
 
-    sound.mute(true);
-    try {
-      Thread.sleep(delayBetweenMs);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      LOGGER.log(Level.WARNING, "Thread interrupted during delay", e);
-    }
-    sound.mute(false);
+    sleepWithoutStepCredits(delayBetweenMs, "Thread interrupted during delay");
     arrayController.resetMeasurements();
   }
 
   private void executeAlgorithm(SortingAlgorithm algorithm) {
-    algorithm.sort();
+    algorithm.beginTiming();
+    try {
+      algorithm.sort();
+    } finally {
+      algorithm.endTiming();
+    }
   }
 
   private void recordMeasurements(SortingAlgorithm algorithm) {
@@ -177,15 +201,34 @@ public class SortingSessionManager {
   }
 
   private void pauseAfterAlgorithm() {
-    sound.mute(true);
-    try {
-      Thread.sleep(delayAfterMs);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      LOGGER.log(Level.WARNING, "Thread interrupted during result pause", e);
-    }
-    sound.mute(false);
+    sleepWithoutStepCredits(delayAfterMs, "Thread interrupted during result pause");
     arrayController.resetMeasurements();
+  }
+
+  /**
+   * Mutes and sleeps while telling the render thread to draw without FrameGate pacing. Draining
+   * alone is not enough: during the sleep {@code isRunning} stays true, so the next frame would
+   * grant fresh credits that nobody consumes until the sleep ends — freezing the view for the whole
+   * pause.
+   */
+  private void sleepWithoutStepCredits(int delayMs, String interruptLog) {
+    stateManager.setFrameGateSuspended(true);
+    try {
+      FrameGate gate = frameGate;
+      if (gate != null) {
+        gate.drain();
+      }
+      sound.mute(true);
+      try {
+        Thread.sleep(delayMs);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        LOGGER.log(Level.WARNING, interruptLog, e);
+      }
+      sound.mute(false);
+    } finally {
+      stateManager.setFrameGateSuspended(false);
+    }
   }
 
   /** Clears all measurement data for a fresh session. */
@@ -266,8 +309,7 @@ public class SortingSessionManager {
         writer.write(',');
         if (i < realTime.size()) {
           double raw = Double.parseDouble(realTime.get(i));
-          double ms = Math.floor(raw / 10000.0) / 100;
-          writer.write(String.valueOf(ms).replace(".", ","));
+          writer.write(TimeEstimateFormat.format(raw));
         }
         writer.write(',');
         writer.write(i < swaps.size() ? swaps.get(i) : "");

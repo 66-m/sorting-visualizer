@@ -3,26 +3,53 @@ package io.github.compilerstuck.visual;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
+import io.github.compilerstuck.control.config.visual.CubeSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.InstanceData;
+import io.github.compilerstuck.control.render.InstanceTransform;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
-import processing.core.PApplet;
+import java.awt.Color;
 
-public class Cube extends Visualization {
+public class Cube extends Visualization implements ConfigurableVisualization {
 
+  /** Unit-box corners matching ModelBuilder/BoxShapeBuilder size 1 (local ±0.5). */
+  private static final float[] CORNERS = {
+    -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
+  };
+
+  /** 12 edges as pairs of corner indices. */
+  private static final int[] EDGE_CORNERS = {
+    0, 1, 1, 2, 2, 3, 3, 0,
+    4, 5, 5, 6, 6, 7, 7, 4,
+    0, 4, 1, 5, 2, 6, 3, 7,
+  };
+
+  /** Legacy fixed tilt ({@code Math.sin/cos(-10)} used radians, not degrees). */
   private static final float SIN_TILT = (float) Math.sin(-10);
   private static final float COS_TILT = (float) Math.cos(-10);
 
-  int radius;
-  static float aa = 0;
+  /** Legacy fixed per-box X spin (radians). */
+  private static final float BOX_SPIN_X = 45f;
 
-  private final ColorBatch colorBatch = new ColorBatch();
+  int radius;
+  private float aa = 0;
+
+  private volatile CubeSettings settings = CubeSettings.defaults();
+
+  private final InstanceData boxes = new InstanceData();
+  private final InstanceTransform boxXform = new InstanceTransform();
+  private final float[] cornerWorld = new float[8 * 3];
+
+  private float[] edgeXyzxyz;
+  private int[] edgeArgb;
 
   private int[] colorsRgb;
   private float[] baseX, baseY, baseZ;
-  private float[] xCords, yCords, zCords;
   private float[] sizes;
   private int bufferCapacity;
   private int latticeXSize = -1;
@@ -36,13 +63,34 @@ public class Cube extends Visualization {
   private int cachedLength = -1;
   private float cachedMaxBoxSize = -1;
   private ColorGradient cachedGradient;
-  private int lastFillRgb;
-  private boolean hasFillAlpha;
 
   public Cube(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "3D - Cube";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (!(next instanceof CubeSettings cube)) {
+      return;
+    }
+    settings = cube;
+    // Scene scale affects lattice radius — force rebuild on next frame.
+    latticeXSize = -1;
+    latticeRadius = -1;
+    latticeDrawCount = -1;
+    cachedRevision = Long.MIN_VALUE;
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureBuffers(int n) {
@@ -52,9 +100,6 @@ public class Cube extends Visualization {
     baseX = new float[n];
     baseY = new float[n];
     baseZ = new float[n];
-    xCords = new float[n];
-    yCords = new float[n];
-    zCords = new float[n];
     sizes = new float[n];
     latticeXSize = -1;
     latticeRadius = -1;
@@ -73,9 +118,9 @@ public class Cube extends Visualization {
     int yCnt = 0;
     int zCnt = 0;
     for (int i = 0; i < drawCount; i++) {
-      baseX[i] = PApplet.map(xCnt, 0, xSize, -radius, radius);
-      baseY[i] = PApplet.map(yCnt, 0, xSize, -radius, radius);
-      baseZ[i] = PApplet.map(zCnt, 0, xSize, -radius, radius);
+      baseX[i] = VisMath.map(xCnt, 0, xSize, -radius, radius);
+      baseY[i] = VisMath.map(yCnt, 0, xSize, -radius, radius);
+      baseZ[i] = VisMath.map(zCnt, 0, xSize, -radius, radius);
 
       zCnt++;
       if (zCnt == xSize) {
@@ -110,18 +155,15 @@ public class Cube extends Visualization {
         sound.playSound(value);
       }
 
-      arrayController.setMarker(value, Marker.NORMAL);
-
       float barHeight =
           (length
               - 2f
                   * Math.min(
-                      Math.min(
-                          Math.abs(i - value), Math.abs(i - length - value)),
+                      Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                       Math.abs(i + length - value)));
 
       colorsRgb[i] = color.getRGB();
-      sizes[i] = PApplet.map(barHeight, 0, length, 0, maxBoxSize);
+      sizes[i] = VisMath.map(barHeight, 0, length, 0, maxBoxSize);
     }
     cachedRevision = rev;
     cachedWidth = screenWidth;
@@ -132,18 +174,55 @@ public class Cube extends Visualization {
     cachedGradient = colorGradient;
   }
 
+  private void ensureEdgeBuffers(int drawCount) {
+    int edges = drawCount * 12;
+    if (edgeXyzxyz != null && edgeXyzxyz.length >= edges * 6) {
+      return;
+    }
+    edgeXyzxyz = new float[edges * 6];
+    edgeArgb = new int[edges];
+  }
+
+  /** Opaque wireframe edges matching legacy Processing box() stroke. */
+  private int fillEdges(int drawCount) {
+    ensureEdgeBuffers(drawCount);
+    int edgeCount = 0;
+    for (int i = 0; i < drawCount; i++) {
+      float s = sizes[i];
+      if (s <= 0f) {
+        continue;
+      }
+      boxXform.transformLocalPoints(boxes, i, CORNERS, 8, cornerWorld);
+      int stroke = 0xFF000000 | (colorsRgb[i] & 0xffffff);
+      for (int e = 0; e < 12; e++) {
+        int a = EDGE_CORNERS[e * 2];
+        int b = EDGE_CORNERS[e * 2 + 1];
+        int o = edgeCount * 6;
+        int ao = a * 3;
+        int bo = b * 3;
+        edgeXyzxyz[o] = cornerWorld[ao];
+        edgeXyzxyz[o + 1] = cornerWorld[ao + 1];
+        edgeXyzxyz[o + 2] = cornerWorld[ao + 2];
+        edgeXyzxyz[o + 3] = cornerWorld[bo];
+        edgeXyzxyz[o + 4] = cornerWorld[bo + 1];
+        edgeXyzxyz[o + 5] = cornerWorld[bo + 2];
+        edgeArgb[edgeCount] = stroke;
+        edgeCount++;
+      }
+    }
+    return edgeCount;
+  }
+
   @Override
-  public void update() {
-    super.update();
-
-    proc.lights();
-
+  public void update(float delta) {
+    CubeSettings s = settings;
     int screenMin = min(screenHeight, screenWidth);
-    radius = (int) (screenMin / 3.5);
-    float centerY = (float) screenHeight / 2 - (int) (screenMin / 10);
+    radius = (int) (screenMin / s.sceneScaleDivisor());
+    // World3D: legacy center (W/2, H/2 - screenMin/10, -screenMin/10) → (0, screenMin/10, …)
+    float centerY = screenMin / 10f;
     float centerZ = -(int) (screenMin / 10);
 
-    aa -= PApplet.PI / (10 * proc.frameRate());
+    aa -= (float) (s.rotationSpeedRadPerSec() * delta);
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -159,6 +238,11 @@ public class Cube extends Visualization {
     rebuildLattice(drawCount, xSize, radius);
     ensureSizesAndColors(drawCount, length, maxBoxSize);
 
+    int fillOpacity = s.fillOpacity();
+    int fillAlpha = fillOpacity << 24;
+    boolean drawFills = fillOpacity > 0;
+
+    boxes.ensureCapacity(drawCount);
     for (int i = 0; i < drawCount; i++) {
       float xa = baseX[i];
       float ya = baseY[i];
@@ -169,31 +253,24 @@ public class Cube extends Visualization {
       float z = SIN_TILT * ya + COS_TILT * zb;
       float y = COS_TILT * ya - SIN_TILT * zb;
 
-      xCords[i] = x;
-      yCords[i] = y;
-      zCords[i] = z;
+      float size = sizes[i];
+      int argb = fillAlpha | (colorsRgb[i] & 0xffffff);
+      // World euler: negate legacy X/Z so on-screen spin matches prior Processing path.
+      boxes.set(i, x, centerY - y, centerZ + z, size, size, size, -BOX_SPIN_X, 0f, aa, argb);
     }
+    boxes.count = drawCount;
 
-    proc.pushMatrix();
-    proc.translate((float) screenWidth / 2, centerY, centerZ);
-    colorBatch.reset();
-    hasFillAlpha = false;
-    for (int i = 0; i < drawCount; i++) {
-      int rgb = colorsRgb[i];
-      colorBatch.stroke(proc, rgb);
-      if (!hasFillAlpha || rgb != lastFillRgb) {
-        proc.fill(rgb, 120f);
-        lastFillRgb = rgb;
-        hasFillAlpha = true;
-      }
+    // Edges need filled instance transforms; always build when wireframe is on.
+    int edgeCount = s.wireframeEnabled() ? fillEdges(drawCount) : 0;
 
-      proc.pushMatrix();
-      proc.translate(xCords[i], yCords[i], zCords[i]);
-      proc.rotateX(45);
-      proc.rotateZ(-aa);
-      proc.box(sizes[i], sizes[i], sizes[i]);
-      proc.popMatrix();
+    rs.begin3D();
+    if (drawFills) {
+      rs.drawBoxes(boxes);
     }
-    proc.popMatrix();
+    if (edgeCount > 0) {
+      // Overlay wireframe: skip depth so edges stay readable at opacity 0 and 254.
+      rs.strokeLines3D(edgeXyzxyz, edgeArgb, edgeCount, false);
+    }
+    rs.end3D();
   }
 }

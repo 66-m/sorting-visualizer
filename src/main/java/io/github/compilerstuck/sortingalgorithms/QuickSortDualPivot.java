@@ -8,23 +8,18 @@ public class QuickSortDualPivot extends SortingAlgorithm {
     super(arrayController);
     this.name = "Quick Sort (Dual Pivot)";
     alternativeSize = arrayController.getLength();
-    delayTime = 3;
   }
 
   public QuickSortDualPivot(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Quick Sort (Dual Pivot)";
     this.alternativeSize = alternativeSize;
-    delayTime = 3;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     sort(arrayController, 0, arrayController.getLength() - 1);
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 
   private void sort(ArrayModel arrayController, int left, int right) {

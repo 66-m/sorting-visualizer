@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import io.github.compilerstuck.control.catalog.VisualizationCatalog;
 import io.github.compilerstuck.control.catalog.VisualizationDescriptor;
 import io.github.compilerstuck.control.model.ArrayController;
-import io.github.compilerstuck.control.render.HeadlessRenderContext;
+import io.github.compilerstuck.control.model.SnapshotPublisher;
+import io.github.compilerstuck.control.render.FakeRenderSystem;
 import io.github.compilerstuck.sound.HeadlessSound;
 import io.github.compilerstuck.visual.Visualization;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
@@ -16,15 +17,14 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 /**
- * Headless smoke test: every registered visualization must be constructible and able to run one
- * {@code update()} without throwing, using a headless render context (no real Processing/Swing
- * runtime).
+ * Headless smoke test: every live visualization must construct and run one {@code render} without
+ * throwing ({@link FakeRenderSystem} — no GPU).
  */
 class VisualizationCatalogSmokeTest {
 
   @TestFactory
   Stream<DynamicTest> everyVisualizationUpdatesHeadlessly() {
-    int size = 16; // perfect square and reasonably sized for grid visuals
+    int size = 16;
     List<VisualizationDescriptor> descriptors = VisualizationCatalog.all();
 
     return descriptors.stream()
@@ -34,24 +34,21 @@ class VisualizationCatalogSmokeTest {
                     descriptor.id(),
                     () -> {
                       ArrayController controller = new ArrayController(size);
-                      HeadlessRenderContext renderContext = new HeadlessRenderContext(400, 300);
-                      HeadlessSound sound = new HeadlessSound(controller);
+                      SnapshotPublisher publisher = new SnapshotPublisher();
+                      publisher.publish(controller);
+                      FakeRenderSystem rs = new FakeRenderSystem(400, 300);
+                      HeadlessSound sound = new HeadlessSound(publisher.publishedView());
                       ColorGradient gradient =
                           new ColorGradient(
                               Color.BLACK, Color.WHITE, Color.RED, "smoke-test", size);
 
                       Visualization visualization =
-                          descriptor.factory().create(controller, gradient, sound, renderContext);
-
-                      if (descriptor.constraints().requiresImage()) {
-                        // Image visuals rely on a real loaded image being resized to the window
-                        // dimensions; the headless dummy image is always 1x1, so update() isn't
-                        // representative here. Just verify construction succeeded.
-                        return;
-                      }
+                          descriptor
+                              .factory()
+                              .create(publisher.publishedView(), gradient, sound, rs);
 
                       assertDoesNotThrow(
-                          visualization::update,
+                          () -> visualization.render(1f / 60f),
                           descriptor.id() + " should update without throwing");
                     }));
   }

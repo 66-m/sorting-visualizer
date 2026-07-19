@@ -99,7 +99,6 @@ public class TimSort extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     for (int i = 0; i < arrayController.getLength() && !isCancelled(); i += RUN) {
       insertionSort(i, Math.min((i + 31), (arrayController.getLength() - 1)));
@@ -114,6 +113,5 @@ public class TimSort extends SortingAlgorithm {
         merge(left, mid, right);
       }
     }
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

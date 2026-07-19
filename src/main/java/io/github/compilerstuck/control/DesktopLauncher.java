@@ -1,0 +1,53 @@
+package io.github.compilerstuck.control;
+
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.ui.AppIcons;
+import io.github.compilerstuck.control.ui.settingsfx.JavaFxBootstrap;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+
+/** Desktop entry point: JavaFX Settings toolkit first, then libGDX LWJGL3 visualization window. */
+public final class DesktopLauncher {
+
+  private DesktopLauncher() {}
+
+  public static void main(String[] args) {
+    LaunchArgs.parse(args);
+    AppIcons.installApplicationIcons();
+    JavaFxBootstrap.start();
+
+    Rectangle bounds = DisplayBounds.resolveBounds(LaunchArgs.display());
+    boolean fullscreen = LaunchArgs.fullscreen();
+    boolean portrait = LaunchArgs.portrait();
+
+    Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+    config.setTitle("Sorting Algorithm Visualizer");
+    config.useVsync(true);
+    config.setForegroundFPS(MainControllerConfig.TARGET_FRAME_RATE);
+    // GL 3.0 (emulated by desktop OpenGL 3.2) required for mesh hardware instancing.
+    config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+    config.setWindowIcon("logo.png");
+    config.setWindowSizeLimits(
+        MainControllerConfig.MIN_WINDOW_WIDTH, MainControllerConfig.MIN_WINDOW_HEIGHT, -1, -1);
+
+    if (fullscreen) {
+      config.setDecorated(false);
+      config.setWindowedMode(Math.max(1, bounds.width), Math.max(1, bounds.height));
+      config.setWindowPosition(bounds.x, bounds.y);
+    } else if (portrait) {
+      Dimension portraitDim = DisplayBounds.portraitSize(bounds);
+      config.setWindowedMode(portraitDim.width, portraitDim.height);
+      int x = bounds.x + Math.max(0, (bounds.width - portraitDim.width) / 2);
+      int y = bounds.y + Math.max(0, (bounds.height - portraitDim.height) / 2);
+      config.setWindowPosition(x, y);
+    } else {
+      config.setWindowedMode(Math.max(1, bounds.width), Math.max(1, bounds.height));
+      config.setWindowPosition(bounds.x, bounds.y);
+      config.setMaximized(true);
+    }
+
+    new Lwjgl3Application(new SortingVisualizerGame(bounds), config);
+  }
+}

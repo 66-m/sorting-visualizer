@@ -13,7 +13,6 @@ public class ShellSort extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int n = arrayController.getLength();
 
@@ -36,7 +35,5 @@ public class ShellSort extends SortingAlgorithm {
 
       arrayController.setMarker(gap, Marker.SET);
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

@@ -2,7 +2,6 @@ package io.github.compilerstuck.control;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.compilerstuck.control.config.DelayStrategy;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.FrameGate;
 import io.github.compilerstuck.sortingalgorithms.QuickSortMiddlePivot;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class StepEngineParityTest {
 
   @Test
-  @DisplayName("QuickSort completes under FrameGate with auto-grant ProcessingContext")
+  @DisplayName("QuickSort completes under FrameGate with auto-grant DelayContext")
   void quickSortWithFrameGate() throws InterruptedException {
     ArrayController array = new ArrayController(64);
     for (int i = 0; i < array.getLength(); i++) {
@@ -25,8 +24,8 @@ class StepEngineParityTest {
     FrameGate gate = new FrameGate();
     AtomicInteger delays = new AtomicInteger();
     SortingAlgorithm sort = new QuickSortMiddlePivot(array);
-    sort.setProcessingContext(
-        ms -> {
+    sort.setDelayContext(
+        () -> {
           delays.incrementAndGet();
           try {
             gate.awaitStep();
@@ -34,7 +33,6 @@ class StepEngineParityTest {
             Thread.currentThread().interrupt();
           }
         });
-    sort.setDelayStrategy(DelayStrategy.ALWAYS);
     sort.setDelay(true);
 
     Thread sorter = new Thread(sort::sort, "test-sort");

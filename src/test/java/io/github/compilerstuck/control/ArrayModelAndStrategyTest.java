@@ -2,20 +2,19 @@ package io.github.compilerstuck.control;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.compilerstuck.control.config.DelayStrategy;
+import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.config.ShuffleStrategy;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.CancellationToken;
 import io.github.compilerstuck.control.model.OperationReporter;
-import io.github.compilerstuck.control.render.ProcessingContext;
+import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.control.shuffle.AlmostSortedShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.ReverseShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.SortedShuffleStrategy;
 import io.github.compilerstuck.visual.Marker;
 import java.util.Arrays;
-import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,12 +22,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-/** Unit tests for ArrayModel, DelayStrategy, and ShuffleStrategy. */
+/** Unit tests for ArrayModel and ShuffleStrategy. */
 class ArrayModelAndStrategyTest {
 
-  /** No-op ProcessingContext for testing (avoids any real Processing runtime). */
-  private static final ProcessingContext NO_OP_CTX =
-      ms -> {
+  /** No-op DelayContext for testing (avoids any real graphics runtime). */
+  private static final DelayContext NO_OP_CTX =
+      () -> {
         /* no-op */
       };
 
@@ -68,6 +67,14 @@ class ArrayModelAndStrategyTest {
 
   private static void shuffle(ArrayController model, ShuffleStrategy strategy) {
     strategy.shuffle(model, NO_OP_CTX, OperationReporter.NOOP, CancellationToken.alwaysActive());
+  }
+
+  private static int countDelays(ArrayController model, ShuffleStrategy strategy) {
+    java.util.concurrent.atomic.AtomicInteger delays =
+        new java.util.concurrent.atomic.AtomicInteger();
+    strategy.shuffle(
+        model, delays::incrementAndGet, OperationReporter.NOOP, CancellationToken.alwaysActive());
+    return delays.get();
   }
 
   // -----------------------------------------------------------------------
@@ -148,66 +155,6 @@ class ArrayModelAndStrategyTest {
   }
 
   // -----------------------------------------------------------------------
-  // DelayStrategy
-  // -----------------------------------------------------------------------
-
-  @Test
-  @DisplayName("DelayStrategy.DEFAULT always delays small arrays")
-  void defaultStrategyDelaysSmallArrays() {
-    // With a 10-element array (< DEFAULT_THRESHOLD), should always delay
-    // at delayFactor = 1.0
-    long fires = 0;
-    for (int i = 0; i < 1000; i++) {
-      if (DelayStrategy.DEFAULT.shouldDelay(10, 1.0)) fires++;
-    }
-    assertEquals(1000, fires, "Should fire every time for tiny array with factor=1.0");
-  }
-
-  @Test
-  @DisplayName("DelayStrategy.DEFAULT respects delayFactor=0 (never delay)")
-  void defaultStrategyRespectsZeroFactor() {
-    long fires = 0;
-    for (int i = 0; i < 1000; i++) {
-      if (DelayStrategy.DEFAULT.shouldDelay(10, 0.0)) fires++;
-    }
-    assertEquals(0, fires, "delayFactor=0 should suppress all delays");
-  }
-
-  @Test
-  @DisplayName("DelayStrategy.never() never delays")
-  void neverStrategyNeverDelays() {
-    DelayStrategy never = DelayStrategy.never();
-    for (int i = 0; i < 1000; i++) {
-      assertFalse(never.shouldDelay(10, 1.0));
-      assertFalse(never.shouldDelay(4000, 1.0));
-    }
-  }
-
-  @Test
-  @DisplayName("DelayStrategy.random(Random) is deterministic with fixed seed")
-  void randomStrategyUsesSuppliedRng() {
-    Random rng = new Random(42);
-    DelayStrategy strategy = DelayStrategy.random(rng);
-    assertTrue(strategy.shouldDelay(10, 1.0));
-    assertFalse(strategy.shouldDelay(10, 0.0));
-  }
-
-  @Test
-  @DisplayName("DelayStrategy.DEFAULT fires proportionally for large arrays")
-  void defaultStrategyProportionalForLargeArrays() {
-    // arrayLength = 4000 (> DEFAULT_THRESHOLD=2000), factor=1.0
-    // Expected probability per call ≈ 0.5
-    long fires = 0;
-    int trials = 100_000;
-    for (int i = 0; i < trials; i++) {
-      if (DelayStrategy.DEFAULT.shouldDelay(4000, 1.0)) fires++;
-    }
-    double rate = (double) fires / trials;
-    assertTrue(
-        rate > 0.4 && rate < 0.6, "Expected ~50% fire rate for arrayLength=4000, got " + rate);
-  }
-
-  // -----------------------------------------------------------------------
   // ShuffleStrategy implementations
   // -----------------------------------------------------------------------
 
@@ -254,6 +201,16 @@ class ArrayModelAndStrategyTest {
     ArrayController model = new ArrayController(100);
     shuffle(model, strategyFor(type));
     assertArrayEquals(identity(100), sortedCopy(model.getArray()));
+  }
+
+  @ParameterizedTest(name = "shuffle visual steps for {0}")
+  @EnumSource(ShuffleType.class)
+  @DisplayName("every ShuffleType fires SHUFFLE_VISUAL_STEPS delays")
+  void everyShuffleTypeFiresFixedVisualSteps(ShuffleType type) {
+    // Almost-sorted needs length >= 10 so swaps = length/10 >= 1
+    ArrayController model = new ArrayController(100);
+    int delays = countDelays(model, strategyFor(type));
+    assertEquals(MainControllerConfig.SHUFFLE_VISUAL_STEPS, delays);
   }
 
   @ParameterizedTest(name = "setShuffleType({0}) wires the correct strategy")

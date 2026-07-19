@@ -1,16 +1,15 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
-import processing.core.PApplet;
-import processing.core.PConstants;
+import java.awt.Color;
 
 public class DisparitySphereHoops extends Visualization {
 
-  private final ColorBatch colorBatch = new ColorBatch();
+  private static final int SEGMENTS = 48;
 
   private float[] wiBase;
   private float[] zOffsets;
@@ -26,10 +25,18 @@ public class DisparitySphereHoops extends Visualization {
   private int cachedRadius = -1;
   private ColorGradient cachedGradient;
 
+  private float[] xyzxyz;
+  private int[] lineArgb;
+
   public DisparitySphereHoops(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "3D - Disparity Sphere Hoops";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void rebuildGeometry(int length, int radius) {
@@ -46,7 +53,7 @@ public class DisparitySphereHoops extends Visualization {
     }
     for (int i = 0; i < length; i++) {
       wiBase[i] = (float) Math.sqrt(1 - Math.pow((((float) i / length) * 2 - 1), 2));
-      zOffsets[i] = radius / 2 - PApplet.map(i, 0, length, 0, radius);
+      zOffsets[i] = radius / 2 - VisMath.map(i, 0, length, 0, radius);
     }
   }
 
@@ -74,13 +81,11 @@ public class DisparitySphereHoops extends Visualization {
                               Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                               Math.abs(i + length - value)))));
       float wi = wiBase[i] * barHeight;
-      sphereWi[i] = (int) PApplet.map(wi, 0, 1, 0, radius);
+      sphereWi[i] = (int) VisMath.map(wi, 0, 1, 0, radius);
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
-
-      arrayController.setMarker(i, Marker.NORMAL);
 
       colorsRgb[i] = color.getRGB();
     }
@@ -93,34 +98,62 @@ public class DisparitySphereHoops extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int screenMin = Math.min(screenHeight, screenWidth);
     int radius = (int) (screenMin / 1.1);
     int length = arrayController.getLength();
     float centerZ = -(int) (screenMin / 10);
-
-    proc.lights();
+    float centerX = (float) screenWidth / 2;
+    float centerY = (float) screenHeight / 2;
 
     rebuildGeometry(length, radius);
     ensureSphereWiAndColors(length, radius);
 
-    proc.noFill();
-    proc.pushMatrix();
-    proc.translate((float) screenWidth / 2, (float) (screenHeight / 2), centerZ);
-    proc.rotateX(PConstants.PI / 3);
+    float rotX = VisMath.PI / 3;
+    float cosX = (float) Math.cos(rotX);
+    float sinX = (float) Math.sin(rotX);
 
-    colorBatch.reset();
-    for (int i = 0; i < length; i++) {
-      colorBatch.stroke(proc, colorsRgb[i]);
-
-      proc.pushMatrix();
-      proc.translate(0, 0, zOffsets[i]);
-      proc.circle(0, 0, sphereWi[i]);
-      proc.popMatrix();
+    int maxLines = length * SEGMENTS;
+    if (xyzxyz == null || xyzxyz.length < maxLines * 6) {
+      xyzxyz = new float[maxLines * 6];
+      lineArgb = new int[maxLines];
     }
 
-    proc.popMatrix();
+    int lineCount = 0;
+    for (int i = 0; i < length; i++) {
+      float w = sphereWi[i];
+      float zLocal = zOffsets[i];
+      int rgb = colorsRgb[i];
+      float prevX = 0, prevY = 0, prevZ = 0;
+      for (int s = 0; s <= SEGMENTS; s++) {
+        float t = (float) (2 * Math.PI * s / SEGMENTS);
+        float lx = (w * 0.5f) * (float) Math.cos(t);
+        float ly = (w * 0.5f) * (float) Math.sin(t);
+        float lz = zLocal;
+        float y2 = cosX * ly - sinX * lz;
+        float z2 = sinX * ly + cosX * lz;
+        float wx = toWorldX(centerX + lx);
+        float wy = toWorldY(centerY + y2);
+        float wz = centerZ + z2;
+        if (s > 0) {
+          int o = lineCount * 6;
+          xyzxyz[o] = prevX;
+          xyzxyz[o + 1] = prevY;
+          xyzxyz[o + 2] = prevZ;
+          xyzxyz[o + 3] = wx;
+          xyzxyz[o + 4] = wy;
+          xyzxyz[o + 5] = wz;
+          lineArgb[lineCount] = rgb;
+          lineCount++;
+        }
+        prevX = wx;
+        prevY = wy;
+        prevZ = wz;
+      }
+    }
+
+    rs.begin3D();
+    rs.strokeLines3D(xyzxyz, lineArgb, lineCount);
+    rs.end3D();
   }
 }

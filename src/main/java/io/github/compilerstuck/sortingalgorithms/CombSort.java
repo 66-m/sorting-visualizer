@@ -8,19 +8,16 @@ public class CombSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Comb Sort";
     alternativeSize = arrayController.getLength();
-    delayFactor = 0.25;
   }
 
   public CombSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Comb Sort";
     this.alternativeSize = alternativeSize;
-    delayFactor = 0.25;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int n = arrayController.getLength();
 
@@ -45,8 +42,6 @@ public class CombSort extends SortingAlgorithm {
         arrayController.addComparisons(1);
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 
   int getNextGap(int gap) {

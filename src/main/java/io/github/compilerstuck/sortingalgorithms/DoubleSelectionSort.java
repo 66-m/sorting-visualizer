@@ -8,12 +8,10 @@ public class DoubleSelectionSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Double Selection Sort";
     alternativeSize = arrayController.getLength();
-    delayTime = 10;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     for (int i = 0, j = arrayController.getLength() - 1; i < j && !isCancelled(); i++, j--) {
       int min = arrayController.get(i), max = arrayController.get(i);
@@ -37,7 +35,5 @@ public class DoubleSelectionSort extends SortingAlgorithm {
 
       delay(new int[] {i, j, min_i, max_i});
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

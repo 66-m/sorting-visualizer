@@ -22,15 +22,12 @@
         <atlantafx.version>2.1.0</atlantafx.version>
         <animatefx.version>1.3.0</animatefx.version>
         <testfx.version>4.0.18</testfx.version>
+        <gdx.version>1.14.2</gdx.version>
     </properties>
     <repositories>
         <repository>
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
         </repository>
     </repositories>
     <build>
@@ -86,7 +83,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.github.compilerstuck.control.MainController</mainClass>
+                            <mainClass>io.github.compilerstuck.control.DesktopLauncher</mainClass>
                         </manifest>
                         <manifestEntries>
                             <!-- SoftSynthesizer low-latency open via MidiSys reflection -->
@@ -157,7 +154,7 @@
                                     <archive>
                                         <manifest>
                                             <mainClass>
-                                                io.github.compilerstuck.control.MainController
+                                                io.github.compilerstuck.control.DesktopLauncher
                                             </mainClass>
                                         </manifest>
                                     </archive>
@@ -208,7 +205,7 @@
                                 <configuration>
                                     <archive>
                                         <manifest>
-                                            <mainClass>io.github.compilerstuck.control.MainController</mainClass>
+                                            <mainClass>io.github.compilerstuck.control.DesktopLauncher</mainClass>
                                         </manifest>
                                         <manifestEntries>
                                             <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
@@ -245,7 +242,7 @@
                                         <argument>--main-jar</argument>
                                         <argument>${project.build.finalName}-jar-with-dependencies.jar</argument>
                                         <argument>--main-class</argument>
-                                        <argument>io.github.compilerstuck.control.MainController</argument>
+                                        <argument>io.github.compilerstuck.control.DesktopLauncher</argument>
                                         <argument>--dest</argument>
                                         <argument>${project.build.directory}/jpackage</argument>
                                         <argument>--app-version</argument>
@@ -268,23 +265,31 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.micycle1</groupId>
-            <artifactId>processing-core-4</artifactId>
-            <version>5c6b728511</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-controls</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-graphics</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-base</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx</artifactId>
+            <version>${gdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-backend-lwjgl3</artifactId>
+            <version>${gdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-platform</artifactId>
+            <version>${gdx.version}</version>
+            <classifier>natives-desktop</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype</artifactId>
+            <version>${gdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype-platform</artifactId>
+            <version>${gdx.version}</version>
+            <classifier>natives-desktop</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>

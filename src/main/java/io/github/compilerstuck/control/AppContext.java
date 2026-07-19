@@ -1,18 +1,24 @@
 package io.github.compilerstuck.control;
 
-import io.github.compilerstuck.control.config.DelayStrategy;
 import io.github.compilerstuck.control.config.RunAllEntryPref;
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.config.UserPreferences;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayController;
+import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.model.FrameGate;
+import io.github.compilerstuck.control.model.SnapshotPublisher;
 import io.github.compilerstuck.control.model.SortingSessionManager;
 import io.github.compilerstuck.control.model.SortingStateManager;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.DelayContext;
+import io.github.compilerstuck.control.render.RenderSystem;
+import io.github.compilerstuck.control.render.asset.ImageHandle;
+import io.github.compilerstuck.control.render.asset.ImageRepository;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.SilentSound;
 import io.github.compilerstuck.sound.Sound;
+import io.github.compilerstuck.visual.ImageSourceVisualization;
 import io.github.compilerstuck.visual.Visualization;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.util.ArrayList;
@@ -22,7 +28,7 @@ import java.util.logging.Logger;
 
 /**
  * Live collaborator bundle for a running visualizer session. Provides the operations the Settings
- * UI needs without depending on {@link MainController}'s static fields.
+ * UI needs without depending on the game class.
  */
 public final class AppContext {
   private static final Logger LOGGER = Logger.getLogger(AppContext.class.getName());
@@ -32,19 +38,21 @@ public final class AppContext {
   private final SortingSessionManager sessionManager;
   private final FrameGate frameGate = new FrameGate();
   private final UserPreferences preferences;
+  private SnapshotPublisher snapshotPublisher;
   private Sound sound;
   private ColorGradient colorGradient;
   private Visualization visualization;
   private final List<SortingAlgorithm> algorithms = new ArrayList<>();
   private int size;
-  private RenderContext renderContext;
-
-  /** Step engine is opt-in via {@code -Dsv.stepEngine=true} or Settings. */
-  private boolean useStepEngine;
+  private RenderSystem renderSystem;
+  private DelayContext delayContext;
+  private ImageRepository imageRepository;
+  private Runnable shutdownHandler;
 
   private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
   private int stepsPerFrame =
       SettingsDefaults.STEPS_PER_FRAME[SettingsDefaults.DEFAULT_SPEED_LEVEL - 1];
+  private boolean perfStatsEnabled;
 
   public AppContext(
       ArrayController arrayController,
@@ -57,11 +65,9 @@ public final class AppContext {
     this.preferences = preferences != null ? preferences : UserPreferences.load();
     this.size = this.preferences.getArraySize();
     this.speedLevel = this.preferences.getSpeedLevel();
-    String stepEngineProp = System.getProperty("sv.stepEngine");
-    if (stepEngineProp != null) {
-      this.useStepEngine = Boolean.parseBoolean(stepEngineProp);
-    } else {
-      this.useStepEngine = this.preferences.isUseStepEngine();
+    this.perfStatsEnabled = this.preferences.isPerfStats();
+    if (sessionManager != null) {
+      sessionManager.setFrameGate(frameGate);
     }
     applySpeedLevel();
   }
@@ -76,10 +82,10 @@ public final class AppContext {
     if (sound != null) {
       preferences.setMuted(sound.isMuted());
     }
-    preferences.setUseStepEngine(useStepEngine);
     preferences.setShuffleType(arrayController.getShuffleType());
     preferences.setPrintMeasurements(stateManager.shouldPrintMeasurements());
     preferences.setShowComparisonTable(stateManager.shouldShowComparisonTable());
+    preferences.setPerfStats(perfStatsEnabled);
     if (colorGradient != null) {
       preferences.setGradientName(colorGradient.getName());
       if (colorGradient.getColor1() != null) {
@@ -96,6 +102,35 @@ public final class AppContext {
     return arrayController;
   }
 
+  /**
+   * Read-only published array for visuals and sound. Falls back to the live controller when no
+   * publisher is wired (tests).
+   */
+  public ArrayModel getPublishedArray() {
+    if (snapshotPublisher != null) {
+      return snapshotPublisher.publishedView();
+    }
+    return arrayController;
+  }
+
+  public SnapshotPublisher getSnapshotPublisher() {
+    return snapshotPublisher;
+  }
+
+  public void setSnapshotPublisher(SnapshotPublisher snapshotPublisher) {
+    this.snapshotPublisher = snapshotPublisher;
+    if (snapshotPublisher != null) {
+      snapshotPublisher.publish(arrayController);
+    }
+  }
+
+  /** Copy working → published and clear working markers. Safe when the sort worker is idle. */
+  public void publishArraySnapshot() {
+    if (snapshotPublisher != null) {
+      snapshotPublisher.publish(arrayController);
+    }
+  }
+
   public SortingStateManager getStateManager() {
     return stateManager;
   }
@@ -106,17 +141,6 @@ public final class AppContext {
 
   public FrameGate getFrameGate() {
     return frameGate;
-  }
-
-  public boolean isUseStepEngine() {
-    return useStepEngine;
-  }
-
-  public void setUseStepEngine(boolean useStepEngine) {
-    this.useStepEngine = useStepEngine;
-    preferences.setUseStepEngine(useStepEngine);
-    preferences.save();
-    applySpeedLevel();
   }
 
   public int getStepsPerFrame() {
@@ -131,7 +155,7 @@ public final class AppContext {
     return speedLevel;
   }
 
-  /** Applies speed level 1–5: steps/frame in step-engine mode, delay time/factor in legacy mode. */
+  /** Applies speed level 1–5 as steps granted per draw frame. */
   public void setSpeedLevel(int level1to5) {
     this.speedLevel = SettingsDefaults.clampSpeedLevel(level1to5);
     applySpeedLevel();
@@ -140,15 +164,7 @@ public final class AppContext {
   }
 
   private void applySpeedLevel() {
-    int idx = speedLevel - 1;
-    if (useStepEngine) {
-      stepsPerFrame = SettingsDefaults.STEPS_PER_FRAME[idx];
-      algorithms.forEach(a -> a.setDelayStrategy(DelayStrategy.ALWAYS));
-    } else {
-      setDelayTime(SettingsDefaults.DELAY_TIME[idx]);
-      setDelayFactor(SettingsDefaults.DELAY_FACTOR[idx]);
-      algorithms.forEach(a -> a.setDelayStrategy(DelayStrategy.DEFAULT));
-    }
+    stepsPerFrame = SettingsDefaults.STEPS_PER_FRAME[speedLevel - 1];
   }
 
   public Sound getSound() {
@@ -187,6 +203,7 @@ public final class AppContext {
 
   public void setVisualization(Visualization visualization) {
     this.visualization = visualization;
+    bindImageRepository(visualization);
     if (visualization != null && colorGradient != null) {
       visualization.updateColorGradient(colorGradient);
     }
@@ -194,6 +211,15 @@ public final class AppContext {
 
   public void setVisualizationId(String id) {
     preferences.setVisualizationId(id);
+    preferences.save();
+  }
+
+  /** Persists per-visualization appearance settings (JSON map in prefs). */
+  public void saveVisualizationSettings(VisualizationSettings settings) {
+    if (settings == null) {
+      return;
+    }
+    preferences.putVisualSettings(settings);
     preferences.save();
   }
 
@@ -222,12 +248,26 @@ public final class AppContext {
     this.size = size;
   }
 
-  public RenderContext getRenderContext() {
-    return renderContext;
+  public RenderSystem getRenderSystem() {
+    return renderSystem;
   }
 
-  public void setRenderContext(RenderContext renderContext) {
-    this.renderContext = renderContext;
+  public void setRenderSystem(RenderSystem renderSystem) {
+    this.renderSystem = renderSystem;
+  }
+
+  public DelayContext getDelayContext() {
+    return delayContext;
+  }
+
+  public void setDelayContext(DelayContext delayContext) {
+    this.delayContext = delayContext;
+  }
+
+  /** Wires draw system and delay port. */
+  public void setGraphics(RenderSystem renderSystem, DelayContext delay) {
+    this.renderSystem = renderSystem;
+    this.delayContext = delay;
   }
 
   /** Resizes the array and dependent components; refuses while a sort is running. */
@@ -249,6 +289,7 @@ public final class AppContext {
       }
     }
     arrayController.resize(newSize);
+    publishArraySnapshot();
     preferences.setArraySize(newSize);
     preferences.save();
   }
@@ -278,16 +319,10 @@ public final class AppContext {
 
   public void setAlgorithm(SortingAlgorithm algorithm) {
     algorithms.clear();
-    algorithms.add(algorithm);
+    if (algorithm != null) {
+      algorithms.add(algorithm);
+    }
     applySpeedLevel();
-  }
-
-  public void setDelayTime(int ms) {
-    algorithms.forEach(a -> a.setDelayTime(ms));
-  }
-
-  public void setDelayFactor(double factor) {
-    algorithms.forEach(a -> a.setDelayFactor(factor));
   }
 
   public void setShowComparisonTable(boolean show) {
@@ -302,6 +337,16 @@ public final class AppContext {
     preferences.save();
   }
 
+  public boolean isPerfStatsEnabled() {
+    return perfStatsEnabled;
+  }
+
+  public void setPerfStatsEnabled(boolean enabled) {
+    perfStatsEnabled = enabled;
+    preferences.setPerfStats(enabled);
+    preferences.save();
+  }
+
   public void setShuffleType(ShuffleType shuffleType) {
     arrayController.setShuffleType(shuffleType);
     preferences.setShuffleType(shuffleType);
@@ -313,6 +358,40 @@ public final class AppContext {
     preferences.save();
   }
 
+  public ImageRepository getImageRepository() {
+    return imageRepository;
+  }
+
+  public void setImageRepository(ImageRepository imageRepository) {
+    this.imageRepository = imageRepository;
+    bindImageRepository(visualization);
+  }
+
+  /**
+   * Load and resize an image on the caller thread (render thread for GDX texture upload). Validates
+   * nothing about the filesystem — Settings VM does NIO checks first.
+   */
+  public boolean loadImageForVisualization(ImageSourceVisualization viz, String path) {
+    if (viz == null || imageRepository == null || renderSystem == null) {
+      return false;
+    }
+    viz.bindRepository(imageRepository);
+    ImageHandle handle =
+        imageRepository.load(path, renderSystem.getWidth(), renderSystem.getHeight());
+    if (handle == null) {
+      return false;
+    }
+    viz.setImage(handle);
+    setImagePath(path);
+    return true;
+  }
+
+  private void bindImageRepository(Visualization visualization) {
+    if (visualization instanceof ImageSourceVisualization imageViz && imageRepository != null) {
+      imageViz.bindRepository(imageRepository);
+    }
+  }
+
   public void persistRunAll(boolean runAll, List<RunAllEntryPref> entries) {
     preferences.setRunAll(runAll);
     preferences.setRunAllEntries(entries);
@@ -321,6 +400,13 @@ public final class AppContext {
 
   public void shutdown() {
     persistPreferences();
-    MainController.shutdown();
+    if (shutdownHandler != null) {
+      shutdownHandler.run();
+    }
+  }
+
+  /** Registers the composition-root quit path (typically {@code Game::shutdown}). */
+  public void setShutdownHandler(Runnable shutdownHandler) {
+    this.shutdownHandler = shutdownHandler;
   }
 }

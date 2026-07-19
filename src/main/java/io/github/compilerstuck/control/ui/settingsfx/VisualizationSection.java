@@ -2,11 +2,13 @@ package io.github.compilerstuck.control.ui.settingsfx;
 
 import atlantafx.base.theme.Styles;
 import io.github.compilerstuck.control.catalog.VisualizationDescriptor;
+import io.github.compilerstuck.control.ui.settingsfx.customize.VisualizationCustomizePanels;
 import io.github.compilerstuck.control.ui.settingsfx.vm.VisualizationViewModel;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -17,10 +19,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-/** Visualization combo + optional image path validation (G3). */
+/** Visualization combo + Customize + optional image path validation (G3). */
 public final class VisualizationSection {
 
   public static final String ROOT_ID = "section-visualization";
+  public static final String CUSTOMIZE_BUTTON_ID = "visualization-customize";
 
   private VisualizationSection() {}
 
@@ -53,9 +56,22 @@ public final class VisualizationSection {
               }
             });
 
+    Button customize = new Button(SettingsStrings.CUSTOMIZE);
+    customize.setId(CUSTOMIZE_BUTTON_ID);
+    customize.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    customize.setDisable(!canCustomize(vm));
+    customize.setOnAction(
+        e -> VisualizationCustomizeDialog.show(customize.getScene().getWindow(), vm));
+
+    HBox comboRow = new HBox(SettingsLayout.GAP_SM, combo, customize);
+    comboRow.setAlignment(Pos.CENTER_LEFT);
+    HBox.setHgrow(combo, Priority.ALWAYS);
+
+    Label imageLabel = SettingsControls.fieldLabel(SettingsStrings.IMAGE);
     TextField path = new TextField(vm.getImagePath());
     path.setPromptText(SettingsStrings.IMAGE_PATH_PROMPT);
     HBox.setHgrow(path, Priority.ALWAYS);
+    imageLabel.setLabelFor(path);
 
     Button browse = new Button(SettingsStrings.BROWSE);
     browse.getStyleClass().add(Styles.BUTTON_OUTLINED);
@@ -84,7 +100,8 @@ public final class VisualizationSection {
     error.setManaged(hasError);
 
     HBox imageRow = new HBox(SettingsLayout.GAP_SM, path, browse);
-    VBox imageBlock = new VBox(SettingsLayout.GAP_SM, imageRow, error);
+    imageRow.setAlignment(Pos.CENTER_LEFT);
+    VBox imageBlock = new VBox(SettingsLayout.GAP_XS, imageLabel, imageRow, error);
     imageBlock.setVisible(vm.needsImage());
     imageBlock.setManaged(vm.needsImage());
 
@@ -101,7 +118,11 @@ public final class VisualizationSection {
                       break;
                     }
                   }
+                  customize.setDisable(!canCustomize(vm) || !vm.isInputsEnabled());
                 });
+          } else if (VisualizationViewModel.PROP_CONFIGURABLE.equals(evt.getPropertyName())) {
+            VmBindings.runFx(
+                () -> customize.setDisable(!canCustomize(vm) || !vm.isInputsEnabled()));
           } else if (VisualizationViewModel.PROP_NEEDS_IMAGE.equals(evt.getPropertyName())) {
             boolean needs = Boolean.TRUE.equals(evt.getNewValue());
             VmBindings.runFx(
@@ -126,6 +147,9 @@ public final class VisualizationSection {
                   error.setVisible(show);
                   error.setManaged(show);
                 });
+          } else if (VisualizationViewModel.PROP_INPUTS_ENABLED.equals(evt.getPropertyName())) {
+            VmBindings.runFx(
+                () -> customize.setDisable(!canCustomize(vm) || !vm.isInputsEnabled()));
           }
         });
 
@@ -145,8 +169,12 @@ public final class VisualizationSection {
         vm::addPropertyChangeListener,
         VisualizationViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, combo, imageBlock);
+    VBox root = new VBox(SettingsLayout.GAP_SM, comboRow, imageBlock);
     root.setId(ROOT_ID);
     return root;
+  }
+
+  private static boolean canCustomize(VisualizationViewModel vm) {
+    return vm.isConfigurable() && VisualizationCustomizePanels.hasPanel(vm.getSelectedId());
   }
 }

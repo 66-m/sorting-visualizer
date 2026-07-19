@@ -1,27 +1,34 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
+import java.awt.Color;
 
 public class DisparityCircleScatterLinked extends Visualization {
 
   int radius;
   private final PhaseLut phaseLut = new PhaseLut();
-  private final ColorBatch colorBatch = new ColorBatch();
 
   private float[] scaledSin;
   private float[] scaledCos;
   private double[] barHeights;
   private int cacheLength = -1;
   private int cacheRadius = -1;
+  private float[] xyxy;
+  private int[] argb;
 
   public DisparityCircleScatterLinked(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Disparity Circle Scatter Linked";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void rebuildScaledDirections(int length, int radius) {
@@ -57,9 +64,7 @@ public class DisparityCircleScatterLinked extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int length = arrayController.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
     int centerX = screenWidth / 2;
@@ -76,31 +81,31 @@ public class DisparityCircleScatterLinked extends Visualization {
       barHeights[i] = disparityBarHeight(i, value, length, screenHeight);
     }
 
-    proc.noFill();
-    colorBatch.reset();
+    int lineCount = Math.max(0, length - 1);
+    if (xyxy == null || xyxy.length < lineCount * 4) {
+      xyxy = new float[Math.max(4, lineCount * 4)];
+      argb = new int[Math.max(1, lineCount)];
+    }
 
-    for (int i = 0; i < length - 1; i++) {
+    for (int i = 0; i < lineCount; i++) {
       int value = arrayController.get(i);
       int nextIndex = i + 1;
       Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
-      int rgb = color.getRGB();
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
-      arrayController.setMarker(i, Marker.NORMAL);
-
       double barHeight1 = barHeights[i];
       double barHeight2 = barHeights[nextIndex];
 
-      int x1 = centerX + (int) (barHeight1 * scaledSin[i]);
-      int y1 = centerY - (int) (barHeight1 * scaledCos[i]);
-      int x2 = centerX + (int) (barHeight2 * scaledSin[nextIndex]);
-      int y2 = centerY - (int) (barHeight2 * scaledCos[nextIndex]);
-
-      colorBatch.stroke(proc, rgb);
-      proc.line(x1, y1, x2, y2);
+      int o = i * 4;
+      xyxy[o] = centerX + (int) (barHeight1 * scaledSin[i]);
+      xyxy[o + 1] = centerY + (int) (barHeight1 * scaledCos[i]);
+      xyxy[o + 2] = centerX + (int) (barHeight2 * scaledSin[nextIndex]);
+      xyxy[o + 3] = centerY + (int) (barHeight2 * scaledCos[nextIndex]);
+      argb[i] = color.getRGB();
     }
+    rs.strokeLines(xyxy, argb, lineCount);
   }
 }

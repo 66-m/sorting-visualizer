@@ -79,12 +79,15 @@ public class MidiSys extends Sound {
 
   @Override
   public void mute(boolean mute) {
+    // Hard cut: allNotesOff alone leaves SoftSynth release tails sounding after sort end.
+    synthesizerChannel.allSoundOff();
     synthesizerChannel.allNotesOff();
     synthesizerChannel.setMute(mute);
   }
 
   @Override
   public void dispose() {
+    synthesizerChannel.allSoundOff();
     synthesizerChannel.allNotesOff();
     if (synthesizer.isOpen()) {
       synthesizer.close();

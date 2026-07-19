@@ -2,9 +2,8 @@ package io.github.compilerstuck.control.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.compilerstuck.control.config.DelayStrategy;
 import io.github.compilerstuck.control.config.ShuffleType;
-import io.github.compilerstuck.control.render.ProcessingContext;
+import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.Sound;
 import java.nio.file.Files;
@@ -12,7 +11,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 class SortingSessionManagerTest {
 
-  private static final ProcessingContext NO_OP_PROCESSING = ms -> {};
+  private static final DelayContext NO_OP_PROCESSING = () -> {};
 
   private ArrayController arrayController;
   private FakeSound sound;
@@ -66,6 +67,84 @@ class SortingSessionManagerTest {
     assertFalse(sessionManager.getWritesAux().isEmpty());
     assertTrue(stateManager.shouldRestart());
     assertFalse(stateManager.isRunning());
+  }
+
+  @Test
+  @DisplayName("session end drains leftover FrameGate credits")
+  void sessionEndDrainsFrameGate() {
+    FrameGate gate = new FrameGate();
+    gate.grant(16);
+    sessionManager.setFrameGate(gate);
+    stateManager.setRunning(true);
+
+    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayController)));
+    sessionManager.waitForCompletion();
+
+    assertEquals(0, gate.availableCredits());
+    assertFalse(gate.isCancelled());
+  }
+
+  @Test
+  @DisplayName("post-sort pause drains leftover credits so awaitIdle is not blocked")
+  void postSortPauseDrainsLeftoverCredits() throws Exception {
+    FrameGate gate = new FrameGate();
+    SortingSessionManager delayedSession =
+        new SortingSessionManager(arrayController, sound, stateManager, 0, 250);
+    delayedSession.setFrameGate(gate);
+    stateManager.setRunning(true);
+
+    CountDownLatch algorithmFinished = new CountDownLatch(1);
+    AtomicBoolean idleDuringPause = new AtomicBoolean(false);
+    AtomicBoolean suspendedDuringPause = new AtomicBoolean(false);
+    Thread renderWaiter =
+        new Thread(
+            () -> {
+              try {
+                assertTrue(algorithmFinished.await(2, TimeUnit.SECONDS));
+                Thread.sleep(20);
+                suspendedDuringPause.set(stateManager.isFrameGateSuspended());
+                long start = System.nanoTime();
+                gate.awaitIdle();
+                idleDuringPause.set(System.nanoTime() - start < TimeUnit.MILLISECONDS.toNanos(100));
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            },
+            "awaitIdle-during-pause");
+    renderWaiter.start();
+
+    delayedSession.startSortingSession(
+        List.of(new CreditLeavingSortAlgorithm(arrayController, gate, algorithmFinished)));
+    delayedSession.waitForCompletion();
+    renderWaiter.join(2000);
+
+    assertTrue(suspendedDuringPause.get(), "frame gate should be suspended during post-sort pause");
+    assertTrue(idleDuringPause.get(), "awaitIdle should return quickly during post-sort pause");
+    assertEquals(0, gate.availableCredits());
+    assertFalse(stateManager.isFrameGateSuspended());
+  }
+
+  @Test
+  @DisplayName("prepareForAlgorithm clears shuffling flag and drains FrameGate after shuffle")
+  void prepareClearsShufflingAndDrainsGate() {
+    FrameGate gate = new FrameGate();
+    sessionManager.setFrameGate(gate);
+    arrayController.setDelayContext(
+        () -> {
+          gate.grant(1);
+          try {
+            gate.awaitStep();
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+        });
+    stateManager.setRunning(true);
+
+    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayController)));
+    sessionManager.waitForCompletion();
+
+    assertFalse(stateManager.isShuffling());
+    assertEquals(0, gate.availableCredits());
   }
 
   @Test
@@ -146,7 +225,7 @@ class SortingSessionManagerTest {
     }
 
     @Override
-    public void playSound(int value) {}
+    public void playSound(int index) {}
 
     @Override
     public void mute(boolean mute) {
@@ -166,7 +245,6 @@ class SortingSessionManagerTest {
       model = arrayController;
       name = "InstantSort";
       setDelay(false);
-      setDelayStrategy(DelayStrategy.never());
     }
 
     @Override
@@ -178,6 +256,33 @@ class SortingSessionManagerTest {
     }
   }
 
+  /** Leaves unused FrameGate credits, mimicking a high steps-per-frame budget at sort end. */
+  private static class CreditLeavingSortAlgorithm extends SortingAlgorithm {
+    private final ArrayModel model;
+    private final FrameGate gate;
+    private final CountDownLatch finished;
+
+    CreditLeavingSortAlgorithm(
+        ArrayModel arrayController, FrameGate gate, CountDownLatch finished) {
+      super(arrayController, NO_OP_PROCESSING);
+      model = arrayController;
+      this.gate = gate;
+      this.finished = finished;
+      name = "CreditLeavingSort";
+      setDelay(false);
+    }
+
+    @Override
+    public void sort() {
+      report(name);
+      for (int i = 0; i < model.getLength(); i++) {
+        model.set(i, i);
+      }
+      gate.grant(500);
+      finished.countDown();
+    }
+  }
+
   private static class UntilCancelledAlgorithm extends SortingAlgorithm {
     private volatile boolean running;
 
@@ -185,7 +290,6 @@ class SortingSessionManagerTest {
       super(arrayController, NO_OP_PROCESSING);
       name = "UntilCancelled";
       setDelay(false);
-      setDelayStrategy(DelayStrategy.never());
     }
 
     boolean isRunning() {

@@ -62,7 +62,7 @@ public final class AlgorithmCatalog {
         displayName,
         (array, proc) -> {
           SortingAlgorithm alg = ctor.apply(array);
-          alg.setProcessingContext(proc);
+          alg.setDelayContext(proc);
           return alg;
         });
   }

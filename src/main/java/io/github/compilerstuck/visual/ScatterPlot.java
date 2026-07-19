@@ -1,26 +1,33 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
+import java.awt.Color;
 
 public class ScatterPlot extends Visualization {
 
   private final IndexXCache indexXCache = new IndexXCache();
-  private final ColorBatch colorBatch = new ColorBatch();
 
   private long cachedRevision = Long.MIN_VALUE;
   private int cachedWidth = -1;
   private int cachedHeight = -1;
   private int cachedN = -1;
   private int[] barHeights;
+  private float[] xyd;
+  private int[] argb;
 
   public ScatterPlot(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Scatter Plot";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureHeights(int n, int heightScale) {
@@ -44,9 +51,7 @@ public class ScatterPlot extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int n = arrayController.getLength();
     int heightScale = screenHeight - 5;
 
@@ -54,19 +59,25 @@ public class ScatterPlot extends Visualization {
     float[] xs = indexXCache.xs();
     ensureHeights(n, heightScale);
 
-    colorBatch.reset();
-    proc.noStroke();
+    if (xyd == null || xyd.length < n * 3) {
+      xyd = new float[n * 3];
+      argb = new int[n];
+    }
+
     for (int i = 0; i < n; i++) {
-      Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color =
+          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
-      arrayController.setMarker(i, Marker.NORMAL);
-
-      colorBatch.fill(proc, color.getRGB());
-      proc.circle(xs[i], screenHeight - barHeights[i], 3);
+      int o = i * 3;
+      xyd[o] = xs[i];
+      xyd[o + 1] = barHeights[i];
+      xyd[o + 2] = 3;
+      argb[i] = color.getRGB();
     }
+    rs.fillCircles(xyd, argb, n);
   }
 }

@@ -1,62 +1,96 @@
 package io.github.compilerstuck.control.ui;
 
 import io.github.compilerstuck.control.config.MainControllerConfig;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import java.util.List;
 
-/** Draws the algorithm comparison results table onto a {@link RenderContext}. */
+/** Draws the algorithm comparison results table onto a {@link RenderSystem}. */
 public final class ResultsTableRenderer {
 
+  private float[] gridLines;
+  private int[] gridArgb;
+  private float[] rowLines;
+  private int[] rowArgb;
+
   public void render(
-      RenderContext ctx,
+      RenderSystem rs,
       List<SortingAlgorithm> algorithms,
       List<String> comparisons,
       List<String> realTime,
       List<String> swaps,
       List<String> writesMain,
       List<String> writesAux) {
-    int width = ctx.getWidth();
-    int height = ctx.getHeight();
+    int width = rs.getWidth();
+    int height = rs.getHeight();
 
-    ctx.textSize(MainControllerConfig.scaleToWidth(MainControllerConfig.FONT_SIZE_RATIO, width));
-    ctx.background(MainControllerConfig.RESULTS_TABLE_BACKGROUND);
-    ctx.fill(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
-    ctx.stroke(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
+    float bg = MainControllerConfig.RESULTS_TABLE_BACKGROUND / 255f;
+    rs.clear(bg, bg, bg);
 
-    drawGrid(ctx, width, height);
-    drawHeaders(ctx, width);
-    drawData(ctx, width, height, algorithms, comparisons, realTime, swaps, writesMain, writesAux);
+    float textSize = MainControllerConfig.scaleToWidth(MainControllerConfig.FONT_SIZE_RATIO, width);
+
+    drawGrid(rs, width, height);
+    drawHeaders(rs, width, textSize);
+    drawData(
+        rs,
+        width,
+        height,
+        textSize,
+        algorithms,
+        comparisons,
+        realTime,
+        swaps,
+        writesMain,
+        writesAux);
   }
 
-  private void drawGrid(RenderContext ctx, int width, int height) {
+  private void drawGrid(RenderSystem rs, int width, int height) {
     float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
+    // 1 center divider + 5 column dividers
+    int count = 6;
+    if (gridLines == null || gridLines.length < count * 4) {
+      gridLines = new float[count * 4];
+      gridArgb = new int[count];
+    }
+    int textColor = packGray(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
 
-    ctx.line(
-        (int) (columnWidth + columnWidth / 2), 0, (int) (columnWidth + columnWidth / 2), height);
+    float x0 = columnWidth + columnWidth / 2;
+    gridLines[0] = x0;
+    gridLines[1] = 0;
+    gridLines[2] = x0;
+    gridLines[3] = height;
+    gridArgb[0] = textColor;
 
     for (int i = 2; i < 7; i++) {
-      ctx.line((int) (columnWidth * i), 0, (int) (columnWidth * i), height);
+      int o = (i - 1) * 4;
+      float x = columnWidth * i;
+      gridLines[o] = x;
+      gridLines[o + 1] = 0;
+      gridLines[o + 2] = x;
+      gridLines[o + 3] = height;
+      gridArgb[i - 1] = textColor;
     }
+    rs.strokeLines(gridLines, gridArgb, count);
   }
 
-  private void drawHeaders(RenderContext ctx, int width) {
+  private void drawHeaders(RenderSystem rs, int width, float textSize) {
     float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
-    int textY = MainControllerConfig.scaleToWidth(MainControllerConfig.FONT_SIZE_RATIO, width);
+    float textY = textSize;
 
-    ctx.text("Alg. name", columnWidth * 0 + 10, textY);
-    ctx.text("Elements", columnWidth * 1 + columnWidth / 2 + 5, textY);
-    ctx.text("Comparisons", columnWidth * 2 + 10, textY);
-    ctx.text("Est. time", columnWidth * 3 + 10, textY);
-    ctx.text("Swaps", columnWidth * 4 + 10, textY);
-    ctx.text("Writes main", columnWidth * 5 + 10, textY);
-    ctx.text("Writes aux", columnWidth * 6 + 10, textY);
+    rs.drawText("Alg. name", columnWidth * 0 + 10, textY, textSize);
+    rs.drawText("Elements", columnWidth * 1 + columnWidth / 2 + 5, textY, textSize);
+    rs.drawText("Comparisons", columnWidth * 2 + 10, textY, textSize);
+    rs.drawText("Est. real time", columnWidth * 3 + 10, textY, textSize);
+    rs.drawText("Swaps", columnWidth * 4 + 10, textY, textSize);
+    rs.drawText("Writes main", columnWidth * 5 + 10, textY, textSize);
+    rs.drawText("Writes aux", columnWidth * 6 + 10, textY, textSize);
   }
 
   private void drawData(
-      RenderContext ctx,
+      RenderSystem rs,
       int width,
       int height,
+      float textSize,
       List<SortingAlgorithm> algorithms,
       List<String> comparisons,
       List<String> realTime,
@@ -69,14 +103,26 @@ public final class ResultsTableRenderer {
 
     float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
     float rowHeight = (height - MainControllerConfig.TABLE_TOP_ROW) / algorithms.size();
+    int textColor = packGray(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
+
+    if (rowLines == null || rowLines.length < algorithms.size() * 4) {
+      rowLines = new float[algorithms.size() * 4];
+      rowArgb = new int[algorithms.size()];
+    }
 
     for (int i = 0; i < algorithms.size(); i++) {
       float rowY = MainControllerConfig.TABLE_TOP_ROW + rowHeight * i;
-      ctx.line(0, (int) rowY, width, (int) rowY);
+      int o = i * 4;
+      rowLines[o] = 0;
+      rowLines[o + 1] = rowY;
+      rowLines[o + 2] = width;
+      rowLines[o + 3] = rowY;
+      rowArgb[i] = textColor;
 
       drawRow(
-          ctx,
+          rs,
           height,
+          textSize,
           i,
           columnWidth,
           rowY,
@@ -87,11 +133,13 @@ public final class ResultsTableRenderer {
           writesMain,
           writesAux);
     }
+    rs.strokeLines(rowLines, rowArgb, algorithms.size());
   }
 
   private void drawRow(
-      RenderContext ctx,
+      RenderSystem rs,
       int height,
+      float textSize,
       int index,
       float columnWidth,
       float rowY,
@@ -105,44 +153,54 @@ public final class ResultsTableRenderer {
     float rowCenterY =
         rowY + 10 + (height - MainControllerConfig.TABLE_TOP_ROW) / algorithms.size() / 2;
 
-    ctx.text(alg.getName(), columnWidth * 0 + 10, (int) rowCenterY);
-    ctx.text(
+    rs.drawText(alg.getName(), columnWidth * 0 + 10, rowCenterY, textSize);
+    rs.drawText(
         String.valueOf(alg.getAlternativeSize()),
         (int) (columnWidth * 1 + columnWidth / 2) + 10,
-        (int) rowCenterY);
+        rowCenterY,
+        textSize);
 
     if (index < comparisons.size()) {
-      ctx.text(
+      rs.drawText(
           String.format("%,d", Long.parseLong(comparisons.get(index))),
           (int) (columnWidth * 2) + 10,
-          (int) rowCenterY);
+          rowCenterY,
+          textSize);
     }
 
     if (index < realTime.size()) {
       String timeStr =
           "~" + TimeEstimateFormat.format(Double.parseDouble(realTime.get(index))) + "ms";
-      ctx.text(timeStr, (int) (columnWidth * 3) + 10, (int) rowCenterY);
+      rs.drawText(timeStr, (int) (columnWidth * 3) + 10, rowCenterY, textSize);
     }
 
     if (index < swaps.size()) {
-      ctx.text(
+      rs.drawText(
           String.format("%,d", Long.parseLong(swaps.get(index))),
           (int) (columnWidth * 4) + 10,
-          (int) rowCenterY);
+          rowCenterY,
+          textSize);
     }
 
     if (index < writesMain.size()) {
-      ctx.text(
+      rs.drawText(
           String.format("%,d", Long.parseLong(writesMain.get(index))),
           (int) (columnWidth * 5) + 10,
-          (int) rowCenterY);
+          rowCenterY,
+          textSize);
     }
 
     if (index < writesAux.size()) {
-      ctx.text(
+      rs.drawText(
           String.format("%,d", Long.parseLong(writesAux.get(index))),
           (int) (columnWidth * 6) + 10,
-          (int) rowCenterY);
+          rowCenterY,
+          textSize);
     }
+  }
+
+  private static int packGray(int channel) {
+    int c = channel & 0xFF;
+    return 0xFF000000 | (c << 16) | (c << 8) | c;
   }
 }

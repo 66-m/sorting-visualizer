@@ -1,111 +1,182 @@
 package io.github.compilerstuck.control.catalog;
 
-import io.github.compilerstuck.visual.*;
+import io.github.compilerstuck.visual.Bars;
+import io.github.compilerstuck.visual.Circle;
+import io.github.compilerstuck.visual.ColorGradientGraph;
+import io.github.compilerstuck.visual.Cube;
+import io.github.compilerstuck.visual.CubicLines;
+import io.github.compilerstuck.visual.DisparityChords;
+import io.github.compilerstuck.visual.DisparityCircle;
+import io.github.compilerstuck.visual.DisparityCircleScatter;
+import io.github.compilerstuck.visual.DisparityCircleScatterLinked;
+import io.github.compilerstuck.visual.DisparityGraph;
+import io.github.compilerstuck.visual.DisparityGraphMirrored;
+import io.github.compilerstuck.visual.DisparityPlane;
+import io.github.compilerstuck.visual.DisparitySphereHoops;
+import io.github.compilerstuck.visual.DisparitySquareScatter;
+import io.github.compilerstuck.visual.Hoops;
+import io.github.compilerstuck.visual.HorizontalPyramid;
+import io.github.compilerstuck.visual.ImageHorizontal;
+import io.github.compilerstuck.visual.ImageVertical;
+import io.github.compilerstuck.visual.MorphingShell;
+import io.github.compilerstuck.visual.MosaicSquares;
+import io.github.compilerstuck.visual.NumberPlot;
+import io.github.compilerstuck.visual.Phyllotaxis;
+import io.github.compilerstuck.visual.Plane;
+import io.github.compilerstuck.visual.Pyramid;
+import io.github.compilerstuck.visual.ScatterPlot;
+import io.github.compilerstuck.visual.ScatterPlotLinked;
+import io.github.compilerstuck.visual.Sphere;
+import io.github.compilerstuck.visual.SphereHoops;
+import io.github.compilerstuck.visual.SphericDisparityLines;
+import io.github.compilerstuck.visual.SwirlDots;
 import java.util.List;
 
-/**
- * Static registry of all visualizations available to the Settings UI, in the order they were
- * historically presented.
- */
+/** Live visualization registry for {@link io.github.compilerstuck.control.render.RenderSystem}. */
 public final class VisualizationCatalog {
 
   private VisualizationCatalog() {}
 
   public static List<VisualizationDescriptor> all() {
     return List.of(
-        new VisualizationDescriptor("bars", "Bars", VisualConstraints.NONE, Bars::new),
         new VisualizationDescriptor(
-            "scatter-plot", "Scatter Plot", VisualConstraints.NONE, ScatterPlot::new),
+            "bars", "Bars", VisualConstraints.NONE, (a, g, s, rs) -> new Bars(a, g, s, rs)),
+        new VisualizationDescriptor(
+            "scatter-plot",
+            "Scatter Plot",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new ScatterPlot(a, g, s, rs)),
         new VisualizationDescriptor(
             "scatter-plot-linked",
             "Scatter Plot Linked",
             VisualConstraints.NONE,
-            ScatterPlotLinked::new),
+            (a, g, s, rs) -> new ScatterPlotLinked(a, g, s, rs)),
         new VisualizationDescriptor(
-            "number-plot", "Number Plot", VisualConstraints.NONE, NumberPlot::new),
+            "number-plot",
+            "Number Plot",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new NumberPlot(a, g, s, rs)),
         new VisualizationDescriptor(
-            "disparity-graph", "Disparity Graph", VisualConstraints.NONE, DisparityGraph::new),
+            "disparity-graph",
+            "Disparity Graph",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new DisparityGraph(a, g, s, rs)),
         new VisualizationDescriptor(
             "disparity-graph-mirrored",
             "Disparity Graph Mirrored",
             VisualConstraints.NONE,
-            DisparityGraphMirrored::new),
+            (a, g, s, rs) -> new DisparityGraphMirrored(a, g, s, rs)),
         new VisualizationDescriptor(
             "horizontal-pyramid",
             "Horizontal Pyramid",
             VisualConstraints.NONE,
-            HorizontalPyramid::new),
+            (a, g, s, rs) -> new HorizontalPyramid(a, g, s, rs)),
         new VisualizationDescriptor(
             "color-gradient-graph",
             "Color Gradient Graph",
             VisualConstraints.NONE,
-            ColorGradientGraph::new),
-        new VisualizationDescriptor("circle", "Circle", VisualConstraints.NONE, Circle::new),
+            (a, g, s, rs) -> new ColorGradientGraph(a, g, s, rs)),
         new VisualizationDescriptor(
-            "disparity-circle", "Disparity Circle", VisualConstraints.NONE, DisparityCircle::new),
+            "circle", "Circle", VisualConstraints.NONE, (a, g, s, rs) -> new Circle(a, g, s, rs)),
+        new VisualizationDescriptor(
+            "disparity-circle",
+            "Disparity Circle",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new DisparityCircle(a, g, s, rs)),
         new VisualizationDescriptor(
             "disparity-circle-scatter",
             "Disparity Circle Scatter",
             VisualConstraints.NONE,
-            DisparityCircleScatter::new),
+            (a, g, s, rs) -> new DisparityCircleScatter(a, g, s, rs)),
         new VisualizationDescriptor(
             "disparity-circle-scatter-linked",
             "Disparity Circle Scatter Linked",
             VisualConstraints.NONE,
-            DisparityCircleScatterLinked::new),
+            (a, g, s, rs) -> new DisparityCircleScatterLinked(a, g, s, rs)),
         new VisualizationDescriptor(
-            "disparity-chords", "Disparity Chords", VisualConstraints.NONE, DisparityChords::new),
+            "disparity-chords",
+            "Disparity Chords",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new DisparityChords(a, g, s, rs)),
         new VisualizationDescriptor(
             "disparity-square-scatter",
             "Disparity Square Scatter",
             VisualConstraints.NONE,
-            DisparitySquareScatter::new),
+            (a, g, s, rs) -> new DisparitySquareScatter(a, g, s, rs)),
         new VisualizationDescriptor(
-            "swirl-dots", "Swirl Dots", VisualConstraints.NONE, SwirlDots::new),
+            "swirl-dots",
+            "Swirl Dots",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new SwirlDots(a, g, s, rs)),
         new VisualizationDescriptor(
-            "phyllotaxis", "Phyllotaxis", VisualConstraints.NONE, Phyllotaxis::new),
+            "phyllotaxis",
+            "Phyllotaxis",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new Phyllotaxis(a, g, s, rs)),
         new VisualizationDescriptor(
             "image-vertical",
             "Image - Vertical Sorting",
             VisualConstraints.IMAGE,
-            ImageVertical::new),
+            (a, g, s, rs) -> new ImageVertical(a, g, s, rs)),
         new VisualizationDescriptor(
             "image-horizontal",
             "Image - Horizontal Sorting",
             VisualConstraints.IMAGE,
-            ImageHorizontal::new),
-        new VisualizationDescriptor("hoops", "Hoops", VisualConstraints.NONE, Hoops::new),
+            (a, g, s, rs) -> new ImageHorizontal(a, g, s, rs)),
+        new VisualizationDescriptor(
+            "hoops", "Hoops", VisualConstraints.NONE, (a, g, s, rs) -> new Hoops(a, g, s, rs)),
         new VisualizationDescriptor(
             "morphing-shell",
             "3D - Morphing Shell",
             VisualConstraints.NONE,
-            MorphingShell::new),
-        new VisualizationDescriptor("sphere", "3D - Sphere", VisualConstraints.SQUARE, Sphere::new),
+            (a, g, s, rs) -> new MorphingShell(a, g, s, rs)),
         new VisualizationDescriptor(
-            "sphere-hoops", "3D - Sphere Hoops", VisualConstraints.NONE, SphereHoops::new),
+            "sphere",
+            "3D - Sphere",
+            VisualConstraints.SQUARE,
+            (a, g, s, rs) -> new Sphere(a, g, s, rs)),
+        new VisualizationDescriptor(
+            "sphere-hoops",
+            "3D - Sphere Hoops",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new SphereHoops(a, g, s, rs)),
         new VisualizationDescriptor(
             "spheric-disparity-lines",
             "3D - Spheric Disparity Lines",
             VisualConstraints.SQUARE,
-            SphericDisparityLines::new),
+            (a, g, s, rs) -> new SphericDisparityLines(a, g, s, rs)),
         new VisualizationDescriptor(
             "disparity-sphere-hoops",
             "3D - Disparity Sphere Hoops",
             VisualConstraints.NONE,
-            DisparitySphereHoops::new),
-        new VisualizationDescriptor("cube", "3D - Cube", VisualConstraints.CUBE, Cube::new),
+            (a, g, s, rs) -> new DisparitySphereHoops(a, g, s, rs)),
         new VisualizationDescriptor(
-            "cubic-lines", "3D - Cubic Lines", VisualConstraints.CUBE, CubicLines::new),
+            "cube", "3D - Cube", VisualConstraints.CUBE, (a, g, s, rs) -> new Cube(a, g, s, rs)),
         new VisualizationDescriptor(
-            "pyramid", "3D - Pyramid", VisualConstraints.NONE, Pyramid::new),
-        new VisualizationDescriptor("plane", "3D - Plane", VisualConstraints.SQUARE, Plane::new),
+            "cubic-lines",
+            "3D - Cubic Lines",
+            VisualConstraints.CUBE,
+            (a, g, s, rs) -> new CubicLines(a, g, s, rs)),
+        new VisualizationDescriptor(
+            "pyramid",
+            "3D - Pyramid",
+            VisualConstraints.NONE,
+            (a, g, s, rs) -> new Pyramid(a, g, s, rs)),
+        new VisualizationDescriptor(
+            "plane",
+            "3D - Plane",
+            VisualConstraints.SQUARE,
+            (a, g, s, rs) -> new Plane(a, g, s, rs)),
         new VisualizationDescriptor(
             "disparity-plane",
             "3D - Disparity Plane",
             VisualConstraints.SQUARE,
-            DisparityPlane::new),
+            (a, g, s, rs) -> new DisparityPlane(a, g, s, rs)),
         new VisualizationDescriptor(
-            "mosaic-squares", "Mosaic Squares", VisualConstraints.SQUARE, MosaicSquares::new));
+            "mosaic-squares",
+            "Mosaic Squares",
+            VisualConstraints.SQUARE,
+            (a, g, s, rs) -> new MosaicSquares(a, g, s, rs)));
   }
 
   public static VisualizationDescriptor findById(String id) {

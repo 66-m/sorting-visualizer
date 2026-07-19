@@ -15,7 +15,7 @@
 
 ## Adding a visualization
 
-1. Subclass `Visualization` under `visual/`.
-2. Draw via `RenderContext` only (no `(PApplet)` casts).
+1. Subclass `Visualization` under `visual/` and implement `update(float delta)`.
+2. Draw via `RenderSystem` batch APIs (`fillRects`, `fillCircles`, `drawBoxes`, …). Do not open raw libGDX batches from visuals.
 3. Register in [`VisualizationCatalog`](../src/main/java/io/github/compilerstuck/control/catalog/VisualizationCatalog.java) with id, display name, factory, and `VisualConstraints` if size/image requirements apply.
-4. Prefer a smoke path via `VisualizationCatalogSmokeTest` / headless render context.
+4. Prefer a smoke path via `VisualizationCatalogSmokeTest` / `FakeRenderSystem`.

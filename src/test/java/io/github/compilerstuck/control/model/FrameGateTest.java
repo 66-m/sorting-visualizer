@@ -57,6 +57,31 @@ class FrameGateTest {
   }
 
   @Test
+  @DisplayName("reset unblocks awaitIdle waiting on leftover credits")
+  void resetUnblocksAwaitIdle() throws InterruptedException {
+    FrameGate gate = new FrameGate();
+    gate.grant(4);
+    AtomicBoolean idleReached = new AtomicBoolean(false);
+    Thread waiter =
+        new Thread(
+            () -> {
+              try {
+                gate.awaitIdle();
+                idleReached.set(true);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            });
+    waiter.start();
+    Thread.sleep(30);
+    assertFalse(idleReached.get());
+    gate.reset();
+    waiter.join(1000);
+    assertTrue(idleReached.get());
+    assertEquals(0, gate.availableCredits());
+  }
+
+  @Test
   @DisplayName("grant then await from another thread")
   void crossThreadGrant() throws InterruptedException {
     FrameGate gate = new FrameGate();
@@ -80,5 +105,66 @@ class FrameGateTest {
     }
     sorter.join(2000);
     assertEquals(3, steps.get());
+  }
+
+  @Test
+  @DisplayName("awaitIdle returns when credits drain to zero")
+  void awaitIdleAfterDrain() throws InterruptedException {
+    FrameGate gate = new FrameGate();
+    gate.grant(2);
+    AtomicBoolean idleReached = new AtomicBoolean(false);
+    Thread waiter =
+        new Thread(
+            () -> {
+              try {
+                gate.awaitIdle();
+                idleReached.set(true);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            });
+    waiter.start();
+    Thread.sleep(30);
+    assertFalse(idleReached.get());
+    gate.awaitStep();
+    assertFalse(idleReached.get());
+    gate.awaitStep();
+    waiter.join(1000);
+    assertTrue(idleReached.get());
+    assertEquals(0, gate.availableCredits());
+  }
+
+  @Test
+  @DisplayName("awaitIdle returns immediately when already idle")
+  void awaitIdleWhenAlreadyIdle() throws InterruptedException {
+    FrameGate gate = new FrameGate();
+    gate.awaitIdle();
+    assertEquals(0, gate.availableCredits());
+  }
+
+  @Test
+  @DisplayName("drain unblocks awaitIdle with leftover credits")
+  void drainUnblocksAwaitIdle() throws InterruptedException {
+    FrameGate gate = new FrameGate();
+    gate.grant(8);
+    AtomicBoolean idleReached = new AtomicBoolean(false);
+    Thread waiter =
+        new Thread(
+            () -> {
+              try {
+                gate.awaitIdle();
+                idleReached.set(true);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            });
+    waiter.start();
+    Thread.sleep(30);
+    assertFalse(idleReached.get());
+    gate.drain();
+    waiter.join(1000);
+    assertTrue(idleReached.get());
+    assertEquals(0, gate.availableCredits());
+    assertFalse(gate.isCancelled());
   }
 }

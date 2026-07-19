@@ -24,6 +24,16 @@ class SortingStateManagerTest {
   }
 
   @Test
+  @DisplayName("isStartRequested peeks without consuming")
+  void isStartRequestedDoesNotConsume() {
+    state.setStartRequested(true);
+    assertTrue(state.isStartRequested());
+    assertTrue(state.isStartRequested());
+    assertTrue(state.requestedStart());
+    assertFalse(state.isStartRequested());
+  }
+
+  @Test
   @DisplayName("setStartRequested sets the start flag")
   void setStartRequested() {
     assertFalse(state.requestedStart());
@@ -32,12 +42,13 @@ class SortingStateManagerTest {
   }
 
   @Test
-  @DisplayName("resetForNewRun clears running, results, restart, and operation")
+  @DisplayName("resetForNewRun clears running, results, restart, shuffling, and operation")
   void resetForNewRunClearsCoreState() {
     state.setStartRequested(true);
     state.setRunning(true);
     state.setShowResults(true);
     state.setRestart(true);
+    state.setShuffling(true);
     state.setCurrentOperation("Bubble Sort");
 
     state.resetForNewRun();
@@ -46,7 +57,28 @@ class SortingStateManagerTest {
     assertFalse(state.isRunning());
     assertFalse(state.shouldShowResults());
     assertFalse(state.shouldRestart());
+    assertFalse(state.isShuffling());
     assertEquals("Waiting", state.getCurrentOperation());
+  }
+
+  @Test
+  @DisplayName("shuffling flag round-trips")
+  void shufflingFlagRoundTrip() {
+    assertFalse(state.isShuffling());
+    state.setShuffling(true);
+    assertTrue(state.isShuffling());
+    state.setShuffling(false);
+    assertFalse(state.isShuffling());
+  }
+
+  @Test
+  @DisplayName("frameGateSuspended flag round-trips and clears on reset")
+  void frameGateSuspendedRoundTrip() {
+    assertFalse(state.isFrameGateSuspended());
+    state.setFrameGateSuspended(true);
+    assertTrue(state.isFrameGateSuspended());
+    state.resetForNewRun();
+    assertFalse(state.isFrameGateSuspended());
   }
 
   @Test

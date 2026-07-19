@@ -33,7 +33,7 @@ public final class MainControllerConfig {
 
   public static final int SETTINGS_DEFAULT_HEIGHT = 560;
 
-  // Frame rate and rendering (display cadence; sort pacing uses delays / FrameGate)
+  // Frame rate and rendering (display cadence; sort pacing uses FrameGate)
   public static final int TARGET_FRAME_RATE = 60;
 
   public static final int MAX_TEXT_SIZE = 50;
@@ -43,6 +43,15 @@ public final class MainControllerConfig {
   public static final int DELAY_AFTER_SORT_RESULT = 1500;
   public static final int SETUP_DELAY = 500;
 
+  /**
+   * Shuffle animation length in seconds. Pacing uses a fixed visual-step budget (not the sort speed
+   * setting).
+   */
+  public static final float SHUFFLE_DURATION_SEC = 1f;
+
+  /** Frame-gate steps fired across one shuffle animation ({@link #SHUFFLE_DURATION_SEC}). */
+  public static final int SHUFFLE_VISUAL_STEPS = 1000;
+
   // Visualization
   public static final int RESULTS_TABLE_BACKGROUND = 15;
   public static final int RESULTS_TABLE_TEXT_COLOR = 255;
@@ -51,10 +60,21 @@ public final class MainControllerConfig {
 
   /**
    * Scales a design-time pixel value (at {@link #WINDOW_RATIO_WIDTH}) to the current canvas width.
-   * Always at least 1 so Processing {@code textSize} never receives 0.
+   * Always at least 1 so text size / font lookup never receives 0.
    */
   public static int scaleToWidth(float designPx, int width) {
     return Math.max(1, Math.round(designPx / (float) WINDOW_RATIO_WIDTH * width));
+  }
+
+  /**
+   * Steps to grant this frame so {@link #SHUFFLE_VISUAL_STEPS} complete in {@link
+   * #SHUFFLE_DURATION_SEC}, independent of the sort speed setting.
+   */
+  public static int shuffleStepsForDelta(float deltaSeconds) {
+    if (deltaSeconds <= 0f) {
+      return 1;
+    }
+    return Math.max(1, Math.round(SHUFFLE_VISUAL_STEPS * deltaSeconds / SHUFFLE_DURATION_SEC));
   }
 
   // Text positioning

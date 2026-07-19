@@ -49,7 +49,7 @@ public final class AlgorithmViewModel {
     this.app = app;
     for (AlgorithmDescriptor descriptor : AlgorithmCatalog.all()) {
       SortingAlgorithm alg =
-          descriptor.factory().apply(app.getArrayController(), app.getRenderContext());
+          descriptor.factory().apply(app.getArrayController(), app.getDelayContext());
       alg.setOperationReporter(app.getStateManager()::setCurrentOperation);
       descriptors.add(descriptor);
       algorithms.add(alg);
@@ -219,6 +219,55 @@ public final class AlgorithmViewModel {
     descriptors.add(toIndex, descriptors.remove(fromIndex));
     persistRunAll();
     pcs.firePropertyChange(PROP_ENTRIES, null, getEntries());
+  }
+
+  /**
+   * Replaces run-all order and selection from a complete snapshot (e.g. after drag-reorder in the
+   * configure-order dialog). {@code orderedIds} must be a permutation of the current entry ids.
+   */
+  public void applyRunAllOrder(List<String> orderedIds, Set<String> selectedIds) {
+    if (!inputsEnabled || orderedIds == null || selectedIds == null) {
+      return;
+    }
+    if (orderedIds.size() != entries.size()) {
+      return;
+    }
+    Map<String, Integer> currentIndex = new HashMap<>();
+    for (int i = 0; i < entries.size(); i++) {
+      currentIndex.put(entries.get(i).getId(), i);
+    }
+    if (orderedIds.size() != new HashSet<>(orderedIds).size()) {
+      return;
+    }
+    for (String id : orderedIds) {
+      if (!currentIndex.containsKey(id)) {
+        return;
+      }
+    }
+
+    List<AlgorithmDescriptor> newDescriptors = new ArrayList<>(orderedIds.size());
+    List<SortingAlgorithm> newAlgorithms = new ArrayList<>(orderedIds.size());
+    List<AlgorithmEntry> newEntries = new ArrayList<>(orderedIds.size());
+    boolean oldCanStart = canStart();
+    for (String id : orderedIds) {
+      int idx = currentIndex.get(id);
+      boolean selected = selectedIds.contains(id);
+      AlgorithmDescriptor descriptor = descriptors.get(idx);
+      SortingAlgorithm alg = algorithms.get(idx);
+      alg.setSelected(selected);
+      newDescriptors.add(descriptor);
+      newAlgorithms.add(alg);
+      newEntries.add(new AlgorithmEntry(id, entries.get(idx).getName(), selected));
+    }
+    descriptors.clear();
+    descriptors.addAll(newDescriptors);
+    algorithms.clear();
+    algorithms.addAll(newAlgorithms);
+    entries.clear();
+    entries.addAll(newEntries);
+    persistRunAll();
+    pcs.firePropertyChange(PROP_ENTRIES, null, getEntries());
+    pcs.firePropertyChange(PROP_CAN_START, oldCanStart, canStart());
   }
 
   /**

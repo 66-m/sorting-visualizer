@@ -13,7 +13,6 @@ public class BucketSort extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
     int[] bucket = new int[max + 1];
@@ -39,7 +38,5 @@ public class BucketSort extends SortingAlgorithm {
         delay(new int[] {j - 1});
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

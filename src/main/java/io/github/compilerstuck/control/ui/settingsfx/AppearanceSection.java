@@ -7,6 +7,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -18,11 +19,13 @@ public final class AppearanceSection {
   private AppearanceSection() {}
 
   public static Node build(AppearanceViewModel vm) {
+    Label presetLabel = SettingsControls.fieldLabel(SettingsStrings.PRESET);
     ComboBox<String> presets = new ComboBox<>();
     List<String> names = vm.getPresetNames();
     presets.getItems().setAll(names);
     presets.getSelectionModel().select(vm.getSelectedIndex());
     presets.setMaxWidth(Double.MAX_VALUE);
+    presetLabel.setLabelFor(presets);
     presets
         .getSelectionModel()
         .selectedIndexProperty()
@@ -34,11 +37,21 @@ public final class AppearanceSection {
                 vm.selectPreset(index.intValue());
               }
             });
+    VBox presetField = new VBox(SettingsLayout.GAP_XS, presetLabel, presets);
 
+    Label colorsLabel = SettingsControls.fieldLabel(SettingsStrings.COLORS);
     ColorPicker color1 = new ColorPicker(toFx(vm.getColor1()));
     ColorPicker color2 = new ColorPicker(toFx(vm.getColor2()));
+    color1.setMaxWidth(Double.MAX_VALUE);
+    color2.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(color1, Priority.ALWAYS);
+    HBox.setHgrow(color2, Priority.ALWAYS);
     color1.setOnAction(e -> vm.setCustomColors(toAwt(color1.getValue()), toAwt(color2.getValue())));
     color2.setOnAction(e -> vm.setCustomColors(toAwt(color1.getValue()), toAwt(color2.getValue())));
+
+    HBox swatches = new HBox(SettingsLayout.GAP_SM, color1, color2);
+    Label hint = SettingsControls.mutedLabel(SettingsStrings.SWATCH_HINT);
+    VBox colorsField = new VBox(SettingsLayout.GAP_XS, colorsLabel, swatches, hint);
 
     vm.addPropertyChangeListener(
         evt -> {
@@ -75,11 +88,7 @@ public final class AppearanceSection {
         vm::addPropertyChangeListener,
         AppearanceViewModel.PROP_INPUTS_ENABLED);
 
-    HBox swatches = new HBox(SettingsLayout.GAP_SM, color1, color2);
-    Label hint = new Label(SettingsStrings.SWATCH_HINT);
-    hint.getStyleClass().add("settings-muted");
-
-    VBox root = new VBox(SettingsLayout.GAP_SM, presets, swatches, hint);
+    VBox root = new VBox(SettingsLayout.GAP_SM, presetField, colorsField);
     root.setId(ROOT_ID);
     return root;
   }

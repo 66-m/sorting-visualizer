@@ -1,10 +1,11 @@
 package io.github.compilerstuck.control.shuffle;
 
+import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.config.ShuffleStrategy;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.model.CancellationToken;
 import io.github.compilerstuck.control.model.OperationReporter;
-import io.github.compilerstuck.control.render.ProcessingContext;
+import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.visual.Marker;
 
 /** Fisher-Yates (random) shuffle. */
@@ -12,10 +13,7 @@ public class RandomShuffleStrategy implements ShuffleStrategy {
 
   @Override
   public void shuffle(
-      ArrayModel model,
-      ProcessingContext ctx,
-      OperationReporter reporter,
-      CancellationToken token) {
+      ArrayModel model, DelayContext ctx, OperationReporter reporter, CancellationToken token) {
     int length = model.getLength();
     for (int i = 0; i < length && !token.isCancelled(); i++) {
       int j = (int) (Math.random() * length);
@@ -28,15 +26,17 @@ public class RandomShuffleStrategy implements ShuffleStrategy {
   }
 
   /**
-   * Fires a delay only at the {@code maxSortingTime} evenly-spaced checkpoints — avoids allocating
-   * an ArrayList on every iteration.
+   * Distributes {@link MainControllerConfig#SHUFFLE_VISUAL_STEPS} delays evenly across {@code
+   * iterations} loop steps (0-based index {@code i}). Small loops fire multiple delays per step so
+   * total pacing stays ~1s.
    */
-  static void maybeDelay(ProcessingContext ctx, int i, int length) {
-    int maxSortingTime = 1000;
-    int step = Math.max(1, (length - 1) / (maxSortingTime - 1));
-    if (i % step == 0) {
-      int delayTime = maxSortingTime / Math.min(maxSortingTime, length);
-      ctx.delay(delayTime);
+  static void maybeDelay(DelayContext ctx, int i, int iterations) {
+    int steps = MainControllerConfig.SHUFFLE_VISUAL_STEPS;
+    int n = Math.max(1, iterations);
+    int due = (int) ((long) (i + 1) * steps / n);
+    int prev = (int) ((long) i * steps / n);
+    for (int d = prev; d < due; d++) {
+      ctx.delay();
     }
   }
 }

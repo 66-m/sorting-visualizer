@@ -8,19 +8,16 @@ public class ShakerSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Shaker Sort";
     alternativeSize = arrayController.getLength();
-    delayFactor = 1. / 100;
   }
 
   public ShakerSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Shaker Sort";
     this.alternativeSize = alternativeSize;
-    delayFactor = 1. / 100;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     boolean swapped = true;
     int start = 0;
@@ -57,7 +54,5 @@ public class ShakerSort extends SortingAlgorithm {
 
       start = start + 1;
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

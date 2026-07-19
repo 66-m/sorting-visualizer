@@ -10,4 +10,5 @@ public record SectionNodes(
     Node visualization,
     Node appearance,
     Node display,
-    Node sound) {}
+    Node sound,
+    Node debug) {}

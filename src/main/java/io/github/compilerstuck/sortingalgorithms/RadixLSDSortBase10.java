@@ -22,7 +22,6 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     @SuppressWarnings("unchecked")
     List<Integer>[] bucket = new List[RADIX];
@@ -63,7 +62,5 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
       placement *= RADIX;
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

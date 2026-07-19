@@ -9,6 +9,7 @@ import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppContextTestFixture;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppearanceViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.ArraySizeViewModel;
+import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SpeedViewModel;
@@ -63,6 +64,7 @@ class SettingsShellSmokeTest extends ApplicationTest {
     assertNotNull(lookup("#" + SoundSection.ROOT_ID).query());
     assertNotNull(lookup("#" + SpeedSection.ROOT_ID).query());
     assertNotNull(lookup("#" + DisplaySection.ROOT_ID).query());
+    assertNotNull(lookup("#" + DebugSection.ROOT_ID).query());
     assertNotNull(lookup("#" + ArraySizeSection.ROOT_ID).query());
     assertNotNull(lookup("#" + AppearanceSection.ROOT_ID).query());
     assertNotNull(lookup("#" + VisualizationSection.ROOT_ID).query());
@@ -88,7 +90,7 @@ class SettingsShellSmokeTest extends ApplicationTest {
     var root = lookup(".root").queryParent();
     // Scene in start() is 720×560; form pref height should sit near that band — not the old 780.
     double pref = root.prefHeight(960);
-    assertTrue(pref >= 420 && pref <= 620, "unexpected prefHeight=" + pref);
+    assertTrue(pref >= 420 && pref <= 700, "unexpected prefHeight=" + pref);
   }
 
   private static ShellResult buildWiredShell() {
@@ -104,6 +106,7 @@ class SettingsShellSmokeTest extends ApplicationTest {
             VisualizationSection.build(vizVm),
             AppearanceSection.build(new AppearanceViewModel(fx.app)),
             DisplaySection.build(new DisplayViewModel(fx.app)),
-            SoundSection.build(new SoundViewModel(fx.app))));
+            SoundSection.build(new SoundViewModel(fx.app)),
+            DebugSection.build(new DebugViewModel(fx.app))));
   }
 }

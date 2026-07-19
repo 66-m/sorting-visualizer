@@ -18,23 +18,22 @@ class SettingsDefaultsTest {
     assertEquals("bars", SettingsDefaults.DEFAULT_VISUALIZATION_ID);
     assertEquals(1280, SettingsDefaults.DEFAULT_ARRAY_SIZE);
     assertEquals(3, SettingsDefaults.DEFAULT_SPEED_LEVEL);
-    assertFalse(SettingsDefaults.DEFAULT_USE_STEP_ENGINE);
     assertFalse(SettingsDefaults.DEFAULT_MUTED);
+    assertFalse(SettingsDefaults.DEFAULT_PERF_STATS);
+    assertEquals("{}", SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
 
     assertEquals(3, SettingsDefaults.ARRAY_SIZE_MIN);
-    assertEquals(20_000, SettingsDefaults.ARRAY_SIZE_MAX);
+    assertEquals(50_000, SettingsDefaults.ARRAY_SIZE_MAX);
     assertEquals(1, SettingsDefaults.SPEED_LEVEL_MIN);
     assertEquals(5, SettingsDefaults.SPEED_LEVEL_MAX);
 
-    assertArrayEquals(new int[] {50, 10, 1, 1, 1}, SettingsDefaults.DELAY_TIME);
-    assertArrayEquals(new double[] {1.0, 1.0, 1.0, 0.12, 0.02}, SettingsDefaults.DELAY_FACTOR);
     assertArrayEquals(new int[] {1, 5, 25, 200, 2000}, SettingsDefaults.STEPS_PER_FRAME);
   }
 
   @Test
   void clampsMatchPreviousRanges() {
     assertEquals(3, SettingsDefaults.clampArraySize(0));
-    assertEquals(20_000, SettingsDefaults.clampArraySize(99_999));
+    assertEquals(50_000, SettingsDefaults.clampArraySize(99_999));
     assertEquals(1280, SettingsDefaults.clampArraySize(1280));
 
     assertEquals(1, SettingsDefaults.clampSpeedLevel(0));

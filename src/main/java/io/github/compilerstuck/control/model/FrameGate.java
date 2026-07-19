@@ -1,9 +1,6 @@
 package io.github.compilerstuck.control.model;
 
-/**
- * Credits-based gate so a sorting thread can wait for draw-thread step budgets instead of sleeping
- * ({@code FrameGate} step-engine mode).
- */
+/** Credits-based gate so a sorting thread waits for draw-thread step budgets. */
 public final class FrameGate {
   private final Object lock = new Object();
   private int credits;
@@ -33,6 +30,32 @@ public final class FrameGate {
         return;
       }
       credits--;
+      if (credits == 0) {
+        lock.notifyAll();
+      }
+    }
+  }
+
+  /**
+   * Blocks until no credits remain (sort worker blocked in {@link #awaitStep}) or the gate is
+   * cancelled. Used by the render thread before publishing an array snapshot.
+   */
+  public void awaitIdle() throws InterruptedException {
+    synchronized (lock) {
+      while (credits > 0 && !cancelled) {
+        lock.wait();
+      }
+    }
+  }
+
+  /**
+   * Drops leftover credits and wakes {@link #awaitIdle} waiters. Used when the sort worker finishes
+   * (or is torn down) so the render thread is not stuck waiting for credits nobody will consume.
+   */
+  public void drain() {
+    synchronized (lock) {
+      credits = 0;
+      lock.notifyAll();
     }
   }
 
@@ -49,6 +72,7 @@ public final class FrameGate {
     synchronized (lock) {
       credits = 0;
       cancelled = false;
+      lock.notifyAll();
     }
   }
 

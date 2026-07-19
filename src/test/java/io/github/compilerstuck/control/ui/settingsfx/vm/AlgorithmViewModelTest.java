@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import io.github.compilerstuck.control.config.ShuffleType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +66,23 @@ class AlgorithmViewModelTest {
     vm.moveEntry(0, 1);
     assertEquals(secondId, vm.getEntries().get(0).getId());
     assertEquals(firstId, vm.getEntries().get(1).getId());
+  }
+
+  @Test
+  void applyRunAllOrderReordersAndSelects() {
+    String firstId = vm.getEntries().get(0).getId();
+    String secondId = vm.getEntries().get(1).getId();
+    List<String> ordered = new ArrayList<>();
+    for (var entry : vm.getEntries()) {
+      ordered.add(entry.getId());
+    }
+    ordered.set(0, secondId);
+    ordered.set(1, firstId);
+    vm.applyRunAllOrder(ordered, Set.of(secondId));
+    assertEquals(secondId, vm.getEntries().get(0).getId());
+    assertEquals(firstId, vm.getEntries().get(1).getId());
+    assertTrue(vm.getEntries().get(0).isSelected());
+    assertFalse(vm.getEntries().get(1).isSelected());
   }
 
   @Test

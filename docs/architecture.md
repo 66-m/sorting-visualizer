@@ -1,91 +1,96 @@
 # Architecture
 
-Versioned overview of the Sorting Algorithm Visualizer desktop app (JavaFX Settings cutover).
+Versioned overview of the Sorting Algorithm Visualizer desktop app (libGDX rendering).
 
 ## Style
 
 - **Monolith** — single Maven module, single JVM process
-- **Dual toolkit UI** — Processing/NEWT OpenGL canvas (`MainController`) + JavaFX Settings (`SettingsFxController` / AtlantaFX Primer Light)
-- **Worker thread** — algorithms run in `SortingSessionManager`; draw loop on Processing’s animation thread
-- **Partial hexagonal ports** — `ArrayModel`, `RenderContext` / `ProcessingContext`, `Sound`, catalogs
+- **Dual toolkit UI** — libGDX/LWJGL3 canvas (`SortingVisualizerGame` + Screens + `GdxRenderSystem`) + JavaFX Settings (`SettingsFxController` / AtlantaFX Primer Light)
+- **Worker thread** — algorithms run in `SortingSessionManager`; draw loop on the libGDX render thread
+- **Ports** — `ArrayModel` (working + published snapshot), `DelayContext` / `FrameGate` (pacing + idle fence), `RenderSystem`, `Sound`, catalogs
+- **Snapshots** — `SnapshotPublisher` copies working → published after `FrameGate.awaitIdle()`; visuals never write markers
 
-Toolkit coexistence (NEWT + JavaFX) was proven in the Phase 0 spike: bootstrap JavaFX with `Platform.startup` **before** `PApplet.main`; Settings window close or canvas Esc → full shutdown (`Platform.exit()` + `PApplet.exit()`).
+Toolkit coexistence: bootstrap JavaFX with `Platform.startup` **before** `Lwjgl3Application`; Settings close or canvas Esc → full shutdown.
+
+## Coordinate spaces
+
+| Space | Origin | Y | Used by |
+|-------|--------|---|---------|
+| **World2D** | bottom-left | up | Bars, graphs, circles, scatters, mosaics |
+| **World3D** | scene center | up | boxes / quads / spheres / 3D lines |
+| **Overlay** | top-left screen | down | HUD, `drawText`, image remap (`drawImageRemap` / Overlay shader) |
+
+Engine owns cameras; visuals submit geometry in world units (or Overlay for text/pixels). See `.cursor/evals/04-libgdx-architecture/` for the migration history.
 
 ## Package map
 
 ```text
 io.github.compilerstuck
-├── control/                 # Orchestration, UI, model, config, render ports
-│   ├── MainController       # PApplet entry; implements RenderContext
-│   ├── AppContext           # Injectable façade for Settings (no static hub for UI ops)
-│   ├── catalog/             # AlgorithmCatalog, VisualizationCatalog + descriptors
-│   ├── config/              # SettingsDefaults, DelayStrategy, ShuffleType, prefs
-│   ├── model/               # ArrayController, session/state, FrameGate, cancel
-│   ├── render/              # RenderContext / Headless / LoadedImage
-│   ├── shuffle/             # Shuffle strategies
-│   └── ui/
-│       ├── settingsfx/      # JavaFX Settings shell, sections, AtlantaFX theme
-│       │   └── vm/          # Headless view-models (no javafx.* — ArchUnit)
-│       ├── AppIcons         # NEWT / taskbar icons
-│       └── ResultsTableRenderer, TimeEstimateFormat
-├── sortingalgorithms/       # SortingAlgorithm base + implementations
-├── visual/                  # Visualization subclasses + Marker + gradient/
-└── sound/                   # Sound, MidiSys, SilentSound, HeadlessSound
+├── control/
+│   ├── DesktopLauncher      # main: JavaFX then Lwjgl3Application
+│   ├── SortingVisualizerGame # Game; composition root + screen navigation
+│   ├── AppContext           # Façade for Settings (+ shutdown handler)
+│   ├── screen/              # VisualizerScreen, ResultsScreen
+│   ├── catalog/             # AlgorithmCatalog, VisualizationCatalog
+│   ├── config/
+│   ├── model/               # ArrayController, SnapshotPublisher, FrameGate, session/state
+│   ├── render/              # RenderSystem, GdxRenderSystem, GeometryBatch2D, FramePipeline, …
+│   │   └── asset/           # AppAssets, ImageRepository, ImageHandle, ImageRemapRenderer
+│   ├── shuffle/
+│   └── ui/settingsfx/       # JavaFX Settings + headless vm/
+├── sortingalgorithms/
+├── visual/                  # Visualizations + VisMath + gradient/
+└── sound/
 ```
 
-## Runtime collaboration
+## Frame pipeline
 
 ```mermaid
 flowchart TB
-  subgraph ui [UI]
-    SettingsFx[SettingsFxController JavaFX]
-    Main[MainController PApplet NEWT]
-  end
-  subgraph core [Core]
-    App[AppContext]
-    Array[ArrayController]
-    Session[SortingSessionManager]
-    Gate[FrameGate]
-    Prefs[UserPreferences]
-  end
-  subgraph ports [Adapters]
-    Viz[Visualization]
-    Snd[Sound MidiSys]
-    Render[RenderContext]
-  end
-  SettingsFx --> VMs[settingsfx.vm]
-  VMs --> App
-  Main --> App
-  App --> Array
-  App --> Session
-  App --> Gate
-  App --> Prefs
-  Session --> Algs[SortingAlgorithm]
-  Algs --> Array
-  Main --> Viz
-  Main --> Render
-  Viz --> Render
-  Algs --> Snd
+  Game[SortingVisualizerGame]
+  Game --> VizScreen[VisualizerScreen]
+  Game --> ResScreen[ResultsScreen]
+  VizScreen --> Begin[renderSystem.beginFrame]
+  Begin --> Idle[FrameGate.awaitIdle]
+  Idle --> Pub[SnapshotPublisher.publish]
+  Pub --> Grant[FrameGate.grant]
+  Grant --> Clear[clear]
+  Clear --> Viz[viz.render reads published]
+  Viz --> EndWorld[endWorld]
+  EndWorld --> HUD[HudRenderer watermark + metrics]
+  HUD --> End[endFrame]
+  Algs[SortingAlgorithm] --> Delay[FrameGateDelayContext]
+  Delay --> Gate[FrameGate]
 ```
 
 ## Key collaborators
 
 | Piece | Role |
 |-------|------|
-| `AppContext` | Composition façade for Settings: size, speed, step engine, algorithm/visual/sound/gradient, persistence hooks |
-| `settingsfx.vm.*` | Headless view-models (validation + AppContext); JavaFX sections bind via `PropertyChangeSupport` |
-| `AlgorithmCatalog` / `VisualizationCatalog` | Stable IDs + factories; Settings builds instances from these |
-| `FrameGate` | Steps-per-frame engine (opt-in via Settings or `-Dsv.stepEngine=true`) |
-| `RenderContext` | Processing drawing API without casts in visuals |
-| `CancellationToken` | Cooperative cancel from UI → session → algorithms |
-| `UserPreferences` | `java.util.prefs` node `io/github/compilerstuck/sorting-visualizer` |
-
-Settings view-models and sections depend on **`AppContext` only**. `MainController` is the Processing entry / composition root and keeps bootstrap statics (`processing`, `sound`, `app`) plus `shutdown()` / `cancelSorting()`.
+| `SortingVisualizerGame` | Composition root: assets, AppContext, screen switch, shutdown |
+| `VisualizerScreen` | Idle / setup delay / active sort + HUD / Esc |
+| `ResultsScreen` | Comparison table via `ResultsTableRenderer` |
+| `AppContext` | Settings façade + snapshot publish + injected shutdown handler |
+| `ArrayController` | Working array mutated by the sort worker |
+| `SnapshotPublisher` | Copy-on-publish; `publishedView()` for visuals/sound |
+| `AppAssets` | Owns FreeType HUD fonts (`flip=true` for Overlay); disposed by composition root |
+| `ImageRepository` | Loads/resizes user images → `ImageHandle`; GDX impl uploads source texture once |
+| `GdxRenderSystem` | World2D/World3D batches + Overlay; circles/ellipses via `GeometryBatch2D` (or `--legacy-2d` ShapeRenderer) |
+| `GeometryBatch2D` | Colored circle quads + low-seg ellipse lines (Phase 8) |
+| `RenderSystem` | Idiomatic draw API: `fillRects` / `fillCircles` / `drawBoxes` / `drawImageRemap` / … |
+| `HudRenderer` | Overlay watermark and metrics (after world pass; counters from working controller) |
+| `FrameGateDelayContext` | Algorithm pacing — no graphics types |
+| `VisualizationCatalog` | All visualizations with size/image constraints |
+| `FrameGate` | Steps-per-frame engine + `awaitIdle` publish fence |
+| `ConfigurableVisualization` | Optional per-viz settings (`CubeSettings` today); Customize dialog drafts then Apply |
+| `VisualizationSettingsCodec` | Versioned JSON for clipboard export/import + `visualSettingsById` prefs blob |
 
 ## Lifecycle
 
-Closing the Settings window or pressing `Esc` on the canvas quits both Settings and the visualization.
+Closing Settings or pressing Esc on the canvas quits both windows.
+
+Per-visualization appearance (Cube first): Settings → Customize beside the visualization combo opens a draft dialog (Cancel / Reset / Import / Export / Apply). Applied settings hot-update the live visual and persist under `UserPreferences.visualSettingsById`.
 
 ## Build & run
 
-See [README](../README.md) and [CONTRIBUTING](../CONTRIBUTING.md). Architecture rules are enforced in tests via ArchUnit (`ArchitectureTest`) — including no `javafx.*` in algorithms/model/shuffle/view-models.
+See [README](../README.md). ArchUnit bans `javafx.*` and `com.badlogic.gdx.*` from algorithms/model/shuffle/view-models; visuals must not depend on `Pixmap` / `Gdx` / `gdx.files` (image I/O lives in `control.render.asset`).

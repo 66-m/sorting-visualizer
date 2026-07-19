@@ -28,6 +28,7 @@ public interface ArrayModel {
 
   void addSleepTime(double sleepTime);
 
+  /** Adds a slice of behind-the-scenes sort work time in nanoseconds (excludes visual pacing). */
   void addRealTime(double timeNs);
 
   // Measurement accessors ------------------------------------------------
@@ -41,6 +42,10 @@ public interface ArrayModel {
 
   double getDelay();
 
+  /**
+   * Accumulated behind-the-scenes sort time in nanoseconds up to this point (algorithm work only;
+   * FrameGate waits are excluded).
+   */
   double getRealTime();
 
   double getSortedPercentage();

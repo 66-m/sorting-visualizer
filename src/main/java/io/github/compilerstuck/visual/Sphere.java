@@ -4,24 +4,24 @@ import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.InstanceData;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
-import processing.core.PApplet;
+import java.awt.Color;
 
 public class Sphere extends Visualization {
 
   int radius;
   float squareRoot;
-  static float aa = 0;
+  private float aa = 0;
 
-  private final ColorBatch colorBatch = new ColorBatch();
+  private final InstanceData spheres = new InstanceData();
 
   private int[] colorsRgb;
   private int[] pointRadii;
   private float[] unitX, unitY, unitZ;
-  private float[] xCords, yCords, zCords;
   private int bufferCapacity;
   private int unitGridSize = -1;
   private int unitDrawCount = -1;
@@ -35,9 +35,14 @@ public class Sphere extends Visualization {
   private ColorGradient cachedGradient;
 
   public Sphere(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "3D - Sphere";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureBuffers(int n) {
@@ -48,9 +53,6 @@ public class Sphere extends Visualization {
     unitX = new float[n];
     unitY = new float[n];
     unitZ = new float[n];
-    xCords = new float[n];
-    yCords = new float[n];
-    zCords = new float[n];
     unitGridSize = -1;
     unitDrawCount = -1;
   }
@@ -104,8 +106,6 @@ public class Sphere extends Visualization {
         sound.playSound(value);
       }
 
-      arrayController.setMarker(value, Marker.NORMAL);
-
       float barHeight =
           (((float) 100000
               / length
@@ -115,7 +115,7 @@ public class Sphere extends Visualization {
                           Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                           Math.abs(i + length - value)))));
 
-      pointRadii[i] = (int) PApplet.map(barHeight, 0, 100000, 0, maxRadius);
+      pointRadii[i] = (int) VisMath.map(barHeight, 0, 100000, 0, maxRadius);
 
       Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
       colorsRgb[i] = color.getRGB();
@@ -130,11 +130,7 @@ public class Sphere extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
-    proc.lights();
-
+  public void update(float delta) {
     int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
     squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
@@ -142,7 +138,7 @@ public class Sphere extends Visualization {
     int maxRadius = (int) (min(screenHeight, screenWidth) / 2.3);
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
 
-    aa -= PApplet.PI / (10 * proc.frameRate());
+    aa -= (float) (Math.PI / 10) * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -150,6 +146,7 @@ public class Sphere extends Visualization {
     rebuildUnitSphere(drawCount, nextN);
     ensureColorsAndRadii(drawCount, length, maxRadius);
 
+    spheres.ensureCapacity(drawCount);
     for (int i = 0; i < drawCount; i++) {
       int pointRadius = pointRadii[i];
 
@@ -162,22 +159,13 @@ public class Sphere extends Visualization {
       float y = cosAa * yMapped - sinAa * zb;
       float z = sinAa * yMapped + cosAa * zb;
 
-      zCords[i] = z;
-      xCords[i] = x;
-      yCords[i] = y;
+      // Legacy center (W/2,H/2,centerZ)+offset → world (x, -y, centerZ+z)
+      spheres.set(i, x, -y, centerZ + z, 3, 3, 3, 0, 0, 0, colorsRgb[i]);
     }
+    spheres.count = drawCount;
 
-    proc.noStroke();
-    proc.pushMatrix();
-    proc.translate((float) screenWidth / 2, (float) screenHeight / 2, centerZ);
-    colorBatch.reset();
-    for (int i = 0; i < drawCount; i++) {
-      colorBatch.fill(proc, colorsRgb[i]);
-      proc.pushMatrix();
-      proc.translate(xCords[i], yCords[i], zCords[i]);
-      proc.circle(0, 0, 3);
-      proc.popMatrix();
-    }
-    proc.popMatrix();
+    rs.begin3D();
+    rs.drawSpheres(spheres);
+    rs.end3D();
   }
 }

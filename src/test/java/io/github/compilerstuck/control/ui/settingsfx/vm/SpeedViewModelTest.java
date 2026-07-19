@@ -1,8 +1,6 @@
 package io.github.compilerstuck.control.ui.settingsfx.vm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +20,6 @@ class SpeedViewModelTest {
   @Test
   void initFromPrefs() {
     assertEquals(SettingsDefaults.DEFAULT_SPEED_LEVEL, vm.getSpeedLevel());
-    assertEquals(SettingsDefaults.DEFAULT_USE_STEP_ENGINE, vm.isUseStepEngine());
   }
 
   @Test
@@ -33,18 +30,9 @@ class SpeedViewModelTest {
   }
 
   @Test
-  void setStepEnginePropagates() {
-    vm.setUseStepEngine(true);
-    assertTrue(vm.isUseStepEngine());
-    assertTrue(fx.app.isUseStepEngine());
-  }
-
-  @Test
-  void inputsEnabledDisablesBothLevelAndStepEngine() {
+  void inputsEnabledDisablesSpeedLevel() {
     vm.setInputsEnabled(false);
     vm.setSpeedLevel(1);
-    vm.setUseStepEngine(true);
     assertEquals(SettingsDefaults.DEFAULT_SPEED_LEVEL, vm.getSpeedLevel());
-    assertFalse(vm.isUseStepEngine());
   }
 }

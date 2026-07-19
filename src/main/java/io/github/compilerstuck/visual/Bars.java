@@ -1,17 +1,16 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
+import java.awt.Color;
 
 public class Bars extends Visualization {
 
-  /** Extra width so adjacent fill quads overlap and hide AA hairlines. */
+  /** Extra width so adjacent fill rects overlap and hide AA hairlines. */
   private static final float SEAM_OVERLAP = 1f;
-
-  private final ColorBatch colorBatch = new ColorBatch();
 
   private long cachedRevision = Long.MIN_VALUE;
   private int cachedWidth = -1;
@@ -19,12 +18,19 @@ public class Bars extends Visualization {
   private int cachedN = -1;
   private ColorGradient cachedGradient;
   private int[] barHeights;
-  private int[] barColorsRgb;
+  private int[] barColorsArgb;
+  private float[] xywh;
+  private int[] argb;
 
   public Bars(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Bars";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureBarCache(int n, int heightScale) {
@@ -38,13 +44,13 @@ public class Bars extends Visualization {
     }
     if (barHeights == null || barHeights.length < n) {
       barHeights = new int[n];
-      barColorsRgb = new int[n];
+      barColorsArgb = new int[n];
     }
     for (int i = 0; i < n; i++) {
       int value = arrayController.get(i);
       barHeights[i] = (value + 1) * heightScale / n;
       Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
-      barColorsRgb[i] = color.getRGB();
+      barColorsArgb[i] = color.getRGB();
     }
     cachedRevision = rev;
     cachedWidth = screenWidth;
@@ -54,36 +60,32 @@ public class Bars extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int n = arrayController.getLength();
     float slotWidth = (float) screenWidth / n;
     int heightScale = screenHeight - 5;
 
     ensureBarCache(n, heightScale);
 
-    proc.noStroke();
-    colorBatch.reset();
-    proc.beginShape(RenderContext.QUADS);
+    if (xywh == null || xywh.length < n * 4) {
+      xywh = new float[n * 4];
+      argb = new int[n];
+    }
 
     for (int i = 0; i < n; i++) {
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
-      arrayController.setMarker(i, Marker.NORMAL);
 
-      colorBatch.fill(proc, barColorsRgb[i]);
       float x0 = i * slotWidth;
       float x1 = Math.min(screenWidth, (i + 1) * slotWidth + SEAM_OVERLAP);
-      float y0 = screenHeight;
-      float y1 = screenHeight - barHeights[i];
-      proc.vertex(x0, y0);
-      proc.vertex(x1, y0);
-      proc.vertex(x1, y1);
-      proc.vertex(x0, y1);
+      int o = i * 4;
+      xywh[o] = x0;
+      xywh[o + 1] = 0;
+      xywh[o + 2] = x1 - x0;
+      xywh[o + 3] = barHeights[i];
+      argb[i] = barColorsArgb[i];
     }
-
-    proc.endShape();
+    rs.fillRects(xywh, argb, n);
   }
 }

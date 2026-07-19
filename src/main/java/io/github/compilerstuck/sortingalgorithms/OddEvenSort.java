@@ -8,21 +8,16 @@ public class OddEvenSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Odd Even Sort";
     alternativeSize = arrayController.getLength();
-    delayFactor = 1. / 55;
   }
 
   public OddEvenSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Odd Even Sort";
     this.alternativeSize = alternativeSize;
-    delayFactor = 1. / 55;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
-
-    delayFactor = 1. / (arrayController.getLength() / 36);
 
     boolean isSorted = false; // Initially array is unsorted
 
@@ -53,7 +48,5 @@ public class OddEvenSort extends SortingAlgorithm {
         arrayController.addComparisons(1);
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

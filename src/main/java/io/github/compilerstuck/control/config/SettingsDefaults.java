@@ -13,7 +13,6 @@ public final class SettingsDefaults {
   public static final String DEFAULT_VISUALIZATION_ID = "bars";
   public static final int DEFAULT_ARRAY_SIZE = 1280;
   public static final int DEFAULT_SPEED_LEVEL = 3;
-  public static final boolean DEFAULT_USE_STEP_ENGINE = false;
   public static final boolean DEFAULT_MUTED = false;
 
   /** Phase 4 additive defaults (missing prefs keys resolve to these — no version bump). */
@@ -27,19 +26,17 @@ public final class SettingsDefaults {
   public static final int DEFAULT_GRADIENT_COLOR2_RGB = Color.BLACK.getRGB();
   public static final boolean DEFAULT_RUN_ALL = false;
   public static final String DEFAULT_RUN_ALL_ENTRIES = "";
+  public static final boolean DEFAULT_PERF_STATS = false;
+
+  /** JSON map of visualizationId → settings object (see VisualizationSettingsCodec). */
+  public static final String DEFAULT_VISUAL_SETTINGS_BY_ID = "{}";
 
   public static final int ARRAY_SIZE_MIN = 3;
-  public static final int ARRAY_SIZE_MAX = 20_000;
+  public static final int ARRAY_SIZE_MAX = 50_000;
   public static final int SPEED_LEVEL_MIN = 1;
   public static final int SPEED_LEVEL_MAX = 5;
 
-  /** Speed levels 1–5 → delay millis when the step engine is off. */
-  public static final int[] DELAY_TIME = {50, 10, 1, 1, 1};
-
-  /** Speed levels 1–5 → delay factor when the step engine is off. */
-  public static final double[] DELAY_FACTOR = {1.0, 1.0, 1.0, 0.12, 0.02};
-
-  /** Speed levels 1–5 → steps per frame when the step engine is enabled. */
+  /** Speed levels 1–5 → steps granted per draw frame. */
   public static final int[] STEPS_PER_FRAME = {1, 5, 25, 200, 2000};
 
   private SettingsDefaults() {}

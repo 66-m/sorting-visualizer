@@ -10,9 +10,10 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-/** Array size slider + validated text field. */
+/** Array size slider + live value + validated text field. */
 public final class ArraySizeSection {
 
   public static final String ROOT_ID = "section-array-size";
@@ -20,28 +21,40 @@ public final class ArraySizeSection {
   private ArraySizeSection() {}
 
   public static Node build(ArraySizeViewModel vm) {
+    Label value = SettingsControls.valueLabel();
+    value.setText(formatSize(vm.getSize()));
+
     Slider slider =
         new Slider(SettingsDefaults.ARRAY_SIZE_MIN, SettingsDefaults.ARRAY_SIZE_MAX, vm.getSize());
+    slider.setMaxWidth(Double.MAX_VALUE);
     slider.setBlockIncrement(1);
     slider.setMajorTickUnit(5000);
     slider.setShowTickMarks(false);
     slider
         .valueProperty()
         .addListener(
-            (obs, old, value) -> {
-              int size = (int) Math.round(value.doubleValue());
+            (obs, old, v) -> {
+              int size = (int) Math.round(v.doubleValue());
+              value.setText(formatSize(size));
               if (size != vm.getSize()) {
                 vm.setSizeFromSlider(size);
               }
             });
 
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+    HBox header =
+        new HBox(
+            SettingsLayout.GAP_SM, SettingsControls.fieldLabel(SettingsStrings.SIZE), spacer, value);
+    header.setAlignment(Pos.CENTER_LEFT);
+
     TextField text = new TextField(vm.getText());
     text.setPrefColumnCount(6);
     text.textProperty()
         .addListener(
-            (obs, old, value) -> {
-              if (!value.equals(vm.getText())) {
-                vm.setText(value);
+            (obs, old, v) -> {
+              if (!v.equals(vm.getText())) {
+                vm.setText(v);
               }
             });
 
@@ -64,13 +77,14 @@ public final class ArraySizeSection {
                   if ((int) Math.round(slider.getValue()) != size) {
                     slider.setValue(size);
                   }
+                  value.setText(formatSize(size));
                 });
           } else if (ArraySizeViewModel.PROP_TEXT.equals(prop)) {
-            String value = String.valueOf(evt.getNewValue());
+            String next = String.valueOf(evt.getNewValue());
             VmBindings.runFx(
                 () -> {
-                  if (!text.getText().equals(value)) {
-                    text.setText(value);
+                  if (!text.getText().equals(next)) {
+                    text.setText(next);
                   }
                 });
           } else if (ArraySizeViewModel.PROP_TEXT_VALID.equals(prop)) {
@@ -103,12 +117,16 @@ public final class ArraySizeSection {
         vm::addPropertyChangeListener,
         ArraySizeViewModel.PROP_INPUTS_ENABLED);
 
-    HBox row = new HBox(SettingsLayout.GAP_SM, text, apply);
-    row.setAlignment(Pos.CENTER_LEFT);
+    HBox precision = new HBox(SettingsLayout.GAP_SM, text, apply);
+    precision.setAlignment(Pos.CENTER_LEFT);
     HBox.setHgrow(text, Priority.ALWAYS);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, slider, row, error);
+    VBox root = new VBox(SettingsLayout.GAP_SM, header, slider, precision, error);
     root.setId(ROOT_ID);
     return root;
+  }
+
+  private static String formatSize(int size) {
+    return String.format("%,d", size);
   }
 }

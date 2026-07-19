@@ -13,7 +13,6 @@ public class CountingSort extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
     int max = (Arrays.stream(arrayController.getArray()).max().getAsInt());
     int[] counter = new int[max + 1];
     for (int i : arrayController.getArray()) {
@@ -22,8 +21,6 @@ public class CountingSort extends SortingAlgorithm {
 
       delay(new int[] {i});
     }
-
-    delayTime = 5;
 
     int ndx = 0;
     for (int i = 0; i < counter.length && !isCancelled(); i++) {
@@ -37,7 +34,5 @@ public class CountingSort extends SortingAlgorithm {
         arrayController.addWritesAux(1);
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

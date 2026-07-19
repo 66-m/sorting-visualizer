@@ -1,12 +1,13 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
+import com.badlogic.gdx.Gdx;
 import io.github.compilerstuck.control.AppContext;
-import io.github.compilerstuck.control.MainController;
 import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppearanceViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.ArraySizeViewModel;
+import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SpeedViewModel;
@@ -49,25 +50,29 @@ public final class SettingsFxController {
   private Button runButton;
   private Button cancelButton;
   private boolean contentReady;
+
   /** Cap for packed stage height (typically ~90% of launch screen). */
   private int maxStageHeight = MainControllerConfig.SETTINGS_DEFAULT_HEIGHT;
+
   private Rectangle launchBounds;
 
   private SoundViewModel soundVm;
   private SpeedViewModel speedVm;
   private DisplayViewModel displayVm;
+  private DebugViewModel debugVm;
   private ArraySizeViewModel arraySizeVm;
   private AppearanceViewModel appearanceVm;
   private VisualizationViewModel visualizationVm;
   private AlgorithmViewModel algorithmVm;
 
   private boolean inputsEnabled = true;
+  private volatile int lastAppliedProgress = Integer.MIN_VALUE;
 
   private SettingsFxController() {}
 
   /**
    * Opens the Settings window chrome immediately (placeholder content). Call as soon as launch
-   * bounds are known so the Stage appears while Processing finishes MIDI / AppContext init.
+   * bounds are known so the Stage appears while libGDX / AppContext init finishes.
    */
   public static void prepare(Rectangle launchScreenBounds) {
     Platform.runLater(
@@ -125,11 +130,21 @@ public final class SettingsFxController {
   }
 
   public static void setProgress(int progress) {
+    int clamped = Math.max(0, Math.min(100, progress));
+    SettingsFxController ctrl = instance;
+    if (ctrl != null && clamped == ctrl.lastAppliedProgress) {
+      return;
+    }
     Platform.runLater(
         () -> {
-          if (instance != null && instance.progressBar != null) {
-            instance.progressBar.setProgress(Math.max(0, Math.min(100, progress)) / 100.0);
+          if (instance == null || instance.progressBar == null) {
+            return;
           }
+          if (clamped == instance.lastAppliedProgress) {
+            return;
+          }
+          instance.lastAppliedProgress = clamped;
+          instance.progressBar.setProgress(clamped / 100.0);
         });
   }
 
@@ -164,9 +179,9 @@ public final class SettingsFxController {
     stage = new Stage();
     stage.setTitle(SettingsStrings.WINDOW_TITLE);
     stage.setScene(placeholderScene());
-    URL settingsIcon = AppIcons.class.getResource(AppIcons.SETTINGS_RESOURCE);
-    if (settingsIcon != null) {
-      stage.getIcons().add(new Image(settingsIcon.toExternalForm()));
+    URL logoIcon = AppIcons.class.getResource(AppIcons.LOGO_RESOURCE);
+    if (logoIcon != null) {
+      stage.getIcons().add(new Image(logoIcon.toExternalForm()));
     }
     stage.setMinWidth(MainControllerConfig.SETTINGS_MIN_WIDTH);
     stage.setMinHeight(MainControllerConfig.SETTINGS_MIN_HEIGHT);
@@ -197,7 +212,10 @@ public final class SettingsFxController {
             app.shutdown();
           } else {
             // Placeholder still up; AppContext not wired yet.
-            MainController.shutdown();
+            JavaFxBootstrap.shutdown();
+            if (Gdx.app != null) {
+              Gdx.app.exit();
+            }
           }
         });
   }
@@ -224,9 +242,7 @@ public final class SettingsFxController {
     }
     // Small slack so sub-pixel layout does not force a scrollbar on a fresh open.
     int height = (int) Math.ceil(prefH + frameChrome + 4);
-    height =
-        Math.max(
-            MainControllerConfig.SETTINGS_MIN_HEIGHT, Math.min(height, maxStageHeight));
+    height = Math.max(MainControllerConfig.SETTINGS_MIN_HEIGHT, Math.min(height, maxStageHeight));
     stage.setHeight(height);
 
     if (launchBounds != null) {
@@ -250,7 +266,8 @@ public final class SettingsFxController {
                 VisualizationSection.build(visualizationVm),
                 AppearanceSection.build(appearanceVm),
                 DisplaySection.build(displayVm),
-                SoundSection.build(soundVm)));
+                SoundSection.build(soundVm),
+                DebugSection.build(debugVm)));
 
     progressBar = shell.progress();
     runButton = shell.run();
@@ -312,6 +329,7 @@ public final class SettingsFxController {
     appearanceVm = new AppearanceViewModel(appContext);
     displayVm = new DisplayViewModel(appContext);
     soundVm = new SoundViewModel(appContext);
+    debugVm = new DebugViewModel(appContext);
 
     arraySizeVm.addPropertyChangeListener(
         evt -> {
@@ -332,6 +350,8 @@ public final class SettingsFxController {
   private void wireActionBar() {
     runButton.setOnAction(
         e -> {
+          // Apply typed size even if the user skipped the Apply button.
+          arraySizeVm.applyText();
           algorithmVm.applySelectionToAppContext();
           app.setStart(true);
           cancelButton.setDisable(false);

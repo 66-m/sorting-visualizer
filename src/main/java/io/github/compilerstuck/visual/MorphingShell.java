@@ -3,22 +3,22 @@ package io.github.compilerstuck.visual;
 import static java.lang.Math.min;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.InstanceData;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
-import processing.core.PApplet;
+import java.awt.Color;
 
 public class MorphingShell extends Visualization {
 
   int radius;
-  static float aa = 0;
-  float angle = 0;
+  private float aa = 0;
+  private float angle = 0;
 
-  private final ColorBatch colorBatch = new ColorBatch();
+  private final InstanceData spheres = new InstanceData();
 
   private float[] lonSin, lonCos, latSin, latCos;
-  private float[] posX, posY, posZ;
   private int[] colorsRgb;
   private int shellColSize = -1;
   private int shellLength = -1;
@@ -28,9 +28,14 @@ public class MorphingShell extends Visualization {
   private ColorGradient cachedGradient;
 
   public MorphingShell(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "3D - Morphing Shell";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void rebuildAngleBases(int length, int colSize) {
@@ -44,17 +49,14 @@ public class MorphingShell extends Visualization {
       lonCos = new float[length];
       latSin = new float[length];
       latCos = new float[length];
-      posX = new float[length];
-      posY = new float[length];
-      posZ = new float[length];
       colorsRgb = new int[length];
     }
 
     int rowCnt = 0;
     int colCnt = 0;
     for (int i = 0; i < length; i++) {
-      float lonBase = -PApplet.PI + rowCnt * (2f * PApplet.PI) / colSize;
-      float latBase = -PApplet.PI + colCnt * (2f * PApplet.PI) / colSize;
+      float lonBase = -VisMath.PI + rowCnt * (2f * VisMath.PI) / colSize;
+      float latBase = -VisMath.PI + colCnt * (2f * VisMath.PI) / colSize;
       lonSin[i] = (float) Math.sin(lonBase);
       lonCos[i] = (float) Math.cos(lonBase);
       latSin[i] = (float) Math.sin(latBase);
@@ -78,15 +80,12 @@ public class MorphingShell extends Visualization {
     for (int i = 0; i < length; i++) {
       int markerIndex = rowCnt + colCnt * colSize;
       Color color =
-          colorGradient.getMarkerColor(
-              arrayController.get(i), arrayController.getMarker(i));
+          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
       colorsRgb[i] = color.getRGB();
 
       if (arrayController.getMarker(markerIndex) == Marker.SET) {
         sound.playSound(markerIndex);
       }
-
-      arrayController.setMarker(markerIndex, Marker.NORMAL);
 
       colCnt++;
       if (colCnt == colSize) {
@@ -100,27 +99,25 @@ public class MorphingShell extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-    proc.lights();
-
+  public void update(float delta) {
     radius = Math.min(screenHeight, screenWidth) / 2;
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
+    float halfW = screenWidth * 0.5f;
 
-    aa += PApplet.PI / (proc.frameRate() * 10);
+    aa += (float) (Math.PI / 10) * delta;
+    angle += (float) (Math.PI / 7.5) * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
     int length = arrayController.getLength();
     int colSize = (int) Math.sqrt(length);
 
-    angle += PApplet.PI / (7.5 * proc.frameRate());
-
     rebuildAngleBases(length, colSize);
     ensureColors(length, colSize);
 
     float radiusThird = radius / 3f;
 
+    spheres.ensureCapacity(length);
     int rowCnt = 0;
     int colCnt = 0;
     for (int i = 0; i < length; i++) {
@@ -136,9 +133,10 @@ public class MorphingShell extends Visualization {
       float x = radius * sinLon * sinLat;
       float y = (float) (radius * cosLon + barHeight);
 
-      posZ[i] = z;
-      posX[i] = x;
-      posY[i] = y;
+      // Legacy Processing pos (W/4 + y/2, H/2 + x/2, centerZ+z) → world
+      float wx = y / 2f - halfW * 0.5f;
+      float wy = -x / 2f;
+      spheres.set(i, wx, wy, centerZ + z, 15, 15, 15, 0, 0, 0, colorsRgb[i]);
 
       colCnt++;
       if (colCnt == colSize) {
@@ -146,19 +144,10 @@ public class MorphingShell extends Visualization {
         colCnt = 0;
       }
     }
+    spheres.count = length;
 
-    proc.noStroke();
-    proc.pushMatrix();
-    proc.translate((float) screenWidth / 4, (float) screenHeight / 2, centerZ);
-    colorBatch.reset();
-    for (int i = 0; i < length; i++) {
-      colorBatch.fill(proc, colorsRgb[i]);
-
-      proc.pushMatrix();
-      proc.translate(posY[i] / 2, posX[i] / 2, posZ[i]);
-      proc.ellipse(0, 0, 15, 15);
-      proc.popMatrix();
-    }
-    proc.popMatrix();
+    rs.begin3D();
+    rs.drawSpheres(spheres);
+    rs.end3D();
   }
 }

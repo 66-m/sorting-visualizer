@@ -4,22 +4,20 @@ import atlantafx.base.controls.ToggleSwitch;
 import atlantafx.base.theme.Styles;
 import io.github.compilerstuck.control.catalog.AlgorithmDescriptor;
 import io.github.compilerstuck.control.config.ShuffleType;
-import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmEntry;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-/** Algorithm selection, run-all inline order list, and shuffle. */
+/** Algorithm selection, run-all order dialog, and shuffle. */
 public final class SortingSection {
 
   public static final String ROOT_ID = "section-sorting";
@@ -57,6 +55,10 @@ public final class SortingSection {
             });
     algorithm.setDisable(vm.isRunAll());
 
+    Label algorithmLabel = SettingsControls.fieldLabel(SettingsStrings.ALGORITHM);
+    algorithmLabel.setLabelFor(algorithm);
+    VBox algorithmField = new VBox(SettingsLayout.GAP_XS, algorithmLabel, algorithm);
+
     ToggleSwitch runAll = new ToggleSwitch(SettingsStrings.RUN_ALL);
     runAll.setSelected(vm.isRunAll());
     runAll
@@ -72,27 +74,24 @@ public final class SortingSection {
     configure.setId(CONFIGURE_ID);
     configure.getStyleClass().add(Styles.BUTTON_OUTLINED);
     configure.setDisable(!vm.isRunAll());
-
-    VBox orderList = new VBox(SettingsLayout.GAP_XS);
-    orderList.getStyleClass().add("settings-run-all-list");
-    orderList.setVisible(false);
-    orderList.setManaged(false);
-    rebuildOrderList(orderList, vm);
-
     configure.setOnAction(
         e -> {
-          boolean show = !orderList.isVisible();
-          orderList.setVisible(show);
-          orderList.setManaged(show);
-          configure.setText(show ? SettingsStrings.HIDE_ORDER : SettingsStrings.CONFIGURE_ORDER);
+          if (configure.getScene() != null && configure.getScene().getWindow() != null) {
+            RunAllOrderDialog.show(configure.getScene().getWindow(), vm);
+          }
         });
 
-    Label shuffleLabel = new Label(SettingsStrings.SHUFFLE);
-    shuffleLabel.getStyleClass().add("settings-muted");
+    Region runAllSpacer = new Region();
+    HBox.setHgrow(runAllSpacer, Priority.ALWAYS);
+    HBox runAllRow = new HBox(SettingsLayout.GAP_SM, runAll, runAllSpacer, configure);
+    runAllRow.setAlignment(Pos.CENTER_LEFT);
+
+    Label shuffleLabel = SettingsControls.fieldLabel(SettingsStrings.SHUFFLE);
     ComboBox<ShuffleType> shuffle = new ComboBox<>();
     shuffle.getItems().setAll(vm.getShuffleTypes());
     shuffle.getSelectionModel().select(vm.getShuffleType());
     shuffle.setMaxWidth(Double.MAX_VALUE);
+    shuffleLabel.setLabelFor(shuffle);
     shuffle
         .getSelectionModel()
         .selectedItemProperty()
@@ -102,6 +101,7 @@ public final class SortingSection {
                 vm.setShuffleType(type);
               }
             });
+    VBox shuffleField = new VBox(SettingsLayout.GAP_XS, shuffleLabel, shuffle);
 
     vm.addPropertyChangeListener(
         evt -> {
@@ -127,11 +127,6 @@ public final class SortingSection {
                   }
                   algorithm.setDisable(value || !vm.isInputsEnabled());
                   configure.setDisable(!value || !vm.isInputsEnabled());
-                  if (!value) {
-                    orderList.setVisible(false);
-                    orderList.setManaged(false);
-                    configure.setText(SettingsStrings.CONFIGURE_ORDER);
-                  }
                 });
           } else if (AlgorithmViewModel.PROP_SHUFFLE_TYPE.equals(evt.getPropertyName())) {
             ShuffleType type = (ShuffleType) evt.getNewValue();
@@ -141,8 +136,6 @@ public final class SortingSection {
                     shuffle.getSelectionModel().select(type);
                   }
                 });
-          } else if (AlgorithmViewModel.PROP_ENTRIES.equals(evt.getPropertyName())) {
-            VmBindings.runFx(() -> rebuildOrderList(orderList, vm));
           } else if (AlgorithmViewModel.PROP_INPUTS_ENABLED.equals(evt.getPropertyName())) {
             boolean enabled = Boolean.TRUE.equals(evt.getNewValue());
             VmBindings.runFx(
@@ -164,51 +157,8 @@ public final class SortingSection {
         vm::addPropertyChangeListener,
         AlgorithmViewModel.PROP_INPUTS_ENABLED);
 
-    VBox algorithmGroup = new VBox(SettingsLayout.GAP_SM, algorithm, runAll);
-    VBox orderGroup = new VBox(SettingsLayout.GAP_SM, configure, orderList);
-    VBox shuffleGroup = new VBox(SettingsLayout.GAP_SM, shuffleLabel, shuffle);
-
-    VBox root = new VBox(SettingsLayout.GAP_LG, algorithmGroup, orderGroup, shuffleGroup);
+    VBox root = new VBox(SettingsLayout.GAP_SM, algorithmField, runAllRow, shuffleField);
     root.setId(ROOT_ID);
     return root;
-  }
-
-  private static void rebuildOrderList(VBox orderList, AlgorithmViewModel vm) {
-    orderList.getChildren().clear();
-    List<AlgorithmEntry> entries = vm.getEntries();
-    for (int i = 0; i < entries.size(); i++) {
-      final int index = i;
-      AlgorithmEntry entry = entries.get(i);
-
-      CheckBox selected = new CheckBox();
-      selected.setSelected(entry.isSelected());
-      selected.setDisable(!vm.isInputsEnabled());
-      selected
-          .selectedProperty()
-          .addListener(
-              (obs, old, value) -> {
-                if (value != entry.isSelected()) {
-                  vm.setEntrySelected(index, value);
-                }
-              });
-
-      Label name = new Label(entry.getName());
-      HBox.setHgrow(name, Priority.ALWAYS);
-
-      Button up = new Button(SettingsStrings.MOVE_UP);
-      up.getStyleClass().addAll(Styles.BUTTON_OUTLINED, "settings-icon-button");
-      up.setDisable(index == 0 || !vm.isInputsEnabled());
-      up.setOnAction(e -> vm.moveEntry(index, index - 1));
-
-      Button down = new Button(SettingsStrings.MOVE_DOWN);
-      down.getStyleClass().addAll(Styles.BUTTON_OUTLINED, "settings-icon-button");
-      down.setDisable(index == entries.size() - 1 || !vm.isInputsEnabled());
-      down.setOnAction(e -> vm.moveEntry(index, index + 1));
-
-      HBox row = new HBox(SettingsLayout.GAP_SM, selected, name, up, down);
-      row.setAlignment(Pos.CENTER_LEFT);
-      row.getStyleClass().add("settings-run-all-row");
-      orderList.getChildren().add(row);
-    }
   }
 }

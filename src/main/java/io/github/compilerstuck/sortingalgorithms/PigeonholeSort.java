@@ -19,7 +19,6 @@ public class PigeonholeSort extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int min = arrayController.get(0);
     int max = arrayController.get(0);
@@ -52,7 +51,5 @@ public class PigeonholeSort extends SortingAlgorithm {
         delay(new int[] {index - 1});
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

@@ -1,15 +1,16 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
 
 public class NumberPlot extends Visualization {
 
+  private static final int LOD_TARGET_LABELS = 512;
+
   private final IndexXCache indexXCache = new IndexXCache();
-  private final ColorBatch colorBatch = new ColorBatch();
 
   private int cachedLength = -1;
   private int cachedWidth = -1;
@@ -17,11 +18,19 @@ public class NumberPlot extends Visualization {
   private int[] cachedValues;
   private int[] barHeights;
   private String[] labels;
+  private String[] drawLabels;
+  private float[] drawXs;
+  private float[] drawYs;
 
   public NumberPlot(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Number Plot";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureSlotCaches(int length, int heightScale) {
@@ -35,6 +44,9 @@ public class NumberPlot extends Visualization {
         cachedValues = new int[length];
         barHeights = new int[length];
         labels = new String[length];
+        drawLabels = new String[length];
+        drawXs = new float[length];
+        drawYs = new float[length];
         for (int i = 0; i < length; i++) {
           cachedValues[i] = Integer.MIN_VALUE;
         }
@@ -51,9 +63,7 @@ public class NumberPlot extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int length = arrayController.getLength();
     int heightScale = screenHeight - 5;
 
@@ -61,20 +71,28 @@ public class NumberPlot extends Visualization {
     float[] xs = indexXCache.xs();
     ensureSlotCaches(length, heightScale);
 
-    proc.textSize(14);
-    proc.noStroke();
-    colorBatch.reset();
-    for (int i = 0; i < length; i++) {
-      Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+    int step = 1;
+    if (length > LOD_TARGET_LABELS) {
+      step = (length + LOD_TARGET_LABELS - 1) / LOD_TARGET_LABELS;
+    }
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+    int drawCount = 0;
+    for (int i = 0; i < length; i++) {
+      boolean highlight = arrayController.getMarker(i) == Marker.SET;
+      if (highlight) {
         sound.playSound(i);
       }
+      if (step > 1 && (i % step) != 0 && !highlight) {
+        continue;
+      }
+      drawLabels[drawCount] = labels[i];
+      drawXs[drawCount] = xs[i];
+      drawYs[drawCount] = worldYToOverlayY(barHeights[i]);
+      drawCount++;
+    }
 
-      arrayController.setMarker(i, Marker.NORMAL);
-
-      colorBatch.fill(proc, color.getRGB());
-      proc.text(labels[i], xs[i], screenHeight - barHeights[i]);
+    if (drawCount > 0) {
+      rs.drawTexts(drawLabels, drawXs, drawYs, 14, drawCount);
     }
   }
 }

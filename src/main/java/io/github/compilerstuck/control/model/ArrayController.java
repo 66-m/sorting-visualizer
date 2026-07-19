@@ -2,7 +2,7 @@ package io.github.compilerstuck.control.model;
 
 import io.github.compilerstuck.control.config.ShuffleStrategy;
 import io.github.compilerstuck.control.config.ShuffleType;
-import io.github.compilerstuck.control.render.ProcessingContext;
+import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.control.shuffle.AlmostSortedShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.RandomShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.ReverseShuffleStrategy;
@@ -34,8 +34,8 @@ public class ArrayController implements ArrayModel {
   private ShuffleStrategy shuffleStrategy;
   private OperationReporter operationReporter = OperationReporter.NOOP;
   private CancellationToken cancellationToken = CancellationToken.alwaysActive();
-  private ProcessingContext processingContext =
-      ms -> {
+  private DelayContext delayContext =
+      () -> {
         /* no-op */
       };
 
@@ -262,16 +262,16 @@ public class ArrayController implements ArrayModel {
 
   void shuffle() {
     if (cancellationToken.isCancelled()) return;
-    shuffleStrategy.shuffle(this, processingContext, operationReporter, cancellationToken);
+    shuffleStrategy.shuffle(this, delayContext, operationReporter, cancellationToken);
     markMetricsDirty();
     bumpVisualRevision();
   }
 
-  public void setProcessingContext(ProcessingContext processingContext) {
-    this.processingContext =
-        processingContext != null
-            ? processingContext
-            : ms -> {
+  public void setDelayContext(DelayContext delayContext) {
+    this.delayContext =
+        delayContext != null
+            ? delayContext
+            : () -> {
               /* no-op */
             };
   }

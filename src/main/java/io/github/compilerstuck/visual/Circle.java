@@ -1,16 +1,16 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
+import java.awt.Color;
 
 public class Circle extends Visualization {
 
   int radius;
   private final PhaseLut phaseLut = new PhaseLut();
-  private final ColorBatch colorBatch = new ColorBatch();
 
   private int[] endX;
   private int[] endY;
@@ -19,11 +19,18 @@ public class Circle extends Visualization {
   private int cacheRadius = -1;
   private int cacheCenterX = -1;
   private int cacheCenterY = -1;
+  private float[] xyxy;
+  private int[] argb;
 
   public Circle(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Circle";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void rebuildEndpoints(int length, int radius, int centerX, int centerY) {
@@ -48,14 +55,12 @@ public class Circle extends Visualization {
     float[] cos = phaseLut.cos();
     for (int i = 0; i < length; i++) {
       endX[i] = centerX + (int) (radius * sin[i]);
-      endY[i] = centerY - (int) (radius * cos[i]);
+      endY[i] = centerY + (int) (radius * cos[i]);
     }
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int length = arrayController.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
     int centerX = screenWidth / 2;
@@ -65,6 +70,10 @@ public class Circle extends Visualization {
 
     if (frameColors == null || frameColors.length < length) {
       frameColors = new int[length];
+    }
+    if (xyxy == null || xyxy.length < length * 4) {
+      xyxy = new float[length * 4];
+      argb = new int[length];
     }
 
     for (int i = 0; i < length; i++) {
@@ -76,15 +85,13 @@ public class Circle extends Visualization {
         sound.playSound(i);
       }
 
-      arrayController.setMarker(i, Marker.NORMAL);
+      int o = i * 4;
+      xyxy[o] = centerX;
+      xyxy[o + 1] = centerY;
+      xyxy[o + 2] = endX[i];
+      xyxy[o + 3] = endY[i];
+      argb[i] = frameColors[i];
     }
-
-    proc.noFill();
-    colorBatch.reset();
-
-    for (int i = 0; i < length; i++) {
-      colorBatch.stroke(proc, frameColors[i]);
-      proc.line(centerX, centerY, endX[i], endY[i]);
-    }
+    rs.strokeLines(xyxy, argb, length);
   }
 }

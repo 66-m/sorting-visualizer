@@ -12,7 +12,6 @@ public class HeapSort extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int n = arrayController.getLength();
 
@@ -27,8 +26,6 @@ public class HeapSort extends SortingAlgorithm {
 
       heapify(arrayController, i, 0);
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 
   private void heapify(ArrayModel arrayController, int n, int i) {

@@ -13,20 +13,17 @@ public class BogoSort extends SortingAlgorithm {
     this.name = "Bogo Sort";
     alternativeSize = arrayController.getLength();
     selected = false;
-    delayFactor = 0.000001;
   }
 
   public BogoSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Bogo Sort";
     this.alternativeSize = alternativeSize;
-    delayFactor = 0.000001;
   }
 
   public void sort() {
     trycnt = 0;
     report(name);
-    startTime = System.nanoTime();
     Random r = new Random();
     while (!arrayController.isSorted() && !isCancelled()) {
 
@@ -41,7 +38,5 @@ public class BogoSort extends SortingAlgorithm {
       trycnt++;
       report("Bogo Sort (Tries: " + trycnt + ")");
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }

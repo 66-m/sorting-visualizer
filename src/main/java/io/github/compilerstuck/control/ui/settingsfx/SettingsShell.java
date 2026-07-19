@@ -14,8 +14,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
- * One-pager Settings shell: header + two-column body + sticky action bar. Section content is
- * supplied by Phase 3 {@link SectionNodes}.
+ * Run Deck Settings shell: header + two-column body + sticky action bar. Section content is
+ * supplied by {@link SectionNodes}.
  */
 public final class SettingsShell {
 
@@ -36,13 +36,15 @@ public final class SettingsShell {
             placeholder(),
             placeholder(),
             placeholder(),
+            placeholder(),
             placeholder()));
   }
 
   /** Builds the root node and exposes action-bar controls for wiring. */
   public static ShellResult build(SectionNodes sections) {
     BorderPane root = new BorderPane();
-    root.setPadding(new Insets(SettingsLayout.GAP_XL));
+    root.getStyleClass().add("settings-root");
+    root.setPadding(new Insets(SettingsLayout.GAP_LG));
     root.setTop(buildHeader());
     root.setCenter(buildBody(sections));
 
@@ -75,7 +77,8 @@ public final class SettingsShell {
     title.getStyleClass().add("settings-title");
 
     VBox header = new VBox(title);
-    header.setPadding(new Insets(0, 0, SettingsLayout.GAP_LG, 0));
+    header.getStyleClass().add("settings-header");
+    header.setPadding(new Insets(0, 0, SettingsLayout.GAP_SM, 0));
     return header;
   }
 
@@ -90,9 +93,10 @@ public final class SettingsShell {
             section(SettingsStrings.SECTION_VISUALIZATION, sections.visualization()),
             section(SettingsStrings.SECTION_APPEARANCE, sections.appearance()),
             section(SettingsStrings.SECTION_DISPLAY, sections.display()),
-            section(SettingsStrings.SECTION_SOUND, sections.sound()));
+            section(SettingsStrings.SECTION_SOUND, sections.sound()),
+            section(SettingsStrings.SECTION_DEBUG, sections.debug()));
 
-    HBox columns = new HBox(SettingsLayout.GAP_COL, left, right);
+    HBox columns = new HBox(SettingsLayout.GAP_MD, left, right);
     HBox.setHgrow(left, Priority.ALWAYS);
     HBox.setHgrow(right, Priority.ALWAYS);
     left.setMaxWidth(Double.MAX_VALUE);
@@ -106,7 +110,7 @@ public final class SettingsShell {
   }
 
   private static VBox column(Node... sectionNodes) {
-    VBox col = new VBox(SettingsLayout.GAP_XL, sectionNodes);
+    VBox col = new VBox(SettingsLayout.GAP_SM, sectionNodes);
     col.setFillWidth(true);
     return col;
   }
@@ -116,6 +120,7 @@ public final class SettingsShell {
     label.getStyleClass().add("settings-section-label");
     VBox block = new VBox(SettingsLayout.GAP_SM, label, content);
     block.getStyleClass().add("settings-section");
+    block.setFillWidth(true);
     return block;
   }
 

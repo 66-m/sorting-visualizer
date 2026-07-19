@@ -42,6 +42,7 @@ class UserPreferencesTest {
     assertFalse(prefs.isRunAll());
     assertEquals("", prefs.getRunAllEntries());
     assertTrue(prefs.getRunAllEntriesList().isEmpty());
+    assertFalse(prefs.isPerfStats());
   }
 
   @Test
@@ -59,6 +60,7 @@ class UserPreferencesTest {
         List.of(
             new RunAllEntryPref("bubble-sort", true),
             new RunAllEntryPref("quicksort-middle", false)));
+    prefs.setPerfStats(true);
     prefs.save(node);
 
     UserPreferences loaded = UserPreferences.load(node);
@@ -76,6 +78,7 @@ class UserPreferencesTest {
     assertTrue(entries.get(0).selected());
     assertEquals("quicksort-middle", entries.get(1).id());
     assertFalse(entries.get(1).selected());
+    assertTrue(loaded.isPerfStats());
   }
 
   @Test

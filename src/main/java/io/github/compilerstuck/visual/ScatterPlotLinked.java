@@ -1,26 +1,33 @@
 package io.github.compilerstuck.visual;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
+import java.awt.Color;
 
 public class ScatterPlotLinked extends Visualization {
 
   private final IndexXCache indexXCache = new IndexXCache();
-  private final ColorBatch colorBatch = new ColorBatch();
 
   private long cachedRevision = Long.MIN_VALUE;
   private int cachedWidth = -1;
   private int cachedHeight = -1;
   private int cachedN = -1;
   private int[] barHeights;
+  private float[] xyxy;
+  private int[] argb;
 
   public ScatterPlotLinked(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "Scatter Plot Linked";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureHeights(int n, int heightScale) {
@@ -44,9 +51,7 @@ public class ScatterPlotLinked extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
+  public void update(float delta) {
     int n = arrayController.getLength();
     int heightScale = screenHeight - 5;
 
@@ -54,25 +59,27 @@ public class ScatterPlotLinked extends Visualization {
     float[] xs = indexXCache.xs();
     ensureHeights(n, heightScale);
 
-    colorBatch.reset();
-    for (int i = 0; i < n - 1; i++) {
-      Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+    int lineCount = Math.max(0, n - 1);
+    if (xyxy == null || xyxy.length < lineCount * 4) {
+      xyxy = new float[Math.max(4, lineCount * 4)];
+      argb = new int[Math.max(1, lineCount)];
+    }
+
+    for (int i = 0; i < lineCount; i++) {
+      Color color =
+          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
-      arrayController.setMarker(i, Marker.NORMAL);
-
-      colorBatch.strokeAndFill(proc, color.getRGB());
-      proc.line(
-          xs[i],
-          screenHeight - barHeights[i],
-          xs[i + 1],
-          screenHeight - barHeights[i + 1]);
+      int o = i * 4;
+      xyxy[o] = xs[i];
+      xyxy[o + 1] = barHeights[i];
+      xyxy[o + 2] = xs[i + 1];
+      xyxy[o + 3] = barHeights[i + 1];
+      argb[i] = color.getRGB();
     }
-    if (n > 0) {
-      arrayController.setMarker(n - 1, Marker.NORMAL);
-    }
+    rs.strokeLines(xyxy, argb, lineCount);
   }
 }

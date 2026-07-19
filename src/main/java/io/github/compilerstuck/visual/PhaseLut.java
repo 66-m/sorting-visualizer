@@ -4,22 +4,22 @@ package io.github.compilerstuck.visual;
  * Cached sin/cos samples for {@code phase = turns * 2π * i / n}. Rebuilds only when {@code n} or
  * {@code turns} change.
  */
-final class PhaseLut {
+public final class PhaseLut {
 
   private float[] sin;
   private float[] cos;
   private int length = -1;
   private double turns = Double.NaN;
 
-  float[] sin() {
+  public float[] sin() {
     return sin;
   }
 
-  float[] cos() {
+  public float[] cos() {
     return cos;
   }
 
-  void ensure(int n, double turns) {
+  public void ensure(int n, double turns) {
     if (n <= 0) {
       return;
     }

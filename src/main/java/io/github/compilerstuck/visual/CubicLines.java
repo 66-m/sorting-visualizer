@@ -4,11 +4,12 @@ import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.InstanceData;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
-import processing.core.PApplet;
+import java.awt.Color;
 
 public class CubicLines extends Visualization {
 
@@ -16,9 +17,9 @@ public class CubicLines extends Visualization {
   private static final float COS_TILT = (float) Math.cos(-10);
 
   int radius;
-  static float aa = 0;
+  private float aa = 0;
 
-  private final ColorBatch colorBatch = new ColorBatch();
+  private final InstanceData points = new InstanceData();
 
   private int[] colorsRgb;
   private float[] baseX, baseY, baseZ;
@@ -32,10 +33,18 @@ public class CubicLines extends Visualization {
   private int cachedDrawCount = -1;
   private ColorGradient cachedGradient;
 
+  private float[] xyzxyz;
+  private int[] lineArgb;
+
   public CubicLines(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "3D - Cubic Lines";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureBuffers(int n) {
@@ -65,9 +74,9 @@ public class CubicLines extends Visualization {
     int yCnt = 0;
     int zCnt = 0;
     for (int i = 0; i < drawCount; i++) {
-      baseX[i] = PApplet.map(xCnt, 0, xSize, -radius, radius);
-      baseY[i] = PApplet.map(yCnt, 0, xSize, -radius, radius);
-      baseZ[i] = PApplet.map(zCnt, 0, xSize, -radius, radius);
+      baseX[i] = VisMath.map(xCnt, 0, xSize, -radius, radius);
+      baseY[i] = VisMath.map(yCnt, 0, xSize, -radius, radius);
+      baseZ[i] = VisMath.map(zCnt, 0, xSize, -radius, radius);
 
       zCnt++;
       if (zCnt == xSize) {
@@ -96,8 +105,6 @@ public class CubicLines extends Visualization {
         sound.playSound(value);
       }
 
-      arrayController.setMarker(value, Marker.NORMAL);
-
       colorsRgb[i] = color.getRGB();
     }
     cachedRevision = rev;
@@ -106,17 +113,14 @@ public class CubicLines extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
-    proc.lights();
-
+  public void update(float delta) {
     int screenMin = min(screenHeight, screenWidth);
     radius = (int) (screenMin / 3.5);
     float centerY = (float) screenHeight / 2 - (int) (screenMin / 10);
     float centerZ = -(int) (screenMin / 10);
+    float centerX = (float) screenWidth / 2;
 
-    aa -= PApplet.PI / (10 * proc.frameRate());
+    aa -= (float) (Math.PI / 10) * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -140,27 +144,42 @@ public class CubicLines extends Visualization {
       float z = SIN_TILT * ya + COS_TILT * zb;
       float y = COS_TILT * ya - SIN_TILT * zb;
 
-      xCords[i] = x;
-      yCords[i] = y;
-      zCords[i] = z;
+      xCords[i] = toWorldX(centerX + x);
+      yCords[i] = toWorldY(centerY + y);
+      zCords[i] = centerZ + z;
     }
 
-    proc.pushMatrix();
-    proc.translate((float) screenWidth / 2, centerY, centerZ);
-    colorBatch.reset();
-    for (int i = 0; i < drawCount; i++) {
-      colorBatch.strokeAndFill(proc, colorsRgb[i]);
+    if (xyzxyz == null || xyzxyz.length < drawCount * 6) {
+      xyzxyz = new float[drawCount * 6];
+      lineArgb = new int[drawCount];
+    }
 
+    points.ensureCapacity(drawCount);
+    int lineCount = 0;
+    int pointCount = 0;
+
+    for (int i = 0; i < drawCount; i++) {
       int target = arrayController.get(i);
       if (i == target || target < 0 || target >= drawCount) {
-        proc.pushMatrix();
-        proc.translate(xCords[i], yCords[i], zCords[i]);
-        proc.circle(0, 0, 2);
-        proc.popMatrix();
+        points.set(pointCount, xCords[i], yCords[i], zCords[i], 2, 2, 2, 0, 0, 0, colorsRgb[i]);
+        pointCount++;
       } else {
-        proc.line(xCords[i], yCords[i], zCords[i], xCords[target], yCords[target], zCords[target]);
+        int o = lineCount * 6;
+        xyzxyz[o] = xCords[i];
+        xyzxyz[o + 1] = yCords[i];
+        xyzxyz[o + 2] = zCords[i];
+        xyzxyz[o + 3] = xCords[target];
+        xyzxyz[o + 4] = yCords[target];
+        xyzxyz[o + 5] = zCords[target];
+        lineArgb[lineCount] = colorsRgb[i];
+        lineCount++;
       }
     }
-    proc.popMatrix();
+    points.count = pointCount;
+
+    rs.begin3D();
+    rs.strokeLines3D(xyzxyz, lineArgb, lineCount);
+    rs.drawSpheres(points);
+    rs.end3D();
   }
 }

@@ -8,12 +8,10 @@ public class GravitySort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Gravity Sort";
     alternativeSize = arrayController.getLength();
-    delayTime = 2;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int max = arrayController.get(0);
     for (int i = 1; i < arrayController.getLength() && !isCancelled(); i++)

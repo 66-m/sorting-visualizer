@@ -4,19 +4,20 @@ import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
 import io.github.compilerstuck.control.model.ArrayModel;
-import io.github.compilerstuck.control.render.RenderContext;
+import io.github.compilerstuck.control.render.CoordinateSpace;
+import io.github.compilerstuck.control.render.InstanceData;
+import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.*;
-import processing.core.PApplet;
+import java.awt.Color;
 
 public class SphericDisparityLines extends Visualization {
 
   int radius;
   float squareRoot;
-  static float aa = 0;
+  private float aa = 0;
 
-  private final ColorBatch colorBatch = new ColorBatch();
+  private final InstanceData points = new InstanceData();
 
   private int[] colorsRgb;
   private int[] pointRadii;
@@ -34,10 +35,18 @@ public class SphericDisparityLines extends Visualization {
   private int cachedMaxRadius = -1;
   private ColorGradient cachedGradient;
 
+  private float[] xyzxyz;
+  private int[] lineArgb;
+
   public SphericDisparityLines(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderContext proc) {
-    super(arrayController, colorGradient, sound, proc);
+      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayController, colorGradient, sound, rs);
     name = "3D - Spheric Disparity Lines";
+  }
+
+  @Override
+  protected CoordinateSpace coordinateSpace() {
+    return CoordinateSpace.WORLD_YUP;
   }
 
   private void ensureBuffers(int n) {
@@ -104,8 +113,6 @@ public class SphericDisparityLines extends Visualization {
         sound.playSound(value);
       }
 
-      arrayController.setMarker(value, Marker.NORMAL);
-
       float barHeight =
           (((float) 100000
               / length
@@ -115,7 +122,7 @@ public class SphericDisparityLines extends Visualization {
                           Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                           Math.abs(i + length - value)))));
 
-      pointRadii[i] = (int) PApplet.map(barHeight, 0, 100000, 0, maxRadius);
+      pointRadii[i] = (int) VisMath.map(barHeight, 0, 100000, 0, maxRadius);
 
       Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
       colorsRgb[i] = color.getRGB();
@@ -130,19 +137,17 @@ public class SphericDisparityLines extends Visualization {
   }
 
   @Override
-  public void update() {
-    super.update();
-
-    proc.lights();
-
+  public void update(float delta) {
     int nextN = (int) (floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1));
     squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
     int length = arrayController.getLength();
     int maxRadius = (int) (min(screenHeight, screenWidth) / 2.3);
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
+    float centerX = (float) screenWidth / 2;
+    float centerY = (float) screenHeight / 2;
 
-    aa -= PApplet.PI / (10 * proc.frameRate());
+    aa -= (float) (Math.PI / 10) * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -162,27 +167,42 @@ public class SphericDisparityLines extends Visualization {
       float y = cosAa * yMapped - sinAa * zb;
       float z = sinAa * yMapped + cosAa * zb;
 
-      zCords[i] = z;
-      xCords[i] = x;
-      yCords[i] = y;
+      xCords[i] = toWorldX(centerX + x);
+      yCords[i] = toWorldY(centerY + y);
+      zCords[i] = centerZ + z;
     }
 
-    proc.pushMatrix();
-    proc.translate((float) screenWidth / 2, (float) screenHeight / 2, centerZ);
-    colorBatch.reset();
-    for (int i = 0; i < drawCount; i++) {
-      colorBatch.strokeAndFill(proc, colorsRgb[i]);
+    if (xyzxyz == null || xyzxyz.length < drawCount * 6) {
+      xyzxyz = new float[drawCount * 6];
+      lineArgb = new int[drawCount];
+    }
 
+    points.ensureCapacity(drawCount);
+    int lineCount = 0;
+    int pointCount = 0;
+
+    for (int i = 0; i < drawCount; i++) {
       int target = arrayController.get(i);
       if (i == target || target < 0 || target >= drawCount) {
-        proc.pushMatrix();
-        proc.translate(xCords[i], yCords[i], zCords[i]);
-        proc.circle(0, 0, 2);
-        proc.popMatrix();
+        points.set(pointCount, xCords[i], yCords[i], zCords[i], 2, 2, 2, 0, 0, 0, colorsRgb[i]);
+        pointCount++;
       } else {
-        proc.line(xCords[i], yCords[i], zCords[i], xCords[target], yCords[target], zCords[target]);
+        int o = lineCount * 6;
+        xyzxyz[o] = xCords[i];
+        xyzxyz[o + 1] = yCords[i];
+        xyzxyz[o + 2] = zCords[i];
+        xyzxyz[o + 3] = xCords[target];
+        xyzxyz[o + 4] = yCords[target];
+        xyzxyz[o + 5] = zCords[target];
+        lineArgb[lineCount] = colorsRgb[i];
+        lineCount++;
       }
     }
-    proc.popMatrix();
+    points.count = pointCount;
+
+    rs.begin3D();
+    rs.strokeLines3D(xyzxyz, lineArgb, lineCount);
+    rs.drawSpheres(points);
+    rs.end3D();
   }
 }

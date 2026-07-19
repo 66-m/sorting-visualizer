@@ -13,9 +13,7 @@ public class QuickSortMiddlePivot extends SortingAlgorithm {
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
     sort(arrayController, 0, arrayController.getLength() - 1);
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 
   private void sort(ArrayModel arrayController, int start, int end) {

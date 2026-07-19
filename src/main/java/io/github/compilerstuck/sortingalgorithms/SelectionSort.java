@@ -8,12 +8,10 @@ public class SelectionSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Selection Sort";
     alternativeSize = arrayController.getLength();
-    delayTime = 10;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int n = arrayController.getLength();
 

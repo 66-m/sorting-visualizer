@@ -5,8 +5,9 @@ import io.github.compilerstuck.control.catalog.VisualConstraints;
 import io.github.compilerstuck.control.catalog.VisualizationCatalog;
 import io.github.compilerstuck.control.catalog.VisualizationDescriptor;
 import io.github.compilerstuck.control.config.SettingsDefaults;
-import io.github.compilerstuck.visual.ImageHorizontal;
-import io.github.compilerstuck.visual.ImageVertical;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
+import io.github.compilerstuck.visual.ConfigurableVisualization;
+import io.github.compilerstuck.visual.ImageSourceVisualization;
 import io.github.compilerstuck.visual.Visualization;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntConsumer;
 
 /** Headless visualization view-model with image-path validation (G3). */
@@ -25,6 +27,7 @@ public final class VisualizationViewModel {
   public static final String PROP_IMAGE_PATH = "imagePath";
   public static final String PROP_IMAGE_ERROR = "imageError";
   public static final String PROP_INPUTS_ENABLED = "inputsEnabled";
+  public static final String PROP_CONFIGURABLE = "configurable";
 
   private final AppContext app;
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -36,21 +39,28 @@ public final class VisualizationViewModel {
   private String imagePath = "";
   private String imageError = "";
   private boolean inputsEnabled = true;
+  private boolean configurable;
   private IntConsumer sizeDisplaySync = size -> {};
 
   public VisualizationViewModel(AppContext app) {
     this.app = app;
     this.descriptors = VisualizationCatalog.all();
     this.visualizations = new ArrayList<>();
+    Map<String, VisualizationSettings> stored = app.getPreferences().getVisualSettingsMap();
     for (VisualizationDescriptor descriptor : descriptors) {
-      visualizations.add(
+      Visualization viz =
           descriptor
               .factory()
               .create(
-                  app.getArrayController(),
+                  app.getPublishedArray(),
                   app.getColorGradient(),
                   app.getSound(),
-                  app.getRenderContext()));
+                  app.getRenderSystem());
+      VisualizationSettings saved = stored.get(descriptor.id());
+      if (saved != null && viz instanceof ConfigurableVisualization configurableViz) {
+        configurableViz.applySettings(saved);
+      }
+      visualizations.add(viz);
     }
     String id = app.getPreferences().getVisualizationId();
     int index = VisualizationCatalog.indexOfId(id);
@@ -79,12 +89,9 @@ public final class VisualizationViewModel {
     return needsImage;
   }
 
-  public String getImagePath() {
-    return imagePath;
-  }
-
-  public String getImageError() {
-    return imageError;
+  /** True when the selected visualization implements {@link ConfigurableVisualization}. */
+  public boolean isConfigurable() {
+    return configurable;
   }
 
   public VisualConstraints currentConstraints() {
@@ -93,6 +100,31 @@ public final class VisualizationViewModel {
       return VisualConstraints.NONE;
     }
     return descriptors.get(index).constraints();
+  }
+
+  public String getImagePath() {
+    return imagePath;
+  }
+
+  public String getImageError() {
+    return imageError;
+  }
+
+  public void addPropertyChangeListener(PropertyChangeListener listener) {
+    pcs.addPropertyChangeListener(listener);
+  }
+
+  public void removePropertyChangeListener(PropertyChangeListener listener) {
+    pcs.removePropertyChangeListener(listener);
+  }
+
+  private int indexOfId(String id) {
+    for (int i = 0; i < descriptors.size(); i++) {
+      if (descriptors.get(i).id().equals(id)) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   public void selectVisualization(String id) {
@@ -107,8 +139,8 @@ public final class VisualizationViewModel {
   }
 
   /**
-   * Validates and applies an image path for the current image visualization (G3). Returns {@code
-   * true} on success.
+   * Validates and applies an image path for the current image visualization. Returns {@code true}
+   * on success.
    */
   public boolean setImagePath(Path path) {
     if (!inputsEnabled || !needsImage) {
@@ -125,17 +157,12 @@ public final class VisualizationViewModel {
 
     int index = indexOfId(selectedId);
     Visualization viz = visualizations.get(index);
-    boolean loaded = false;
     String absolute = path.toAbsolutePath().toString();
-    if (viz instanceof ImageVertical imageVertical) {
-      loaded = imageVertical.setImg(absolute);
+    boolean loaded = false;
+    if (viz instanceof ImageSourceVisualization imageViz) {
+      loaded = app.loadImageForVisualization(imageViz, absolute);
       if (loaded) {
-        app.setVisualization(imageVertical);
-      }
-    } else if (viz instanceof ImageHorizontal imageHorizontal) {
-      loaded = imageHorizontal.setImg(absolute);
-      if (loaded) {
-        app.setVisualization(imageHorizontal);
+        app.setVisualization(viz);
       }
     }
 
@@ -147,7 +174,6 @@ public final class VisualizationViewModel {
 
     imagePath = absolute;
     imageError = "";
-    app.setImagePath(absolute);
     pcs.firePropertyChange(PROP_IMAGE_PATH, oldPath, imagePath);
     pcs.firePropertyChange(PROP_IMAGE_ERROR, oldError, imageError);
     return true;
@@ -166,6 +192,59 @@ public final class VisualizationViewModel {
     pcs.firePropertyChange(PROP_INPUTS_ENABLED, old, enabled);
   }
 
+  public VisualizationSettings getCurrentCustomization() {
+    int index = indexOfId(selectedId);
+    if (index < 0) {
+      return null;
+    }
+    Visualization viz = visualizations.get(index);
+    if (viz instanceof ConfigurableVisualization configurableViz) {
+      return configurableViz.currentSettings();
+    }
+    return null;
+  }
+
+  /**
+   * Applies settings to the live visualization without persisting. Used for customize-dialog draft
+   * preview; call {@link #applyCustomization} to save.
+   */
+  public boolean previewCustomization(VisualizationSettings settings) {
+    ConfigurableVisualization configurableViz = configurableVisualizationFor(settings);
+    if (configurableViz == null) {
+      return false;
+    }
+    configurableViz.applySettings(settings);
+    return true;
+  }
+
+  public boolean applyCustomization(VisualizationSettings settings) {
+    ConfigurableVisualization configurableViz = configurableVisualizationFor(settings);
+    if (configurableViz == null) {
+      return false;
+    }
+    configurableViz.applySettings(settings);
+    app.saveVisualizationSettings(settings);
+    return true;
+  }
+
+  private ConfigurableVisualization configurableVisualizationFor(VisualizationSettings settings) {
+    if (!inputsEnabled || settings == null) {
+      return null;
+    }
+    if (!settings.visualizationId().equals(selectedId)) {
+      return null;
+    }
+    int index = indexOfId(selectedId);
+    if (index < 0) {
+      return null;
+    }
+    Visualization viz = visualizations.get(index);
+    if (!(viz instanceof ConfigurableVisualization configurableViz)) {
+      return null;
+    }
+    return configurableViz;
+  }
+
   private void applySelection(int index, boolean fireEvents) {
     VisualizationDescriptor descriptor = descriptors.get(index);
     VisualConstraints constraints = descriptor.constraints();
@@ -182,31 +261,17 @@ public final class VisualizationViewModel {
 
     String oldId = selectedId;
     boolean oldNeeds = needsImage;
+    boolean oldConfigurable = configurable;
     selectedId = descriptor.id();
     needsImage = constraints.requiresImage();
+    configurable = visualizations.get(index) instanceof ConfigurableVisualization;
     app.setVisualization(visualizations.get(index));
     app.setVisualizationId(descriptor.id());
 
     if (fireEvents) {
       pcs.firePropertyChange(PROP_SELECTED_ID, oldId, selectedId);
       pcs.firePropertyChange(PROP_NEEDS_IMAGE, oldNeeds, needsImage);
+      pcs.firePropertyChange(PROP_CONFIGURABLE, oldConfigurable, configurable);
     }
-  }
-
-  private int indexOfId(String id) {
-    for (int i = 0; i < descriptors.size(); i++) {
-      if (descriptors.get(i).id().equals(id)) {
-        return i;
-      }
-    }
-    return VisualizationCatalog.indexOfId(id);
-  }
-
-  public void addPropertyChangeListener(PropertyChangeListener listener) {
-    pcs.addPropertyChangeListener(listener);
-  }
-
-  public void removePropertyChangeListener(PropertyChangeListener listener) {
-    pcs.removePropertyChangeListener(listener);
   }
 }

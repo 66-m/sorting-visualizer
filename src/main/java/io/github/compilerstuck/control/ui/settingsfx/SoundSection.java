@@ -3,7 +3,7 @@ package io.github.compilerstuck.control.ui.settingsfx;
 import atlantafx.base.controls.ToggleSwitch;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import javafx.scene.Node;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 /** Sound effects toggle bound to {@link SoundViewModel}. */
 public final class SoundSection {
@@ -41,7 +41,7 @@ public final class SoundSection {
         vm::addPropertyChangeListener,
         SoundViewModel.PROP_INPUTS_ENABLED);
 
-    HBox root = new HBox(toggle);
+    VBox root = new VBox(toggle);
     root.setId(ROOT_ID);
     return root;
   }

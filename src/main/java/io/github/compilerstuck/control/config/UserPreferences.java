@@ -1,6 +1,10 @@
 package io.github.compilerstuck.control.config;
 
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettingsCodec;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -22,7 +26,6 @@ public final class UserPreferences {
   private static final String KEY_ARRAY_SIZE = "arraySize";
   private static final String KEY_SPEED = "speedLevel";
   private static final String KEY_MUTED = "muted";
-  private static final String KEY_STEP_ENGINE = "useStepEngine";
   private static final String KEY_DEFAULTS_VERSION = "defaultsVersion";
   // Phase 4 additive keys
   private static final String KEY_SHUFFLE = "shuffleType";
@@ -34,20 +37,20 @@ public final class UserPreferences {
   private static final String KEY_GRADIENT_COLOR2 = "gradientColor2";
   private static final String KEY_RUN_ALL = "runAll";
   private static final String KEY_RUN_ALL_ENTRIES = "runAllEntries";
+  private static final String KEY_PERF_STATS = "perfStats";
+  private static final String KEY_VISUAL_SETTINGS_BY_ID = "visualSettingsById";
   private static final int CURRENT_DEFAULTS_VERSION = 1;
 
   public static final String DEFAULT_ALGORITHM_ID = SettingsDefaults.DEFAULT_ALGORITHM_ID;
   public static final String DEFAULT_VISUALIZATION_ID = SettingsDefaults.DEFAULT_VISUALIZATION_ID;
   public static final int DEFAULT_ARRAY_SIZE = SettingsDefaults.DEFAULT_ARRAY_SIZE;
   public static final int DEFAULT_SPEED_LEVEL = SettingsDefaults.DEFAULT_SPEED_LEVEL;
-  public static final boolean DEFAULT_USE_STEP_ENGINE = SettingsDefaults.DEFAULT_USE_STEP_ENGINE;
 
   private String algorithmId = DEFAULT_ALGORITHM_ID;
   private String visualizationId = DEFAULT_VISUALIZATION_ID;
   private int arraySize = DEFAULT_ARRAY_SIZE;
   private int speedLevel = DEFAULT_SPEED_LEVEL;
   private boolean muted = SettingsDefaults.DEFAULT_MUTED;
-  private boolean useStepEngine = DEFAULT_USE_STEP_ENGINE;
   private ShuffleType shuffleType = SettingsDefaults.DEFAULT_SHUFFLE_TYPE;
   private boolean printMeasurements = SettingsDefaults.DEFAULT_PRINT_MEASUREMENTS;
   private boolean showComparisonTable = SettingsDefaults.DEFAULT_SHOW_COMPARISON_TABLE;
@@ -57,6 +60,8 @@ public final class UserPreferences {
   private int gradientColor2Rgb = SettingsDefaults.DEFAULT_GRADIENT_COLOR2_RGB;
   private boolean runAll = SettingsDefaults.DEFAULT_RUN_ALL;
   private String runAllEntries = SettingsDefaults.DEFAULT_RUN_ALL_ENTRIES;
+  private boolean perfStats = SettingsDefaults.DEFAULT_PERF_STATS;
+  private String visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
 
   public static UserPreferences load() {
     return load(Preferences.userRoot().node(NODE));
@@ -71,13 +76,7 @@ public final class UserPreferences {
     prefs.speedLevel = clampSpeed(node.getInt(KEY_SPEED, DEFAULT_SPEED_LEVEL));
     prefs.muted = node.getBoolean(KEY_MUTED, SettingsDefaults.DEFAULT_MUTED);
     if (node.getInt(KEY_DEFAULTS_VERSION, 0) < CURRENT_DEFAULTS_VERSION) {
-      // The step engine used to default to true. Migrate existing installs once so sound returns to
-      // legacy per-step timing; an explicit choice made after migration remains persistent.
-      prefs.useStepEngine = DEFAULT_USE_STEP_ENGINE;
-      node.putBoolean(KEY_STEP_ENGINE, prefs.useStepEngine);
       node.putInt(KEY_DEFAULTS_VERSION, CURRENT_DEFAULTS_VERSION);
-    } else {
-      prefs.useStepEngine = node.getBoolean(KEY_STEP_ENGINE, DEFAULT_USE_STEP_ENGINE);
     }
     prefs.shuffleType =
         parseShuffleType(node.get(KEY_SHUFFLE, SettingsDefaults.DEFAULT_SHUFFLE_TYPE.name()));
@@ -99,6 +98,12 @@ public final class UserPreferences {
     if (prefs.runAllEntries == null) {
       prefs.runAllEntries = SettingsDefaults.DEFAULT_RUN_ALL_ENTRIES;
     }
+    prefs.perfStats = node.getBoolean(KEY_PERF_STATS, SettingsDefaults.DEFAULT_PERF_STATS);
+    prefs.visualSettingsById =
+        node.get(KEY_VISUAL_SETTINGS_BY_ID, SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
+    if (prefs.visualSettingsById == null) {
+      prefs.visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
+    }
     return prefs;
   }
 
@@ -113,7 +118,6 @@ public final class UserPreferences {
     node.putInt(KEY_ARRAY_SIZE, arraySize);
     node.putInt(KEY_SPEED, speedLevel);
     node.putBoolean(KEY_MUTED, muted);
-    node.putBoolean(KEY_STEP_ENGINE, useStepEngine);
     node.putInt(KEY_DEFAULTS_VERSION, CURRENT_DEFAULTS_VERSION);
     node.put(KEY_SHUFFLE, shuffleType.name());
     node.putBoolean(KEY_PRINT_MEASUREMENTS, printMeasurements);
@@ -126,6 +130,12 @@ public final class UserPreferences {
     node.putInt(KEY_GRADIENT_COLOR2, gradientColor2Rgb);
     node.putBoolean(KEY_RUN_ALL, runAll);
     node.put(KEY_RUN_ALL_ENTRIES, runAllEntries != null ? runAllEntries : "");
+    node.putBoolean(KEY_PERF_STATS, perfStats);
+    node.put(
+        KEY_VISUAL_SETTINGS_BY_ID,
+        visualSettingsById != null
+            ? visualSettingsById
+            : SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
   }
 
   private static ShuffleType parseShuffleType(String raw) {
@@ -178,14 +188,6 @@ public final class UserPreferences {
 
   public void setMuted(boolean muted) {
     this.muted = muted;
-  }
-
-  public boolean isUseStepEngine() {
-    return useStepEngine;
-  }
-
-  public void setUseStepEngine(boolean useStepEngine) {
-    this.useStepEngine = useStepEngine;
   }
 
   public ShuffleType getShuffleType() {
@@ -269,6 +271,38 @@ public final class UserPreferences {
 
   public List<RunAllEntryPref> getRunAllEntriesList() {
     return RunAllPreferencesCodec.decode(runAllEntries);
+  }
+
+  public boolean isPerfStats() {
+    return perfStats;
+  }
+
+  public void setPerfStats(boolean perfStats) {
+    this.perfStats = perfStats;
+  }
+
+  public String getVisualSettingsById() {
+    return visualSettingsById;
+  }
+
+  public void setVisualSettingsById(String visualSettingsById) {
+    this.visualSettingsById =
+        visualSettingsById != null && !visualSettingsById.isBlank()
+            ? visualSettingsById
+            : SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
+  }
+
+  public Map<String, VisualizationSettings> getVisualSettingsMap() {
+    return VisualizationSettingsCodec.decodeStore(visualSettingsById);
+  }
+
+  public void putVisualSettings(VisualizationSettings settings) {
+    if (settings == null) {
+      return;
+    }
+    Map<String, VisualizationSettings> map = new LinkedHashMap<>(getVisualSettingsMap());
+    map.put(settings.visualizationId(), settings);
+    visualSettingsById = VisualizationSettingsCodec.encodeStore(map);
   }
 
   private static int clampSize(int size) {

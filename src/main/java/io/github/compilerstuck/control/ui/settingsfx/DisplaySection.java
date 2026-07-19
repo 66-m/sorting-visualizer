@@ -44,6 +44,7 @@ public final class DisplaySection {
     Button export = new Button(SettingsStrings.EXPORT_CSV);
     export.setId(EXPORT_ID);
     export.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    export.setMaxWidth(Double.MAX_VALUE);
     export.setDisable(!vm.canExport());
     export.setOnAction(
         e -> {

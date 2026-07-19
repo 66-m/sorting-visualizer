@@ -8,19 +8,16 @@ public class InsertionSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Insertion Sort";
     alternativeSize = arrayController.getLength();
-    delayTime = 10;
   }
 
   public InsertionSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Insertion Sort";
     this.alternativeSize = alternativeSize;
-    delayTime = 10;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     int n = arrayController.getLength();
 

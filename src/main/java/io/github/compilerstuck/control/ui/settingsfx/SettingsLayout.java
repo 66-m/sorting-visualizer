@@ -1,8 +1,6 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
-/**
- * 8pt spacing grid for the Settings one-pager (see 04-ui-ux-design-mockup §4.6).
- */
+/** 8pt spacing grid for the Settings one-pager (see 04-ui-ux-design-mockup §4.6). */
 public final class SettingsLayout {
 
   /** Label↔subtitle, tight list rows. */

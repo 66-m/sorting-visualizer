@@ -8,19 +8,16 @@ public class CycleSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "Cycle Sort";
     alternativeSize = arrayController.getLength();
-    delayTime = 8;
   }
 
   public CycleSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "Cycle Sort";
     this.alternativeSize = alternativeSize;
-    delayTime = 8;
   }
 
   public void sort() {
     report(name);
-    startTime = System.nanoTime();
 
     for (int cycle_start = 0;
         cycle_start <= arrayController.getLength() - 2 && !isCancelled();
@@ -73,7 +70,5 @@ public class CycleSort extends SortingAlgorithm {
         arrayController.addComparisons(1);
       }
     }
-
-    arrayController.addRealTime(System.nanoTime() - startTime);
   }
 }
