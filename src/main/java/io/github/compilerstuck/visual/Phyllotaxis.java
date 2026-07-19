@@ -82,6 +82,7 @@ public class Phyllotaxis extends Visualization {
     rebuildMappedRadius(length, c, screenMin);
 
     colorBatch.reset();
+    proc.noStroke();
 
     for (int i = 0; i < length; i++) {
       int value = arrayController.get(i);
@@ -98,7 +99,7 @@ public class Phyllotaxis extends Visualization {
       float x = r * angleCos[i];
       float y = r * angleSin[i];
 
-      colorBatch.strokeAndFill(proc, rgb);
+      colorBatch.fill(proc, rgb);
       proc.circle(centerX + x, centerY + y, 5);
     }
   }

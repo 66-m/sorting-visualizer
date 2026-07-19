@@ -20,11 +20,22 @@ public interface RenderContext extends ProcessingContext {
 
   void stroke(int rgb, float alpha);
 
+  void strokeWeight(float weight);
+
   void noStroke();
 
   void noFill();
 
   void rect(float x, float y, float w, float h);
+
+  /** Processing {@code QUADS} mode for {@link #beginShape(int)}. */
+  int QUADS = 16;
+
+  void beginShape(int kind);
+
+  void vertex(float x, float y);
+
+  void endShape();
 
   // basic primitives used by visuals
   void line(float x1, float y1, float x2, float y2);

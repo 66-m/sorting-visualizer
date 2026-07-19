@@ -639,6 +639,11 @@ public class MainController extends PApplet implements RenderContext {
   }
 
   @Override
+  public void strokeWeight(float weight) {
+    super.strokeWeight(weight);
+  }
+
+  @Override
   public void noStroke() {
     super.noStroke();
   }
@@ -651,6 +656,21 @@ public class MainController extends PApplet implements RenderContext {
   @Override
   public void rect(float x, float y, float w, float h) {
     super.rect(x, y, w, h);
+  }
+
+  @Override
+  public void beginShape(int kind) {
+    super.beginShape(kind);
+  }
+
+  @Override
+  public void vertex(float x, float y) {
+    super.vertex(x, y);
+  }
+
+  @Override
+  public void endShape() {
+    super.endShape();
   }
 
   @Override

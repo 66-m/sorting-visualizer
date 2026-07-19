@@ -32,6 +32,7 @@ public class SwirlDots extends Visualization {
     float[] cos = phaseLut.cos();
 
     colorBatch.reset();
+    proc.noStroke();
 
     for (int i = 0; i < length; i++) {
       int value = arrayController.get(i);
@@ -49,7 +50,7 @@ public class SwirlDots extends Visualization {
       int x = centerX + (int) (scale * sin[i]);
       int y = centerY + (int) (scale * cos[i]);
 
-      colorBatch.strokeAndFill(proc, rgb);
+      colorBatch.fill(proc, rgb);
       proc.circle(x, y, 5);
     }
   }

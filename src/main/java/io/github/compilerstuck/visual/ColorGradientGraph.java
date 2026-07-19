@@ -8,7 +8,8 @@ import java.awt.*;
 
 public class ColorGradientGraph extends Visualization {
 
-  private final IndexXCache indexXCache = new IndexXCache();
+  private static final float SEAM_OVERLAP = 1f;
+
   private final ColorBatch colorBatch = new ColorBatch();
 
   public ColorGradientGraph(
@@ -22,13 +23,12 @@ public class ColorGradientGraph extends Visualization {
     super.update();
 
     int length = arrayController.getLength();
-    int rectWidth = (screenWidth - (length - 1)) / length;
-    int negHeight = -screenHeight;
+    float slotWidth = (float) screenWidth / length;
 
-    indexXCache.ensure(length, screenWidth);
-    float[] xs = indexXCache.xs();
-
+    proc.noStroke();
     colorBatch.reset();
+    proc.beginShape(RenderContext.QUADS);
+
     for (int i = 0; i < length; i++) {
       Color color =
           colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
@@ -36,11 +36,20 @@ public class ColorGradientGraph extends Visualization {
       if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
-
       arrayController.setMarker(i, Marker.NORMAL);
 
-      colorBatch.strokeAndFill(proc, color.getRGB());
-      proc.rect(xs[i], screenHeight, rectWidth, negHeight);
+      colorBatch.fill(proc, color.getRGB());
+
+      float x0 = i * slotWidth;
+      float x1 = Math.min(screenWidth, (i + 1) * slotWidth + SEAM_OVERLAP);
+      float y0 = screenHeight;
+      float y1 = 0;
+      proc.vertex(x0, y0);
+      proc.vertex(x1, y0);
+      proc.vertex(x1, y1);
+      proc.vertex(x0, y1);
     }
+
+    proc.endShape();
   }
 }

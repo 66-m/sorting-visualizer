@@ -47,6 +47,7 @@ public class Hoops extends Visualization {
     rebuildRadii(length, maxRadius);
 
     proc.noFill();
+    proc.strokeWeight(0.5f);
     colorBatch.reset();
 
     for (int i = 0; i < length; i++) {

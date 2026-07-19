@@ -61,6 +61,8 @@ public class NumberPlot extends Visualization {
     float[] xs = indexXCache.xs();
     ensureSlotCaches(length, heightScale);
 
+    proc.textSize(14);
+    proc.noStroke();
     colorBatch.reset();
     for (int i = 0; i < length; i++) {
       Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
@@ -71,7 +73,7 @@ public class NumberPlot extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      colorBatch.strokeAndFill(proc, color.getRGB());
+      colorBatch.fill(proc, color.getRGB());
       proc.text(labels[i], xs[i], screenHeight - barHeights[i]);
     }
   }

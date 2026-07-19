@@ -48,8 +48,6 @@ public class ScatterPlotLinked extends Visualization {
     super.update();
 
     int n = arrayController.getLength();
-    int maxPrimitives = Math.min(Math.max(screenWidth * 2, 1), 4096);
-    int stride = LodStride.forLength(n, maxPrimitives);
     int heightScale = screenHeight - 5;
 
     indexXCache.ensure(n, screenWidth);
@@ -57,8 +55,7 @@ public class ScatterPlotLinked extends Visualization {
     ensureHeights(n, heightScale);
 
     colorBatch.reset();
-    for (int i = 0; i < n - 1; i += stride) {
-      int next = Math.min(i + stride, n - 1);
+    for (int i = 0; i < n - 1; i++) {
       Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
       if (arrayController.getMarker(i) == Marker.SET) {
@@ -71,8 +68,11 @@ public class ScatterPlotLinked extends Visualization {
       proc.line(
           xs[i],
           screenHeight - barHeights[i],
-          xs[next],
-          screenHeight - barHeights[next]);
+          xs[i + 1],
+          screenHeight - barHeights[i + 1]);
+    }
+    if (n > 0) {
+      arrayController.setMarker(n - 1, Marker.NORMAL);
     }
   }
 }

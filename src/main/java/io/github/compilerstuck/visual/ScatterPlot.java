@@ -48,8 +48,6 @@ public class ScatterPlot extends Visualization {
     super.update();
 
     int n = arrayController.getLength();
-    int maxPrimitives = Math.min(Math.max(screenWidth * 2, 1), 4096);
-    int stride = LodStride.forLength(n, maxPrimitives);
     int heightScale = screenHeight - 5;
 
     indexXCache.ensure(n, screenWidth);
@@ -57,7 +55,8 @@ public class ScatterPlot extends Visualization {
     ensureHeights(n, heightScale);
 
     colorBatch.reset();
-    for (int i = 0; i < n; i += stride) {
+    proc.noStroke();
+    for (int i = 0; i < n; i++) {
       Color color = colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
 
       if (arrayController.getMarker(i) == Marker.SET) {
@@ -66,7 +65,7 @@ public class ScatterPlot extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      colorBatch.strokeAndFill(proc, color.getRGB());
+      colorBatch.fill(proc, color.getRGB());
       proc.circle(xs[i], screenHeight - barHeights[i], 3);
     }
   }

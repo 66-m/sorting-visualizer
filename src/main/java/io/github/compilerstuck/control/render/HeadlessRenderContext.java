@@ -56,6 +56,11 @@ public class HeadlessRenderContext implements RenderContext {
   }
 
   @Override
+  public void strokeWeight(float weight) {
+    // no-op
+  }
+
+  @Override
   public void noStroke() {
     // no-op
   }
@@ -67,6 +72,21 @@ public class HeadlessRenderContext implements RenderContext {
 
   @Override
   public void rect(float x, float y, float w, float h) {
+    // no-op
+  }
+
+  @Override
+  public void beginShape(int kind) {
+    // no-op
+  }
+
+  @Override
+  public void vertex(float x, float y) {
+    // no-op
+  }
+
+  @Override
+  public void endShape() {
     // no-op
   }
 

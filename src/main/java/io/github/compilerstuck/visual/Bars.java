@@ -5,19 +5,18 @@ import io.github.compilerstuck.control.render.RenderContext;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.*;
-import processing.core.PApplet;
 
 public class Bars extends Visualization {
 
-  private final IndexXCache indexXCache = new IndexXCache();
+  /** Extra width so adjacent fill quads overlap and hide AA hairlines. */
+  private static final float SEAM_OVERLAP = 1f;
+
   private final ColorBatch colorBatch = new ColorBatch();
 
   private long cachedRevision = Long.MIN_VALUE;
   private int cachedWidth = -1;
   private int cachedHeight = -1;
   private int cachedN = -1;
-  private int cachedStride = -1;
-  private int cachedBucketCount = -1;
   private ColorGradient cachedGradient;
   private int[] barHeights;
   private int[] barColorsRgb;
@@ -28,47 +27,29 @@ public class Bars extends Visualization {
     name = "Bars";
   }
 
-  private void ensureBucketCache(int n, int stride, int bucketCount, int heightScale) {
+  private void ensureBarCache(int n, int heightScale) {
     long rev = arrayController.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
         && cachedN == n
-        && cachedStride == stride
-        && cachedBucketCount == bucketCount
         && cachedGradient == colorGradient) {
       return;
     }
-    if (barHeights == null || barHeights.length < bucketCount) {
-      barHeights = new int[bucketCount];
-      barColorsRgb = new int[bucketCount];
+    if (barHeights == null || barHeights.length < n) {
+      barHeights = new int[n];
+      barColorsRgb = new int[n];
     }
-    for (int b = 0, i = 0; b < bucketCount; b++, i += stride) {
-      int bucketEnd = Math.min(i + stride, n);
-      int maxValuePlusOne = 0;
-      int colorIndex = i;
-
-      for (int j = i; j < bucketEnd; j++) {
-        int valuePlusOne = arrayController.get(j) + 1;
-        if (valuePlusOne > maxValuePlusOne) {
-          maxValuePlusOne = valuePlusOne;
-          colorIndex = j;
-        }
-      }
-
-      barHeights[b] = maxValuePlusOne * heightScale / n;
-
-      Color color =
-          colorGradient.getMarkerColor(
-              arrayController.get(colorIndex), arrayController.getMarker(colorIndex));
-      barColorsRgb[b] = color.getRGB();
+    for (int i = 0; i < n; i++) {
+      int value = arrayController.get(i);
+      barHeights[i] = (value + 1) * heightScale / n;
+      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      barColorsRgb[i] = color.getRGB();
     }
     cachedRevision = rev;
     cachedWidth = screenWidth;
     cachedHeight = screenHeight;
     cachedN = n;
-    cachedStride = stride;
-    cachedBucketCount = bucketCount;
     cachedGradient = colorGradient;
   }
 
@@ -77,37 +58,32 @@ public class Bars extends Visualization {
     super.update();
 
     int n = arrayController.getLength();
-    int maxPrimitives = Math.max(1, Math.min(screenWidth, 2048));
-    int stride = LodStride.forLength(n, maxPrimitives);
-    int bucketCount = (n + stride - 1) / stride;
-    int rectWidth = Math.max(1, (screenWidth - (bucketCount - 1)) / bucketCount);
+    float slotWidth = (float) screenWidth / n;
     int heightScale = screenHeight - 5;
 
-    indexXCache.ensure(n, screenWidth);
-    float[] xs = indexXCache.xs();
-    ensureBucketCache(n, stride, bucketCount, heightScale);
+    ensureBarCache(n, heightScale);
 
+    proc.noStroke();
     colorBatch.reset();
-    for (int b = 0, i = 0; b < bucketCount; b++, i += stride) {
-      int bucketEnd = Math.min(i + stride, n);
-      int soundIndex = -1;
+    proc.beginShape(RenderContext.QUADS);
 
-      for (int j = i; j < bucketEnd; j++) {
-        if (arrayController.getMarker(j) == Marker.SET) {
-          soundIndex = j;
-        }
+    for (int i = 0; i < n; i++) {
+      if (arrayController.getMarker(i) == Marker.SET) {
+        sound.playSound(i);
       }
+      arrayController.setMarker(i, Marker.NORMAL);
 
-      if (soundIndex >= 0) {
-        sound.playSound(soundIndex);
-      }
-
-      for (int j = i; j < bucketEnd; j++) {
-        arrayController.setMarker(j, Marker.NORMAL);
-      }
-
-      colorBatch.strokeAndFill(proc, barColorsRgb[b]);
-      proc.rect(xs[i], screenHeight, rectWidth, -1 * barHeights[b]);
+      colorBatch.fill(proc, barColorsRgb[i]);
+      float x0 = i * slotWidth;
+      float x1 = Math.min(screenWidth, (i + 1) * slotWidth + SEAM_OVERLAP);
+      float y0 = screenHeight;
+      float y1 = screenHeight - barHeights[i];
+      proc.vertex(x0, y0);
+      proc.vertex(x1, y0);
+      proc.vertex(x1, y1);
+      proc.vertex(x0, y1);
     }
+
+    proc.endShape();
   }
 }

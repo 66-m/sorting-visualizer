@@ -60,6 +60,7 @@ public class MosaicSquares extends Visualization {
 
     ensureTileOrigins(drawCount, nextN, squareRoot);
 
+    proc.noStroke();
     colorBatch.reset();
     for (int i = 0; i < drawCount; i++) {
       Color color =
@@ -71,7 +72,7 @@ public class MosaicSquares extends Visualization {
 
       arrayController.setMarker(i, Marker.NORMAL);
 
-      colorBatch.strokeAndFill(proc, color.getRGB());
+      colorBatch.fill(proc, color.getRGB());
       proc.rect(tileX[i], tileY[i], cachedTileDimX, cachedTileDimY);
     }
   }
