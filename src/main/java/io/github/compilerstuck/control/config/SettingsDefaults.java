@@ -36,6 +36,9 @@ public final class SettingsDefaults {
 
   /** Warn in Settings when idle preview FPS falls below this while choosing array size. */
   public static final int ARRAY_SIZE_FPS_WARNING_THRESHOLD = 24;
+
+  /** Crossing above this size from at-or-below shows a one-shot lag warning in Settings. */
+  public static final int ARRAY_SIZE_HIGH_WARNING_THRESHOLD = 20_000;
   public static final int SPEED_LEVEL_MIN = 1;
   public static final int SPEED_LEVEL_MAX = 5;
 

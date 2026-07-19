@@ -17,6 +17,7 @@ public final class ArraySizeViewModel {
   public static final String PROP_CAN_RUN = "canRun";
   public static final String PROP_INPUTS_ENABLED = "inputsEnabled";
   public static final String PROP_FPS_WARNING = "fpsWarning";
+  public static final String PROP_HIGH_SIZE_WARNING = "highSizeWarning";
 
   private final AppContext app;
   private final Supplier<VisualConstraints> constraintsSupplier;
@@ -28,6 +29,7 @@ public final class ArraySizeViewModel {
   private String validationMessage = "";
   private boolean inputsEnabled = true;
   private boolean fpsWarning;
+  private boolean highSizeWarning;
 
   public ArraySizeViewModel(AppContext app, Supplier<VisualConstraints> constraintsSupplier) {
     this.app = app;
@@ -117,6 +119,10 @@ public final class ArraySizeViewModel {
     return fpsWarning;
   }
 
+  public boolean isHighSizeWarning() {
+    return highSizeWarning;
+  }
+
   public void setInputsEnabled(boolean enabled) {
     if (inputsEnabled == enabled) {
       return;
@@ -152,6 +158,15 @@ public final class ArraySizeViewModel {
     pcs.firePropertyChange(PROP_FPS_WARNING, old, warn);
   }
 
+  private void setHighSizeWarning(boolean warn) {
+    if (highSizeWarning == warn) {
+      return;
+    }
+    boolean old = highSizeWarning;
+    highSizeWarning = warn;
+    pcs.firePropertyChange(PROP_HIGH_SIZE_WARNING, old, warn);
+  }
+
   private void applyFitted(int fitted) {
     if (app.isRunning()) {
       return;
@@ -164,9 +179,24 @@ public final class ArraySizeViewModel {
     textValid = true;
     validationMessage = "";
     app.updateArraySize(fitted);
+    updateHighSizeWarning(oldSize, fitted);
     pcs.firePropertyChange(PROP_SIZE, oldSize, size);
     pcs.firePropertyChange(PROP_TEXT, oldText, text);
     pcs.firePropertyChange(PROP_CAN_RUN, oldCanRun, canRun());
+  }
+
+  /**
+   * Shows a lag warning only when crossing from {@code <=} {@link
+   * SettingsDefaults#ARRAY_SIZE_HIGH_WARNING_THRESHOLD} to above it. Clears when size drops back to
+   * the threshold or below.
+   */
+  private void updateHighSizeWarning(int oldSize, int newSize) {
+    int threshold = SettingsDefaults.ARRAY_SIZE_HIGH_WARNING_THRESHOLD;
+    if (oldSize <= threshold && newSize > threshold) {
+      setHighSizeWarning(true);
+    } else if (newSize <= threshold) {
+      setHighSizeWarning(false);
+    }
   }
 
   private int fit(int requestedSize) {

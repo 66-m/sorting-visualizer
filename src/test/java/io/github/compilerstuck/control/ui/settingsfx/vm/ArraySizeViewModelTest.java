@@ -111,4 +111,30 @@ class ArraySizeViewModelTest {
     assertTrue(vm.applyText());
     assertEquals(SettingsDefaults.ARRAY_SIZE_MAX, vm.getSize());
   }
+
+  @Test
+  void highSizeWarningOnCrossingAboveThreshold() {
+    vm.setSizeFromSlider(10_000);
+    assertFalse(vm.isHighSizeWarning());
+
+    vm.setSizeFromSlider(25_000);
+    assertTrue(vm.isHighSizeWarning());
+
+    vm.setSizeFromSlider(40_000);
+    assertTrue(vm.isHighSizeWarning());
+
+    vm.setSizeFromSlider(15_000);
+    assertFalse(vm.isHighSizeWarning());
+  }
+
+  @Test
+  void highSizeWarningNotShownWhenStartingAlreadyAbove() {
+    fx.app.updateArraySize(30_000);
+    ArraySizeViewModel highVm = new ArraySizeViewModel(fx.app, () -> VisualConstraints.NONE);
+    assertEquals(30_000, highVm.getSize());
+    assertFalse(highVm.isHighSizeWarning());
+
+    highVm.setSizeFromSlider(40_000);
+    assertFalse(highVm.isHighSizeWarning());
+  }
 }

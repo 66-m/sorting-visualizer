@@ -22,6 +22,7 @@ public final class ArraySizeSection {
 
   public static final String ROOT_ID = "section-array-size";
   public static final String FPS_WARNING_ID = "array-size-fps-warning";
+  public static final String HIGH_SIZE_WARNING_ID = "array-size-high-warning";
 
   private static final Duration FPS_POLL_INTERVAL = Duration.millis(500);
 
@@ -74,6 +75,13 @@ public final class ArraySizeSection {
     error.setVisible(!vm.isTextValid());
     error.setManaged(!vm.isTextValid());
 
+    Label highSizeWarning = new Label(SettingsStrings.ARRAY_SIZE_HIGH_WARNING);
+    highSizeWarning.setId(HIGH_SIZE_WARNING_ID);
+    highSizeWarning.getStyleClass().add("settings-inline-warning");
+    highSizeWarning.setWrapText(true);
+    highSizeWarning.setVisible(vm.isHighSizeWarning());
+    highSizeWarning.setManaged(vm.isHighSizeWarning());
+
     Label fpsWarning = new Label(SettingsStrings.ARRAY_SIZE_FPS_WARNING);
     fpsWarning.setId(FPS_WARNING_ID);
     fpsWarning.getStyleClass().add("settings-inline-warning");
@@ -116,6 +124,13 @@ public final class ArraySizeSection {
           } else if (ArraySizeViewModel.PROP_VALIDATION_MESSAGE.equals(prop)) {
             String msg = String.valueOf(evt.getNewValue());
             VmBindings.runFx(() -> error.setText(msg == null ? "" : msg));
+          } else if (ArraySizeViewModel.PROP_HIGH_SIZE_WARNING.equals(prop)) {
+            boolean warn = Boolean.TRUE.equals(evt.getNewValue());
+            VmBindings.runFx(
+                () -> {
+                  highSizeWarning.setVisible(warn);
+                  highSizeWarning.setManaged(warn);
+                });
           } else if (ArraySizeViewModel.PROP_FPS_WARNING.equals(prop)) {
             boolean warn = Boolean.TRUE.equals(evt.getNewValue());
             VmBindings.runFx(
@@ -156,7 +171,9 @@ public final class ArraySizeSection {
     precision.setAlignment(Pos.CENTER_LEFT);
     HBox.setHgrow(text, Priority.ALWAYS);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, header, slider, precision, error, fpsWarning);
+    VBox root =
+        new VBox(
+            SettingsLayout.GAP_SM, header, slider, precision, error, highSizeWarning, fpsWarning);
     root.setId(ROOT_ID);
     root.sceneProperty()
         .addListener(

@@ -19,7 +19,9 @@ public final class SettingsStrings {
   public static final String ALGORITHM = "Algorithm";
   public static final String SIZE = "Size";
   public static final String ARRAY_SIZE_FPS_WARNING =
-      "Preview is below 24 FPS at this size. Sorting will be even heavier, consider fewer elements.";
+      "Preview is below 24 FPS at this size.\nSorting will be even heavier, consider fewer elements.";
+  public static final String ARRAY_SIZE_HIGH_WARNING =
+      "Large array sizes can lag the preview and sorting.\nConsider staying at 20,000 or fewer if performance matters.";
   public static final String LEVEL = "Level";
   public static final String PRESET = "Preset";
   public static final String IMAGE = "Image";

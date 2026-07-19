@@ -25,6 +25,7 @@ class SettingsDefaultsTest {
     assertEquals(3, SettingsDefaults.ARRAY_SIZE_MIN);
     assertEquals(100_000, SettingsDefaults.ARRAY_SIZE_MAX);
     assertEquals(24, SettingsDefaults.ARRAY_SIZE_FPS_WARNING_THRESHOLD);
+    assertEquals(20_000, SettingsDefaults.ARRAY_SIZE_HIGH_WARNING_THRESHOLD);
     assertEquals(1, SettingsDefaults.SPEED_LEVEL_MIN);
     assertEquals(5, SettingsDefaults.SPEED_LEVEL_MAX);
 
