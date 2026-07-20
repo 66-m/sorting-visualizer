@@ -78,14 +78,14 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 
 | Control | Options |
 |---------|---------|
-| Array | Size up to 20 000; shuffle: random, reverse, almost sorted, sorted |
+| Array | Size 3–100 000; shuffle: random, reverse, almost sorted, sorted |
 | Sorting | Algorithm picker, run-all with drag-reorder dialog, shuffle type |
 | Speed | Five levels (steps per frame) |
 | Appearance | Gradient presets + custom colors |
-| Visualization | 30 modes; image path with validation for image viz |
-| Sound | MIDI tones mapped to values; mute anytime |
-| Metrics | Sorted %, comparisons, swaps, main/aux writes, estimated time |
-| Session | Cancel mid-run; optional end-of-run comparison table (persisted prefs) |
+| Visualization | 30 modes; Customize (Cube); image path with validation for image viz |
+| Sound | MIDI tones mapped to values; sound-effects checkbox |
+| Display | Show measurements (sorted %, comparisons, swaps, main/aux writes, est. time); comparison table after run-all; export CSV |
+| Session | Cancel mid-run; prefs persist across launches |
 
 ## Build from source
 
