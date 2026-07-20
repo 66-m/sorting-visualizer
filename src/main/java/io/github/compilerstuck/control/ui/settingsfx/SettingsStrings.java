@@ -12,9 +12,7 @@ public final class SettingsStrings {
   public static final String SECTION_SPEED = "SPEED";
   public static final String SECTION_VISUALIZATION = "VISUALIZATION";
   public static final String SECTION_APPEARANCE = "APPEARANCE";
-  public static final String SECTION_DISPLAY = "DISPLAY";
-  public static final String SECTION_SOUND = "SOUND";
-  public static final String SECTION_DEBUG = "DEBUG";
+  public static final String SECTION_OPTIONS = "OPTIONS";
 
   public static final String ALGORITHM = "Algorithm";
   public static final String SIZE = "Size";
@@ -38,8 +36,7 @@ public final class SettingsStrings {
   public static final String RESET_SETTING = "Reset";
   public static final String IMPORT = "Import";
   public static final String EXPORT = "Export";
-  public static final String CUSTOMIZE_EXPORT_COPIED =
-      "Settings copied to clipboard.";
+  public static final String CUSTOMIZE_EXPORT_COPIED = "Settings copied to clipboard.";
   public static final String CUSTOMIZE_IMPORT_TITLE = "Import settings";
   public static final String CUSTOMIZE_IMPORT_HINT =
       "Paste an exported visualization config below.";
@@ -49,8 +46,7 @@ public final class SettingsStrings {
   public static final String CUSTOMIZE_IMPORT_LOAD = "Import";
   public static final String CUSTOMIZE_IMPORT_SUCCESS = "Settings imported.";
   public static final String CUSTOMIZE_IMPORT_EMPTY = "Paste a config to import.";
-  public static final String CUSTOMIZE_IMPORT_INVALID =
-      "This is not a valid visualization config.";
+  public static final String CUSTOMIZE_IMPORT_INVALID = "This is not a valid visualization config.";
   public static final String CUSTOMIZE_IMPORT_WRONG_VIZ =
       "Config is for a different visualization.";
   public static final String CUSTOMIZE_IMPORT_CLAMPED =
@@ -68,7 +64,6 @@ public final class SettingsStrings {
   public static final String CUBE_SCENE_SCALE = "Scene scale";
   public static final String CUBE_WIREFRAME = "Wireframe";
   public static final String RESET_SETTING_TOOLTIP = "Reset to default";
-  public static final String EXPORT_CSV = "Export CSV…";
   public static final String BROWSE = "Browse…";
   public static final String CONFIGURE_ORDER = "Configure order…";
   public static final String RUN_ALL_ORDER_TITLE = "Configure run-all";

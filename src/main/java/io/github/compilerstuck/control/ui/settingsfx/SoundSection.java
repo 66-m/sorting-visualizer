@@ -3,7 +3,6 @@ package io.github.compilerstuck.control.ui.settingsfx;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.VBox;
 
 /** Sound effects checkbox bound to {@link SoundViewModel}. */
 public final class SoundSection {
@@ -14,6 +13,7 @@ public final class SoundSection {
 
   public static Node build(SoundViewModel vm) {
     CheckBox soundEffects = new CheckBox(SettingsStrings.SOUND_EFFECTS);
+    soundEffects.setId(ROOT_ID);
     soundEffects.setSelected(vm.isSoundEnabled());
     soundEffects
         .selectedProperty()
@@ -41,8 +41,6 @@ public final class SoundSection {
         vm::addPropertyChangeListener,
         SoundViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(soundEffects);
-    root.setId(ROOT_ID);
-    return root;
+    return soundEffects;
   }
 }

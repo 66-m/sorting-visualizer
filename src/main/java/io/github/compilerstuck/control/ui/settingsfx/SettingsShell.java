@@ -35,8 +35,6 @@ public final class SettingsShell {
             placeholder(),
             placeholder(),
             placeholder(),
-            placeholder(),
-            placeholder(),
             placeholder()));
   }
 
@@ -44,7 +42,7 @@ public final class SettingsShell {
   public static ShellResult build(SectionNodes sections) {
     BorderPane root = new BorderPane();
     root.getStyleClass().add("settings-root");
-    root.setPadding(new Insets(SettingsLayout.GAP_LG));
+    root.setPadding(new Insets(SettingsLayout.GAP_COL));
     root.setTop(buildHeader());
     root.setCenter(buildBody(sections));
 
@@ -78,7 +76,7 @@ public final class SettingsShell {
 
     VBox header = new VBox(title);
     header.getStyleClass().add("settings-header");
-    header.setPadding(new Insets(0, 0, SettingsLayout.GAP_SM, 0));
+    header.setPadding(new Insets(0, 0, SettingsLayout.GAP_LG, 0));
     return header;
   }
 
@@ -92,11 +90,10 @@ public final class SettingsShell {
         column(
             section(SettingsStrings.SECTION_VISUALIZATION, sections.visualization()),
             section(SettingsStrings.SECTION_APPEARANCE, sections.appearance()),
-            section(SettingsStrings.SECTION_DISPLAY, sections.display()),
-            section(SettingsStrings.SECTION_SOUND, sections.sound()),
-            section(SettingsStrings.SECTION_DEBUG, sections.debug()));
+            section(SettingsStrings.SECTION_OPTIONS, sections.options()));
 
-    HBox columns = new HBox(SettingsLayout.GAP_MD, left, right);
+    HBox columns = new HBox(SettingsLayout.GAP_COL, left, right);
+    columns.setAlignment(Pos.TOP_LEFT);
     HBox.setHgrow(left, Priority.ALWAYS);
     HBox.setHgrow(right, Priority.ALWAYS);
     left.setMaxWidth(Double.MAX_VALUE);
@@ -110,8 +107,9 @@ public final class SettingsShell {
   }
 
   private static VBox column(Node... sectionNodes) {
-    VBox col = new VBox(SettingsLayout.GAP_SM, sectionNodes);
+    VBox col = new VBox(SettingsLayout.GAP_XL, sectionNodes);
     col.setFillWidth(true);
+    col.setAlignment(Pos.TOP_LEFT);
     return col;
   }
 

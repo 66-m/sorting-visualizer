@@ -144,16 +144,6 @@ public final class SettingsFxController {
         });
   }
 
-  /** Refresh CSV export enablement after a session finishes. */
-  public static void refreshExportEnabled() {
-    Platform.runLater(
-        () -> {
-          if (instance != null && instance.displayVm != null) {
-            instance.displayVm.refreshCanExport();
-          }
-        });
-  }
-
   private static SettingsFxController instance() {
     if (instance == null) {
       synchronized (SettingsFxController.class) {
@@ -242,9 +232,7 @@ public final class SettingsFxController {
                 SpeedSection.build(speedVm),
                 VisualizationSection.build(visualizationVm),
                 AppearanceSection.build(appearanceVm),
-                DisplaySection.build(displayVm),
-                SoundSection.build(soundVm),
-                DebugSection.build(debugVm)));
+                OptionsSection.build(displayVm, soundVm, debugVm)));
 
     progressBar = shell.progress();
     runButton = shell.run();

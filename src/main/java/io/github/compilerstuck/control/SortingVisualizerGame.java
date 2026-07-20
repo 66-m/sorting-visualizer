@@ -245,7 +245,6 @@ public final class SortingVisualizerGame extends Game {
     progressPublishAccum = 0f;
     SettingsFxController.setInputsEnabled(true);
     SettingsFxController.setCancelEnabled(false);
-    SettingsFxController.refreshExportEnabled();
 
     if (appContext != null) {
       appContext.getFrameGate().reset();

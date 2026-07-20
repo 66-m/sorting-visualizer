@@ -42,21 +42,16 @@ public final class SpeedSection {
               }
             });
 
-    Region spacer = new Region();
-    HBox.setHgrow(spacer, Priority.ALWAYS);
-    HBox header =
-        new HBox(
-            SettingsLayout.GAP_SM,
-            SettingsControls.fieldLabel(SettingsStrings.LEVEL),
-            spacer,
-            value);
-    header.setAlignment(Pos.CENTER_LEFT);
+    HBox header = SettingsControls.labelValueHeader(SettingsStrings.LEVEL, value);
 
     Label slow = SettingsControls.mutedLabel(SettingsStrings.SPEED_SLOW);
     Label fast = SettingsControls.mutedLabel(SettingsStrings.SPEED_FAST);
-    HBox sliderRow = new HBox(SettingsLayout.GAP_SM, slow, slider, fast);
-    sliderRow.setAlignment(Pos.CENTER_LEFT);
-    HBox.setHgrow(slider, Priority.ALWAYS);
+    Region endpointsSpacer = new Region();
+    HBox.setHgrow(endpointsSpacer, Priority.ALWAYS);
+    HBox endpoints = new HBox(SettingsLayout.GAP_SM, slow, endpointsSpacer, fast);
+    endpoints.setAlignment(Pos.CENTER_LEFT);
+
+    VBox sliderBlock = new VBox(SettingsLayout.GAP_XS, slider, endpoints);
 
     vm.addPropertyChangeListener(
         evt -> {
@@ -78,7 +73,7 @@ public final class SpeedSection {
         vm::addPropertyChangeListener,
         SpeedViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, header, sliderRow);
+    VBox root = new VBox(SettingsLayout.GAP_SM, header, sliderBlock);
     root.setId(ROOT_ID);
     return root;
   }

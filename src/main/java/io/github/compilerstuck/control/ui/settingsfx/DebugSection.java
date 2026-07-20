@@ -3,7 +3,6 @@ package io.github.compilerstuck.control.ui.settingsfx;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.VBox;
 
 /** Debug toggles bound to {@link DebugViewModel}. */
 public final class DebugSection {
@@ -14,6 +13,7 @@ public final class DebugSection {
 
   public static Node build(DebugViewModel vm) {
     CheckBox perfStats = new CheckBox(SettingsStrings.SHOW_PERF_STATS);
+    perfStats.setId(ROOT_ID);
     perfStats.setSelected(vm.isPerfStats());
     perfStats
         .selectedProperty()
@@ -37,8 +37,6 @@ public final class DebugSection {
           }
         });
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, perfStats);
-    root.setId(ROOT_ID);
-    return root;
+    return perfStats;
   }
 }

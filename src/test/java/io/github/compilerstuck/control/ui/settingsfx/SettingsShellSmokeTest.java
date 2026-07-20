@@ -105,8 +105,9 @@ class SettingsShellSmokeTest extends ApplicationTest {
             SpeedSection.build(new SpeedViewModel(fx.app)),
             VisualizationSection.build(vizVm),
             AppearanceSection.build(new AppearanceViewModel(fx.app)),
-            DisplaySection.build(new DisplayViewModel(fx.app)),
-            SoundSection.build(new SoundViewModel(fx.app)),
-            DebugSection.build(new DebugViewModel(fx.app))));
+            OptionsSection.build(
+                new DisplayViewModel(fx.app),
+                new SoundViewModel(fx.app),
+                new DebugViewModel(fx.app))));
   }
 }

@@ -8,14 +8,12 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
@@ -63,15 +61,11 @@ public final class VisualizationSection {
     customize.setOnAction(
         e -> VisualizationCustomizeDialog.show(customize.getScene().getWindow(), vm));
 
-    HBox comboRow = new HBox(SettingsLayout.GAP_SM, combo, customize);
-    comboRow.setAlignment(Pos.CENTER_LEFT);
-    HBox.setHgrow(combo, Priority.ALWAYS);
+    HBox comboRow = SettingsControls.controlWithAction(combo, customize);
 
-    Label imageLabel = SettingsControls.fieldLabel(SettingsStrings.IMAGE);
     TextField path = new TextField(vm.getImagePath());
     path.setPromptText(SettingsStrings.IMAGE_PATH_PROMPT);
-    HBox.setHgrow(path, Priority.ALWAYS);
-    imageLabel.setLabelFor(path);
+    path.setMaxWidth(Double.MAX_VALUE);
 
     Button browse = new Button(SettingsStrings.BROWSE);
     browse.getStyleClass().add(Styles.BUTTON_OUTLINED);
@@ -99,8 +93,9 @@ public final class VisualizationSection {
     error.setVisible(hasError);
     error.setManaged(hasError);
 
-    HBox imageRow = new HBox(SettingsLayout.GAP_SM, path, browse);
-    imageRow.setAlignment(Pos.CENTER_LEFT);
+    HBox imageRow = SettingsControls.controlWithAction(path, browse);
+    Label imageLabel = SettingsControls.fieldLabel(SettingsStrings.IMAGE);
+    imageLabel.setLabelFor(path);
     VBox imageBlock = new VBox(SettingsLayout.GAP_XS, imageLabel, imageRow, error);
     imageBlock.setVisible(vm.needsImage());
     imageBlock.setManaged(vm.needsImage());

@@ -38,9 +38,9 @@
   -fx-padding: 0 0 0 0;
 }
 
-/* Sections separated by spacing + labels only. */
+/* Sections separated by column GAP_XL; no extra bottom pad (avoids fighting the stack gap). */
 .settings-section {
-  -fx-padding: 0 0 4 0;
+  -fx-padding: 0;
 }
 
 .settings-field-label {
@@ -158,7 +158,7 @@
 }
 
 .settings-action-bar {
-  -fx-padding: 12 0 0 0;
+  -fx-padding: 16 0 0 0;
   -fx-spacing: 12;
   -fx-alignment: center-left;
   -fx-border-color: -color-border-default transparent transparent transparent;

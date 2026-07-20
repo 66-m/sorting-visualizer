@@ -11,7 +11,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -55,11 +54,9 @@ public final class SortingSection {
             });
     algorithm.setDisable(vm.isRunAll());
 
-    Label algorithmLabel = SettingsControls.fieldLabel(SettingsStrings.ALGORITHM);
-    algorithmLabel.setLabelFor(algorithm);
-    VBox algorithmField = new VBox(SettingsLayout.GAP_XS, algorithmLabel, algorithm);
+    VBox algorithmField = SettingsControls.labeledField(SettingsStrings.ALGORITHM, algorithm);
 
-    ToggleSwitch runAll = new ToggleSwitch(SettingsStrings.RUN_ALL);
+    ToggleSwitch runAll = new ToggleSwitch();
     runAll.setSelected(vm.isRunAll());
     runAll
         .selectedProperty()
@@ -83,15 +80,18 @@ public final class SortingSection {
 
     Region runAllSpacer = new Region();
     HBox.setHgrow(runAllSpacer, Priority.ALWAYS);
-    HBox runAllRow = new HBox(SettingsLayout.GAP_SM, runAll, runAllSpacer, configure);
-    runAllRow.setAlignment(Pos.CENTER_LEFT);
+    HBox runAllControls = new HBox(SettingsLayout.GAP_SM, runAll, runAllSpacer, configure);
+    runAllControls.setAlignment(Pos.CENTER_LEFT);
+    VBox runAllField =
+        new VBox(
+            SettingsLayout.GAP_XS,
+            SettingsControls.fieldLabel(SettingsStrings.RUN_ALL),
+            runAllControls);
 
-    Label shuffleLabel = SettingsControls.fieldLabel(SettingsStrings.SHUFFLE);
     ComboBox<ShuffleType> shuffle = new ComboBox<>();
     shuffle.getItems().setAll(vm.getShuffleTypes());
     shuffle.getSelectionModel().select(vm.getShuffleType());
     shuffle.setMaxWidth(Double.MAX_VALUE);
-    shuffleLabel.setLabelFor(shuffle);
     shuffle
         .getSelectionModel()
         .selectedItemProperty()
@@ -101,7 +101,7 @@ public final class SortingSection {
                 vm.setShuffleType(type);
               }
             });
-    VBox shuffleField = new VBox(SettingsLayout.GAP_XS, shuffleLabel, shuffle);
+    VBox shuffleField = SettingsControls.labeledField(SettingsStrings.SHUFFLE, shuffle);
 
     vm.addPropertyChangeListener(
         evt -> {
@@ -157,7 +157,7 @@ public final class SortingSection {
         vm::addPropertyChangeListener,
         AlgorithmViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, algorithmField, runAllRow, shuffleField);
+    VBox root = new VBox(SettingsLayout.GAP_SM, algorithmField, runAllField, shuffleField);
     root.setId(ROOT_ID);
     return root;
   }

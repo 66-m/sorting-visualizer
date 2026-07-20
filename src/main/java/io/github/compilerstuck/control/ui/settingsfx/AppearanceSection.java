@@ -19,13 +19,11 @@ public final class AppearanceSection {
   private AppearanceSection() {}
 
   public static Node build(AppearanceViewModel vm) {
-    Label presetLabel = SettingsControls.fieldLabel(SettingsStrings.PRESET);
     ComboBox<String> presets = new ComboBox<>();
     List<String> names = vm.getPresetNames();
     presets.getItems().setAll(names);
     presets.getSelectionModel().select(vm.getSelectedIndex());
     presets.setMaxWidth(Double.MAX_VALUE);
-    presetLabel.setLabelFor(presets);
     presets
         .getSelectionModel()
         .selectedIndexProperty()
@@ -37,7 +35,7 @@ public final class AppearanceSection {
                 vm.selectPreset(index.intValue());
               }
             });
-    VBox presetField = new VBox(SettingsLayout.GAP_XS, presetLabel, presets);
+    VBox presetField = SettingsControls.labeledField(SettingsStrings.PRESET, presets);
 
     Label colorsLabel = SettingsControls.fieldLabel(SettingsStrings.COLORS);
     ColorPicker color1 = new ColorPicker(toFx(vm.getColor1()));

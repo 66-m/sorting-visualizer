@@ -5,15 +5,12 @@ import io.github.compilerstuck.control.ui.settingsfx.vm.ArraySizeViewModel;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -49,15 +46,11 @@ public final class ArraySizeSection {
               }
             });
 
-    Region spacer = new Region();
-    HBox.setHgrow(spacer, Priority.ALWAYS);
-    HBox header =
-        new HBox(
-            SettingsLayout.GAP_SM, SettingsControls.fieldLabel(SettingsStrings.SIZE), spacer, value);
-    header.setAlignment(Pos.CENTER_LEFT);
+    HBox header = SettingsControls.labelValueHeader(SettingsStrings.SIZE, value);
 
     TextField text = new TextField(vm.getText());
     text.setPrefColumnCount(7);
+    text.setMaxWidth(Double.MAX_VALUE);
     text.textProperty()
         .addListener(
             (obs, old, v) -> {
@@ -89,8 +82,7 @@ public final class ArraySizeSection {
     fpsWarning.setVisible(vm.isFpsWarning());
     fpsWarning.setManaged(vm.isFpsWarning());
 
-    Timeline fpsPoll =
-        new Timeline(new KeyFrame(FPS_POLL_INTERVAL, e -> vm.refreshFpsWarning()));
+    Timeline fpsPoll = new Timeline(new KeyFrame(FPS_POLL_INTERVAL, e -> vm.refreshFpsWarning()));
     fpsPoll.setCycleCount(Animation.INDEFINITE);
 
     vm.addPropertyChangeListener(
@@ -167,13 +159,12 @@ public final class ArraySizeSection {
         vm::addPropertyChangeListener,
         ArraySizeViewModel.PROP_INPUTS_ENABLED);
 
-    HBox precision = new HBox(SettingsLayout.GAP_SM, text, apply);
-    precision.setAlignment(Pos.CENTER_LEFT);
-    HBox.setHgrow(text, Priority.ALWAYS);
+    HBox precision = SettingsControls.controlWithAction(text, apply);
+    // Slider + precision entry read as one control cluster.
+    VBox sizeControl = new VBox(SettingsLayout.GAP_XS, slider, precision);
 
     VBox root =
-        new VBox(
-            SettingsLayout.GAP_SM, header, slider, precision, error, highSizeWarning, fpsWarning);
+        new VBox(SettingsLayout.GAP_SM, header, sizeControl, error, highSizeWarning, fpsWarning);
     root.setId(ROOT_ID);
     root.sceneProperty()
         .addListener(
