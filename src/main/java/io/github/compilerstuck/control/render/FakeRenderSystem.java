@@ -230,6 +230,18 @@ public final class FakeRenderSystem implements RenderSystem {
       int length,
       boolean horizontal,
       int contentRevision) {
+    drawImageRemap(image, stripIndices, stripHighlight, length, horizontal, contentRevision, 1f);
+  }
+
+  @Override
+  public void drawImageRemap(
+      ImageHandle image,
+      int[] stripIndices,
+      boolean[] stripHighlight,
+      int length,
+      boolean horizontal,
+      int contentRevision,
+      float highlightStrength) {
     if (image == null || stripIndices == null || length <= 0) {
       return;
     }
@@ -242,7 +254,15 @@ public final class FakeRenderSystem implements RenderSystem {
     }
     if (lastRemapRevision != contentRevision) {
       ImageStripRemap.remap(
-          image.argb(), remapScratch, w, h, stripIndices, stripHighlight, length, horizontal);
+          image.argb(),
+          remapScratch,
+          w,
+          h,
+          stripIndices,
+          stripHighlight,
+          length,
+          horizontal,
+          highlightStrength);
       lastRemapRevision = contentRevision;
       pixelUploadCount++;
     }

@@ -32,6 +32,18 @@ public final class SettingsStrings {
   public static final String APPLY = "Apply";
   public static final String CUSTOMIZE = "Customize";
   public static final String CUSTOMIZE_TITLE = "Customize visualization";
+  public static final String CUSTOMIZE_UNAVAILABLE_TOOLTIP =
+      "No customization options for this visualization.";
+  public static final String CUSTOMIZE_BUSY_TOOLTIP = "Unavailable while sorting.";
+  public static final String RESET_ALL_VISUALS = "Reset all";
+  public static final String RESET_ALL_VISUALS_TITLE = "Reset all customizations?";
+  public static final String RESET_ALL_VISUALS_MESSAGE =
+      "Reset every visualization's customization to its defaults? Saved settings will be cleared.";
+  public static final String RESET_ALL_VISUALS_CONFIRM = "Reset all";
+  public static final String RESET_ALL_VISUALS_BUSY_TOOLTIP = "Unavailable while sorting.";
+  public static final String CONFIGURE_ORDER_UNAVAILABLE_TOOLTIP =
+      "Enable Run all to configure the algorithm order.";
+  public static final String CONFIGURE_ORDER_BUSY_TOOLTIP = "Unavailable while sorting.";
   public static final String RESET_ALL = "Reset all";
   public static final String RESET_SETTING = "Reset";
   public static final String IMPORT = "Import";
@@ -51,14 +63,15 @@ public final class SettingsStrings {
       "Config is for a different visualization.";
   public static final String CUSTOMIZE_IMPORT_CLAMPED =
       "Settings imported. Some values were outside the allowed range and were clamped.";
-  public static final String CUSTOMIZE_DISCARD_TITLE = "Discard changes?";
-  public static final String CUSTOMIZE_DISCARD_MESSAGE =
-      "You have unsaved changes. Discard them and close? The live preview will revert.";
-  public static final String CUSTOMIZE_DISCARD = "Discard";
+  public static final String CUSTOMIZE_UNSAVED_TITLE = "Unsaved changes";
+  public static final String CUSTOMIZE_UNSAVED_MESSAGE =
+      "Save your changes before closing, or discard them to revert the live preview.";
+  public static final String CUSTOMIZE_SAVE_AND_CLOSE = "Save and close";
+  public static final String CUSTOMIZE_DISCARD = "Discard changes";
   public static final String CUSTOMIZE_KEEP_EDITING = "Keep editing";
   public static final String CUBE_SECTION_MOTION = "MOTION";
   public static final String CUBE_SECTION_APPEARANCE = "APPEARANCE";
-  public static final String CUBE_SECTION_FRAME = "FRAME";
+  public static final String CUBE_SECTION_FRAME = "LAYOUT";
   public static final String CUBE_ROTATION_SPEED = "Rotation speed";
   public static final String CUBE_FILL_OPACITY = "Fill opacity";
   public static final String CUBE_SCENE_SCALE = "Scene scale";

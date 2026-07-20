@@ -64,8 +64,8 @@ public final class ImageRemapRenderer implements Disposable {
   }
 
   /**
-   * Upload strip indices when {@code contentRevision} changes. Highlight strips use alpha=0 (shader
-   * draws white).
+   * Upload strip indices when {@code contentRevision} changes. Highlight strips keep the source
+   * index and use alpha=0 so the shader can blend toward white.
    *
    * @return {@code true} if GPU index data was rewritten
    */
@@ -88,10 +88,6 @@ public final class ImageRemapRenderer implements Disposable {
     }
     Pixmap pm = new Pixmap(length, 1, Pixmap.Format.RGBA8888);
     for (int i = 0; i < length; i++) {
-      if (highlight != null && highlight[i]) {
-        pm.drawPixel(i, 0, 0x00000000);
-        continue;
-      }
       int idx = indices[i];
       if (idx < 0) {
         idx = 0;
@@ -100,7 +96,8 @@ public final class ImageRemapRenderer implements Disposable {
       }
       int r = (idx >> 8) & 0xFF;
       int g = idx & 0xFF;
-      pm.drawPixel(i, 0, (r << 24) | (g << 16) | 0x000000FF);
+      int a = highlight != null && highlight[i] ? 0x00 : 0xFF;
+      pm.drawPixel(i, 0, (r << 24) | (g << 16) | a);
     }
     indexTexture.draw(pm, 0, 0);
     pm.dispose();
@@ -110,6 +107,10 @@ public final class ImageRemapRenderer implements Disposable {
   }
 
   public void draw(Texture source, boolean horizontal, int length) {
+    draw(source, horizontal, length, 1f);
+  }
+
+  public void draw(Texture source, boolean horizontal, int length, float highlightStrength) {
     if (source == null || indexTexture == null || length <= 0) {
       return;
     }
@@ -123,6 +124,7 @@ public final class ImageRemapRenderer implements Disposable {
     shader.setUniformi("u_index", 1);
     shader.setUniformf("u_length", length);
     shader.setUniformi("u_horizontal", horizontal ? 1 : 0);
+    shader.setUniformf("u_highlightStrength", Math.max(0f, Math.min(1f, highlightStrength)));
     quad.render(shader, GL20.GL_TRIANGLE_STRIP);
     Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
   }

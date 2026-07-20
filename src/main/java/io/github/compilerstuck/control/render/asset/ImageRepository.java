@@ -13,6 +13,14 @@ public interface ImageRepository extends Disposable {
    */
   ImageHandle load(String path, int targetW, int targetH);
 
+  /**
+   * Load scaled to fit inside {@code maxW}×{@code maxH} while preserving aspect ratio (no letterbox
+   * padding — the returned handle is smaller than the window when needed).
+   */
+  default ImageHandle loadContained(String path, int maxW, int maxH) {
+    return load(path, maxW, maxH);
+  }
+
   /** Blank opaque buffer (tests / missing image). */
   ImageHandle blank(int width, int height);
 

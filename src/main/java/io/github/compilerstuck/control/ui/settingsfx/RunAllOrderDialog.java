@@ -106,7 +106,10 @@ public final class RunAllOrderDialog {
     content.getStyleClass().add("run-all-order-content");
     content.setPadding(
         new Insets(
-            SettingsLayout.GAP_SM, SettingsLayout.GAP_SM, SettingsLayout.GAP_XS, SettingsLayout.GAP_SM));
+            SettingsLayout.GAP_SM,
+            SettingsLayout.GAP_SM,
+            SettingsLayout.GAP_XS,
+            SettingsLayout.GAP_SM));
     content.setFillWidth(true);
 
     refreshChrome(rows, countLabel, status);

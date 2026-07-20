@@ -28,6 +28,15 @@ abstract class AbstractImageVisualization extends Visualization
   private int cachedHandleGen = -1;
   private int drawRevision;
   private boolean hasDrawRevision;
+  private int lastFitWindowW = -1;
+  private int lastFitWindowH = -1;
+  private boolean lastFitContain;
+
+  /** 0–1 blend of SET strips toward white. */
+  protected volatile float highlightStrength = 1f;
+
+  /** When true, load image letterboxed into the window. */
+  protected volatile boolean containFit;
 
   AbstractImageVisualization(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
@@ -107,7 +116,14 @@ abstract class AbstractImageVisualization extends Visualization
       return;
     }
 
-    rs.drawImageRemap(image, stripIndices, stripHighlight, length, horizontalMode(), drawRevision);
+    rs.drawImageRemap(
+        image,
+        stripIndices,
+        stripHighlight,
+        length,
+        horizontalMode(),
+        drawRevision,
+        highlightStrength);
   }
 
   private boolean isDirty(int length) {
@@ -139,11 +155,20 @@ abstract class AbstractImageVisualization extends Visualization
   private void ensureImageSizedForWindow() {
     int w = Math.max(1, rs.getWidth());
     int h = Math.max(1, rs.getHeight());
-    if (image != null && image.width() == w && image.height() == h) {
+    if (image != null
+        && lastFitWindowW == w
+        && lastFitWindowH == h
+        && lastFitContain == containFit) {
       return;
     }
+    lastFitWindowW = w;
+    lastFitWindowH = h;
+    lastFitContain = containFit;
     if (imageRepository != null && imagePath != null && !imagePath.isBlank()) {
-      ImageHandle reloaded = imageRepository.load(imagePath, w, h);
+      ImageHandle reloaded =
+          containFit
+              ? imageRepository.loadContained(imagePath, w, h)
+              : imageRepository.load(imagePath, w, h);
       if (reloaded != null) {
         setImage(reloaded);
         return;
@@ -153,6 +178,21 @@ abstract class AbstractImageVisualization extends Visualization
       setImage(imageRepository.blank(w, h));
     } else {
       setImage(blankHandle(w, h));
+    }
+  }
+
+  protected void applyImageLook(boolean contain, float highlight) {
+    float nextHighlight = Math.max(0f, Math.min(1f, highlight));
+    boolean fitChanged = containFit != contain;
+    boolean highlightChanged = Math.abs(highlightStrength - nextHighlight) > 1e-6f;
+    containFit = contain;
+    highlightStrength = nextHighlight;
+    if (fitChanged || highlightChanged) {
+      invalidateCache();
+    }
+    if (fitChanged) {
+      lastFitWindowW = -1;
+      lastFitWindowH = -1;
     }
   }
 

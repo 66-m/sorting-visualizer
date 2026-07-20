@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.PyramidSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.InstanceData;
@@ -8,7 +10,9 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class Pyramid extends Visualization {
+public class Pyramid extends Visualization implements ConfigurableVisualization {
+
+  private volatile PyramidSettings settings = PyramidSettings.defaults();
 
   private float angle = 0;
 
@@ -31,6 +35,18 @@ public class Pyramid extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "3D - Pyramid";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof PyramidSettings s) {
+      settings = s;
+    }
   }
 
   @Override
@@ -88,14 +104,15 @@ public class Pyramid extends Visualization {
 
   @Override
   public void update(float delta) {
+    PyramidSettings s = settings;
     int screenMin = Math.min(screenHeight, screenWidth);
-    int radius = (int) (screenMin / 1.7);
+    int radius = (int) (screenMin * s.stackScale());
     int length = arrayController.getLength();
     float centerY = (float) (screenHeight / 2.5);
     float centerZ = -(int) (screenMin / 10);
     float centerX = (float) screenWidth / 2;
 
-    angle -= (float) (Math.PI / 15) * delta;
+    angle -= (float) s.rotationSpeedRadPerSec() * delta;
 
     rebuildZOffsets(length, radius);
     ensureBarHeightsAndColors(length, radius);
@@ -119,14 +136,14 @@ public class Pyramid extends Visualization {
       float y3 = cosX * y2 - sinX * z2;
       float z3 = sinX * y2 + cosX * z2;
 
-      float s = barHeights[i];
+      float size = barHeights[i];
       quads.set(
           i,
           toWorldX(centerX + x2),
           toWorldY(centerY + y3),
           centerZ + z3,
-          s,
-          s,
+          size,
+          size,
           1f,
           -rotX,
           0f,

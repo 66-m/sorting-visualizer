@@ -6,6 +6,7 @@ import io.github.compilerstuck.control.catalog.VisualizationCatalog;
 import io.github.compilerstuck.control.catalog.VisualizationDescriptor;
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
+import io.github.compilerstuck.control.ui.settingsfx.customize.VisualizationCustomizePanels;
 import io.github.compilerstuck.visual.ConfigurableVisualization;
 import io.github.compilerstuck.visual.ImageSourceVisualization;
 import io.github.compilerstuck.visual.Visualization;
@@ -224,6 +225,27 @@ public final class VisualizationViewModel {
     }
     configurableViz.applySettings(settings);
     app.saveVisualizationSettings(settings);
+    return true;
+  }
+
+  /**
+   * Applies each visualization’s customize defaults live and clears persisted custom settings.
+   *
+   * @return {@code true} if the reset ran (inputs enabled)
+   */
+  public boolean resetAllCustomizations() {
+    if (!inputsEnabled) {
+      return false;
+    }
+    for (int i = 0; i < visualizations.size(); i++) {
+      Visualization viz = visualizations.get(i);
+      if (!(viz instanceof ConfigurableVisualization configurableViz)) {
+        continue;
+      }
+      String id = descriptors.get(i).id();
+      VisualizationCustomizePanels.defaultsFor(id).ifPresent(configurableViz::applySettings);
+    }
+    app.clearAllVisualizationSettings();
     return true;
   }
 

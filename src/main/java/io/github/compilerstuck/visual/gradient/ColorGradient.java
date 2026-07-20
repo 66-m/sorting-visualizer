@@ -47,9 +47,23 @@ public class ColorGradient {
   }
 
   public Color getMarkerColor(int index, Marker m) {
-    if (m == Marker.NORMAL) return colorGradient[index];
-    else if (m == Marker.SET) return markerSetColor;
-    else return Color.BLACK;
+    if (m == Marker.NORMAL) {
+      Color[] gradient = colorGradient;
+      if (gradient == null || gradient.length == 0) {
+        return Color.BLACK;
+      }
+      int i = index;
+      if (i < 0) {
+        i = 0;
+      } else if (i >= gradient.length) {
+        i = gradient.length - 1;
+      }
+      return gradient[i];
+    } else if (m == Marker.SET) {
+      return markerSetColor;
+    } else {
+      return Color.BLACK;
+    }
   }
 
   public void setColor1(Color color1) {

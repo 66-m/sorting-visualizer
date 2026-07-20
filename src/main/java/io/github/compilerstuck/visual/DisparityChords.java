@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.DisparityChordsSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,10 +9,12 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class DisparityChords extends Visualization {
+public class DisparityChords extends Visualization implements ConfigurableVisualization {
 
   int radius;
   private final PhaseLut phaseLut = new PhaseLut();
+
+  private volatile DisparityChordsSettings settings = DisparityChordsSettings.defaults();
 
   private int[] endX;
   private int[] endY;
@@ -27,6 +31,19 @@ public class DisparityChords extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Disparity Chords";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof DisparityChordsSettings s) {
+      settings = s;
+      cacheLength = -1;
+    }
   }
 
   @Override
@@ -63,7 +80,8 @@ public class DisparityChords extends Visualization {
   @Override
   public void update(float delta) {
     int length = arrayController.getLength();
-    radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
+    DisparityChordsSettings s = settings;
+    radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
 
@@ -97,9 +115,10 @@ public class DisparityChords extends Visualization {
         int o = ellipseCount * 4;
         ellipseXywh[o] = x;
         ellipseXywh[o + 1] = y;
-        ellipseXywh[o + 2] = 1;
-        ellipseXywh[o + 3] = 1;
-        ellipseArgb[ellipseCount] = rgb;
+        float marker = (float) s.coincidentMarkerSize();
+        ellipseXywh[o + 2] = marker;
+        ellipseXywh[o + 3] = marker;
+        ellipseArgb[ellipseCount] = VisColors.withAlpha(rgb, s.chordOpacity());
         ellipseCount++;
       } else {
         int o = lineCount * 4;
@@ -107,10 +126,11 @@ public class DisparityChords extends Visualization {
         xyxy[o + 1] = y;
         xyxy[o + 2] = x2;
         xyxy[o + 3] = y2;
-        lineArgb[lineCount] = rgb;
+        lineArgb[lineCount] = VisColors.withAlpha(rgb, s.chordOpacity());
         lineCount++;
       }
     }
+    rs.strokeWeight((float) s.lineThickness());
     rs.strokeLines(xyxy, lineArgb, lineCount);
     rs.strokeEllipses(ellipseXywh, ellipseArgb, ellipseCount);
   }

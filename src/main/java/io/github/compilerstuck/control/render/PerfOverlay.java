@@ -28,15 +28,12 @@ public final class PerfOverlay {
             y,
             line);
     line =
-        text(
-            rs,
-            String.format("heap %.1f / %.1f MB", stats.heapUsedMb, stats.heapMaxMb),
-            y,
-            line);
+        text(rs, String.format("heap %.1f / %.1f MB", stats.heapUsedMb, stats.heapMaxMb), y, line);
 
     if (ctx != null) {
       line = text(rs, ctx.width + "x" + ctx.height + "  N=" + ctx.arrayLength, y, line);
-      String viz = ctx.visualization == null || ctx.visualization.isEmpty() ? "?" : ctx.visualization;
+      String viz =
+          ctx.visualization == null || ctx.visualization.isEmpty() ? "?" : ctx.visualization;
       line =
           text(
               rs,
@@ -70,12 +67,7 @@ public final class PerfOverlay {
             line);
     line = text(rs, "instances " + stats.instancesSubmitted, y, line);
     line = text(rs, "lineDraws " + stats.lineDraws, y, line);
-    line =
-        text(
-            rs,
-            "geo2d " + stats.geo2dDraws + " prims " + stats.geo2dPrimitives,
-            y,
-            line);
+    line = text(rs, "geo2d " + stats.geo2dDraws + " prims " + stats.geo2dPrimitives, y, line);
     text(rs, "modelRestarts " + stats.modelBatchRestarts, y, line);
   }
 

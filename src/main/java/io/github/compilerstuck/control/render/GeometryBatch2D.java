@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
  * World2D colored geometry without ShapeRenderer tessellation: axis-aligned circle quads and
- * low-segment ellipse outlines as {@code GL_LINES}.
+ * stroked ellipse outlines as {@code GL_LINES}.
  */
 public final class GeometryBatch2D implements Disposable {
   private static final String VERT_PATH = "shaders/geo2d.vert";
@@ -23,7 +23,10 @@ public final class GeometryBatch2D implements Disposable {
   private static final int FLOATS_PER_VERT = 6;
 
   private static final int INITIAL_CIRCLES = 4096;
-  private static final int ELLIPSE_SEGMENTS = 12;
+
+  /** Segments per ellipse outline — high enough that large rings read as circles, not polygons. */
+  public static final int ELLIPSE_SEGMENTS = 64;
+
   private static final int INITIAL_LINE_SEGMENTS = 4096;
 
   private final ShaderProgram shader;
@@ -41,8 +44,14 @@ public final class GeometryBatch2D implements Disposable {
     ShaderProgram.pedantic = false;
     String prevVert = ShaderProgram.prependVertexCode;
     String prevFrag = ShaderProgram.prependFragmentCode;
-    ShaderProgram.prependVertexCode = "#version 300 es\n";
-    ShaderProgram.prependFragmentCode = "#version 300 es\n";
+    ShaderProgram.prependVertexCode =
+        """
+        #version 300 es
+        """;
+    ShaderProgram.prependFragmentCode =
+        """
+        #version 300 es
+        """;
     try {
       shader = new ShaderProgram(Gdx.files.internal(VERT_PATH), Gdx.files.internal(FRAG_PATH));
     } finally {
@@ -80,7 +89,8 @@ public final class GeometryBatch2D implements Disposable {
   }
 
   /**
-   * Draws stroked ellipses as 12-segment polylines. {@code xywh} = [cx,cy,w,h] × count.
+   * Draws stroked ellipses as {@link #ELLIPSE_SEGMENTS}-segment polylines. {@code xywh} =
+   * [cx,cy,w,h] × count.
    *
    * @return true if a draw was issued
    */

@@ -83,8 +83,7 @@ public final class CubeCustomizePanel implements VisualizationCustomizePanel {
                 fillOpacity,
                 fillOpacityValue,
                 CubeSettings.DEFAULT_FILL_OPACITY),
-            checkboxRow(
-                SettingsStrings.CUBE_WIREFRAME, wireframe, CubeSettings.DEFAULT_WIREFRAME));
+            checkboxRow(SettingsStrings.CUBE_WIREFRAME, wireframe, CubeSettings.DEFAULT_WIREFRAME));
 
     VBox frame =
         section(
@@ -95,7 +94,7 @@ public final class CubeCustomizePanel implements VisualizationCustomizePanel {
                 sceneScaleValue,
                 CubeSettings.DEFAULT_SCENE_SCALE_DIVISOR));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, motion, appearance, frame);
+    VBox root = new VBox(SettingsLayout.GAP_MD, frame, motion, appearance);
     root.getStyleClass().add("customize-panel");
     root.setFillWidth(true);
     return root;

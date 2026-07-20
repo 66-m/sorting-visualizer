@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.ScatterPlotSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,9 +9,11 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class ScatterPlot extends Visualization {
+public class ScatterPlot extends Visualization implements ConfigurableVisualization {
 
   private final IndexXCache indexXCache = new IndexXCache();
+
+  private volatile ScatterPlotSettings settings = ScatterPlotSettings.defaults();
 
   private long cachedRevision = Long.MIN_VALUE;
   private int cachedWidth = -1;
@@ -23,6 +27,18 @@ public class ScatterPlot extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Scatter Plot";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof ScatterPlotSettings s) {
+      settings = s;
+    }
   }
 
   @Override
@@ -52,6 +68,8 @@ public class ScatterPlot extends Visualization {
 
   @Override
   public void update(float delta) {
+    ScatterPlotSettings s = settings;
+    float pointSize = (float) s.pointSize();
     int n = arrayController.getLength();
     int heightScale = screenHeight - 5;
 
@@ -75,7 +93,7 @@ public class ScatterPlot extends Visualization {
       int o = i * 3;
       xyd[o] = xs[i];
       xyd[o + 1] = barHeights[i];
-      xyd[o + 2] = 3;
+      xyd[o + 2] = pointSize;
       argb[i] = color.getRGB();
     }
     rs.fillCircles(xyd, argb, n);

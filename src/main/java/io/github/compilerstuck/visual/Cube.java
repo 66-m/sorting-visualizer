@@ -31,6 +31,7 @@ public class Cube extends Visualization implements ConfigurableVisualization {
 
   /** Legacy fixed tilt ({@code Math.sin/cos(-10)} used radians, not degrees). */
   private static final float SIN_TILT = (float) Math.sin(-10);
+
   private static final float COS_TILT = (float) Math.cos(-10);
 
   /** Legacy fixed per-box X spin (radians). */

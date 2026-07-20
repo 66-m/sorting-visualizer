@@ -2,6 +2,8 @@ package io.github.compilerstuck.visual;
 
 import static java.lang.Math.floor;
 
+import io.github.compilerstuck.control.config.visual.MosaicSquaresSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -9,7 +11,9 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class MosaicSquares extends Visualization {
+public class MosaicSquares extends Visualization implements ConfigurableVisualization {
+
+  private volatile MosaicSquaresSettings settings = MosaicSquaresSettings.defaults();
 
   private int cachedDrawCount = -1;
   private int cachedNextN = -1;
@@ -26,6 +30,19 @@ public class MosaicSquares extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Mosaic Squares";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof MosaicSquaresSettings s) {
+      settings = s;
+      cachedDrawCount = -1;
+    }
   }
 
   @Override
@@ -77,11 +94,14 @@ public class MosaicSquares extends Visualization {
         sound.playSound(i);
       }
 
+      MosaicSquaresSettings s = settings;
+      float gap = (float) s.tileGapPx();
+      float inset = gap * 0.5f;
       int o = i * 4;
-      xywh[o] = tileX[i];
-      xywh[o + 1] = tileY[i];
-      xywh[o + 2] = cachedTileDimX;
-      xywh[o + 3] = cachedTileDimY;
+      xywh[o] = tileX[i] + inset;
+      xywh[o + 1] = tileY[i] + inset;
+      xywh[o + 2] = Math.max(0.5f, cachedTileDimX - gap);
+      xywh[o + 3] = Math.max(0.5f, cachedTileDimY - gap);
       argb[i] = color.getRGB();
     }
     rs.fillRects(xywh, argb, drawCount);

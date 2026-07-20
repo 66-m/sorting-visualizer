@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.DisparitySquareScatterSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,9 +9,12 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class DisparitySquareScatter extends Visualization {
+public class DisparitySquareScatter extends Visualization implements ConfigurableVisualization {
 
   int sideLength;
+
+  private volatile DisparitySquareScatterSettings settings =
+      DisparitySquareScatterSettings.defaults();
 
   private int[] baseX;
   private int[] baseY;
@@ -23,6 +28,19 @@ public class DisparitySquareScatter extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Disparity Square Scatter";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof DisparitySquareScatterSettings s) {
+      settings = s;
+      cacheLength = -1;
+    }
   }
 
   @Override
@@ -66,9 +84,11 @@ public class DisparitySquareScatter extends Visualization {
   @Override
   public void update(float delta) {
     int length = arrayController.getLength();
-    sideLength = (int) ((Math.min(screenHeight, screenWidth) / 2.4) * 2);
-    int sideLengthX = screenWidth;
-    int sideLengthY = screenHeight;
+    DisparitySquareScatterSettings s = settings;
+    int side = (int) (Math.min(screenHeight, screenWidth) * s.perimeterScale());
+    sideLength = side;
+    int sideLengthX = side;
+    int sideLengthY = side;
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
 
@@ -100,7 +120,7 @@ public class DisparitySquareScatter extends Visualization {
       int o = i * 3;
       xyd[o] = centerX + (int) (baseX[i] * barHeight);
       xyd[o + 1] = centerY + (int) (baseY[i] * barHeight);
-      xyd[o + 2] = 6;
+      xyd[o + 2] = (float) s.pointSize();
       argb[i] = color.getRGB();
     }
     rs.fillCircles(xyd, argb, length);

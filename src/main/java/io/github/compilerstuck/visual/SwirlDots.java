@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.SwirlDotsSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,17 +9,35 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class SwirlDots extends Visualization {
+public class SwirlDots extends Visualization implements ConfigurableVisualization {
 
   int radius;
   private final PhaseLut phaseLut = new PhaseLut();
+
+  private volatile SwirlDotsSettings settings = SwirlDotsSettings.defaults();
+
   private float[] xyd;
   private int[] argb;
+  private double cacheTurns = Double.NaN;
+  private int cacheLength = -1;
 
   public SwirlDots(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Swirl Dots";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof SwirlDotsSettings s) {
+      settings = s;
+      cacheLength = -1;
+    }
   }
 
   @Override
@@ -27,13 +47,20 @@ public class SwirlDots extends Visualization {
 
   @Override
   public void update(float delta) {
+    SwirlDotsSettings s = settings;
     int length = arrayController.getLength();
-    radius = (int) (Math.min(screenHeight, screenWidth) / 2.5);
+    radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
-    phaseLut.ensure(length, 8.0);
+    double turns = s.spiralTurns();
+    if (cacheLength != length || cacheTurns != turns) {
+      phaseLut.ensure(length, turns);
+      cacheLength = length;
+      cacheTurns = turns;
+    }
     float[] sin = phaseLut.sin();
     float[] cos = phaseLut.cos();
+    float pointSize = (float) s.pointSize();
 
     if (xyd == null || xyd.length < length * 3) {
       xyd = new float[length * 3];
@@ -52,7 +79,7 @@ public class SwirlDots extends Visualization {
       int o = i * 3;
       xyd[o] = centerX + (int) (scale * sin[i]);
       xyd[o + 1] = centerY + (int) (scale * cos[i]);
-      xyd[o + 2] = 5;
+      xyd[o + 2] = pointSize;
       argb[i] = color.getRGB();
     }
     rs.fillCircles(xyd, argb, length);

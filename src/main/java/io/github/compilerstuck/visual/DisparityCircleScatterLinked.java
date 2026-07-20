@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.DisparityCircleScatterLinkedSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,10 +9,14 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class DisparityCircleScatterLinked extends Visualization {
+public class DisparityCircleScatterLinked extends Visualization
+    implements ConfigurableVisualization {
 
   int radius;
   private final PhaseLut phaseLut = new PhaseLut();
+
+  private volatile DisparityCircleScatterLinkedSettings settings =
+      DisparityCircleScatterLinkedSettings.defaults();
 
   private float[] scaledSin;
   private float[] scaledCos;
@@ -24,6 +30,19 @@ public class DisparityCircleScatterLinked extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Disparity Circle Scatter Linked";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof DisparityCircleScatterLinkedSettings s) {
+      settings = s;
+      cacheLength = -1;
+    }
   }
 
   @Override
@@ -65,8 +84,9 @@ public class DisparityCircleScatterLinked extends Visualization {
 
   @Override
   public void update(float delta) {
+    DisparityCircleScatterLinkedSettings s = settings;
     int length = arrayController.getLength();
-    radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
+    radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
 
@@ -106,6 +126,7 @@ public class DisparityCircleScatterLinked extends Visualization {
       xyxy[o + 3] = centerY + (int) (barHeight2 * scaledCos[nextIndex]);
       argb[i] = color.getRGB();
     }
+    rs.strokeWeight((float) s.lineThickness());
     rs.strokeLines(xyxy, argb, lineCount);
   }
 }

@@ -2,6 +2,8 @@ package io.github.compilerstuck.visual;
 
 import static java.lang.Math.floor;
 
+import io.github.compilerstuck.control.config.visual.PlaneSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.InstanceData;
@@ -10,7 +12,9 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class Plane extends Visualization {
+public class Plane extends Visualization implements ConfigurableVisualization {
+
+  private volatile PlaneSettings settings = PlaneSettings.defaults();
 
   private float angle = 0;
   float squareRoot;
@@ -32,6 +36,18 @@ public class Plane extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "3D - Plane";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof PlaneSettings s) {
+      settings = s;
+    }
   }
 
   @Override
@@ -83,18 +99,21 @@ public class Plane extends Visualization {
 
   @Override
   public void update(float delta) {
+    PlaneSettings s = settings;
     int screenMin = Math.min(screenHeight, screenWidth);
-    int radius = (int) (screenMin / 1.2);
+    int radius = (int) (screenMin * s.planeScale());
     float centerYProc = (float) (screenHeight / 2.5);
     float centerZ = -(int) (screenMin / 10);
     float worldCenterY = -(centerYProc - screenHeight * 0.5f);
 
-    angle += (float) (Math.PI / 15) * delta;
+    angle += (float) s.rotationSpeedRadPerSec() * delta;
 
     int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
     float tileDim = radius / squareRoot;
+    float gap = (float) (tileDim * s.tileGap());
+    float drawDim = Math.max(0.5f, tileDim - gap);
 
     rebuildTiles(drawCount, nextN, radius, tileDim);
     ensureColors(drawCount);
@@ -120,8 +139,8 @@ public class Plane extends Visualization {
           x1,
           worldCenterY - y2,
           centerZ + z2,
-          tileDim,
-          tileDim,
+          drawDim,
+          drawDim,
           1f,
           -rotX,
           0f,

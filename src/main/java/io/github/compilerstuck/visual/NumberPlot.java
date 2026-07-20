@@ -1,16 +1,18 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.NumberPlotSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 
-public class NumberPlot extends Visualization {
-
-  private static final int LOD_TARGET_LABELS = 512;
+public class NumberPlot extends Visualization implements ConfigurableVisualization {
 
   private final IndexXCache indexXCache = new IndexXCache();
+
+  private volatile NumberPlotSettings settings = NumberPlotSettings.defaults();
 
   private int cachedLength = -1;
   private int cachedWidth = -1;
@@ -18,14 +20,24 @@ public class NumberPlot extends Visualization {
   private int[] cachedValues;
   private int[] barHeights;
   private String[] labels;
-  private String[] drawLabels;
-  private float[] drawXs;
   private float[] drawYs;
 
   public NumberPlot(
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Number Plot";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof NumberPlotSettings s) {
+      settings = s;
+    }
   }
 
   @Override
@@ -44,8 +56,6 @@ public class NumberPlot extends Visualization {
         cachedValues = new int[length];
         barHeights = new int[length];
         labels = new String[length];
-        drawLabels = new String[length];
-        drawXs = new float[length];
         drawYs = new float[length];
         for (int i = 0; i < length; i++) {
           cachedValues[i] = Integer.MIN_VALUE;
@@ -64,6 +74,7 @@ public class NumberPlot extends Visualization {
 
   @Override
   public void update(float delta) {
+    NumberPlotSettings s = settings;
     int length = arrayController.getLength();
     int heightScale = screenHeight - 5;
 
@@ -71,28 +82,15 @@ public class NumberPlot extends Visualization {
     float[] xs = indexXCache.xs();
     ensureSlotCaches(length, heightScale);
 
-    int step = 1;
-    if (length > LOD_TARGET_LABELS) {
-      step = (length + LOD_TARGET_LABELS - 1) / LOD_TARGET_LABELS;
-    }
-
-    int drawCount = 0;
     for (int i = 0; i < length; i++) {
-      boolean highlight = arrayController.getMarker(i) == Marker.SET;
-      if (highlight) {
+      if (arrayController.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
-      if (step > 1 && (i % step) != 0 && !highlight) {
-        continue;
-      }
-      drawLabels[drawCount] = labels[i];
-      drawXs[drawCount] = xs[i];
-      drawYs[drawCount] = worldYToOverlayY(barHeights[i]);
-      drawCount++;
+      drawYs[i] = worldYToOverlayY(barHeights[i]);
     }
 
-    if (drawCount > 0) {
-      rs.drawTexts(drawLabels, drawXs, drawYs, 14, drawCount);
+    if (length > 0) {
+      rs.drawTexts(labels, xs, drawYs, (float) s.fontSize(), length);
     }
   }
 }

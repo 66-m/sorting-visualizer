@@ -2,6 +2,8 @@ package io.github.compilerstuck.visual;
 
 import static java.lang.Math.min;
 
+import io.github.compilerstuck.control.config.visual.MorphingShellSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.InstanceData;
@@ -10,7 +12,9 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class MorphingShell extends Visualization {
+public class MorphingShell extends Visualization implements ConfigurableVisualization {
+
+  private volatile MorphingShellSettings settings = MorphingShellSettings.defaults();
 
   int radius;
   private float aa = 0;
@@ -30,6 +34,18 @@ public class MorphingShell extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "3D - Morphing Shell";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof MorphingShellSettings s) {
+      settings = s;
+    }
   }
 
   @Override
@@ -99,11 +115,12 @@ public class MorphingShell extends Visualization {
 
   @Override
   public void update(float delta) {
-    radius = Math.min(screenHeight, screenWidth) / 2;
+    MorphingShellSettings s = settings;
+    radius = (int) (Math.min(screenHeight, screenWidth) * s.shellRadiusScale());
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
     float halfW = screenWidth * 0.5f;
 
-    aa += (float) (Math.PI / 10) * delta;
+    aa += (float) s.rotationSpeedRadPerSec() * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -134,7 +151,8 @@ public class MorphingShell extends Visualization {
       // Legacy Processing pos (W/4 + y/2, H/2 + x/2, centerZ+z) → world
       float wx = y / 2f - halfW * 0.5f;
       float wy = -x / 2f;
-      spheres.set(i, wx, wy, centerZ + z, 15, 15, 15, 0, 0, 0, colorsRgb[i]);
+      float ss = (float) s.sphereSize();
+      spheres.set(i, wx, wy, centerZ + z, ss, ss, ss, 0, 0, 0, colorsRgb[i]);
 
       colCnt++;
       if (colCnt == colSize) {

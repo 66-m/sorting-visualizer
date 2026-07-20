@@ -23,12 +23,13 @@ class GeometryBatch2DTest {
   }
 
   @Test
-  void packEllipseLinesWritesTwelveSegments() {
+  void packEllipseLinesWritesConfiguredSegments() {
+    int segs = GeometryBatch2D.ELLIPSE_SEGMENTS;
     float[] xywh = {0f, 0f, 2f, 4f};
     int[] argb = {0xFFFFFFFF};
-    float[] out = new float[12 * 2 * 6];
+    float[] out = new float[segs * 2 * 6];
     float[] rgba = new float[4];
     int floats = GeometryBatch2D.packEllipseLines(xywh, argb, 1, out, rgba);
-    assertEquals(12 * 2 * 6, floats);
+    assertEquals(segs * 2 * 6, floats);
   }
 }

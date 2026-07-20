@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -28,7 +29,7 @@ import javafx.stage.Window;
  * Modal draft dialog for per-visualization customization.
  *
  * <p>Draft edits are previewed live on the visualization. Apply persists them; closing with unsaved
- * changes asks to discard and restores the last applied baseline.
+ * changes offers save, discard (restore baseline), or keep editing.
  */
 public final class VisualizationCustomizeDialog {
 
@@ -36,6 +37,12 @@ public final class VisualizationCustomizeDialog {
   public static final String DISCARD_CONFIRM_ID = "visualization-customize-discard-confirm";
   public static final String IMPORT_DIALOG_ID = "visualization-customize-import-dialog";
   public static final String IMPORT_TEXT_ID = "visualization-customize-import-text";
+
+  private enum UnsavedCloseChoice {
+    SAVE,
+    DISCARD,
+    CANCEL
+  }
 
   private VisualizationCustomizeDialog() {}
 
@@ -64,7 +71,10 @@ public final class VisualizationCustomizeDialog {
     content.getStyleClass().add("customize-dialog-content");
     content.setPadding(
         new Insets(
-            SettingsLayout.GAP_SM, SettingsLayout.GAP_SM, SettingsLayout.GAP_XS, SettingsLayout.GAP_SM));
+            SettingsLayout.GAP_SM,
+            SettingsLayout.GAP_SM,
+            SettingsLayout.GAP_XS,
+            SettingsLayout.GAP_SM));
     VBox.setVgrow(content, Priority.ALWAYS);
     panel.setOnDraftChanged(() -> previewDraft(vm, panel));
     panel.load(seed);
@@ -190,7 +200,7 @@ public final class VisualizationCustomizeDialog {
   }
 
   /**
-   * @return {@code true} if the dialog may close (clean, or user discarded and live preview was
+   * @return {@code true} if the dialog may close (clean, saved, or discarded and live preview
    *     restored)
    */
   private static boolean confirmCloseIfDirty(
@@ -201,11 +211,22 @@ public final class VisualizationCustomizeDialog {
     if (!isDirty(panel, baseline)) {
       return true;
     }
-    if (!confirmDiscardUnsaved(dialog.getDialogPane().getScene().getWindow())) {
-      return false;
-    }
-    vm.previewCustomization(baseline);
-    return true;
+    UnsavedCloseChoice choice =
+        askUnsavedCloseChoice(dialog.getDialogPane().getScene().getWindow());
+    return switch (choice) {
+      case SAVE -> {
+        if (!panel.isValid()) {
+          yield false;
+        }
+        VisualizationSettings next = panel.toSettings();
+        yield vm.applyCustomization(next);
+      }
+      case DISCARD -> {
+        vm.previewCustomization(baseline);
+        yield true;
+      }
+      case CANCEL -> false;
+    };
   }
 
   /**
@@ -314,7 +335,8 @@ public final class VisualizationCustomizeDialog {
     return Optional.ofNullable(accepted.get());
   }
 
-  private static boolean isDirty(VisualizationCustomizePanel panel, VisualizationSettings baseline) {
+  private static boolean isDirty(
+      VisualizationCustomizePanel panel, VisualizationSettings baseline) {
     VisualizationSettings current = panel.toSettings();
     if (baseline == null) {
       return current != null;
@@ -322,27 +344,67 @@ public final class VisualizationCustomizeDialog {
     return !baseline.equals(current);
   }
 
-  /** @return {@code true} if the user chose to discard and close */
-  private static boolean confirmDiscardUnsaved(Window owner) {
+  /**
+   * Unsaved-close layout (platform-stable via ButtonBar order):
+   *
+   * <pre>
+   * [Discard changes]              [Keep editing]  [Save and close]
+   * </pre>
+   *
+   * <p>Destructive action is isolated on the left; Escape → keep editing; Enter → save.
+   */
+  private static UnsavedCloseChoice askUnsavedCloseChoice(Window owner) {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.initOwner(owner);
-    alert.setTitle(SettingsStrings.CUSTOMIZE_DISCARD_TITLE);
+    alert.setTitle(SettingsStrings.CUSTOMIZE_UNSAVED_TITLE);
     alert.setHeaderText(null);
-    alert.setContentText(SettingsStrings.CUSTOMIZE_DISCARD_MESSAGE);
+    alert.setContentText(SettingsStrings.CUSTOMIZE_UNSAVED_MESSAGE);
     alert.getDialogPane().setId(DISCARD_CONFIRM_ID);
 
+    // LEFT = far left; CANCEL_CLOSE = Escape; OK_DONE = Enter / default.
     ButtonType discard =
-        new ButtonType(SettingsStrings.CUSTOMIZE_DISCARD, ButtonBar.ButtonData.OK_DONE);
+        new ButtonType(SettingsStrings.CUSTOMIZE_DISCARD, ButtonBar.ButtonData.LEFT);
     ButtonType keepEditing =
         new ButtonType(SettingsStrings.CUSTOMIZE_KEEP_EDITING, ButtonBar.ButtonData.CANCEL_CLOSE);
-    alert.getButtonTypes().setAll(keepEditing, discard);
+    ButtonType saveAndClose =
+        new ButtonType(SettingsStrings.CUSTOMIZE_SAVE_AND_CLOSE, ButtonBar.ButtonData.OK_DONE);
+    alert.getButtonTypes().setAll(discard, keepEditing, saveAndClose);
 
     var css = SettingsFxController.class.getResource("/css/settings-app.css");
     if (css != null) {
       alert.getDialogPane().getStylesheets().add(css.toExternalForm());
     }
 
-    return alert.showAndWait().filter(discard::equals).isPresent();
+    alert.setOnShown(
+        e -> {
+          Node barNode = alert.getDialogPane().lookup(".button-bar");
+          if (barNode instanceof ButtonBar bar) {
+            // L = LEFT, C = CANCEL_CLOSE, O = OK_DONE; + = flexible gap.
+            bar.setButtonOrder("L+CO");
+          }
+          Button saveButton = (Button) alert.getDialogPane().lookupButton(saveAndClose);
+          if (saveButton != null) {
+            saveButton.getStyleClass().add(Styles.ACCENT);
+          }
+          Button discardButton = (Button) alert.getDialogPane().lookupButton(discard);
+          if (discardButton != null) {
+            discardButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+          }
+        });
+
+    return alert
+        .showAndWait()
+        .map(
+            type -> {
+              if (saveAndClose.equals(type)) {
+                return UnsavedCloseChoice.SAVE;
+              }
+              if (discard.equals(type)) {
+                return UnsavedCloseChoice.DISCARD;
+              }
+              return UnsavedCloseChoice.CANCEL;
+            })
+        .orElse(UnsavedCloseChoice.CANCEL);
   }
 
   private static void showStatus(Label status, String message, boolean error) {

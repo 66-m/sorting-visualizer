@@ -3,6 +3,8 @@ package io.github.compilerstuck.visual;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
+import io.github.compilerstuck.control.config.visual.SphereSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.InstanceData;
@@ -11,7 +13,9 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class Sphere extends Visualization {
+public class Sphere extends Visualization implements ConfigurableVisualization {
+
+  private volatile SphereSettings settings = SphereSettings.defaults();
 
   int radius;
   float squareRoot;
@@ -38,6 +42,18 @@ public class Sphere extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "3D - Sphere";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof SphereSettings s) {
+      settings = s;
+    }
   }
 
   @Override
@@ -131,14 +147,15 @@ public class Sphere extends Visualization {
 
   @Override
   public void update(float delta) {
+    SphereSettings s = settings;
     int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
     int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
     int length = arrayController.getLength();
-    int maxRadius = (int) (min(screenHeight, screenWidth) / 2.3);
+    int maxRadius = (int) (min(screenHeight, screenWidth) * s.globeScale());
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
 
-    aa -= (float) (Math.PI / 10) * delta;
+    aa -= (float) s.rotationSpeedRadPerSec() * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -160,7 +177,8 @@ public class Sphere extends Visualization {
       float z = sinAa * yMapped + cosAa * zb;
 
       // Legacy center (W/2,H/2,centerZ)+offset → world (x, -y, centerZ+z)
-      spheres.set(i, x, -y, centerZ + z, 3, 3, 3, 0, 0, 0, colorsRgb[i]);
+      float ps = (float) s.pointSize();
+      spheres.set(i, x, -y, centerZ + z, ps, ps, ps, 0, 0, 0, colorsRgb[i]);
     }
     spheres.count = drawCount;
 

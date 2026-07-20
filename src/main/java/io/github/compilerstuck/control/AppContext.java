@@ -50,8 +50,7 @@ public final class AppContext {
   private Runnable shutdownHandler;
 
   private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
-  private int stepsPerFrame =
-      SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
+  private int stepsPerFrame = SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
   private boolean perfStatsEnabled;
 
   public AppContext(
@@ -223,6 +222,12 @@ public final class AppContext {
     preferences.save();
   }
 
+  /** Clears all persisted visualization customizations. */
+  public void clearAllVisualizationSettings() {
+    preferences.clearVisualSettings();
+    preferences.save();
+  }
+
   public void setAlgorithmId(String id) {
     preferences.setAlgorithmId(id);
     preferences.save();
@@ -281,8 +286,11 @@ public final class AppContext {
       LOGGER.log(Level.WARNING, "Ignoring array resize to {0} while a sort is active", newSize);
       return;
     }
+    int oldSize = arrayController != null ? arrayController.getLength() : size;
     this.size = newSize;
-    if (colorGradient != null) {
+    // Grow gradient before publish so render never indexes past the LUT; shrink after publish so
+    // stale published values cannot exceed the new LUT during the hand-off.
+    if (newSize >= oldSize && colorGradient != null) {
       colorGradient.updateGradient(newSize);
     }
     if (visualization != null && colorGradient != null) {
@@ -295,6 +303,12 @@ public final class AppContext {
     }
     arrayController.resize(newSize);
     publishArraySnapshot();
+    if (newSize < oldSize && colorGradient != null) {
+      colorGradient.updateGradient(newSize);
+      if (visualization != null) {
+        visualization.updateColorGradient(colorGradient);
+      }
+    }
     preferences.setArraySize(newSize);
     preferences.save();
   }
@@ -373,13 +387,21 @@ public final class AppContext {
   }
 
   /**
-   * Load and resize an image on the caller thread (render thread for GDX texture upload). Validates
-   * nothing about the filesystem; Settings VM does NIO checks first.
+   * Load and resize an image on the render thread (GDX texture dispose/upload). Settings may call
+   * from the JavaFX thread; work is marshalled when needed. Validates nothing about the filesystem;
+   * Settings VM does NIO checks first.
    */
   public boolean loadImageForVisualization(ImageSourceVisualization viz, String path) {
     if (viz == null || imageRepository == null || renderSystem == null) {
       return false;
     }
+    if (renderSystem.isRenderThread()) {
+      return loadImageOnRenderThread(viz, path);
+    }
+    return renderSystem.runOnRenderThreadAndWait(() -> loadImageOnRenderThread(viz, path));
+  }
+
+  private boolean loadImageOnRenderThread(ImageSourceVisualization viz, String path) {
     viz.bindRepository(imageRepository);
     ImageHandle handle =
         imageRepository.load(path, renderSystem.getWidth(), renderSystem.getHeight());

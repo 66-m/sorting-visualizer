@@ -305,6 +305,11 @@ public final class UserPreferences {
     visualSettingsById = VisualizationSettingsCodec.encodeStore(map);
   }
 
+  /** Clears persisted per-visualization settings (all vizs revert to code defaults on load). */
+  public void clearVisualSettings() {
+    visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
+  }
+
   private static int clampSize(int size) {
     return SettingsDefaults.clampArraySize(size);
   }

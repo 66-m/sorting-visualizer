@@ -11,9 +11,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /** Algorithm selection, run-all order dialog, and shuffle. */
@@ -70,17 +72,19 @@ public final class SortingSection {
     Button configure = new Button(SettingsStrings.CONFIGURE_ORDER);
     configure.setId(CONFIGURE_ID);
     configure.getStyleClass().add(Styles.BUTTON_OUTLINED);
-    configure.setDisable(!vm.isRunAll());
     configure.setOnAction(
         e -> {
           if (configure.getScene() != null && configure.getScene().getWindow() != null) {
             RunAllOrderDialog.show(configure.getScene().getWindow(), vm);
           }
         });
+    StackPane configureHost = SettingsControls.wrapForDisabledTooltip(configure);
+    Tooltip configureTip = SettingsControls.disabledTooltip();
+    syncConfigureState(configure, configureHost, configureTip, vm);
 
     Region runAllSpacer = new Region();
     HBox.setHgrow(runAllSpacer, Priority.ALWAYS);
-    HBox runAllControls = new HBox(SettingsLayout.GAP_SM, runAll, runAllSpacer, configure);
+    HBox runAllControls = new HBox(SettingsLayout.GAP_SM, runAll, runAllSpacer, configureHost);
     runAllControls.setAlignment(Pos.CENTER_LEFT);
     VBox runAllField =
         new VBox(
@@ -126,7 +130,7 @@ public final class SortingSection {
                     runAll.setSelected(value);
                   }
                   algorithm.setDisable(value || !vm.isInputsEnabled());
-                  configure.setDisable(!value || !vm.isInputsEnabled());
+                  syncConfigureState(configure, configureHost, configureTip, vm);
                 });
           } else if (AlgorithmViewModel.PROP_SHUFFLE_TYPE.equals(evt.getPropertyName())) {
             ShuffleType type = (ShuffleType) evt.getNewValue();
@@ -141,7 +145,7 @@ public final class SortingSection {
             VmBindings.runFx(
                 () -> {
                   algorithm.setDisable(vm.isRunAll() || !enabled);
-                  configure.setDisable(!vm.isRunAll() || !enabled);
+                  syncConfigureState(configure, configureHost, configureTip, vm);
                 });
           }
         });
@@ -160,5 +164,19 @@ public final class SortingSection {
     VBox root = new VBox(SettingsLayout.GAP_SM, algorithmField, runAllField, shuffleField);
     root.setId(ROOT_ID);
     return root;
+  }
+
+  private static void syncConfigureState(
+      Button configure, StackPane host, Tooltip tip, AlgorithmViewModel vm) {
+    boolean runAll = vm.isRunAll();
+    boolean inputsEnabled = vm.isInputsEnabled();
+    configure.setDisable(!runAll || !inputsEnabled);
+    String reason = null;
+    if (!inputsEnabled) {
+      reason = SettingsStrings.CONFIGURE_ORDER_BUSY_TOOLTIP;
+    } else if (!runAll) {
+      reason = SettingsStrings.CONFIGURE_ORDER_UNAVAILABLE_TOOLTIP;
+    }
+    SettingsControls.setDisabledTooltip(host, tip, reason);
   }
 }

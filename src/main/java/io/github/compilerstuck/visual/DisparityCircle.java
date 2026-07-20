@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.DisparityCircleSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,15 +9,18 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class DisparityCircle extends Visualization {
+public class DisparityCircle extends Visualization implements ConfigurableVisualization {
 
   int radius;
   private final PhaseLut phaseLut = new PhaseLut();
+
+  private volatile DisparityCircleSettings settings = DisparityCircleSettings.defaults();
 
   private float[] scaledSin;
   private float[] scaledCos;
   private int cacheLength = -1;
   private int cacheRadius = -1;
+  private double cacheStartAngle = Double.NaN;
   private float[] xyxy;
   private int[] argb;
 
@@ -26,16 +31,30 @@ public class DisparityCircle extends Visualization {
   }
 
   @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof DisparityCircleSettings s) {
+      settings = s;
+      cacheLength = -1;
+    }
+  }
+
+  @Override
   protected CoordinateSpace coordinateSpace() {
     return CoordinateSpace.WORLD_YUP;
   }
 
-  private void rebuildScaledDirections(int length, int radius) {
-    if (cacheLength == length && cacheRadius == radius) {
+  private void rebuildScaledDirections(int length, int radius, double startAngleDeg) {
+    if (cacheLength == length && cacheRadius == radius && cacheStartAngle == startAngleDeg) {
       return;
     }
     cacheLength = length;
     cacheRadius = radius;
+    cacheStartAngle = startAngleDeg;
 
     if (scaledSin == null || scaledSin.length < length) {
       scaledSin = new float[length];
@@ -45,20 +64,26 @@ public class DisparityCircle extends Visualization {
     phaseLut.ensure(length, 1.0);
     float[] sin = phaseLut.sin();
     float[] cos = phaseLut.cos();
+    double rad = Math.toRadians(startAngleDeg);
+    float cosA = (float) Math.cos(rad);
+    float sinA = (float) Math.sin(rad);
     for (int i = 0; i < length; i++) {
-      scaledSin[i] = radius * sin[i];
-      scaledCos[i] = radius * cos[i];
+      float x = radius * sin[i];
+      float y = radius * cos[i];
+      scaledSin[i] = x * cosA - y * sinA;
+      scaledCos[i] = x * sinA + y * cosA;
     }
   }
 
   @Override
   public void update(float delta) {
+    DisparityCircleSettings s = settings;
     int length = arrayController.getLength();
-    radius = (int) (Math.min(screenHeight, screenWidth) / 2.4);
+    radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
 
-    rebuildScaledDirections(length, radius);
+    rebuildScaledDirections(length, radius, s.startAngleDeg());
 
     if (xyxy == null || xyxy.length < length * 4) {
       xyxy = new float[length * 4];
@@ -93,6 +118,7 @@ public class DisparityCircle extends Visualization {
       xyxy[o + 3] = y;
       argb[i] = color.getRGB();
     }
+    rs.strokeWeight((float) s.lineThickness());
     rs.strokeLines(xyxy, argb, length);
   }
 }

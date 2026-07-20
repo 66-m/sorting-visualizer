@@ -3,6 +3,8 @@ package io.github.compilerstuck.visual;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
+import io.github.compilerstuck.control.config.visual.CubicLinesSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.InstanceData;
@@ -11,7 +13,9 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class CubicLines extends Visualization {
+public class CubicLines extends Visualization implements ConfigurableVisualization {
+
+  private volatile CubicLinesSettings settings = CubicLinesSettings.defaults();
 
   private static final float SIN_TILT = (float) Math.sin(-10);
   private static final float COS_TILT = (float) Math.cos(-10);
@@ -40,6 +44,19 @@ public class CubicLines extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "3D - Cubic Lines";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof CubicLinesSettings s) {
+      settings = s;
+      // lattice depends on scale
+    }
   }
 
   @Override
@@ -114,13 +131,14 @@ public class CubicLines extends Visualization {
 
   @Override
   public void update(float delta) {
+    CubicLinesSettings s = settings;
     int screenMin = min(screenHeight, screenWidth);
-    radius = (int) (screenMin / 3.5);
+    radius = (int) (screenMin / s.sceneScaleDivisor());
     float centerY = (float) screenHeight / 2 - (int) (screenMin / 10);
     float centerZ = -(int) (screenMin / 10);
     float centerX = (float) screenWidth / 2;
 
-    aa -= (float) (Math.PI / 10) * delta;
+    aa -= (float) s.rotationSpeedRadPerSec() * delta;
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
@@ -161,7 +179,8 @@ public class CubicLines extends Visualization {
     for (int i = 0; i < drawCount; i++) {
       int target = arrayController.get(i);
       if (i == target || target < 0 || target >= drawCount) {
-        points.set(pointCount, xCords[i], yCords[i], zCords[i], 2, 2, 2, 0, 0, 0, colorsRgb[i]);
+        float ms = (float) s.markerSize();
+        points.set(pointCount, xCords[i], yCords[i], zCords[i], ms, ms, ms, 0, 0, 0, colorsRgb[i]);
         pointCount++;
       } else {
         int o = lineCount * 6;
@@ -171,13 +190,14 @@ public class CubicLines extends Visualization {
         xyzxyz[o + 3] = xCords[target];
         xyzxyz[o + 4] = yCords[target];
         xyzxyz[o + 5] = zCords[target];
-        lineArgb[lineCount] = colorsRgb[i];
+        lineArgb[lineCount] = VisColors.withAlpha(colorsRgb[i], s.lineOpacity());
         lineCount++;
       }
     }
     points.count = pointCount;
 
     rs.begin3D();
+    rs.strokeWeight(1f);
     rs.strokeLines3D(xyzxyz, lineArgb, lineCount);
     rs.drawSpheres(points);
     rs.end3D();

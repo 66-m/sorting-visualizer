@@ -107,6 +107,17 @@ public interface RenderSystem {
       int length,
       boolean horizontal,
       int contentRevision) {
+    drawImageRemap(image, stripIndices, stripHighlight, length, horizontal, contentRevision, 1f);
+  }
+
+  default void drawImageRemap(
+      ImageHandle image,
+      int[] stripIndices,
+      boolean[] stripHighlight,
+      int length,
+      boolean horizontal,
+      int contentRevision,
+      float highlightStrength) {
     if (image == null || stripIndices == null || length <= 0) {
       return;
     }
@@ -114,7 +125,8 @@ public interface RenderSystem {
     int h = image.height();
     int[] src = image.argb();
     int[] dst = new int[w * h];
-    ImageStripRemap.remap(src, dst, w, h, stripIndices, stripHighlight, length, horizontal);
+    ImageStripRemap.remap(
+        src, dst, w, h, stripIndices, stripHighlight, length, horizontal, highlightStrength);
     drawArgbPixels(dst, w, h, contentRevision);
   }
 
@@ -142,5 +154,18 @@ public interface RenderSystem {
    */
   default void strokeLines3D(float[] xyzxyz, int[] argb, int count, boolean depthTest) {
     strokeLines3D(xyzxyz, argb, count);
+  }
+
+  /** {@code true} when the caller is already on the thread that owns GL / image GPU resources. */
+  default boolean isRenderThread() {
+    return true;
+  }
+
+  /**
+   * Runs {@code action} on the render thread and waits for completion. Headless/fake
+   * implementations run immediately on the caller thread.
+   */
+  default boolean runOnRenderThreadAndWait(java.util.function.BooleanSupplier action) {
+    return action != null && action.getAsBoolean();
   }
 }

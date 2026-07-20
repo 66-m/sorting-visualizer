@@ -35,6 +35,10 @@ import io.github.compilerstuck.control.render.asset.ImageRepository;
 import io.github.compilerstuck.control.render.asset.ImageStripRemap;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,6 +113,7 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   private boolean modelBatchOpen;
   private boolean modelBatchEndedThisFrame;
   private ShapeRenderer.ShapeType shapeType;
+  private volatile Thread renderThread;
 
   public GdxRenderSystem(AppAssets assets) {
     this.assets = Objects.requireNonNull(assets, "assets");
@@ -266,6 +271,7 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
 
   @Override
   public void beginFrame() {
+    renderThread = Thread.currentThread();
     endShapes();
     endSprites();
     pipeline.beginFrame();
@@ -273,6 +279,42 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     modelBatchEndedThisFrame = false;
     frameStats.reset();
     syncEngineScene(getWidth(), getHeight());
+  }
+
+  @Override
+  public boolean isRenderThread() {
+    Thread t = renderThread;
+    return t != null && Thread.currentThread() == t;
+  }
+
+  @Override
+  public boolean runOnRenderThreadAndWait(BooleanSupplier action) {
+    if (action == null) {
+      return false;
+    }
+    if (isRenderThread() || Gdx.app == null) {
+      return action.getAsBoolean();
+    }
+    AtomicBoolean result = new AtomicBoolean(false);
+    CountDownLatch latch = new CountDownLatch(1);
+    Gdx.app.postRunnable(
+        () -> {
+          try {
+            result.set(action.getAsBoolean());
+          } finally {
+            latch.countDown();
+          }
+        });
+    try {
+      if (!latch.await(60, TimeUnit.SECONDS)) {
+        LOGGER.log(Level.WARNING, "Timed out waiting for render-thread image work");
+        return false;
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return false;
+    }
+    return result.get();
   }
 
   @Override
@@ -479,6 +521,18 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
       int length,
       boolean horizontal,
       int contentRevision) {
+    drawImageRemap(image, stripIndices, stripHighlight, length, horizontal, contentRevision, 1f);
+  }
+
+  @Override
+  public void drawImageRemap(
+      ImageHandle image,
+      int[] stripIndices,
+      boolean[] stripHighlight,
+      int length,
+      boolean horizontal,
+      int contentRevision,
+      float highlightStrength) {
     if (image == null || stripIndices == null || length <= 0) {
       return;
     }
@@ -496,7 +550,7 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
       if (uploaded) {
         frameStats.pixelUploads++;
       }
-      imageRemapRenderer.draw(source, horizontal, length);
+      imageRemapRenderer.draw(source, horizontal, length, highlightStrength);
       return;
     }
     // CPU fallback (no GL30 / missing source texture)
@@ -508,7 +562,15 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     }
     if (imageRemapRevision != contentRevision) {
       ImageStripRemap.remap(
-          image.argb(), imageRemapScratch, w, h, stripIndices, stripHighlight, length, horizontal);
+          image.argb(),
+          imageRemapScratch,
+          w,
+          h,
+          stripIndices,
+          stripHighlight,
+          length,
+          horizontal,
+          highlightStrength);
       imageRemapRevision = contentRevision;
     }
     drawArgbPixels(imageRemapScratch, w, h, contentRevision);

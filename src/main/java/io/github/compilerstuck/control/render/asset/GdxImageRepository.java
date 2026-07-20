@@ -17,11 +17,18 @@ public final class GdxImageRepository implements ImageRepository {
 
   @Override
   public ImageHandle load(String path, int targetW, int targetH) {
+    return loadInternal(path, Math.max(1, targetW), Math.max(1, targetH), false);
+  }
+
+  @Override
+  public ImageHandle loadContained(String path, int maxW, int maxH) {
+    return loadInternal(path, Math.max(1, maxW), Math.max(1, maxH), true);
+  }
+
+  private ImageHandle loadInternal(String path, int targetW, int targetH, boolean contain) {
     if (path == null || path.isBlank()) {
       return null;
     }
-    int w = Math.max(1, targetW);
-    int h = Math.max(1, targetH);
     try {
       FileHandle handle = Gdx.files.absolute(path);
       if (!handle.exists()) {
@@ -31,8 +38,17 @@ public final class GdxImageRepository implements ImageRepository {
         return null;
       }
       Pixmap loaded = new Pixmap(handle);
+      int srcW = Math.max(1, loaded.getWidth());
+      int srcH = Math.max(1, loaded.getHeight());
+      int w = targetW;
+      int h = targetH;
+      if (contain) {
+        double scale = Math.min(targetW / (double) srcW, targetH / (double) srcH);
+        w = Math.max(1, (int) Math.round(srcW * scale));
+        h = Math.max(1, (int) Math.round(srcH * scale));
+      }
       Pixmap resized = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-      resized.drawPixmap(loaded, 0, 0, loaded.getWidth(), loaded.getHeight(), 0, 0, w, h);
+      resized.drawPixmap(loaded, 0, 0, srcW, srcH, 0, 0, w, h);
       loaded.dispose();
       int[] argb = copyPixmapToArgb(resized);
       resized.dispose();

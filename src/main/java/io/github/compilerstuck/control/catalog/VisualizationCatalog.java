@@ -114,6 +114,11 @@ public final class VisualizationCatalog {
             VisualConstraints.NONE,
             (a, g, s, rs) -> new Phyllotaxis(a, g, s, rs)),
         new VisualizationDescriptor(
+            "mosaic-squares",
+            "Mosaic Squares",
+            VisualConstraints.SQUARE,
+            (a, g, s, rs) -> new MosaicSquares(a, g, s, rs)),
+        new VisualizationDescriptor(
             "image-vertical",
             "Image - Vertical Sorting",
             VisualConstraints.IMAGE,
@@ -171,12 +176,7 @@ public final class VisualizationCatalog {
             "disparity-plane",
             "3D - Disparity Plane",
             VisualConstraints.SQUARE,
-            (a, g, s, rs) -> new DisparityPlane(a, g, s, rs)),
-        new VisualizationDescriptor(
-            "mosaic-squares",
-            "Mosaic Squares",
-            VisualConstraints.SQUARE,
-            (a, g, s, rs) -> new MosaicSquares(a, g, s, rs)));
+            (a, g, s, rs) -> new DisparityPlane(a, g, s, rs)));
   }
 
   public static VisualizationDescriptor findById(String id) {

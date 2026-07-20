@@ -1,5 +1,7 @@
 package io.github.compilerstuck.visual;
 
+import io.github.compilerstuck.control.config.visual.HoopsSettings;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayModel;
 import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
@@ -7,9 +9,11 @@ import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 
-public class Hoops extends Visualization {
+public class Hoops extends Visualization implements ConfigurableVisualization {
 
   int radius;
+
+  private volatile HoopsSettings settings = HoopsSettings.defaults();
 
   private int[] radii;
   private int cacheLength = -1;
@@ -21,6 +25,19 @@ public class Hoops extends Visualization {
       ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
     super(arrayController, colorGradient, sound, rs);
     name = "Hoops";
+  }
+
+  @Override
+  public VisualizationSettings currentSettings() {
+    return settings;
+  }
+
+  @Override
+  public void applySettings(VisualizationSettings next) {
+    if (next instanceof HoopsSettings s) {
+      settings = s;
+      cacheLength = -1;
+    }
   }
 
   @Override
@@ -44,8 +61,9 @@ public class Hoops extends Visualization {
 
   @Override
   public void update(float delta) {
+    HoopsSettings s = settings;
     int length = arrayController.getLength();
-    int maxRadius = (int) (Math.min(screenHeight, screenWidth) / 1.1);
+    int maxRadius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
     rebuildRadii(length, maxRadius);
