@@ -37,6 +37,7 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   private final OrthographicCamera camWorld2d = new OrthographicCamera();
   private final OrthographicCamera camOverlay = new OrthographicCamera();
   private final ScreenViewport viewport2d = new ScreenViewport(camWorld2d);
+  private final ScreenViewport viewportOverlay = new ScreenViewport(camOverlay);
   private final PerspectiveCamera cam3d = new PerspectiveCamera();
 
   private final FrameStats frameStats = new FrameStats();
@@ -70,6 +71,10 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     return viewport2d;
   }
 
+  ScreenViewport viewportOverlay() {
+    return viewportOverlay;
+  }
+
   PerspectiveCamera cam3d() {
     return cam3d;
   }
@@ -96,6 +101,11 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
 
   /** Full-framebuffer viewport for overlay draws (Y-down camera). */
   void applyOverlayViewport() {
+    viewportOverlay.apply(false);
+  }
+
+  /** Full-framebuffer viewport for World3D draws (after a 2D/overlay {@code apply}). */
+  void applyWorld3DViewport() {
     int w = Math.max(1, getWidth());
     int h = Math.max(1, getHeight());
     Gdx.gl.glViewport(0, 0, w, h);
@@ -128,9 +138,10 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     if (width <= 0 || height <= 0) {
       return;
     }
+    // ScreenViewport owns camWorld2d (Y-up); do not also call setToOrtho on it.
     viewport2d.update(width, height, true);
-    camWorld2d.setToOrtho(false, width, height);
-    camWorld2d.update();
+    // Overlay is Y-down HUD space: sync ScreenViewport bounds, then re-assert Y-down.
+    viewportOverlay.update(width, height, true);
     camOverlay.setToOrtho(true, width, height);
     camOverlay.update();
     cam3d.viewportWidth = width;
@@ -216,7 +227,6 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   @Override
   public void endFrame() {
     endWorld();
-    Gdx.gl.glLineWidth(1f);
     frameStats.frameMs = Gdx.graphics.getDeltaTime() * 1000f;
     frameStats.fps = Gdx.graphics.getFramesPerSecond();
     frameTimeWindow.add(frameStats.frameMs);

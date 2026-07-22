@@ -123,8 +123,30 @@ final class GdxWorld2DPass implements Disposable {
     if (count <= 0) {
       return;
     }
+    OrthographicCamera camWorld2d = host.camWorld2d();
+    FrameStats frameStats = host.frameStats();
+    if (geometryBatch2D != null) {
+      endShapes();
+      endSprites();
+      enterWorld2DPass();
+      host.viewport2d().apply();
+      if (geometryBatch2D.drawLines(xyxy, argb, count, strokeWeightPx, camWorld2d.combined)) {
+        frameStats.geo2dDraws++;
+        frameStats.geo2dPrimitives += count;
+      }
+      return;
+    }
+    // Legacy ShapeRenderer: rectLine for thick strokes (glLineWidth is not portable).
+    if (strokeWeightPx > GeometryBatch2D.HAIRLINE_MAX_PX) {
+      beginShapes(ShapeRenderer.ShapeType.Filled);
+      for (int i = 0; i < count; i++) {
+        setShapeColor(argb[i]);
+        int o = i * 4;
+        shapes.rectLine(xyxy[o], xyxy[o + 1], xyxy[o + 2], xyxy[o + 3], strokeWeightPx);
+      }
+      return;
+    }
     beginShapes(ShapeRenderer.ShapeType.Line);
-    Gdx.gl.glLineWidth(strokeWeightPx);
     for (int i = 0; i < count; i++) {
       setShapeColor(argb[i]);
       int o = i * 4;
@@ -151,7 +173,6 @@ final class GdxWorld2DPass implements Disposable {
       return;
     }
     beginShapes(ShapeRenderer.ShapeType.Line);
-    Gdx.gl.glLineWidth(strokeWeightPx);
     for (int i = 0; i < count; i++) {
       setShapeColor(argb[i]);
       int o = i * 4;

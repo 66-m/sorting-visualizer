@@ -51,6 +51,7 @@ public final class InstanceRenderer3D implements Disposable {
     if (Gdx.gl30 == null) {
       throw new GdxRuntimeException("InstanceRenderer3D requires GL30");
     }
+    boolean prevPedantic = ShaderProgram.pedantic;
     ShaderProgram.pedantic = false;
     String prevVert = ShaderProgram.prependVertexCode;
     String prevFrag = ShaderProgram.prependFragmentCode;
@@ -61,6 +62,7 @@ public final class InstanceRenderer3D implements Disposable {
     } finally {
       ShaderProgram.prependVertexCode = prevVert;
       ShaderProgram.prependFragmentCode = prevFrag;
+      ShaderProgram.pedantic = prevPedantic;
     }
     if (!shader.isCompiled()) {
       throw new GdxRuntimeException("instance_lit shader: " + shader.getLog());

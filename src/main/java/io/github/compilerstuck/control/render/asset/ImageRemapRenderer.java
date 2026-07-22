@@ -25,6 +25,7 @@ public final class ImageRemapRenderer implements Disposable {
   private boolean lastCallUploaded;
 
   public ImageRemapRenderer() {
+    boolean prevPedantic = ShaderProgram.pedantic;
     ShaderProgram.pedantic = false;
     String prevV = ShaderProgram.prependVertexCode;
     String prevF = ShaderProgram.prependFragmentCode;
@@ -38,6 +39,7 @@ public final class ImageRemapRenderer implements Disposable {
     } finally {
       ShaderProgram.prependVertexCode = prevV;
       ShaderProgram.prependFragmentCode = prevF;
+      ShaderProgram.pedantic = prevPedantic;
     }
     if (!shader.isCompiled()) {
       throw new GdxRuntimeException("image_remap: " + shader.getLog());

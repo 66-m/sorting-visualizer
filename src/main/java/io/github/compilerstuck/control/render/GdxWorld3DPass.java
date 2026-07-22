@@ -162,6 +162,7 @@ final class GdxWorld3DPass implements Disposable {
     if (!host.pipeline().enterWorld3D()) {
       return;
     }
+    host.applyWorld3DViewport();
     Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
     Gdx.gl.glEnable(GL20.GL_BLEND);
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -266,7 +267,16 @@ final class GdxWorld3DPass implements Disposable {
     }
     try {
       if (lineRenderer != null) {
-        if (lineRenderer.draw(xyzxyz, argb, count, world2d.strokeWeightPx(), cam3d.combined)) {
+        float screenH = Math.max(1f, host.getHeight());
+        float worldPerPx = sceneH / screenH;
+        if (lineRenderer.draw(
+            xyzxyz,
+            argb,
+            count,
+            world2d.strokeWeightPx(),
+            cam3d.combined,
+            cam3d.position,
+            worldPerPx)) {
           frameStats.lineDraws++;
         }
         return;
@@ -280,7 +290,6 @@ final class GdxWorld3DPass implements Disposable {
       shapes.begin(ShapeRenderer.ShapeType.Line);
       frameStats.shapeBegins++;
       frameStats.lineDraws++;
-      Gdx.gl.glLineWidth(world2d.strokeWeightPx());
       for (int i = 0; i < count; i++) {
         world2d.setShapeColor(argb[i]);
         int o = i * 6;
