@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.NumberPlotSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -17,14 +16,13 @@ public final class NumberPlotCustomizePanel implements VisualizationCustomizePan
           NumberPlotSettings.FONT_SIZE_MAX,
           NumberPlotSettings.DEFAULT_FONT_SIZE);
   private final Label fontSizeValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
     CustomizePanelSupport.configureSlider(fontSize, false);
     CustomizePanelSupport.bindValueLabel(fontSize, fontSizeValue, v -> String.format("%.0f", v));
-    bindDraftChanges();
+    draft.bind(fontSize.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -32,22 +30,19 @@ public final class NumberPlotCustomizePanel implements VisualizationCustomizePan
             CustomizePanelSupport.sliderRow(
                 "Font size", fontSize, fontSizeValue, NumberPlotSettings.DEFAULT_FONT_SIZE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     NumberPlotSettings s =
-        settings instanceof NumberPlotSettings c ? c : NumberPlotSettings.defaults();
-    loading = true;
-    try {
-      fontSize.setValue(s.fontSize());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, NumberPlotSettings.class, NumberPlotSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          fontSize.setValue(s.fontSize());
+        });
   }
 
   @Override
@@ -62,16 +57,6 @@ public final class NumberPlotCustomizePanel implements VisualizationCustomizePan
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    fontSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

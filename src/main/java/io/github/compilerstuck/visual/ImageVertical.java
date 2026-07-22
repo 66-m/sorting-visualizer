@@ -13,8 +13,8 @@ public class ImageVertical extends AbstractImageVisualization implements Configu
   private volatile ImageVerticalSettings settings = ImageVerticalSettings.defaults();
 
   public ImageVertical(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Image - Vertical Sorting";
   }
 

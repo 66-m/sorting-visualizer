@@ -1,9 +1,12 @@
 package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import atlantafx.base.theme.Styles;
+import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import io.github.compilerstuck.control.ui.settingsfx.SettingsStrings;
 import java.util.function.DoubleFunction;
+import java.util.function.Supplier;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -162,6 +165,55 @@ public final class CustomizePanelSupport {
     Runnable update = () -> label.setText(format.apply(slider.getValue()));
     update.run();
     slider.valueProperty().addListener((obs, old, value) -> update.run());
+  }
+
+  /** Wraps section(s) in the standard customize-panel root. */
+  public static VBox panelRoot(Node... sections) {
+    VBox root = new VBox(SettingsLayout.GAP_MD, sections);
+    root.getStyleClass().add("customize-panel");
+    root.setFillWidth(true);
+    return root;
+  }
+
+  /** Guards {@code load()} so draft-changed listeners do not fire. */
+  public static void whileLoading(DraftSession session, Runnable action) {
+    session.loading = true;
+    try {
+      action.run();
+    } finally {
+      session.loading = false;
+    }
+  }
+
+  /**
+   * Casts {@code settings} to {@code type}, or returns {@code defaults} when the runtime type does
+   * not match.
+   */
+  public static <S extends VisualizationSettings> S castOrDefaults(
+      VisualizationSettings settings, Class<S> type, Supplier<S> defaults) {
+    return type.isInstance(settings) ? type.cast(settings) : defaults.get();
+  }
+
+  /** Shared draft-change listener + load guard for customize panels. */
+  public static final class DraftSession {
+    private Runnable onDraftChanged = () -> {};
+    private boolean loading;
+
+    public void setListener(Runnable listener) {
+      onDraftChanged = listener != null ? listener : () -> {};
+    }
+
+    public void bind(ObservableValue<?>... values) {
+      for (ObservableValue<?> value : values) {
+        value.addListener((obs, oldValue, newValue) -> fireIfNotLoading());
+      }
+    }
+
+    private void fireIfNotLoading() {
+      if (!loading) {
+        onDraftChanged.run();
+      }
+    }
   }
 
   public record FieldRow(Node label, Node control, Node value, Node reset) {}

@@ -2,7 +2,7 @@ package io.github.compilerstuck.control;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.config.ShuffleStrategy;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.model.ArrayController;
@@ -210,7 +210,7 @@ class ArrayModelAndStrategyTest {
     // Almost-sorted needs length >= 10 so swaps = length/10 >= 1
     ArrayController model = new ArrayController(100);
     int delays = countDelays(model, strategyFor(type));
-    assertEquals(MainControllerConfig.SHUFFLE_VISUAL_STEPS, delays);
+    assertEquals(AppConfig.SHUFFLE_VISUAL_STEPS, delays);
   }
 
   @ParameterizedTest(name = "setShuffleType({0}) wires the correct strategy")

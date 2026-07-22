@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.ScatterPlotSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -17,14 +16,13 @@ public final class ScatterPlotCustomizePanel implements VisualizationCustomizePa
           ScatterPlotSettings.POINT_SIZE_MAX,
           ScatterPlotSettings.DEFAULT_POINT_SIZE);
   private final Label pointSizeValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
     CustomizePanelSupport.configureSlider(pointSize, false);
     CustomizePanelSupport.bindValueLabel(pointSize, pointSizeValue, v -> String.format("%.1f", v));
-    bindDraftChanges();
+    draft.bind(pointSize.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -32,22 +30,19 @@ public final class ScatterPlotCustomizePanel implements VisualizationCustomizePa
             CustomizePanelSupport.sliderRow(
                 "Point size", pointSize, pointSizeValue, ScatterPlotSettings.DEFAULT_POINT_SIZE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     ScatterPlotSettings s =
-        settings instanceof ScatterPlotSettings c ? c : ScatterPlotSettings.defaults();
-    loading = true;
-    try {
-      pointSize.setValue(s.pointSize());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, ScatterPlotSettings.class, ScatterPlotSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          pointSize.setValue(s.pointSize());
+        });
   }
 
   @Override
@@ -62,16 +57,6 @@ public final class ScatterPlotCustomizePanel implements VisualizationCustomizePa
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    pointSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

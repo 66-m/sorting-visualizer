@@ -38,8 +38,8 @@ public class DisparityPlane extends Visualization implements ConfigurableVisuali
   private ColorGradient cachedGradient;
 
   public DisparityPlane(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Disparity Plane";
   }
 
@@ -85,7 +85,7 @@ public class DisparityPlane extends Visualization implements ConfigurableVisuali
   }
 
   private void ensureBarHeightsAndColors(int drawCount, int length, int quarterHeight) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -96,8 +96,8 @@ public class DisparityPlane extends Visualization implements ConfigurableVisuali
       return;
     }
     for (int i = 0; i < drawCount; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
       barHeights[i] =
           quarterHeight
@@ -110,7 +110,7 @@ public class DisparityPlane extends Visualization implements ConfigurableVisuali
                                   Math.min(Math.abs(i - value), Math.abs(i - length - value)),
                                   Math.abs(i + length - value))));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
@@ -130,7 +130,7 @@ public class DisparityPlane extends Visualization implements ConfigurableVisuali
     DisparityPlaneSettings s = settings;
     int screenMin = Math.min(screenHeight, screenWidth);
     int radius = (int) (screenMin * s.planeScale());
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     float centerY = (float) (screenHeight / 2.5);
     float centerZ = -(int) (screenMin / 10);
     float centerX = (float) screenWidth / 2;

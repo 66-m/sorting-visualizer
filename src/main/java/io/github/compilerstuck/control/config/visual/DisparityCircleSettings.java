@@ -18,9 +18,9 @@ public record DisparityCircleSettings(
   public static final double START_ANGLE_DEG_MAX = 360.0;
 
   public DisparityCircleSettings {
-    radiusScale = clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
-    lineThickness = clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
-    startAngleDeg = clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    lineThickness = Numbers.clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
+    startAngleDeg = Numbers.clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
   }
 
   public static DisparityCircleSettings defaults() {
@@ -31,9 +31,5 @@ public record DisparityCircleSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

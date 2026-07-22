@@ -103,11 +103,6 @@ public final class SnapshotPublisher {
     }
 
     @Override
-    public void addSleepTime(double sleepTime) {
-      throw unsupported();
-    }
-
-    @Override
     public void addRealTime(double timeNs) {
       throw unsupported();
     }
@@ -129,11 +124,6 @@ public final class SnapshotPublisher {
 
     @Override
     public long getWritesAux() {
-      return 0;
-    }
-
-    @Override
-    public double getDelay() {
       return 0;
     }
 

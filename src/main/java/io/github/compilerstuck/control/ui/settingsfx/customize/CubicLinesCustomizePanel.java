@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.CubicLinesSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -35,8 +34,7 @@ public final class CubicLinesCustomizePanel implements VisualizationCustomizePan
           CubicLinesSettings.LINE_OPACITY_MAX,
           CubicLinesSettings.DEFAULT_LINE_OPACITY);
   private final Label lineOpacityValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -52,7 +50,11 @@ public final class CubicLinesCustomizePanel implements VisualizationCustomizePan
         markerSize, markerSizeValue, v -> String.format("%.1f", v));
     CustomizePanelSupport.bindValueLabel(
         lineOpacity, lineOpacityValue, v -> String.format("%d", Math.round(v)));
-    bindDraftChanges();
+    draft.bind(
+        rotationSpeedRadPerSec.valueProperty(),
+        sceneScaleDivisor.valueProperty(),
+        markerSize.valueProperty(),
+        lineOpacity.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -75,25 +77,22 @@ public final class CubicLinesCustomizePanel implements VisualizationCustomizePan
                 lineOpacityValue,
                 CubicLinesSettings.DEFAULT_LINE_OPACITY));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     CubicLinesSettings s =
-        settings instanceof CubicLinesSettings c ? c : CubicLinesSettings.defaults();
-    loading = true;
-    try {
-      rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
-      sceneScaleDivisor.setValue(s.sceneScaleDivisor());
-      markerSize.setValue(s.markerSize());
-      lineOpacity.setValue(s.lineOpacity());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, CubicLinesSettings.class, CubicLinesSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
+          sceneScaleDivisor.setValue(s.sceneScaleDivisor());
+          markerSize.setValue(s.markerSize());
+          lineOpacity.setValue(s.lineOpacity());
+        });
   }
 
   @Override
@@ -112,19 +111,6 @@ public final class CubicLinesCustomizePanel implements VisualizationCustomizePan
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    rotationSpeedRadPerSec.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    sceneScaleDivisor.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    markerSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    lineOpacity.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

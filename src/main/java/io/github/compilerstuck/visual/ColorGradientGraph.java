@@ -19,8 +19,8 @@ public class ColorGradientGraph extends Visualization implements ConfigurableVis
   private int[] argb;
 
   public ColorGradientGraph(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Color Gradient Graph";
   }
 
@@ -43,7 +43,7 @@ public class ColorGradientGraph extends Visualization implements ConfigurableVis
 
   @Override
   public void update(float delta) {
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     float slotWidth = (float) screenWidth / length;
 
     if (xywh == null || xywh.length < length * 4) {
@@ -52,10 +52,9 @@ public class ColorGradientGraph extends Visualization implements ConfigurableVis
     }
 
     for (int i = 0; i < length; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

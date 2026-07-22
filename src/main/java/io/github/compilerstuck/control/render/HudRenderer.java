@@ -1,7 +1,7 @@
 package io.github.compilerstuck.control.render;
 
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.config.Brand;
-import io.github.compilerstuck.control.config.MainControllerConfig;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.SortingStateManager;
 import io.github.compilerstuck.control.ui.TimeEstimateFormat;
@@ -56,17 +56,7 @@ public final class HudRenderer {
     if (!labelsInitialized || width != cachedLayoutWidth) {
       return false;
     }
-    String operation = stateManager.getCurrentOperation();
-    int sortedPct = (int) (arrayController.getSortedPercentage() * 100);
-    int segments = arrayController.getSegments();
-    long comparisons = arrayController.getComparisons();
-    long swaps = arrayController.getSwaps();
-    long writes = arrayController.getWrites();
-    long writesAux = arrayController.getWritesAux();
-    int length = arrayController.getLength();
-    String realTime = TimeEstimateFormat.format(arrayController.getRealTime());
-    return sameKeys(
-        operation, sortedPct, segments, comparisons, swaps, writes, writesAux, length, realTime);
+    return sameKeys(readMetrics(stateManager, arrayController));
   }
 
   private void ensureLayout(int width) {
@@ -74,10 +64,9 @@ public final class HudRenderer {
       return;
     }
     cachedLayoutWidth = width;
-    cachedTextSize = MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_Y_OFFSET, width);
-    cachedTextX = MainControllerConfig.scaleToWidth(MainControllerConfig.TEXT_X_OFFSET, width);
-    cachedLineHeight =
-        MainControllerConfig.scaleToWidth(MainControllerConfig.LINE_HEIGHT_OFFSET, width);
+    cachedTextSize = AppConfig.scaleToWidth(AppConfig.TEXT_Y_OFFSET, width);
+    cachedTextX = AppConfig.scaleToWidth(AppConfig.TEXT_X_OFFSET, width);
+    cachedLineHeight = AppConfig.scaleToWidth(AppConfig.LINE_HEIGHT_OFFSET, width);
     for (int i = 0; i < LABEL_COUNT; i++) {
       labelYs[i] = cachedLineHeight * (i + 1);
     }
@@ -87,70 +76,57 @@ public final class HudRenderer {
 
   private void rebuildLabelsIfDirty(
       SortingStateManager stateManager, ArrayController arrayController) {
-    String operation = stateManager.getCurrentOperation();
-    int sortedPct = (int) (arrayController.getSortedPercentage() * 100);
-    int segments = arrayController.getSegments();
-    long comparisons = arrayController.getComparisons();
-    long swaps = arrayController.getSwaps();
-    long writes = arrayController.getWrites();
-    long writesAux = arrayController.getWritesAux();
-    int length = arrayController.getLength();
-    String realTime = TimeEstimateFormat.format(arrayController.getRealTime());
+    Metrics m = readMetrics(stateManager, arrayController);
 
-    if (labelsInitialized
-        && sameKeys(
-            operation,
-            sortedPct,
-            segments,
-            comparisons,
-            swaps,
-            writes,
-            writesAux,
-            length,
-            realTime)) {
+    if (labelsInitialized && sameKeys(m)) {
       return;
     }
 
-    cachedOperation = operation;
-    cachedSortedPct = sortedPct;
-    cachedSegments = segments;
-    cachedComparisons = comparisons;
-    cachedSwaps = swaps;
-    cachedWrites = writes;
-    cachedWritesAux = writesAux;
-    cachedLength = length;
-    cachedRealTimeFormatted = realTime;
+    cachedOperation = m.operation;
+    cachedSortedPct = m.sortedPct;
+    cachedSegments = m.segments;
+    cachedComparisons = m.comparisons;
+    cachedSwaps = m.swaps;
+    cachedWrites = m.writes;
+    cachedWritesAux = m.writesAux;
+    cachedLength = m.length;
+    cachedRealTimeFormatted = m.realTime;
 
-    labels[0] = operation;
-    labels[1] = buildSortedLine(sortedPct, segments);
-    labels[2] = formatCount(comparisons, " Comparisons");
-    labels[3] = buildRealTimeLine(realTime);
-    labels[4] = formatCount(swaps, " Swaps");
-    labels[5] = formatCount(writes, " Writes to main array");
-    labels[6] = formatCount(writesAux, " Writes to auxiliary array");
-    labels[7] = length + " Elements";
+    labels[0] = m.operation;
+    labels[1] = buildSortedLine(m.sortedPct, m.segments);
+    labels[2] = formatCount(m.comparisons, " Comparisons");
+    labels[3] = buildRealTimeLine(m.realTime);
+    labels[4] = formatCount(m.swaps, " Swaps");
+    labels[5] = formatCount(m.writes, " Writes to main array");
+    labels[6] = formatCount(m.writesAux, " Writes to auxiliary array");
+    labels[7] = m.length + " Elements";
     labelsInitialized = true;
   }
 
-  private boolean sameKeys(
-      String operation,
-      int sortedPct,
-      int segments,
-      long comparisons,
-      long swaps,
-      long writes,
-      long writesAux,
-      int length,
-      String realTime) {
-    return sortedPct == cachedSortedPct
-        && segments == cachedSegments
-        && comparisons == cachedComparisons
-        && swaps == cachedSwaps
-        && writes == cachedWrites
-        && writesAux == cachedWritesAux
-        && length == cachedLength
-        && Objects.equals(operation, cachedOperation)
-        && Objects.equals(realTime, cachedRealTimeFormatted);
+  private static Metrics readMetrics(
+      SortingStateManager stateManager, ArrayController arrayController) {
+    return new Metrics(
+        stateManager.getCurrentOperation(),
+        (int) (arrayController.getSortedPercentage() * 100),
+        arrayController.getSegments(),
+        arrayController.getComparisons(),
+        arrayController.getSwaps(),
+        arrayController.getWrites(),
+        arrayController.getWritesAux(),
+        arrayController.getLength(),
+        TimeEstimateFormat.format(arrayController.getRealTime()));
+  }
+
+  private boolean sameKeys(Metrics m) {
+    return m.sortedPct == cachedSortedPct
+        && m.segments == cachedSegments
+        && m.comparisons == cachedComparisons
+        && m.swaps == cachedSwaps
+        && m.writes == cachedWrites
+        && m.writesAux == cachedWritesAux
+        && m.length == cachedLength
+        && Objects.equals(m.operation, cachedOperation)
+        && Objects.equals(m.realTime, cachedRealTimeFormatted);
   }
 
   private String buildSortedLine(int sortedPct, int segments) {
@@ -170,4 +146,15 @@ public final class HudRenderer {
     sb.append(String.format("%,d", value)).append(suffix);
     return sb.toString();
   }
+
+  private record Metrics(
+      String operation,
+      int sortedPct,
+      int segments,
+      long comparisons,
+      long swaps,
+      long writes,
+      long writesAux,
+      int length,
+      String realTime) {}
 }

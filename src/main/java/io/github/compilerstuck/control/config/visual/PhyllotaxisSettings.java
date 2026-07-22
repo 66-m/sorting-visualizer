@@ -17,9 +17,9 @@ public record PhyllotaxisSettings(double angleStepDeg, double scaleDivisor, doub
   public static final double POINT_SIZE_MAX = 12.0;
 
   public PhyllotaxisSettings {
-    angleStepDeg = clamp(angleStepDeg, ANGLE_STEP_DEG_MIN, ANGLE_STEP_DEG_MAX);
-    scaleDivisor = clamp(scaleDivisor, SCALE_DIVISOR_MIN, SCALE_DIVISOR_MAX);
-    pointSize = clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
+    angleStepDeg = Numbers.clamp(angleStepDeg, ANGLE_STEP_DEG_MIN, ANGLE_STEP_DEG_MAX);
+    scaleDivisor = Numbers.clamp(scaleDivisor, SCALE_DIVISOR_MIN, SCALE_DIVISOR_MAX);
+    pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
   public static PhyllotaxisSettings defaults() {
@@ -30,9 +30,5 @@ public record PhyllotaxisSettings(double angleStepDeg, double scaleDivisor, doub
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

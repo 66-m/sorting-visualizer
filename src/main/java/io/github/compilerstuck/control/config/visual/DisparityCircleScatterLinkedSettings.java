@@ -14,8 +14,8 @@ public record DisparityCircleScatterLinkedSettings(double lineThickness, double 
   public static final double RADIUS_SCALE_MAX = 0.5;
 
   public DisparityCircleScatterLinkedSettings {
-    lineThickness = clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
-    radiusScale = clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    lineThickness = Numbers.clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
   }
 
   public static DisparityCircleScatterLinkedSettings defaults() {
@@ -25,9 +25,5 @@ public record DisparityCircleScatterLinkedSettings(double lineThickness, double 
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

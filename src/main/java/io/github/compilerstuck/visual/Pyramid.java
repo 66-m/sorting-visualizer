@@ -31,9 +31,8 @@ public class Pyramid extends Visualization implements ConfigurableVisualization 
   private int cachedRadius = -1;
   private ColorGradient cachedGradient;
 
-  public Pyramid(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+  public Pyramid(ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Pyramid";
   }
 
@@ -69,7 +68,7 @@ public class Pyramid extends Visualization implements ConfigurableVisualization 
   }
 
   private void ensureBarHeightsAndColors(int length, int radius) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -83,12 +82,12 @@ public class Pyramid extends Visualization implements ConfigurableVisualization 
       colorsRgb = new int[length];
     }
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
       barHeights[i] = (value + 1) * (radius - 5) / length;
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
@@ -107,7 +106,7 @@ public class Pyramid extends Visualization implements ConfigurableVisualization 
     PyramidSettings s = settings;
     int screenMin = Math.min(screenHeight, screenWidth);
     int radius = (int) (screenMin * s.stackScale());
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     float centerY = (float) (screenHeight / 2.5);
     float centerZ = -(int) (screenMin / 10);
     float centerX = (float) screenWidth / 2;

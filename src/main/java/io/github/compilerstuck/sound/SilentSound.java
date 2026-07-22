@@ -7,8 +7,8 @@ import io.github.compilerstuck.control.model.ArrayModel;
  * Never throws; safe to call from UI and draw loops.
  */
 public class SilentSound extends Sound {
-  public SilentSound(ArrayModel arrayController) {
-    super(arrayController);
+  public SilentSound(ArrayModel arrayModel) {
+    super(arrayModel);
   }
 
   @Override

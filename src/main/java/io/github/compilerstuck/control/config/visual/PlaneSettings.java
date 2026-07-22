@@ -18,10 +18,10 @@ public record PlaneSettings(double rotationSpeedRadPerSec, double planeScale, do
 
   public PlaneSettings {
     rotationSpeedRadPerSec =
-        clamp(
+        Numbers.clamp(
             rotationSpeedRadPerSec, ROTATION_SPEED_RAD_PER_SEC_MIN, ROTATION_SPEED_RAD_PER_SEC_MAX);
-    planeScale = clamp(planeScale, PLANE_SCALE_MIN, PLANE_SCALE_MAX);
-    tileGap = clamp(tileGap, TILE_GAP_MIN, TILE_GAP_MAX);
+    planeScale = Numbers.clamp(planeScale, PLANE_SCALE_MIN, PLANE_SCALE_MAX);
+    tileGap = Numbers.clamp(tileGap, TILE_GAP_MIN, TILE_GAP_MAX);
   }
 
   public static PlaneSettings defaults() {
@@ -32,9 +32,5 @@ public record PlaneSettings(double rotationSpeedRadPerSec, double planeScale, do
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

@@ -31,8 +31,8 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
   private ColorGradient cachedGradient;
 
   public MorphingShell(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Morphing Shell";
   }
 
@@ -86,7 +86,7 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
   }
 
   private void ensureColors(int length, int colSize) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev && cachedColSize == colSize && cachedGradient == colorGradient) {
       return;
     }
@@ -94,11 +94,10 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
     int colCnt = 0;
     for (int i = 0; i < length; i++) {
       int markerIndex = rowCnt + colCnt * colSize;
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
       colorsRgb[i] = color.getRGB();
 
-      if (arrayController.getMarker(markerIndex) == Marker.SET) {
+      if (arrayModel.getMarker(markerIndex) == Marker.SET) {
         sound.playSound(markerIndex);
       }
 
@@ -124,7 +123,7 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     int colSize = (int) Math.sqrt(length);
 
     rebuildAngleBases(length, colSize);
@@ -137,7 +136,7 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
     int colCnt = 0;
     for (int i = 0; i < length; i++) {
       int markerIndex = rowCnt + colCnt * colSize;
-      double barHeight = arrayController.get(markerIndex);
+      double barHeight = arrayModel.get(markerIndex);
 
       float sinLon = sinAa * lonCos[i] + cosAa * lonSin[i];
       float cosLon = cosAa * lonCos[i] - sinAa * lonSin[i];

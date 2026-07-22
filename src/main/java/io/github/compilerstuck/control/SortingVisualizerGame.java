@@ -114,6 +114,8 @@ public final class SortingVisualizerGame extends Game {
     appContext.setColorGradient(colorGradient);
     appContext.setSpeedLevel(prefs.getSpeedLevel());
 
+    // Bootstrap the selected visualization only; VisualizationViewModel adopts it and lazy-creates
+    // others on demand (SettingsFxController.show is async on the JavaFX thread).
     VisualizationDescriptor vizDesc = VisualizationCatalog.findById(prefs.getVisualizationId());
     visualization = vizDesc.factory().create(published, colorGradient, sound, renderSystem);
     var savedVizSettings = prefs.getVisualSettingsMap().get(vizDesc.id());
@@ -202,21 +204,17 @@ public final class SortingVisualizerGame extends Game {
     }
   }
 
-  public void publishArraySnapshot() {
-    if (appContext != null) {
-      appContext.publishArraySnapshot();
-    } else if (snapshotPublisher != null) {
-      snapshotPublisher.publish(arrayController);
-    }
-  }
-
   public void drawWorld(float delta) {
     renderSystem.clear(15 / 255f, 15 / 255f, 15 / 255f);
     currentVisualization().render(delta);
   }
 
   public void publishThenDraw(float delta) {
-    publishArraySnapshot();
+    if (appContext != null) {
+      appContext.publishArraySnapshot();
+    } else if (snapshotPublisher != null) {
+      snapshotPublisher.publish(arrayController);
+    }
     drawWorld(delta);
   }
 
@@ -230,8 +228,7 @@ public final class SortingVisualizerGame extends Game {
       stateManager.setShowResults(false);
     }
 
-    sound.mute(true);
-    sound.mute(false);
+    sound.cutNotes();
 
     sessionManager.printTimestampsToConsole(new ArrayList<>(currentAlgorithms()));
     arrayController.resetMeasurements();
@@ -240,11 +237,17 @@ public final class SortingVisualizerGame extends Game {
     stateManager.setContinueExecution(true);
     arrayController.resetArray();
 
-    SettingsFxController.setProgress(100);
-    lastPublishedProgress = 100;
-    progressPublishAccum = 0f;
-    SettingsFxController.setInputsEnabled(true);
-    SettingsFxController.setCancelEnabled(false);
+    if (appContext != null) {
+      SettingsBridge bridge = appContext.settingsBridge();
+      bridge.setProgress(100);
+      lastPublishedProgress = 100;
+      progressPublishAccum = 0f;
+      bridge.setInputsEnabled(true);
+      bridge.setCancelEnabled(false);
+    } else {
+      lastPublishedProgress = 100;
+      progressPublishAccum = 0f;
+    }
 
     if (appContext != null) {
       appContext.getFrameGate().reset();
@@ -253,7 +256,9 @@ public final class SortingVisualizerGame extends Game {
 
   public void startSortingSessionBody() {
     stateManager.setRunning(true);
-    SettingsFxController.setInputsEnabled(false);
+    if (appContext != null) {
+      appContext.settingsBridge().setInputsEnabled(false);
+    }
 
     arrayController.resetArray();
     algorithms = new ArrayList<>(currentAlgorithms());

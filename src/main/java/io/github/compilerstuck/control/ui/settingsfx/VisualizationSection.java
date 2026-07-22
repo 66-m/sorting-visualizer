@@ -257,7 +257,7 @@ public final class VisualizationSection {
     ButtonType cancel = new ButtonType(SettingsStrings.CANCEL, ButtonBar.ButtonData.CANCEL_CLOSE);
     alert.getButtonTypes().setAll(cancel, reset);
 
-    var css = SettingsFxController.class.getResource("/css/settings-app.css");
+    var css = SettingsStylesheets.cssUrl();
     if (css != null) {
       alert.getDialogPane().getStylesheets().add(css.toExternalForm());
     }

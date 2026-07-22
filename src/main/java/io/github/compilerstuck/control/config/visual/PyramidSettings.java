@@ -15,9 +15,9 @@ public record PyramidSettings(double rotationSpeedRadPerSec, double stackScale)
 
   public PyramidSettings {
     rotationSpeedRadPerSec =
-        clamp(
+        Numbers.clamp(
             rotationSpeedRadPerSec, ROTATION_SPEED_RAD_PER_SEC_MIN, ROTATION_SPEED_RAD_PER_SEC_MAX);
-    stackScale = clamp(stackScale, STACK_SCALE_MIN, STACK_SCALE_MAX);
+    stackScale = Numbers.clamp(stackScale, STACK_SCALE_MIN, STACK_SCALE_MAX);
   }
 
   public static PyramidSettings defaults() {
@@ -27,9 +27,5 @@ public record PyramidSettings(double rotationSpeedRadPerSec, double stackScale)
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

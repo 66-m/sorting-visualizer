@@ -1,6 +1,6 @@
 package io.github.compilerstuck.control.ui;
 
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import java.util.List;
@@ -24,10 +24,10 @@ public final class ResultsTableRenderer {
     int width = rs.getWidth();
     int height = rs.getHeight();
 
-    float bg = MainControllerConfig.RESULTS_TABLE_BACKGROUND / 255f;
+    float bg = AppConfig.RESULTS_TABLE_BACKGROUND / 255f;
     rs.clear(bg, bg, bg);
 
-    float textSize = MainControllerConfig.scaleToWidth(MainControllerConfig.FONT_SIZE_RATIO, width);
+    float textSize = AppConfig.scaleToWidth(AppConfig.FONT_SIZE_RATIO, width);
 
     drawGrid(rs, width, height);
     drawHeaders(rs, width, textSize);
@@ -45,14 +45,14 @@ public final class ResultsTableRenderer {
   }
 
   private void drawGrid(RenderSystem rs, int width, int height) {
-    float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
+    float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
     // 1 center divider + 5 column dividers
     int count = 6;
     if (gridLines == null || gridLines.length < count * 4) {
       gridLines = new float[count * 4];
       gridArgb = new int[count];
     }
-    int textColor = packGray(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
+    int textColor = packGray(AppConfig.RESULTS_TABLE_TEXT_COLOR);
 
     float x0 = columnWidth + columnWidth / 2;
     gridLines[0] = x0;
@@ -74,7 +74,7 @@ public final class ResultsTableRenderer {
   }
 
   private void drawHeaders(RenderSystem rs, int width, float textSize) {
-    float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
+    float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
     float textY = textSize;
 
     rs.drawText("Alg. name", columnWidth * 0 + 10, textY, textSize);
@@ -101,9 +101,9 @@ public final class ResultsTableRenderer {
       return;
     }
 
-    float columnWidth = width * MainControllerConfig.TABLE_COLUMN_WIDTH_RATIO;
-    float rowHeight = (height - MainControllerConfig.TABLE_TOP_ROW) / algorithms.size();
-    int textColor = packGray(MainControllerConfig.RESULTS_TABLE_TEXT_COLOR);
+    float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
+    float rowHeight = (height - AppConfig.TABLE_TOP_ROW) / algorithms.size();
+    int textColor = packGray(AppConfig.RESULTS_TABLE_TEXT_COLOR);
 
     if (rowLines == null || rowLines.length < algorithms.size() * 4) {
       rowLines = new float[algorithms.size() * 4];
@@ -111,7 +111,7 @@ public final class ResultsTableRenderer {
     }
 
     for (int i = 0; i < algorithms.size(); i++) {
-      float rowY = MainControllerConfig.TABLE_TOP_ROW + rowHeight * i;
+      float rowY = AppConfig.TABLE_TOP_ROW + rowHeight * i;
       int o = i * 4;
       rowLines[o] = 0;
       rowLines[o + 1] = rowY;
@@ -150,8 +150,7 @@ public final class ResultsTableRenderer {
       List<String> writesMain,
       List<String> writesAux) {
     SortingAlgorithm alg = algorithms.get(index);
-    float rowCenterY =
-        rowY + 10 + (height - MainControllerConfig.TABLE_TOP_ROW) / algorithms.size() / 2;
+    float rowCenterY = rowY + 10 + (height - AppConfig.TABLE_TOP_ROW) / algorithms.size() / 2;
 
     rs.drawText(alg.getName(), columnWidth * 0 + 10, rowCenterY, textSize);
     rs.drawText(

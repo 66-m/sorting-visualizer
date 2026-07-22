@@ -26,8 +26,8 @@ public class DisparityCircleScatter extends Visualization implements Configurabl
   private int[] argb;
 
   public DisparityCircleScatter(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Disparity Circle Scatter";
   }
 
@@ -80,7 +80,7 @@ public class DisparityCircleScatter extends Visualization implements Configurabl
   public void update(float delta) {
     DisparityCircleScatterSettings s = settings;
     float pointSize = (float) s.pointSize();
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
@@ -93,10 +93,10 @@ public class DisparityCircleScatter extends Visualization implements Configurabl
     }
 
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

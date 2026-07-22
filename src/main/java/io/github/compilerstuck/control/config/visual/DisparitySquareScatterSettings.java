@@ -14,8 +14,8 @@ public record DisparitySquareScatterSettings(double pointSize, double perimeterS
   public static final double PERIMETER_SCALE_MAX = 1.0;
 
   public DisparitySquareScatterSettings {
-    pointSize = clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
-    perimeterScale = clamp(perimeterScale, PERIMETER_SCALE_MIN, PERIMETER_SCALE_MAX);
+    pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
+    perimeterScale = Numbers.clamp(perimeterScale, PERIMETER_SCALE_MIN, PERIMETER_SCALE_MAX);
   }
 
   public static DisparitySquareScatterSettings defaults() {
@@ -25,9 +25,5 @@ public record DisparitySquareScatterSettings(double pointSize, double perimeterS
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

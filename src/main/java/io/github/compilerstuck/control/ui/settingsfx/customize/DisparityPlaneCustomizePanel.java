@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.DisparityPlaneSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -35,8 +34,7 @@ public final class DisparityPlaneCustomizePanel implements VisualizationCustomiz
           DisparityPlaneSettings.TILE_GAP_MAX,
           DisparityPlaneSettings.DEFAULT_TILE_GAP);
   private final Label tileGapValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -51,7 +49,11 @@ public final class DisparityPlaneCustomizePanel implements VisualizationCustomiz
     CustomizePanelSupport.bindValueLabel(
         planeScale, planeScaleValue, v -> String.format("%.2f", v));
     CustomizePanelSupport.bindValueLabel(tileGap, tileGapValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(
+        rotationSpeedRadPerSec.valueProperty(),
+        maxExtrusionFraction.valueProperty(),
+        planeScale.valueProperty(),
+        tileGap.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -74,25 +76,22 @@ public final class DisparityPlaneCustomizePanel implements VisualizationCustomiz
             CustomizePanelSupport.sliderRow(
                 "Tile gap", tileGap, tileGapValue, DisparityPlaneSettings.DEFAULT_TILE_GAP));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     DisparityPlaneSettings s =
-        settings instanceof DisparityPlaneSettings c ? c : DisparityPlaneSettings.defaults();
-    loading = true;
-    try {
-      rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
-      maxExtrusionFraction.setValue(s.maxExtrusionFraction());
-      planeScale.setValue(s.planeScale());
-      tileGap.setValue(s.tileGap());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, DisparityPlaneSettings.class, DisparityPlaneSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
+          maxExtrusionFraction.setValue(s.maxExtrusionFraction());
+          planeScale.setValue(s.planeScale());
+          tileGap.setValue(s.tileGap());
+        });
   }
 
   @Override
@@ -111,19 +110,6 @@ public final class DisparityPlaneCustomizePanel implements VisualizationCustomiz
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    rotationSpeedRadPerSec.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    maxExtrusionFraction.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    planeScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    tileGap.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

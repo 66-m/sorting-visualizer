@@ -10,7 +10,7 @@ public record MosaicSquaresSettings(double tileGapPx) implements VisualizationSe
   public static final double TILE_GAP_PX_MAX = 4.0;
 
   public MosaicSquaresSettings {
-    tileGapPx = clamp(tileGapPx, TILE_GAP_PX_MIN, TILE_GAP_PX_MAX);
+    tileGapPx = Numbers.clamp(tileGapPx, TILE_GAP_PX_MIN, TILE_GAP_PX_MAX);
   }
 
   public static MosaicSquaresSettings defaults() {
@@ -20,9 +20,5 @@ public record MosaicSquaresSettings(double tileGapPx) implements VisualizationSe
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

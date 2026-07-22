@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.DisparitySquareScatterSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -23,8 +22,7 @@ public final class DisparitySquareScatterCustomizePanel implements Visualization
           DisparitySquareScatterSettings.PERIMETER_SCALE_MAX,
           DisparitySquareScatterSettings.DEFAULT_PERIMETER_SCALE);
   private final Label perimeterScaleValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -33,7 +31,7 @@ public final class DisparitySquareScatterCustomizePanel implements Visualization
     CustomizePanelSupport.bindValueLabel(pointSize, pointSizeValue, v -> String.format("%.1f", v));
     CustomizePanelSupport.bindValueLabel(
         perimeterScale, perimeterScaleValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(pointSize.valueProperty(), perimeterScale.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -49,25 +47,22 @@ public final class DisparitySquareScatterCustomizePanel implements Visualization
                 pointSizeValue,
                 DisparitySquareScatterSettings.DEFAULT_POINT_SIZE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     DisparitySquareScatterSettings s =
-        settings instanceof DisparitySquareScatterSettings c
-            ? c
-            : DisparitySquareScatterSettings.defaults();
-    loading = true;
-    try {
-      pointSize.setValue(s.pointSize());
-      perimeterScale.setValue(s.perimeterScale());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings,
+            DisparitySquareScatterSettings.class,
+            DisparitySquareScatterSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          pointSize.setValue(s.pointSize());
+          perimeterScale.setValue(s.perimeterScale());
+        });
   }
 
   @Override
@@ -82,17 +77,6 @@ public final class DisparitySquareScatterCustomizePanel implements Visualization
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    pointSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    perimeterScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

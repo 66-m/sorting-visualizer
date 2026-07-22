@@ -22,12 +22,12 @@ public record DisparityPlaneSettings(
 
   public DisparityPlaneSettings {
     rotationSpeedRadPerSec =
-        clamp(
+        Numbers.clamp(
             rotationSpeedRadPerSec, ROTATION_SPEED_RAD_PER_SEC_MIN, ROTATION_SPEED_RAD_PER_SEC_MAX);
     maxExtrusionFraction =
-        clamp(maxExtrusionFraction, MAX_EXTRUSION_FRACTION_MIN, MAX_EXTRUSION_FRACTION_MAX);
-    planeScale = clamp(planeScale, PLANE_SCALE_MIN, PLANE_SCALE_MAX);
-    tileGap = clamp(tileGap, TILE_GAP_MIN, TILE_GAP_MAX);
+        Numbers.clamp(maxExtrusionFraction, MAX_EXTRUSION_FRACTION_MIN, MAX_EXTRUSION_FRACTION_MAX);
+    planeScale = Numbers.clamp(planeScale, PLANE_SCALE_MIN, PLANE_SCALE_MAX);
+    tileGap = Numbers.clamp(tileGap, TILE_GAP_MIN, TILE_GAP_MAX);
   }
 
   public static DisparityPlaneSettings defaults() {
@@ -41,9 +41,5 @@ public record DisparityPlaneSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

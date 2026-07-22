@@ -12,17 +12,17 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
- * World2D colored geometry without ShapeRenderer tessellation: axis-aligned circle quads and
- * stroked ellipse outlines as {@code GL_LINES}.
+ * World2D colored geometry without ShapeRenderer tessellation: filled circle/rect quads and stroked
+ * ellipse outlines as {@code GL_LINES}.
  */
 public final class GeometryBatch2D implements Disposable {
   private static final String VERT_PATH = "shaders/geo2d.vert";
   private static final String FRAG_PATH = "shaders/geo2d.frag";
 
-  /** Floats per vertex: xy + rgba. */
-  private static final int FLOATS_PER_VERT = 6;
+  /** Floats per vertex: xy + rgba + uv. */
+  static final int FLOATS_PER_VERT = 8;
 
-  private static final int INITIAL_CIRCLES = 4096;
+  private static final int INITIAL_QUADS = 4096;
 
   /** Segments per ellipse outline — high enough that large rings read as circles, not polygons. */
   public static final int ELLIPSE_SEGMENTS = 64;
@@ -32,7 +32,7 @@ public final class GeometryBatch2D implements Disposable {
   private final ShaderProgram shader;
   private Mesh quadMesh;
   private float[] quadVerts;
-  private int maxCircles;
+  private int maxQuads;
 
   private Mesh lineMesh;
   private float[] lineVerts;
@@ -61,9 +61,9 @@ public final class GeometryBatch2D implements Disposable {
     if (!shader.isCompiled()) {
       throw new GdxRuntimeException("geo2d shader: " + shader.getLog());
     }
-    maxCircles = INITIAL_CIRCLES;
-    quadVerts = new float[maxCircles * 6 * FLOATS_PER_VERT];
-    quadMesh = createQuadMesh(maxCircles);
+    maxQuads = INITIAL_QUADS;
+    quadVerts = new float[maxQuads * 6 * FLOATS_PER_VERT];
+    quadMesh = createQuadMesh(maxQuads);
 
     maxLineSegments = INITIAL_LINE_SEGMENTS;
     lineVerts = new float[maxLineSegments * 2 * FLOATS_PER_VERT];
@@ -71,7 +71,8 @@ public final class GeometryBatch2D implements Disposable {
   }
 
   /**
-   * Draws filled circles as axis-aligned quads. {@code xyd} = [x,y,diameter] × count.
+   * Draws filled circles as axis-aligned quads with a unit-disk fragment mask. {@code xyd} =
+   * [x,y,diameter] × count.
    *
    * @return true if a draw was issued
    */
@@ -79,11 +80,35 @@ public final class GeometryBatch2D implements Disposable {
     if (xyd == null || argb == null || count <= 0 || projView == null) {
       return false;
     }
-    ensureCircleCapacity(count);
+    ensureQuadCapacity(count);
     int floats = packCircleQuads(xyd, argb, count, quadVerts, tmpRgba);
     quadMesh.setVertices(quadVerts, 0, floats);
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     shader.bind();
     shader.setUniformMatrix("u_projView", projView);
+    shader.setUniformf("u_circleMask", 1f);
+    quadMesh.render(shader, GL20.GL_TRIANGLES, 0, count * 6);
+    return true;
+  }
+
+  /**
+   * Draws filled axis-aligned rects. {@code xywh} = [x,y,w,h] × count.
+   *
+   * @return true if a draw was issued
+   */
+  public boolean drawRects(float[] xywh, int[] argb, int count, Matrix4 projView) {
+    if (xywh == null || argb == null || count <= 0 || projView == null) {
+      return false;
+    }
+    ensureQuadCapacity(count);
+    int floats = packRectQuads(xywh, argb, count, quadVerts, tmpRgba);
+    quadMesh.setVertices(quadVerts, 0, floats);
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    shader.bind();
+    shader.setUniformMatrix("u_projView", projView);
+    shader.setUniformf("u_circleMask", 0f);
     quadMesh.render(shader, GL20.GL_TRIANGLES, 0, count * 6);
     return true;
   }
@@ -104,14 +129,18 @@ public final class GeometryBatch2D implements Disposable {
     int floats = packEllipseLines(xywh, argb, count, lineVerts, tmpRgba);
     lineMesh.setVertices(lineVerts, 0, floats);
     Gdx.gl.glLineWidth(Math.max(0.1f, lineWidthPx));
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     shader.bind();
     shader.setUniformMatrix("u_projView", projView);
+    shader.setUniformf("u_circleMask", 0f);
     lineMesh.render(shader, GL20.GL_LINES, 0, segments * 2);
     return true;
   }
 
   /**
-   * Packs circle quads as two triangles (6 verts) each. Package-visible for tests.
+   * Packs circle quads as two triangles (6 verts) each with local UV in {@code [-1,1]}.
+   * Package-visible for tests.
    *
    * @return number of floats written
    */
@@ -124,13 +153,42 @@ public final class GeometryBatch2D implements Disposable {
       float r = xyd[s + 2] * 0.5f;
       InstanceTransform.unpackArgb(argb[i], tmpRgba, 0);
       // Triangle 1: BL, BR, TL
-      o = putVert(out, o, cx - r, cy - r, tmpRgba);
-      o = putVert(out, o, cx + r, cy - r, tmpRgba);
-      o = putVert(out, o, cx - r, cy + r, tmpRgba);
+      o = putVert(out, o, cx - r, cy - r, tmpRgba, -1f, -1f);
+      o = putVert(out, o, cx + r, cy - r, tmpRgba, 1f, -1f);
+      o = putVert(out, o, cx - r, cy + r, tmpRgba, -1f, 1f);
       // Triangle 2: BR, TR, TL
-      o = putVert(out, o, cx + r, cy - r, tmpRgba);
-      o = putVert(out, o, cx + r, cy + r, tmpRgba);
-      o = putVert(out, o, cx - r, cy + r, tmpRgba);
+      o = putVert(out, o, cx + r, cy - r, tmpRgba, 1f, -1f);
+      o = putVert(out, o, cx + r, cy + r, tmpRgba, 1f, 1f);
+      o = putVert(out, o, cx - r, cy + r, tmpRgba, -1f, 1f);
+    }
+    return o;
+  }
+
+  /**
+   * Packs rect quads as two triangles (6 verts) each. UV unused ({@code 0,0}). Package-visible for
+   * tests.
+   *
+   * @return number of floats written
+   */
+  static int packRectQuads(float[] xywh, int[] argb, int count, float[] out, float[] tmpRgba) {
+    int o = 0;
+    for (int i = 0; i < count; i++) {
+      int s = i * 4;
+      float x = xywh[s];
+      float y = xywh[s + 1];
+      float w = xywh[s + 2];
+      float h = xywh[s + 3];
+      float x1 = x + w;
+      float y1 = y + h;
+      InstanceTransform.unpackArgb(argb[i], tmpRgba, 0);
+      // Triangle 1: BL, BR, TL
+      o = putVert(out, o, x, y, tmpRgba, 0f, 0f);
+      o = putVert(out, o, x1, y, tmpRgba, 0f, 0f);
+      o = putVert(out, o, x, y1, tmpRgba, 0f, 0f);
+      // Triangle 2: BR, TR, TL
+      o = putVert(out, o, x1, y, tmpRgba, 0f, 0f);
+      o = putVert(out, o, x1, y1, tmpRgba, 0f, 0f);
+      o = putVert(out, o, x, y1, tmpRgba, 0f, 0f);
     }
     return o;
   }
@@ -154,37 +212,51 @@ public final class GeometryBatch2D implements Disposable {
         float a1 = (float) (Math.PI * 2.0 * (seg + 1) / ELLIPSE_SEGMENTS);
         o =
             putVert(
-                out, o, cx + (float) Math.cos(a0) * hw, cy + (float) Math.sin(a0) * hh, tmpRgba);
+                out,
+                o,
+                cx + (float) Math.cos(a0) * hw,
+                cy + (float) Math.sin(a0) * hh,
+                tmpRgba,
+                0f,
+                0f);
         o =
             putVert(
-                out, o, cx + (float) Math.cos(a1) * hw, cy + (float) Math.sin(a1) * hh, tmpRgba);
+                out,
+                o,
+                cx + (float) Math.cos(a1) * hw,
+                cy + (float) Math.sin(a1) * hh,
+                tmpRgba,
+                0f,
+                0f);
       }
     }
     return o;
   }
 
-  private static int putVert(float[] out, int o, float x, float y, float[] rgba) {
+  private static int putVert(float[] out, int o, float x, float y, float[] rgba, float u, float v) {
     out[o++] = x;
     out[o++] = y;
     out[o++] = rgba[0];
     out[o++] = rgba[1];
     out[o++] = rgba[2];
     out[o++] = rgba[3];
+    out[o++] = u;
+    out[o++] = v;
     return o;
   }
 
-  private void ensureCircleCapacity(int circles) {
-    if (circles <= maxCircles) {
+  private void ensureQuadCapacity(int quads) {
+    if (quads <= maxQuads) {
       return;
     }
-    int next = maxCircles;
-    while (next < circles) {
+    int next = maxQuads;
+    while (next < quads) {
       next *= 2;
     }
-    maxCircles = next;
-    quadVerts = new float[maxCircles * 6 * FLOATS_PER_VERT];
+    maxQuads = next;
+    quadVerts = new float[maxQuads * 6 * FLOATS_PER_VERT];
     quadMesh.dispose();
-    quadMesh = createQuadMesh(maxCircles);
+    quadMesh = createQuadMesh(maxQuads);
   }
 
   private void ensureLineCapacity(int segments) {
@@ -201,14 +273,15 @@ public final class GeometryBatch2D implements Disposable {
     lineMesh = createLineMesh(maxLineSegments);
   }
 
-  private static Mesh createQuadMesh(int maxCircles) {
+  private static Mesh createQuadMesh(int maxQuads) {
     return new Mesh(
         false,
-        maxCircles * 6,
+        maxQuads * 6,
         0,
         new VertexAttributes(
             new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
-            new VertexAttribute(Usage.ColorUnpacked, 4, "a_color")));
+            new VertexAttribute(Usage.ColorUnpacked, 4, "a_color"),
+            new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv")));
   }
 
   private static Mesh createLineMesh(int maxSegments) {
@@ -218,7 +291,8 @@ public final class GeometryBatch2D implements Disposable {
         0,
         new VertexAttributes(
             new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
-            new VertexAttribute(Usage.ColorUnpacked, 4, "a_color")));
+            new VertexAttribute(Usage.ColorUnpacked, 4, "a_color"),
+            new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv")));
   }
 
   @Override

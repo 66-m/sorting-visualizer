@@ -95,7 +95,7 @@ public final class LaunchArgs {
 
   /**
    * When true, force the pre-instancing ModelInstance 3D path (A/B with {@code --perf-stats}).
-   * Phase 2: remove after soak.
+   * Supported fallback when GL30/instancing is unavailable.
    */
   public static boolean legacy3d() {
     return launchLegacy3d;

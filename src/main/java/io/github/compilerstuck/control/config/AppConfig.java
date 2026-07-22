@@ -1,11 +1,8 @@
 package io.github.compilerstuck.control.config;
 
-/**
- * Configuration constants for MainController. Centralizes all magic numbers and configuration
- * values for easier maintenance.
- */
-public final class MainControllerConfig {
-  private MainControllerConfig() {
+/** Application runtime configuration constants (window sizes, timings, layout ratios). */
+public final class AppConfig {
+  private AppConfig() {
     // Utility class
   }
 
@@ -86,7 +83,4 @@ public final class MainControllerConfig {
   public static final float LINE_HEIGHT_OFFSET = 20.0f;
   public static final float TABLE_COLUMN_WIDTH_RATIO = 1.0f / 7.0f;
   public static final float TABLE_TOP_ROW = 50.0f;
-
-  // Default configuration (delegates to SettingsDefaults, single source of truth)
-  public static final int DEFAULT_ARRAY_SIZE = SettingsDefaults.DEFAULT_ARRAY_SIZE;
 }

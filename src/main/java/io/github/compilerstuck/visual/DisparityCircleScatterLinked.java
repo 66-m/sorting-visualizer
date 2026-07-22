@@ -27,8 +27,8 @@ public class DisparityCircleScatterLinked extends Visualization
   private int[] argb;
 
   public DisparityCircleScatterLinked(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Disparity Circle Scatter Linked";
   }
 
@@ -85,7 +85,7 @@ public class DisparityCircleScatterLinked extends Visualization
   @Override
   public void update(float delta) {
     DisparityCircleScatterLinkedSettings s = settings;
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
@@ -97,7 +97,7 @@ public class DisparityCircleScatterLinked extends Visualization
     }
 
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
+      int value = arrayModel.get(i);
       barHeights[i] = disparityBarHeight(i, value, length, screenHeight);
     }
 
@@ -108,11 +108,11 @@ public class DisparityCircleScatterLinked extends Visualization
     }
 
     for (int i = 0; i < lineCount; i++) {
-      int value = arrayController.get(i);
+      int value = arrayModel.get(i);
       int nextIndex = i + 1;
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

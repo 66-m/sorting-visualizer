@@ -22,8 +22,8 @@ public class SwirlDots extends Visualization implements ConfigurableVisualizatio
   private int cacheLength = -1;
 
   public SwirlDots(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Swirl Dots";
   }
 
@@ -48,7 +48,7 @@ public class SwirlDots extends Visualization implements ConfigurableVisualizatio
   @Override
   public void update(float delta) {
     SwirlDotsSettings s = settings;
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
@@ -68,10 +68,10 @@ public class SwirlDots extends Visualization implements ConfigurableVisualizatio
     }
 
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

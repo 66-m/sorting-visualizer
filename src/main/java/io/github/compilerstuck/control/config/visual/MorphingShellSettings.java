@@ -19,10 +19,11 @@ public record MorphingShellSettings(
 
   public MorphingShellSettings {
     rotationSpeedRadPerSec =
-        clamp(
+        Numbers.clamp(
             rotationSpeedRadPerSec, ROTATION_SPEED_RAD_PER_SEC_MIN, ROTATION_SPEED_RAD_PER_SEC_MAX);
-    sphereSize = clamp(sphereSize, SPHERE_SIZE_MIN, SPHERE_SIZE_MAX);
-    shellRadiusScale = clamp(shellRadiusScale, SHELL_RADIUS_SCALE_MIN, SHELL_RADIUS_SCALE_MAX);
+    sphereSize = Numbers.clamp(sphereSize, SPHERE_SIZE_MIN, SPHERE_SIZE_MAX);
+    shellRadiusScale =
+        Numbers.clamp(shellRadiusScale, SHELL_RADIUS_SCALE_MIN, SHELL_RADIUS_SCALE_MAX);
   }
 
   public static MorphingShellSettings defaults() {
@@ -33,9 +34,5 @@ public record MorphingShellSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

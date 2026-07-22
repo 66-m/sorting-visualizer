@@ -28,7 +28,6 @@ public class ArrayController implements ArrayModel {
   /** Bumped on content mutations and {@link Marker#SET}; see {@link #getVisualRevision()}. */
   private final AtomicLong visualRevision = new AtomicLong();
 
-  private double delay;
   private double realTime;
 
   private ShuffleType shuffleType = ShuffleType.RANDOM;
@@ -52,7 +51,6 @@ public class ArrayController implements ArrayModel {
     comparisons = 0;
     swaps = 0;
     writes = 0;
-    delay = 0;
     realTime = 0;
     writesAux = 0;
     sortedPercentage = 1;
@@ -101,20 +99,6 @@ public class ArrayController implements ArrayModel {
   }
 
   @Override
-  public void addSleepTime(double sleepTime) {
-    this.delay += sleepTime;
-  }
-
-  @Override
-  public double getDelay() {
-    return delay;
-  }
-
-  public void setDelay(double delay) {
-    this.delay = delay;
-  }
-
-  @Override
   public double getRealTime() {
     return realTime;
   }
@@ -143,7 +127,6 @@ public class ArrayController implements ArrayModel {
     comparisons = 0;
     swaps = 0;
     writes = 0;
-    delay = 0;
     realTime = 0;
     writesAux = 0;
     sortedPercentage = 1;

@@ -27,11 +27,43 @@ import io.github.compilerstuck.control.config.visual.SphereSettings;
 import io.github.compilerstuck.control.config.visual.SphericDisparityLinesSettings;
 import io.github.compilerstuck.control.config.visual.SwirlDotsSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 /** Registry of customize panels by visualization id. */
 public final class VisualizationCustomizePanels {
+
+  private static final Map<String, Supplier<VisualizationCustomizePanel>> BY_ID =
+      Map.ofEntries(
+          Map.entry(CubeSettings.ID, CubeCustomizePanel::new),
+          Map.entry(CircleSettings.ID, CircleCustomizePanel::new),
+          Map.entry(ColorGradientGraphSettings.ID, ColorGradientGraphCustomizePanel::new),
+          Map.entry(CubicLinesSettings.ID, CubicLinesCustomizePanel::new),
+          Map.entry(DisparityChordsSettings.ID, DisparityChordsCustomizePanel::new),
+          Map.entry(DisparityCircleSettings.ID, DisparityCircleCustomizePanel::new),
+          Map.entry(DisparityCircleScatterSettings.ID, DisparityCircleScatterCustomizePanel::new),
+          Map.entry(
+              DisparityCircleScatterLinkedSettings.ID,
+              DisparityCircleScatterLinkedCustomizePanel::new),
+          Map.entry(DisparityPlaneSettings.ID, DisparityPlaneCustomizePanel::new),
+          Map.entry(DisparitySphereHoopsSettings.ID, DisparitySphereHoopsCustomizePanel::new),
+          Map.entry(DisparitySquareScatterSettings.ID, DisparitySquareScatterCustomizePanel::new),
+          Map.entry(HoopsSettings.ID, HoopsCustomizePanel::new),
+          Map.entry(ImageVerticalSettings.ID, ImageVerticalCustomizePanel::new),
+          Map.entry(ImageHorizontalSettings.ID, ImageHorizontalCustomizePanel::new),
+          Map.entry(MorphingShellSettings.ID, MorphingShellCustomizePanel::new),
+          Map.entry(MosaicSquaresSettings.ID, MosaicSquaresCustomizePanel::new),
+          Map.entry(NumberPlotSettings.ID, NumberPlotCustomizePanel::new),
+          Map.entry(PhyllotaxisSettings.ID, PhyllotaxisCustomizePanel::new),
+          Map.entry(PlaneSettings.ID, PlaneCustomizePanel::new),
+          Map.entry(PyramidSettings.ID, PyramidCustomizePanel::new),
+          Map.entry(ScatterPlotSettings.ID, ScatterPlotCustomizePanel::new),
+          Map.entry(ScatterPlotLinkedSettings.ID, ScatterPlotLinkedCustomizePanel::new),
+          Map.entry(SphereSettings.ID, SphereCustomizePanel::new),
+          Map.entry(SphereHoopsSettings.ID, SphereHoopsCustomizePanel::new),
+          Map.entry(SphericDisparityLinesSettings.ID, SphericDisparityLinesCustomizePanel::new),
+          Map.entry(SwirlDotsSettings.ID, SwirlDotsCustomizePanel::new));
 
   private VisualizationCustomizePanels() {}
 
@@ -45,84 +77,6 @@ public final class VisualizationCustomizePanels {
   }
 
   public static Optional<Supplier<VisualizationCustomizePanel>> forId(String visualizationId) {
-    if (CubeSettings.ID.equals(visualizationId)) {
-      return Optional.of(CubeCustomizePanel::new);
-    }
-    if (CircleSettings.ID.equals(visualizationId)) {
-      return Optional.of(CircleCustomizePanel::new);
-    }
-    if (ColorGradientGraphSettings.ID.equals(visualizationId)) {
-      return Optional.of(ColorGradientGraphCustomizePanel::new);
-    }
-    if (CubicLinesSettings.ID.equals(visualizationId)) {
-      return Optional.of(CubicLinesCustomizePanel::new);
-    }
-    if (DisparityChordsSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparityChordsCustomizePanel::new);
-    }
-    if (DisparityCircleSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparityCircleCustomizePanel::new);
-    }
-    if (DisparityCircleScatterSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparityCircleScatterCustomizePanel::new);
-    }
-    if (DisparityCircleScatterLinkedSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparityCircleScatterLinkedCustomizePanel::new);
-    }
-    if (DisparityPlaneSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparityPlaneCustomizePanel::new);
-    }
-    if (DisparitySphereHoopsSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparitySphereHoopsCustomizePanel::new);
-    }
-    if (DisparitySquareScatterSettings.ID.equals(visualizationId)) {
-      return Optional.of(DisparitySquareScatterCustomizePanel::new);
-    }
-    if (HoopsSettings.ID.equals(visualizationId)) {
-      return Optional.of(HoopsCustomizePanel::new);
-    }
-    if (ImageVerticalSettings.ID.equals(visualizationId)) {
-      return Optional.of(ImageVerticalCustomizePanel::new);
-    }
-    if (ImageHorizontalSettings.ID.equals(visualizationId)) {
-      return Optional.of(ImageHorizontalCustomizePanel::new);
-    }
-    if (MorphingShellSettings.ID.equals(visualizationId)) {
-      return Optional.of(MorphingShellCustomizePanel::new);
-    }
-    if (MosaicSquaresSettings.ID.equals(visualizationId)) {
-      return Optional.of(MosaicSquaresCustomizePanel::new);
-    }
-    if (NumberPlotSettings.ID.equals(visualizationId)) {
-      return Optional.of(NumberPlotCustomizePanel::new);
-    }
-    if (PhyllotaxisSettings.ID.equals(visualizationId)) {
-      return Optional.of(PhyllotaxisCustomizePanel::new);
-    }
-    if (PlaneSettings.ID.equals(visualizationId)) {
-      return Optional.of(PlaneCustomizePanel::new);
-    }
-    if (PyramidSettings.ID.equals(visualizationId)) {
-      return Optional.of(PyramidCustomizePanel::new);
-    }
-    if (ScatterPlotSettings.ID.equals(visualizationId)) {
-      return Optional.of(ScatterPlotCustomizePanel::new);
-    }
-    if (ScatterPlotLinkedSettings.ID.equals(visualizationId)) {
-      return Optional.of(ScatterPlotLinkedCustomizePanel::new);
-    }
-    if (SphereSettings.ID.equals(visualizationId)) {
-      return Optional.of(SphereCustomizePanel::new);
-    }
-    if (SphereHoopsSettings.ID.equals(visualizationId)) {
-      return Optional.of(SphereHoopsCustomizePanel::new);
-    }
-    if (SphericDisparityLinesSettings.ID.equals(visualizationId)) {
-      return Optional.of(SphericDisparityLinesCustomizePanel::new);
-    }
-    if (SwirlDotsSettings.ID.equals(visualizationId)) {
-      return Optional.of(SwirlDotsCustomizePanel::new);
-    }
-    return Optional.empty();
+    return Optional.ofNullable(BY_ID.get(visualizationId));
   }
 }

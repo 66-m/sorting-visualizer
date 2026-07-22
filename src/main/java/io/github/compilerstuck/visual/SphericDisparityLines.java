@@ -44,8 +44,8 @@ public class SphericDisparityLines extends Visualization implements Configurable
   private int[] lineArgb;
 
   public SphericDisparityLines(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Spheric Disparity Lines";
   }
 
@@ -113,7 +113,7 @@ public class SphericDisparityLines extends Visualization implements Configurable
   }
 
   private void ensureColorsAndRadii(int drawCount, int length, int maxRadius) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -124,9 +124,9 @@ public class SphericDisparityLines extends Visualization implements Configurable
       return;
     }
     for (int i = 0; i < drawCount; i++) {
-      int value = arrayController.get(i);
+      int value = arrayModel.get(i);
 
-      if (arrayController.getMarker(value) == Marker.SET) {
+      if (arrayModel.getMarker(value) == Marker.SET) {
         sound.playSound(value);
       }
 
@@ -141,7 +141,7 @@ public class SphericDisparityLines extends Visualization implements Configurable
 
       pointRadii[i] = (int) VisMath.map(barHeight, 0, 100000, 0, maxRadius);
 
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
       colorsRgb[i] = color.getRGB();
     }
     cachedRevision = rev;
@@ -156,10 +156,10 @@ public class SphericDisparityLines extends Visualization implements Configurable
   @Override
   public void update(float delta) {
     SphericDisparityLinesSettings s = settings;
-    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
+    int nextN = (int) floor(Math.pow(arrayModel.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
-    int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
-    int length = arrayController.getLength();
+    int drawCount = Math.min(arrayModel.getLength(), nextN * nextN);
+    int length = arrayModel.getLength();
     int maxRadius = (int) (min(screenHeight, screenWidth) * s.globeScale());
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
     float centerX = (float) screenWidth / 2;
@@ -200,7 +200,7 @@ public class SphericDisparityLines extends Visualization implements Configurable
     int pointCount = 0;
 
     for (int i = 0; i < drawCount; i++) {
-      int target = arrayController.get(i);
+      int target = arrayModel.get(i);
       if (i == target || target < 0 || target >= drawCount) {
         points.set(
             pointCount,

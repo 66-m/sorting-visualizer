@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.SphericDisparityLinesSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -35,8 +34,7 @@ public final class SphericDisparityLinesCustomizePanel implements VisualizationC
           SphericDisparityLinesSettings.MARKER_SIZE_MAX,
           SphericDisparityLinesSettings.DEFAULT_MARKER_SIZE);
   private final Label markerSizeValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -52,7 +50,11 @@ public final class SphericDisparityLinesCustomizePanel implements VisualizationC
         lineOpacity, lineOpacityValue, v -> String.format("%d", Math.round(v)));
     CustomizePanelSupport.bindValueLabel(
         markerSize, markerSizeValue, v -> String.format("%.1f", v));
-    bindDraftChanges();
+    draft.bind(
+        rotationSpeedRadPerSec.valueProperty(),
+        globeScale.valueProperty(),
+        lineOpacity.valueProperty(),
+        markerSize.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -78,27 +80,22 @@ public final class SphericDisparityLinesCustomizePanel implements VisualizationC
                 lineOpacityValue,
                 SphericDisparityLinesSettings.DEFAULT_LINE_OPACITY));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     SphericDisparityLinesSettings s =
-        settings instanceof SphericDisparityLinesSettings c
-            ? c
-            : SphericDisparityLinesSettings.defaults();
-    loading = true;
-    try {
-      rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
-      globeScale.setValue(s.globeScale());
-      lineOpacity.setValue(s.lineOpacity());
-      markerSize.setValue(s.markerSize());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, SphericDisparityLinesSettings.class, SphericDisparityLinesSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
+          globeScale.setValue(s.globeScale());
+          lineOpacity.setValue(s.lineOpacity());
+          markerSize.setValue(s.markerSize());
+        });
   }
 
   @Override
@@ -117,19 +114,6 @@ public final class SphericDisparityLinesCustomizePanel implements VisualizationC
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    rotationSpeedRadPerSec.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    globeScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    lineOpacity.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    markerSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

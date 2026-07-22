@@ -1,6 +1,6 @@
 package io.github.compilerstuck.control;
 
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.config.AppConfig;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -55,21 +55,12 @@ public final class DisplayBounds {
   public static Dimension portraitSize(Rectangle screen) {
     int h = Math.max(1, (int) Math.round(screen.height * 0.9));
     int w =
-        Math.max(
-            1,
-            Math.round(
-                h
-                    * (MainControllerConfig.PORTRAIT_WIDTH
-                        / (float) MainControllerConfig.PORTRAIT_HEIGHT)));
+        Math.max(1, Math.round(h * (AppConfig.PORTRAIT_WIDTH / (float) AppConfig.PORTRAIT_HEIGHT)));
     if (w > screen.width) {
       w = screen.width;
       h =
           Math.max(
-              1,
-              Math.round(
-                  w
-                      * (MainControllerConfig.PORTRAIT_HEIGHT
-                          / (float) MainControllerConfig.PORTRAIT_WIDTH)));
+              1, Math.round(w * (AppConfig.PORTRAIT_HEIGHT / (float) AppConfig.PORTRAIT_WIDTH)));
     }
     if (h > screen.height) {
       h = screen.height;

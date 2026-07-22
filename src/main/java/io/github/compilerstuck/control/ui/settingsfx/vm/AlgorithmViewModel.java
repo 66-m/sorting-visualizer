@@ -135,10 +135,6 @@ public final class AlgorithmViewModel {
     return shuffleType;
   }
 
-  public List<SortingAlgorithm> getAlgorithmInstances() {
-    return Collections.unmodifiableList(algorithms);
-  }
-
   public void selectAlgorithm(String id) {
     if (!inputsEnabled || runAll) {
       return;

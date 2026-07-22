@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.DisparityChordsSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -35,8 +34,7 @@ public final class DisparityChordsCustomizePanel implements VisualizationCustomi
           DisparityChordsSettings.CHORD_OPACITY_MAX,
           DisparityChordsSettings.DEFAULT_CHORD_OPACITY);
   private final Label chordOpacityValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -52,7 +50,11 @@ public final class DisparityChordsCustomizePanel implements VisualizationCustomi
         coincidentMarkerSize, coincidentMarkerSizeValue, v -> String.format("%.1f", v));
     CustomizePanelSupport.bindValueLabel(
         chordOpacity, chordOpacityValue, v -> String.format("%d", Math.round(v)));
-    bindDraftChanges();
+    draft.bind(
+        radiusScale.valueProperty(),
+        lineThickness.valueProperty(),
+        coincidentMarkerSize.valueProperty(),
+        chordOpacity.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -78,25 +80,22 @@ public final class DisparityChordsCustomizePanel implements VisualizationCustomi
                 chordOpacityValue,
                 DisparityChordsSettings.DEFAULT_CHORD_OPACITY));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     DisparityChordsSettings s =
-        settings instanceof DisparityChordsSettings c ? c : DisparityChordsSettings.defaults();
-    loading = true;
-    try {
-      radiusScale.setValue(s.radiusScale());
-      lineThickness.setValue(s.lineThickness());
-      coincidentMarkerSize.setValue(s.coincidentMarkerSize());
-      chordOpacity.setValue(s.chordOpacity());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, DisparityChordsSettings.class, DisparityChordsSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          radiusScale.setValue(s.radiusScale());
+          lineThickness.setValue(s.lineThickness());
+          coincidentMarkerSize.setValue(s.coincidentMarkerSize());
+          chordOpacity.setValue(s.chordOpacity());
+        });
   }
 
   @Override
@@ -115,19 +114,6 @@ public final class DisparityChordsCustomizePanel implements VisualizationCustomi
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    radiusScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    lineThickness.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    coincidentMarkerSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    chordOpacity.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

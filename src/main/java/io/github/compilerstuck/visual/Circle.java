@@ -27,9 +27,8 @@ public class Circle extends Visualization implements ConfigurableVisualization {
   private float[] xyxy;
   private int[] argb;
 
-  public Circle(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+  public Circle(ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Circle";
   }
 
@@ -88,7 +87,7 @@ public class Circle extends Visualization implements ConfigurableVisualization {
   @Override
   public void update(float delta) {
     CircleSettings s = settings;
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     radius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
@@ -104,11 +103,10 @@ public class Circle extends Visualization implements ConfigurableVisualization {
     }
 
     for (int i = 0; i < length; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
       frameColors[i] = color.getRGB();
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

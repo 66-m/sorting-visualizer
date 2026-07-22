@@ -17,9 +17,9 @@ public record SwirlDotsSettings(double spiralTurns, double radiusScale, double p
   public static final double POINT_SIZE_MAX = 12.0;
 
   public SwirlDotsSettings {
-    spiralTurns = clamp(spiralTurns, SPIRAL_TURNS_MIN, SPIRAL_TURNS_MAX);
-    radiusScale = clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
-    pointSize = clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
+    spiralTurns = Numbers.clamp(spiralTurns, SPIRAL_TURNS_MIN, SPIRAL_TURNS_MAX);
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
   public static SwirlDotsSettings defaults() {
@@ -29,9 +29,5 @@ public record SwirlDotsSettings(double spiralTurns, double radiusScale, double p
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

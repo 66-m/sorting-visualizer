@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Drift guard: {@link SettingsDefaults} must keep the numeric values that were previously hardcoded
- * across UserPreferences / MainControllerConfig / AppContext.
+ * across UserPreferences / AppConfig / AppContext.
  */
 class SettingsDefaultsTest {
 
@@ -48,8 +48,6 @@ class SettingsDefaultsTest {
 
   @Test
   void legacyFacadesDelegateToSettingsDefaults() {
-    assertEquals(SettingsDefaults.DEFAULT_ARRAY_SIZE, MainControllerConfig.DEFAULT_ARRAY_SIZE);
-    assertEquals(SettingsDefaults.DEFAULT_ARRAY_SIZE, UserPreferences.DEFAULT_ARRAY_SIZE);
     assertEquals(SettingsDefaults.DEFAULT_ALGORITHM_ID, UserPreferences.DEFAULT_ALGORITHM_ID);
     assertEquals(SettingsDefaults.DEFAULT_SPEED_LEVEL, UserPreferences.DEFAULT_SPEED_LEVEL);
   }

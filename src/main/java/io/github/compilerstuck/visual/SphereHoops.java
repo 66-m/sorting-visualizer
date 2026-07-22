@@ -24,8 +24,8 @@ public class SphereHoops extends Visualization implements ConfigurableVisualizat
   private int[] lineArgb;
 
   public SphereHoops(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Sphere Hoops";
   }
 
@@ -69,7 +69,7 @@ public class SphereHoops extends Visualization implements ConfigurableVisualizat
     SphereHoopsSettings s = settings;
     int screenMin = Math.min(screenHeight, screenWidth);
     int radius = (int) (screenMin * s.globeScale());
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     float centerZ = -(int) (screenMin / 10);
     float centerX = (float) screenWidth / 2;
     float centerY = (float) screenHeight / 2;
@@ -88,10 +88,9 @@ public class SphereHoops extends Visualization implements ConfigurableVisualizat
 
     int lineCount = 0;
     for (int i = 0; i < length; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

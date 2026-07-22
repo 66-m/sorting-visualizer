@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.DisparityCircleScatterLinkedSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -24,8 +23,7 @@ public final class DisparityCircleScatterLinkedCustomizePanel
           DisparityCircleScatterLinkedSettings.RADIUS_SCALE_MAX,
           DisparityCircleScatterLinkedSettings.DEFAULT_RADIUS_SCALE);
   private final Label radiusScaleValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -35,7 +33,7 @@ public final class DisparityCircleScatterLinkedCustomizePanel
         lineThickness, lineThicknessValue, v -> String.format("%.2f", v));
     CustomizePanelSupport.bindValueLabel(
         radiusScale, radiusScaleValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(lineThickness.valueProperty(), radiusScale.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -51,25 +49,22 @@ public final class DisparityCircleScatterLinkedCustomizePanel
                 lineThicknessValue,
                 DisparityCircleScatterLinkedSettings.DEFAULT_LINE_THICKNESS));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     DisparityCircleScatterLinkedSettings s =
-        settings instanceof DisparityCircleScatterLinkedSettings c
-            ? c
-            : DisparityCircleScatterLinkedSettings.defaults();
-    loading = true;
-    try {
-      lineThickness.setValue(s.lineThickness());
-      radiusScale.setValue(s.radiusScale());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings,
+            DisparityCircleScatterLinkedSettings.class,
+            DisparityCircleScatterLinkedSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          lineThickness.setValue(s.lineThickness());
+          radiusScale.setValue(s.radiusScale());
+        });
   }
 
   @Override
@@ -85,17 +80,6 @@ public final class DisparityCircleScatterLinkedCustomizePanel
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    lineThickness.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    radiusScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

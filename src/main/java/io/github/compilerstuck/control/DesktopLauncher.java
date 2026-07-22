@@ -2,7 +2,7 @@ package io.github.compilerstuck.control;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.settingsfx.JavaFxBootstrap;
 import java.awt.Dimension;
@@ -25,12 +25,11 @@ public final class DesktopLauncher {
     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
     config.setTitle("Sorting Algorithm Visualizer");
     config.useVsync(true);
-    config.setForegroundFPS(MainControllerConfig.TARGET_FRAME_RATE);
+    config.setForegroundFPS(AppConfig.TARGET_FRAME_RATE);
     // GL 3.0 (emulated by desktop OpenGL 3.2) required for mesh hardware instancing.
     config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
     config.setWindowIcon("logo.png");
-    config.setWindowSizeLimits(
-        MainControllerConfig.MIN_WINDOW_WIDTH, MainControllerConfig.MIN_WINDOW_HEIGHT, -1, -1);
+    config.setWindowSizeLimits(AppConfig.MIN_WINDOW_WIDTH, AppConfig.MIN_WINDOW_HEIGHT, -1, -1);
 
     if (fullscreen) {
       config.setDecorated(false);

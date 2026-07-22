@@ -43,12 +43,11 @@ public final class UserPreferences {
 
   public static final String DEFAULT_ALGORITHM_ID = SettingsDefaults.DEFAULT_ALGORITHM_ID;
   public static final String DEFAULT_VISUALIZATION_ID = SettingsDefaults.DEFAULT_VISUALIZATION_ID;
-  public static final int DEFAULT_ARRAY_SIZE = SettingsDefaults.DEFAULT_ARRAY_SIZE;
   public static final int DEFAULT_SPEED_LEVEL = SettingsDefaults.DEFAULT_SPEED_LEVEL;
 
   private String algorithmId = DEFAULT_ALGORITHM_ID;
   private String visualizationId = DEFAULT_VISUALIZATION_ID;
-  private int arraySize = DEFAULT_ARRAY_SIZE;
+  private int arraySize = SettingsDefaults.DEFAULT_ARRAY_SIZE;
   private int speedLevel = DEFAULT_SPEED_LEVEL;
   private boolean muted = SettingsDefaults.DEFAULT_MUTED;
   private ShuffleType shuffleType = SettingsDefaults.DEFAULT_SHUFFLE_TYPE;
@@ -72,7 +71,7 @@ public final class UserPreferences {
     UserPreferences prefs = new UserPreferences();
     prefs.algorithmId = node.get(KEY_ALGORITHM, DEFAULT_ALGORITHM_ID);
     prefs.visualizationId = node.get(KEY_VISUALIZATION, DEFAULT_VISUALIZATION_ID);
-    prefs.arraySize = clampSize(node.getInt(KEY_ARRAY_SIZE, DEFAULT_ARRAY_SIZE));
+    prefs.arraySize = clampSize(node.getInt(KEY_ARRAY_SIZE, SettingsDefaults.DEFAULT_ARRAY_SIZE));
     prefs.speedLevel = clampSpeed(node.getInt(KEY_SPEED, DEFAULT_SPEED_LEVEL));
     prefs.muted = node.getBoolean(KEY_MUTED, SettingsDefaults.DEFAULT_MUTED);
     if (node.getInt(KEY_DEFAULTS_VERSION, 0) < CURRENT_DEFAULTS_VERSION) {

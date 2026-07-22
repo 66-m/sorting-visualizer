@@ -20,8 +20,4 @@ public record ColorGradientGraphSettings(boolean showIndexDividers)
   public String visualizationId() {
     return ID;
   }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
-  }
 }

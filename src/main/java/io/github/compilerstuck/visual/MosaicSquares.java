@@ -27,8 +27,8 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
   private int[] argb;
 
   public MosaicSquares(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Mosaic Squares";
   }
 
@@ -75,9 +75,9 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
 
   @Override
   public void update(float delta) {
-    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
+    int nextN = (int) floor(Math.pow(arrayModel.getLength(), 1 / 2.) + 0.1);
     float squareRoot = nextN;
-    int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
+    int drawCount = Math.min(arrayModel.getLength(), nextN * nextN);
 
     ensureTileOrigins(drawCount, nextN, squareRoot);
 
@@ -87,10 +87,9 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
     }
 
     for (int i = 0; i < drawCount; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

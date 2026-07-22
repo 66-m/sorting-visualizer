@@ -10,7 +10,7 @@ public record ScatterPlotLinkedSettings(double lineThickness) implements Visuali
   public static final double LINE_THICKNESS_MAX = 4.0;
 
   public ScatterPlotLinkedSettings {
-    lineThickness = clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
+    lineThickness = Numbers.clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
   }
 
   public static ScatterPlotLinkedSettings defaults() {
@@ -20,9 +20,5 @@ public record ScatterPlotLinkedSettings(double lineThickness) implements Visuali
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

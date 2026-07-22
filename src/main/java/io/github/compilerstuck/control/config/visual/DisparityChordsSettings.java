@@ -21,11 +21,12 @@ public record DisparityChordsSettings(
   public static final int CHORD_OPACITY_MAX = 255;
 
   public DisparityChordsSettings {
-    radiusScale = clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
-    lineThickness = clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    lineThickness = Numbers.clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
     coincidentMarkerSize =
-        clamp(coincidentMarkerSize, COINCIDENT_MARKER_SIZE_MIN, COINCIDENT_MARKER_SIZE_MAX);
-    chordOpacity = (int) Math.round(clamp(chordOpacity, CHORD_OPACITY_MIN, CHORD_OPACITY_MAX));
+        Numbers.clamp(coincidentMarkerSize, COINCIDENT_MARKER_SIZE_MIN, COINCIDENT_MARKER_SIZE_MAX);
+    chordOpacity =
+        (int) Math.round(Numbers.clamp(chordOpacity, CHORD_OPACITY_MIN, CHORD_OPACITY_MAX));
   }
 
   public static DisparityChordsSettings defaults() {
@@ -39,9 +40,5 @@ public record DisparityChordsSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

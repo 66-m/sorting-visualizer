@@ -65,7 +65,7 @@ public final class JavaFxBootstrap {
             colorPicker,
             new ToggleSwitch());
     Scene scene = new Scene(root, 8, 8);
-    URL css = SettingsFxController.class.getResource("/css/settings-app.css");
+    URL css = SettingsStylesheets.cssUrl();
     if (css != null) {
       scene.getStylesheets().add(css.toExternalForm());
     }

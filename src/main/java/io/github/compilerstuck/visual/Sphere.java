@@ -38,9 +38,8 @@ public class Sphere extends Visualization implements ConfigurableVisualization {
   private int cachedMaxRadius = -1;
   private ColorGradient cachedGradient;
 
-  public Sphere(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+  public Sphere(ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Sphere";
   }
 
@@ -105,7 +104,7 @@ public class Sphere extends Visualization implements ConfigurableVisualization {
   }
 
   private void ensureColorsAndRadii(int drawCount, int length, int maxRadius) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -116,9 +115,9 @@ public class Sphere extends Visualization implements ConfigurableVisualization {
       return;
     }
     for (int i = 0; i < drawCount; i++) {
-      int value = arrayController.get(i);
+      int value = arrayModel.get(i);
 
-      if (arrayController.getMarker(value) == Marker.SET) {
+      if (arrayModel.getMarker(value) == Marker.SET) {
         sound.playSound(value);
       }
 
@@ -133,7 +132,7 @@ public class Sphere extends Visualization implements ConfigurableVisualization {
 
       pointRadii[i] = (int) VisMath.map(barHeight, 0, 100000, 0, maxRadius);
 
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
       colorsRgb[i] = color.getRGB();
     }
     cachedRevision = rev;
@@ -148,10 +147,10 @@ public class Sphere extends Visualization implements ConfigurableVisualization {
   @Override
   public void update(float delta) {
     SphereSettings s = settings;
-    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
+    int nextN = (int) floor(Math.pow(arrayModel.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
-    int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
-    int length = arrayController.getLength();
+    int drawCount = Math.min(arrayModel.getLength(), nextN * nextN);
+    int length = arrayModel.getLength();
     int maxRadius = (int) (min(screenHeight, screenWidth) * s.globeScale());
     float centerZ = -(int) (min(screenHeight, screenWidth) / 10);
 

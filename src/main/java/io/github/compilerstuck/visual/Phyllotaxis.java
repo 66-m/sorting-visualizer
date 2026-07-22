@@ -29,8 +29,8 @@ public class Phyllotaxis extends Visualization implements ConfigurableVisualizat
   private int[] argb;
 
   public Phyllotaxis(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Phyllotaxis";
   }
 
@@ -97,7 +97,7 @@ public class Phyllotaxis extends Visualization implements ConfigurableVisualizat
   @Override
   public void update(float delta) {
     PhyllotaxisSettings s = settings;
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     int screenMin = Math.min(screenHeight, screenWidth);
     float centerX = screenWidth / 2f;
     float centerY = screenHeight / 2f;
@@ -112,10 +112,10 @@ public class Phyllotaxis extends Visualization implements ConfigurableVisualizat
     }
 
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

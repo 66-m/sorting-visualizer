@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.SphereHoopsSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -17,15 +16,14 @@ public final class SphereHoopsCustomizePanel implements VisualizationCustomizePa
           SphereHoopsSettings.GLOBE_SCALE_MAX,
           SphereHoopsSettings.DEFAULT_GLOBE_SCALE);
   private final Label globeScaleValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
     CustomizePanelSupport.configureSlider(globeScale, false);
     CustomizePanelSupport.bindValueLabel(
         globeScale, globeScaleValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(globeScale.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -36,22 +34,19 @@ public final class SphereHoopsCustomizePanel implements VisualizationCustomizePa
                 globeScaleValue,
                 SphereHoopsSettings.DEFAULT_GLOBE_SCALE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     SphereHoopsSettings s =
-        settings instanceof SphereHoopsSettings c ? c : SphereHoopsSettings.defaults();
-    loading = true;
-    try {
-      globeScale.setValue(s.globeScale());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, SphereHoopsSettings.class, SphereHoopsSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          globeScale.setValue(s.globeScale());
+        });
   }
 
   @Override
@@ -66,16 +61,6 @@ public final class SphereHoopsCustomizePanel implements VisualizationCustomizePa
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    globeScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

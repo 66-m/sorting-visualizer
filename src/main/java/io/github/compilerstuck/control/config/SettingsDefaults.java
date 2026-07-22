@@ -4,8 +4,8 @@ import java.awt.Color;
 
 /**
  * Single source of truth for Settings / session defaults (G10). Referenced by {@link
- * UserPreferences}, {@link MainControllerConfig}, and {@link
- * io.github.compilerstuck.control.AppContext} so magic indices are not duplicated.
+ * UserPreferences}, {@link AppConfig}, and {@link io.github.compilerstuck.control.AppContext} so
+ * magic indices are not duplicated.
  */
 public final class SettingsDefaults {
 

@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.DisparityCircleSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -29,8 +28,7 @@ public final class DisparityCircleCustomizePanel implements VisualizationCustomi
           DisparityCircleSettings.START_ANGLE_DEG_MAX,
           DisparityCircleSettings.DEFAULT_START_ANGLE_DEG);
   private final Label startAngleDegValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -43,7 +41,8 @@ public final class DisparityCircleCustomizePanel implements VisualizationCustomi
         lineThickness, lineThicknessValue, v -> String.format("%.2f", v));
     CustomizePanelSupport.bindValueLabel(
         startAngleDeg, startAngleDegValue, v -> String.format("%.0f°", v));
-    bindDraftChanges();
+    draft.bind(
+        radiusScale.valueProperty(), lineThickness.valueProperty(), startAngleDeg.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -64,24 +63,21 @@ public final class DisparityCircleCustomizePanel implements VisualizationCustomi
                 lineThicknessValue,
                 DisparityCircleSettings.DEFAULT_LINE_THICKNESS));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     DisparityCircleSettings s =
-        settings instanceof DisparityCircleSettings c ? c : DisparityCircleSettings.defaults();
-    loading = true;
-    try {
-      radiusScale.setValue(s.radiusScale());
-      lineThickness.setValue(s.lineThickness());
-      startAngleDeg.setValue(s.startAngleDeg());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, DisparityCircleSettings.class, DisparityCircleSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          radiusScale.setValue(s.radiusScale());
+          lineThickness.setValue(s.lineThickness());
+          startAngleDeg.setValue(s.startAngleDeg());
+        });
   }
 
   @Override
@@ -97,18 +93,6 @@ public final class DisparityCircleCustomizePanel implements VisualizationCustomi
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    radiusScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    lineThickness.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    startAngleDeg.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

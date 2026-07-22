@@ -10,7 +10,7 @@ public record SphereHoopsSettings(double globeScale) implements VisualizationSet
   public static final double GLOBE_SCALE_MAX = 0.9;
 
   public SphereHoopsSettings {
-    globeScale = clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
+    globeScale = Numbers.clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
   }
 
   public static SphereHoopsSettings defaults() {
@@ -20,9 +20,5 @@ public record SphereHoopsSettings(double globeScale) implements VisualizationSet
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

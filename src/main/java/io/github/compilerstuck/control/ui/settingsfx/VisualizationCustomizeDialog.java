@@ -159,7 +159,7 @@ public final class VisualizationCustomizeDialog {
           showStatus(status, SettingsStrings.CUSTOMIZE_EXPORT_COPIED, false);
         });
 
-    var css = SettingsFxController.class.getResource("/css/settings-app.css");
+    var css = SettingsStylesheets.cssUrl();
     if (css != null) {
       dialog.getDialogPane().getStylesheets().add(css.toExternalForm());
     }
@@ -325,7 +325,7 @@ public final class VisualizationCustomizeDialog {
           accepted.set(decoded.get());
         });
 
-    var css = SettingsFxController.class.getResource("/css/settings-app.css");
+    var css = SettingsStylesheets.cssUrl();
     if (css != null) {
       importDialog.getDialogPane().getStylesheets().add(css.toExternalForm());
     }
@@ -370,7 +370,7 @@ public final class VisualizationCustomizeDialog {
         new ButtonType(SettingsStrings.CUSTOMIZE_SAVE_AND_CLOSE, ButtonBar.ButtonData.OK_DONE);
     alert.getButtonTypes().setAll(discard, keepEditing, saveAndClose);
 
-    var css = SettingsFxController.class.getResource("/css/settings-app.css");
+    var css = SettingsStylesheets.cssUrl();
     if (css != null) {
       alert.getDialogPane().getStylesheets().add(css.toExternalForm());
     }

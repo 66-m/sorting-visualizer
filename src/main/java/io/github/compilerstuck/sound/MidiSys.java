@@ -25,8 +25,8 @@ public class MidiSys extends Sound {
   private final Synthesizer synthesizer;
   private final MidiChannel synthesizerChannel;
 
-  public MidiSys(ArrayModel arrayController) throws MidiUnavailableException {
-    super(arrayController);
+  public MidiSys(ArrayModel arrayModel) throws MidiUnavailableException {
+    super(arrayModel);
     synthesizer = MidiSystem.getSynthesizer();
     openSynthesizer(synthesizer);
     synthesizer.loadAllInstruments(synthesizer.getDefaultSoundbank());
@@ -68,13 +68,12 @@ public class MidiSys extends Sound {
   @Override
   public void playSound(int index) {
 
-    if (!isMuted && index >= 0 && arrayController.getMarker(index) == Marker.SET) {
+    if (!isMuted && index >= 0 && arrayModel.getMarker(index) == Marker.SET) {
       // Hard cut (same as main): Electric Piano release tails from noteOff change the timbre.
       synthesizerChannel.allSoundOff();
       synthesizerChannel.allNotesOff();
 
-      synthesizerChannel.noteOn(
-          28 + 40 * (arrayController.get(index) + 1) / arrayController.getLength(), 90);
+      synthesizerChannel.noteOn(28 + 40 * (arrayModel.get(index) + 1) / arrayModel.getLength(), 90);
     }
   }
 
@@ -84,6 +83,12 @@ public class MidiSys extends Sound {
     synthesizerChannel.allSoundOff();
     synthesizerChannel.allNotesOff();
     synthesizerChannel.setMute(mute);
+  }
+
+  @Override
+  public void cutNotes() {
+    synthesizerChannel.allSoundOff();
+    synthesizerChannel.allNotesOff();
   }
 
   @Override

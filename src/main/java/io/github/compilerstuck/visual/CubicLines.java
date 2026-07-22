@@ -41,8 +41,8 @@ public class CubicLines extends Visualization implements ConfigurableVisualizati
   private int[] lineArgb;
 
   public CubicLines(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Cubic Lines";
   }
 
@@ -110,15 +110,15 @@ public class CubicLines extends Visualization implements ConfigurableVisualizati
   }
 
   private void ensureColors(int drawCount) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev && cachedDrawCount == drawCount && cachedGradient == colorGradient) {
       return;
     }
     for (int i = 0; i < drawCount; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(value) == Marker.SET) {
+      if (arrayModel.getMarker(value) == Marker.SET) {
         sound.playSound(value);
       }
 
@@ -142,11 +142,11 @@ public class CubicLines extends Visualization implements ConfigurableVisualizati
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
-    int xSize = (int) floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1);
+    int xSize = (int) floor(Math.pow(arrayModel.getLength(), 1 / 3f) + 0.1);
     if (xSize < 1) {
       xSize = 1;
     }
-    int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
+    int drawCount = Math.min(arrayModel.getLength(), xSize * xSize * xSize);
 
     ensureBuffers(drawCount);
     rebuildLattice(drawCount, xSize, radius);
@@ -177,7 +177,7 @@ public class CubicLines extends Visualization implements ConfigurableVisualizati
     int pointCount = 0;
 
     for (int i = 0; i < drawCount; i++) {
-      int target = arrayController.get(i);
+      int target = arrayModel.get(i);
       if (i == target || target < 0 || target >= drawCount) {
         float ms = (float) s.markerSize();
         points.set(pointCount, xCords[i], yCords[i], zCords[i], ms, ms, ms, 0, 0, 0, colorsRgb[i]);

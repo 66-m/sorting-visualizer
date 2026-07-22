@@ -10,7 +10,7 @@ public record NumberPlotSettings(double fontSize) implements VisualizationSettin
   public static final double FONT_SIZE_MAX = 24.0;
 
   public NumberPlotSettings {
-    fontSize = clamp(fontSize, FONT_SIZE_MIN, FONT_SIZE_MAX);
+    fontSize = Numbers.clamp(fontSize, FONT_SIZE_MIN, FONT_SIZE_MAX);
   }
 
   public static NumberPlotSettings defaults() {
@@ -20,9 +20,5 @@ public record NumberPlotSettings(double fontSize) implements VisualizationSettin
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

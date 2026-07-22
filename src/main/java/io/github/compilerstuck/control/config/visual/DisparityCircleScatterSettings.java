@@ -17,9 +17,9 @@ public record DisparityCircleScatterSettings(
   public static final double START_ANGLE_DEG_MAX = 360.0;
 
   public DisparityCircleScatterSettings {
-    pointSize = clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
-    radiusScale = clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
-    startAngleDeg = clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
+    pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    startAngleDeg = Numbers.clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
   }
 
   public static DisparityCircleScatterSettings defaults() {
@@ -30,9 +30,5 @@ public record DisparityCircleScatterSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

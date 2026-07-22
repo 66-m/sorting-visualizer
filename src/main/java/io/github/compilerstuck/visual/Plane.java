@@ -32,9 +32,8 @@ public class Plane extends Visualization implements ConfigurableVisualization {
   private int cachedDrawCount = -1;
   private ColorGradient cachedGradient;
 
-  public Plane(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+  public Plane(ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Plane";
   }
 
@@ -79,16 +78,15 @@ public class Plane extends Visualization implements ConfigurableVisualization {
   }
 
   private void ensureColors(int drawCount) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev && cachedDrawCount == drawCount && cachedGradient == colorGradient) {
       return;
     }
     for (int i = 0; i < drawCount; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
       colorsRgb[i] = color.getRGB();
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
     }
@@ -108,9 +106,9 @@ public class Plane extends Visualization implements ConfigurableVisualization {
 
     angle += (float) s.rotationSpeedRadPerSec() * delta;
 
-    int nextN = (int) floor(Math.pow(arrayController.getLength(), 1 / 2.) + 0.1);
+    int nextN = (int) floor(Math.pow(arrayModel.getLength(), 1 / 2.) + 0.1);
     squareRoot = nextN;
-    int drawCount = Math.min(arrayController.getLength(), nextN * nextN);
+    int drawCount = Math.min(arrayModel.getLength(), nextN * nextN);
     float tileDim = radius / squareRoot;
     float gap = (float) (tileDim * s.tileGap());
     float drawDim = Math.max(0.5f, tileDim - gap);

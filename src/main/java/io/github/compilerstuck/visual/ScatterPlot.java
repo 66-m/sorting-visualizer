@@ -24,8 +24,8 @@ public class ScatterPlot extends Visualization implements ConfigurableVisualizat
   private int[] argb;
 
   public ScatterPlot(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Scatter Plot";
   }
 
@@ -47,7 +47,7 @@ public class ScatterPlot extends Visualization implements ConfigurableVisualizat
   }
 
   private void ensureHeights(int n, int heightScale) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -58,7 +58,7 @@ public class ScatterPlot extends Visualization implements ConfigurableVisualizat
       barHeights = new int[n];
     }
     for (int i = 0; i < n; i++) {
-      barHeights[i] = (arrayController.get(i) + 1) * heightScale / n;
+      barHeights[i] = (arrayModel.get(i) + 1) * heightScale / n;
     }
     cachedRevision = rev;
     cachedWidth = screenWidth;
@@ -70,7 +70,7 @@ public class ScatterPlot extends Visualization implements ConfigurableVisualizat
   public void update(float delta) {
     ScatterPlotSettings s = settings;
     float pointSize = (float) s.pointSize();
-    int n = arrayController.getLength();
+    int n = arrayModel.getLength();
     int heightScale = screenHeight - 5;
 
     indexXCache.ensure(n, screenWidth);
@@ -83,10 +83,9 @@ public class ScatterPlot extends Visualization implements ConfigurableVisualizat
     }
 
     for (int i = 0; i < n; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

@@ -3,10 +3,10 @@ package io.github.compilerstuck.control.model;
 import io.github.compilerstuck.visual.Marker;
 
 /**
- * Represents the model for a sortable array; the interface exposes only the the operations required
- * by sorting algorithms and instrumentation. By coding against this interface we can later replace
- * the implementation, add listeners, or provide a mock for tests. The interface also exposes
- * various measurement accessors used by the UI and test harness.
+ * Represents the model for a sortable array; the interface exposes only the operations required by
+ * sorting algorithms and instrumentation. By coding against this interface we can later replace the
+ * implementation, add listeners, or provide a mock for tests. The interface also exposes various
+ * measurement accessors used by the UI and test harness.
  */
 public interface ArrayModel {
   int getLength();
@@ -26,8 +26,6 @@ public interface ArrayModel {
 
   void addWritesAux(int n);
 
-  void addSleepTime(double sleepTime);
-
   /** Adds a slice of behind-the-scenes sort work time in nanoseconds (excludes visual pacing). */
   void addRealTime(double timeNs);
 
@@ -39,8 +37,6 @@ public interface ArrayModel {
   long getWrites();
 
   long getWritesAux();
-
-  double getDelay();
 
   /**
    * Accumulated behind-the-scenes sort time in nanoseconds up to this point (algorithm work only;
@@ -59,8 +55,9 @@ public interface ArrayModel {
   boolean isSorted();
 
   /**
-   * Return direct access to the underlying int[]; provided for algorithms that require a bulk view.
-   * Consumers should not modify the returned array except via the ArrayModel API.
+   * Live mutable backing store for algorithms that need a bulk view and for snapshot publishers
+   * that copy values. Algorithms may read/write this array directly for performance; visuals and
+   * sound must use the published snapshot view, not this method.
    */
   int[] getArray();
 

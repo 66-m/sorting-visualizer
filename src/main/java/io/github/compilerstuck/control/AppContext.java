@@ -48,6 +48,7 @@ public final class AppContext {
   private DelayContext delayContext;
   private ImageRepository imageRepository;
   private Runnable shutdownHandler;
+  private SettingsBridge settingsBridge = SettingsBridge.NOOP;
 
   private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
   private int stepsPerFrame = SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
@@ -144,10 +145,6 @@ public final class AppContext {
 
   public int getStepsPerFrame() {
     return stepsPerFrame;
-  }
-
-  public void setStepsPerFrame(int stepsPerFrame) {
-    this.stepsPerFrame = Math.max(1, stepsPerFrame);
   }
 
   public int getSpeedLevel() {
@@ -268,10 +265,6 @@ public final class AppContext {
 
   public DelayContext getDelayContext() {
     return delayContext;
-  }
-
-  public void setDelayContext(DelayContext delayContext) {
-    this.delayContext = delayContext;
   }
 
   /** Wires draw system and delay port. */
@@ -435,5 +428,13 @@ public final class AppContext {
   /** Registers the composition-root quit path (typically {@code Game::shutdown}). */
   public void setShutdownHandler(Runnable shutdownHandler) {
     this.shutdownHandler = shutdownHandler;
+  }
+
+  public SettingsBridge settingsBridge() {
+    return settingsBridge;
+  }
+
+  public void setSettingsBridge(SettingsBridge settingsBridge) {
+    this.settingsBridge = settingsBridge != null ? settingsBridge : SettingsBridge.NOOP;
   }
 }

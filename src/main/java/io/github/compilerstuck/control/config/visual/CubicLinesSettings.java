@@ -22,11 +22,12 @@ public record CubicLinesSettings(
 
   public CubicLinesSettings {
     rotationSpeedRadPerSec =
-        clamp(
+        Numbers.clamp(
             rotationSpeedRadPerSec, ROTATION_SPEED_RAD_PER_SEC_MIN, ROTATION_SPEED_RAD_PER_SEC_MAX);
-    sceneScaleDivisor = clamp(sceneScaleDivisor, SCENE_SCALE_DIVISOR_MIN, SCENE_SCALE_DIVISOR_MAX);
-    markerSize = clamp(markerSize, MARKER_SIZE_MIN, MARKER_SIZE_MAX);
-    lineOpacity = (int) Math.round(clamp(lineOpacity, LINE_OPACITY_MIN, LINE_OPACITY_MAX));
+    sceneScaleDivisor =
+        Numbers.clamp(sceneScaleDivisor, SCENE_SCALE_DIVISOR_MIN, SCENE_SCALE_DIVISOR_MAX);
+    markerSize = Numbers.clamp(markerSize, MARKER_SIZE_MIN, MARKER_SIZE_MAX);
+    lineOpacity = (int) Math.round(Numbers.clamp(lineOpacity, LINE_OPACITY_MIN, LINE_OPACITY_MAX));
   }
 
   public static CubicLinesSettings defaults() {
@@ -40,9 +41,5 @@ public record CubicLinesSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

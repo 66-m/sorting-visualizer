@@ -10,7 +10,7 @@ public record ScatterPlotSettings(double pointSize) implements VisualizationSett
   public static final double POINT_SIZE_MAX = 12.0;
 
   public ScatterPlotSettings {
-    pointSize = clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
+    pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
   public static ScatterPlotSettings defaults() {
@@ -20,9 +20,5 @@ public record ScatterPlotSettings(double pointSize) implements VisualizationSett
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

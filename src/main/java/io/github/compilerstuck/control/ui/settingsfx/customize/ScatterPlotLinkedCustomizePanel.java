@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.ScatterPlotLinkedSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -17,15 +16,14 @@ public final class ScatterPlotLinkedCustomizePanel implements VisualizationCusto
           ScatterPlotLinkedSettings.LINE_THICKNESS_MAX,
           ScatterPlotLinkedSettings.DEFAULT_LINE_THICKNESS);
   private final Label lineThicknessValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
     CustomizePanelSupport.configureSlider(lineThickness, false);
     CustomizePanelSupport.bindValueLabel(
         lineThickness, lineThicknessValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(lineThickness.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -36,22 +34,19 @@ public final class ScatterPlotLinkedCustomizePanel implements VisualizationCusto
                 lineThicknessValue,
                 ScatterPlotLinkedSettings.DEFAULT_LINE_THICKNESS));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     ScatterPlotLinkedSettings s =
-        settings instanceof ScatterPlotLinkedSettings c ? c : ScatterPlotLinkedSettings.defaults();
-    loading = true;
-    try {
-      lineThickness.setValue(s.lineThickness());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, ScatterPlotLinkedSettings.class, ScatterPlotLinkedSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          lineThickness.setValue(s.lineThickness());
+        });
   }
 
   @Override
@@ -66,16 +61,6 @@ public final class ScatterPlotLinkedCustomizePanel implements VisualizationCusto
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    lineThickness.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

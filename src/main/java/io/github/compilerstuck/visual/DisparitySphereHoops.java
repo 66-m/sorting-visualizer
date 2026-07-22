@@ -33,8 +33,8 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
   private int[] lineArgb;
 
   public DisparitySphereHoops(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Disparity Sphere Hoops";
   }
 
@@ -74,7 +74,7 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
   }
 
   private void ensureSphereWiAndColors(int length, int radius) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -84,8 +84,8 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
       return;
     }
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
       float barHeight =
           -(float)
@@ -99,7 +99,7 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
       float wi = wiBase[i] * barHeight;
       sphereWi[i] = (int) VisMath.map(wi, 0, 1, 0, radius);
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 
@@ -118,7 +118,7 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
     DisparitySphereHoopsSettings s = settings;
     int screenMin = Math.min(screenHeight, screenWidth);
     int radius = (int) (screenMin * s.globeScale());
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     float centerZ = -(int) (screenMin / 10);
     float centerX = (float) screenWidth / 2;
     float centerY = (float) screenHeight / 2;

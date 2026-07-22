@@ -14,8 +14,8 @@ public class ImageHorizontal extends AbstractImageVisualization
   private volatile ImageHorizontalSettings settings = ImageHorizontalSettings.defaults();
 
   public ImageHorizontal(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Image - Horizontal Sorting";
   }
 

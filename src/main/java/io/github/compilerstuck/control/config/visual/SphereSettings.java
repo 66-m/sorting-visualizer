@@ -18,10 +18,10 @@ public record SphereSettings(double rotationSpeedRadPerSec, double globeScale, d
 
   public SphereSettings {
     rotationSpeedRadPerSec =
-        clamp(
+        Numbers.clamp(
             rotationSpeedRadPerSec, ROTATION_SPEED_RAD_PER_SEC_MIN, ROTATION_SPEED_RAD_PER_SEC_MAX);
-    globeScale = clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
-    pointSize = clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
+    globeScale = Numbers.clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
+    pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
   public static SphereSettings defaults() {
@@ -32,9 +32,5 @@ public record SphereSettings(double rotationSpeedRadPerSec, double globeScale, d
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

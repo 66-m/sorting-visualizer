@@ -2,7 +2,8 @@ package io.github.compilerstuck.control.ui.settingsfx;
 
 import com.badlogic.gdx.Gdx;
 import io.github.compilerstuck.control.AppContext;
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.SettingsBridge;
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppearanceViewModel;
@@ -14,7 +15,6 @@ import io.github.compilerstuck.control.ui.settingsfx.vm.SpeedViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.VisualizationViewModel;
 import java.net.URL;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -32,14 +32,14 @@ import javafx.util.Duration;
 
 /**
  * Owns the JavaFX Settings {@link Stage}, view-models, section binding, and action bar. Not an
- * {@link javafx.application.Application} subclass: classpath launcher (Phase 0).
+ * {@link javafx.application.Application} subclass: classpath launcher.
  *
- * <p>Window close shuts down Settings and the canvas via {@link AppContext#shutdown()}.
+ * <p>Window close shuts down Settings and the canvas via {@link AppContext#shutdown()}. Implements
+ * {@link SettingsBridge} for cross-thread updates from the libGDX render thread.
  */
-public final class SettingsFxController {
+public final class SettingsFxController implements SettingsBridge {
 
   private static final Logger LOGGER = Logger.getLogger(SettingsFxController.class.getName());
-  private static final String CSS_PATH = "/css/settings-app.css";
   private static final Duration RAISE_PULSE = Duration.millis(300);
 
   private static volatile SettingsFxController instance;
@@ -96,54 +96,6 @@ public final class SettingsFxController {
         });
   }
 
-  /** Fans running-state enablement out to every section view-model. */
-  public static void setInputsEnabled(boolean enabled) {
-    Platform.runLater(
-        () -> {
-          SettingsFxController ctrl = instance;
-          if (ctrl == null || ctrl.app == null) {
-            return;
-          }
-          ctrl.inputsEnabled = enabled;
-          ctrl.soundVm.setInputsEnabled(enabled);
-          ctrl.speedVm.setInputsEnabled(enabled);
-          ctrl.displayVm.setInputsEnabled(enabled);
-          ctrl.arraySizeVm.setInputsEnabled(enabled);
-          ctrl.appearanceVm.setInputsEnabled(enabled);
-          ctrl.visualizationVm.setInputsEnabled(enabled);
-          ctrl.algorithmVm.setInputsEnabled(enabled);
-          ctrl.updateRunEnabled();
-        });
-  }
-
-  public static void setCancelEnabled(boolean enabled) {
-    Platform.runLater(
-        () -> {
-          if (instance != null && instance.cancelButton != null) {
-            instance.cancelButton.setDisable(!enabled);
-          }
-        });
-  }
-
-  public static void setProgress(int progress) {
-    int clamped = Math.max(0, Math.min(100, progress));
-    SettingsFxController ctrl = instance;
-    if (ctrl != null && clamped == ctrl.lastAppliedProgress) {
-      return;
-    }
-    Platform.runLater(
-        () -> {
-          if (instance == null || instance.progressBar == null) {
-            return;
-          }
-          if (clamped == instance.lastAppliedProgress) {
-            return;
-          }
-          instance.lastAppliedProgress = clamped;
-          instance.progressBar.setProgress(clamped / 100.0);
-        });
-  }
-
   private static SettingsFxController instance() {
     if (instance == null) {
       synchronized (SettingsFxController.class) {
@@ -153,6 +105,54 @@ public final class SettingsFxController {
       }
     }
     return instance;
+  }
+
+  @Override
+  public void setInputsEnabled(boolean enabled) {
+    Platform.runLater(
+        () -> {
+          if (app == null) {
+            return;
+          }
+          inputsEnabled = enabled;
+          soundVm.setInputsEnabled(enabled);
+          speedVm.setInputsEnabled(enabled);
+          displayVm.setInputsEnabled(enabled);
+          arraySizeVm.setInputsEnabled(enabled);
+          appearanceVm.setInputsEnabled(enabled);
+          visualizationVm.setInputsEnabled(enabled);
+          algorithmVm.setInputsEnabled(enabled);
+          updateRunEnabled();
+        });
+  }
+
+  @Override
+  public void setCancelEnabled(boolean enabled) {
+    Platform.runLater(
+        () -> {
+          if (cancelButton != null) {
+            cancelButton.setDisable(!enabled);
+          }
+        });
+  }
+
+  @Override
+  public void setProgress(int progress) {
+    int clamped = Math.max(0, Math.min(100, progress));
+    if (clamped == lastAppliedProgress) {
+      return;
+    }
+    Platform.runLater(
+        () -> {
+          if (progressBar == null) {
+            return;
+          }
+          if (clamped == lastAppliedProgress) {
+            return;
+          }
+          lastAppliedProgress = clamped;
+          progressBar.setProgress(clamped / 100.0);
+        });
   }
 
   /** Creates and sizes the Stage with a lightweight placeholder scene (no section graph). */
@@ -168,18 +168,16 @@ public final class SettingsFxController {
     if (logoIcon != null) {
       stage.getIcons().add(new Image(logoIcon.toExternalForm()));
     }
-    stage.setMinWidth(MainControllerConfig.SETTINGS_MIN_WIDTH);
-    stage.setMinHeight(MainControllerConfig.SETTINGS_MIN_HEIGHT);
+    stage.setMinWidth(AppConfig.SETTINGS_MIN_WIDTH);
+    stage.setMinHeight(AppConfig.SETTINGS_MIN_HEIGHT);
 
     Rectangle2D visual = primaryVisualBounds();
     double width =
         Math.max(
-            MainControllerConfig.SETTINGS_MIN_WIDTH,
-            visual.getWidth() * MainControllerConfig.SETTINGS_SCREEN_FRACTION);
+            AppConfig.SETTINGS_MIN_WIDTH, visual.getWidth() * AppConfig.SETTINGS_SCREEN_FRACTION);
     double height =
         Math.max(
-            MainControllerConfig.SETTINGS_MIN_HEIGHT,
-            visual.getHeight() * MainControllerConfig.SETTINGS_SCREEN_FRACTION);
+            AppConfig.SETTINGS_MIN_HEIGHT, visual.getHeight() * AppConfig.SETTINGS_SCREEN_FRACTION);
     stage.setWidth(width);
     stage.setHeight(height);
     centerOnPrimaryScreen();
@@ -223,6 +221,7 @@ public final class SettingsFxController {
     }
     this.app = appContext;
     createViewModels(appContext);
+    appContext.setSettingsBridge(this);
 
     ShellResult shell =
         SettingsShell.build(
@@ -259,18 +258,10 @@ public final class SettingsFxController {
   }
 
   private static void applyAppStylesheet(Scene scene) {
-    URL css = SettingsFxController.class.getResource(CSS_PATH);
-    if (css != null) {
-      scene.getStylesheets().add(css.toExternalForm());
-    } else {
-      LOGGER.log(Level.WARNING, "Missing stylesheet: {0}", CSS_PATH);
-    }
+    SettingsStylesheets.applyTo(scene);
   }
 
-  /**
-   * Show + brief always-on-top pulse so a maximized NEWT canvas does not keep Settings buried
-   * (Phase 0 §4.3).
-   */
+  /** Show + brief always-on-top pulse so a maximized NEWT canvas does not keep Settings buried. */
   private void raiseAndShow() {
     if (stage == null) {
       return;

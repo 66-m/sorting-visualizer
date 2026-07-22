@@ -18,7 +18,8 @@ public record ImageVerticalSettings(FitMode fitMode, double highlightStrength)
 
   public ImageVerticalSettings {
     fitMode = fitMode == null ? DEFAULT_FIT_MODE : fitMode;
-    highlightStrength = clamp(highlightStrength, HIGHLIGHT_STRENGTH_MIN, HIGHLIGHT_STRENGTH_MAX);
+    highlightStrength =
+        Numbers.clamp(highlightStrength, HIGHLIGHT_STRENGTH_MIN, HIGHLIGHT_STRENGTH_MAX);
   }
 
   public static ImageVerticalSettings defaults() {
@@ -28,9 +29,5 @@ public record ImageVerticalSettings(FitMode fitMode, double highlightStrength)
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.SphereSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -29,8 +28,7 @@ public final class SphereCustomizePanel implements VisualizationCustomizePanel {
           SphereSettings.POINT_SIZE_MAX,
           SphereSettings.DEFAULT_POINT_SIZE);
   private final Label pointSizeValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -42,7 +40,10 @@ public final class SphereCustomizePanel implements VisualizationCustomizePanel {
     CustomizePanelSupport.bindValueLabel(
         globeScale, globeScaleValue, v -> String.format("%.2f", v));
     CustomizePanelSupport.bindValueLabel(pointSize, pointSizeValue, v -> String.format("%.1f", v));
-    bindDraftChanges();
+    draft.bind(
+        rotationSpeedRadPerSec.valueProperty(),
+        globeScale.valueProperty(),
+        pointSize.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -57,23 +58,21 @@ public final class SphereCustomizePanel implements VisualizationCustomizePanel {
             CustomizePanelSupport.sliderRow(
                 "Point size", pointSize, pointSizeValue, SphereSettings.DEFAULT_POINT_SIZE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
-    SphereSettings s = settings instanceof SphereSettings c ? c : SphereSettings.defaults();
-    loading = true;
-    try {
-      rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
-      globeScale.setValue(s.globeScale());
-      pointSize.setValue(s.pointSize());
-    } finally {
-      loading = false;
-    }
+    SphereSettings s =
+        CustomizePanelSupport.castOrDefaults(
+            settings, SphereSettings.class, SphereSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
+          globeScale.setValue(s.globeScale());
+          pointSize.setValue(s.pointSize());
+        });
   }
 
   @Override
@@ -89,18 +88,6 @@ public final class SphereCustomizePanel implements VisualizationCustomizePanel {
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    rotationSpeedRadPerSec.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    globeScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    pointSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

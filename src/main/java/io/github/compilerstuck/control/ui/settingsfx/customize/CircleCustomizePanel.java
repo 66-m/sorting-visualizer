@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.CircleSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -29,8 +28,7 @@ public final class CircleCustomizePanel implements VisualizationCustomizePanel {
           CircleSettings.LINE_THICKNESS_MAX,
           CircleSettings.DEFAULT_LINE_THICKNESS);
   private final Label lineThicknessValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -43,7 +41,8 @@ public final class CircleCustomizePanel implements VisualizationCustomizePanel {
         startAngleDeg, startAngleDegValue, v -> String.format("%.0f°", v));
     CustomizePanelSupport.bindValueLabel(
         lineThickness, lineThicknessValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(
+        radiusScale.valueProperty(), startAngleDeg.valueProperty(), lineThickness.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -61,23 +60,21 @@ public final class CircleCustomizePanel implements VisualizationCustomizePanel {
                 lineThicknessValue,
                 CircleSettings.DEFAULT_LINE_THICKNESS));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
-    CircleSettings s = settings instanceof CircleSettings c ? c : CircleSettings.defaults();
-    loading = true;
-    try {
-      radiusScale.setValue(s.radiusScale());
-      startAngleDeg.setValue(s.startAngleDeg());
-      lineThickness.setValue(s.lineThickness());
-    } finally {
-      loading = false;
-    }
+    CircleSettings s =
+        CustomizePanelSupport.castOrDefaults(
+            settings, CircleSettings.class, CircleSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          radiusScale.setValue(s.radiusScale());
+          startAngleDeg.setValue(s.startAngleDeg());
+          lineThickness.setValue(s.lineThickness());
+        });
   }
 
   @Override
@@ -93,18 +90,6 @@ public final class CircleCustomizePanel implements VisualizationCustomizePanel {
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    radiusScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    startAngleDeg.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    lineThickness.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

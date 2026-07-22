@@ -23,8 +23,8 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
   private float[] drawYs;
 
   public NumberPlot(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Number Plot";
   }
 
@@ -63,7 +63,7 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
       }
     }
     for (int i = 0; i < length; i++) {
-      int value = arrayController.get(i);
+      int value = arrayModel.get(i);
       if (layoutChanged || cachedValues[i] != value) {
         cachedValues[i] = value;
         barHeights[i] = (value + 1) * heightScale / length;
@@ -75,7 +75,7 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
   @Override
   public void update(float delta) {
     NumberPlotSettings s = settings;
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     int heightScale = screenHeight - 5;
 
     indexXCache.ensure(length, screenWidth);
@@ -83,7 +83,7 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
     ensureSlotCaches(length, heightScale);
 
     for (int i = 0; i < length; i++) {
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
       drawYs[i] = worldYToOverlayY(barHeights[i]);

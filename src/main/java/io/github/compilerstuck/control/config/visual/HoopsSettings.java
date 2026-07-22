@@ -10,7 +10,7 @@ public record HoopsSettings(double radiusScale) implements VisualizationSettings
   public static final double RADIUS_SCALE_MAX = 1.0;
 
   public HoopsSettings {
-    radiusScale = clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
   }
 
   public static HoopsSettings defaults() {
@@ -20,9 +20,5 @@ public record HoopsSettings(double radiusScale) implements VisualizationSettings
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

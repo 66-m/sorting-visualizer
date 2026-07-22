@@ -1,6 +1,6 @@
 package io.github.compilerstuck.control.ui.settingsfx.vm;
 
-/** In-memory run-all list row (not persisted until Phase 4). */
+/** In-memory run-all list row (selection and order persisted via preferences). */
 public final class AlgorithmEntry {
 
   private final String id;

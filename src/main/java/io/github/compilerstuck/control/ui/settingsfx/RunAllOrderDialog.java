@@ -142,7 +142,7 @@ public final class RunAllOrderDialog {
     Button cancelButton = (Button) dialog.getDialogPane().lookupButton(cancelType);
     cancelButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
 
-    var css = SettingsFxController.class.getResource("/css/settings-app.css");
+    var css = SettingsStylesheets.cssUrl();
     if (css != null) {
       dialog.getDialogPane().getStylesheets().add(css.toExternalForm());
     }

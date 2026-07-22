@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.ColorGradientGraphSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
@@ -11,13 +10,12 @@ import javafx.scene.layout.VBox;
 public final class ColorGradientGraphCustomizePanel implements VisualizationCustomizePanel {
 
   private final CheckBox showIndexDividers = new CheckBox();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
 
-    bindDraftChanges();
+    draft.bind(showIndexDividers.selectedProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -27,24 +25,19 @@ public final class ColorGradientGraphCustomizePanel implements VisualizationCust
                 showIndexDividers,
                 ColorGradientGraphSettings.DEFAULT_SHOW_INDEX_DIVIDERS));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     ColorGradientGraphSettings s =
-        settings instanceof ColorGradientGraphSettings c
-            ? c
-            : ColorGradientGraphSettings.defaults();
-    loading = true;
-    try {
-      showIndexDividers.setSelected(s.showIndexDividers());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, ColorGradientGraphSettings.class, ColorGradientGraphSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          showIndexDividers.setSelected(s.showIndexDividers());
+        });
   }
 
   @Override
@@ -59,16 +52,6 @@ public final class ColorGradientGraphCustomizePanel implements VisualizationCust
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    showIndexDividers.selectedProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

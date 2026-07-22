@@ -24,8 +24,8 @@ public class ScatterPlotLinked extends Visualization implements ConfigurableVisu
   private int[] argb;
 
   public ScatterPlotLinked(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Scatter Plot Linked";
   }
 
@@ -47,7 +47,7 @@ public class ScatterPlotLinked extends Visualization implements ConfigurableVisu
   }
 
   private void ensureHeights(int n, int heightScale) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -58,7 +58,7 @@ public class ScatterPlotLinked extends Visualization implements ConfigurableVisu
       barHeights = new int[n];
     }
     for (int i = 0; i < n; i++) {
-      barHeights[i] = (arrayController.get(i) + 1) * heightScale / n;
+      barHeights[i] = (arrayModel.get(i) + 1) * heightScale / n;
     }
     cachedRevision = rev;
     cachedWidth = screenWidth;
@@ -69,7 +69,7 @@ public class ScatterPlotLinked extends Visualization implements ConfigurableVisu
   @Override
   public void update(float delta) {
     ScatterPlotLinkedSettings s = settings;
-    int n = arrayController.getLength();
+    int n = arrayModel.getLength();
     int heightScale = screenHeight - 5;
 
     indexXCache.ensure(n, screenWidth);
@@ -83,10 +83,9 @@ public class ScatterPlotLinked extends Visualization implements ConfigurableVisu
     }
 
     for (int i = 0; i < lineCount; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

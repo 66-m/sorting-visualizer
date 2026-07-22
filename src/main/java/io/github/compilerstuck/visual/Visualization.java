@@ -8,7 +8,7 @@ import io.github.compilerstuck.visual.gradient.ColorGradient;
 
 public abstract class Visualization {
 
-  protected ArrayModel arrayController;
+  protected ArrayModel arrayModel;
   protected ColorGradient colorGradient;
   protected RenderSystem rs;
   protected int screenWidth;
@@ -21,8 +21,8 @@ public abstract class Visualization {
   }
 
   public Visualization(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    this.arrayController = arrayController;
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    this.arrayModel = arrayModel;
     this.colorGradient = colorGradient;
     this.rs = rs;
     this.sound = sound;
@@ -59,15 +59,6 @@ public abstract class Visualization {
    * is called.
    */
   public abstract void update(float delta);
-
-  /**
-   * @deprecated use {@link #update(float)}
-   */
-  @Deprecated
-  @SuppressWarnings("InlineMeSuggester")
-  public void update() {
-    update(1f / 60f);
-  }
 
   /** Convert World2D Y-up bar-top (or point) Y into Overlay top-left Y-down screen Y. */
   protected float worldYToOverlayY(float worldY) {

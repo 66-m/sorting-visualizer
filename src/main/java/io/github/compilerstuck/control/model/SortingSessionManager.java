@@ -1,6 +1,6 @@
 package io.github.compilerstuck.control.model;
 
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.ui.TimeEstimateFormat;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.Sound;
@@ -44,8 +44,8 @@ public class SortingSessionManager {
         arrayController,
         sound,
         stateManager,
-        MainControllerConfig.DELAY_BETWEEN_ALGORITHMS,
-        MainControllerConfig.DELAY_AFTER_SORT_RESULT);
+        AppConfig.DELAY_BETWEEN_ALGORITHMS,
+        AppConfig.DELAY_AFTER_SORT_RESULT);
   }
 
   public SortingSessionManager(
@@ -107,7 +107,7 @@ public class SortingSessionManager {
     stateManager.setContinueExecution(false);
   }
 
-  public CancellationToken getCancellationToken() {
+  CancellationToken getCancellationToken() {
     return cancellationToken;
   }
 
@@ -160,8 +160,7 @@ public class SortingSessionManager {
   }
 
   private void prepareForAlgorithm() {
-    sound.mute(true);
-    sound.mute(false);
+    sound.cutNotes();
 
     stateManager.setShuffling(true);
     try {
@@ -218,14 +217,15 @@ public class SortingSessionManager {
       if (gate != null) {
         gate.drain();
       }
-      sound.mute(true);
-      try {
-        Thread.sleep(delayMs);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        LOGGER.log(Level.WARNING, interruptLog, e);
-      }
-      sound.mute(false);
+      sound.withMuted(
+          () -> {
+            try {
+              Thread.sleep(delayMs);
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              LOGGER.log(Level.WARNING, interruptLog, e);
+            }
+          });
     } finally {
       stateManager.setFrameGateSuspended(false);
     }
@@ -272,10 +272,6 @@ public class SortingSessionManager {
 
   public List<String> getWritesAux() {
     return new ArrayList<>(writesAux);
-  }
-
-  public List<Integer> getTimestamps() {
-    return new ArrayList<>(timestamps);
   }
 
   /** Logs timing information to console after sorting completes. */

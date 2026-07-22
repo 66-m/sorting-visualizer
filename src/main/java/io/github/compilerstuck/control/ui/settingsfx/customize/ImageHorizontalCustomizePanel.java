@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.ImageHorizontalSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -19,8 +18,7 @@ public final class ImageHorizontalCustomizePanel implements VisualizationCustomi
           ImageHorizontalSettings.HIGHLIGHT_STRENGTH_MAX,
           ImageHorizontalSettings.DEFAULT_HIGHLIGHT_STRENGTH);
   private final Label highlightStrengthValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -29,7 +27,8 @@ public final class ImageHorizontalCustomizePanel implements VisualizationCustomi
     CustomizePanelSupport.configureSlider(highlightStrength, false);
     CustomizePanelSupport.bindValueLabel(
         highlightStrength, highlightStrengthValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(
+        fitMode.getSelectionModel().selectedItemProperty(), highlightStrength.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -42,23 +41,20 @@ public final class ImageHorizontalCustomizePanel implements VisualizationCustomi
                 highlightStrengthValue,
                 ImageHorizontalSettings.DEFAULT_HIGHLIGHT_STRENGTH));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     ImageHorizontalSettings s =
-        settings instanceof ImageHorizontalSettings c ? c : ImageHorizontalSettings.defaults();
-    loading = true;
-    try {
-      fitMode.getSelectionModel().select(s.fitMode());
-      highlightStrength.setValue(s.highlightStrength());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, ImageHorizontalSettings.class, ImageHorizontalSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          fitMode.getSelectionModel().select(s.fitMode());
+          highlightStrength.setValue(s.highlightStrength());
+        });
   }
 
   @Override
@@ -74,20 +70,6 @@ public final class ImageHorizontalCustomizePanel implements VisualizationCustomi
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    fitMode
-        .getSelectionModel()
-        .selectedItemProperty()
-        .addListener((obs, o, v) -> fireDraftChanged());
-    highlightStrength.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

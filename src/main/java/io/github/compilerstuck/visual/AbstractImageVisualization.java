@@ -39,8 +39,8 @@ abstract class AbstractImageVisualization extends Visualization
   protected volatile boolean containFit;
 
   AbstractImageVisualization(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+      ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     setImage(blankHandle(screenWidth, screenHeight));
   }
 
@@ -95,7 +95,7 @@ abstract class AbstractImageVisualization extends Visualization
       return;
     }
 
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     if (length <= 0) {
       return;
     }
@@ -103,7 +103,7 @@ abstract class AbstractImageVisualization extends Visualization
     boolean dirty = isDirty(length);
     if (dirty) {
       rebuildStrips(length);
-      cachedRevision = arrayController.getVisualRevision();
+      cachedRevision = arrayModel.getVisualRevision();
       cachedScreenW = screenWidth;
       cachedScreenH = screenHeight;
       cachedHandleGen = image.generation();
@@ -128,7 +128,7 @@ abstract class AbstractImageVisualization extends Visualization
 
   private boolean isDirty(int length) {
     return !hasDrawRevision
-        || cachedRevision != arrayController.getVisualRevision()
+        || cachedRevision != arrayModel.getVisualRevision()
         || cachedScreenW != screenWidth
         || cachedScreenH != screenHeight
         || cachedHandleGen != image.generation()
@@ -143,8 +143,8 @@ abstract class AbstractImageVisualization extends Visualization
       stripHighlight = new boolean[length];
     }
     for (int i = 0; i < length; i++) {
-      stripIndices[i] = arrayController.get(i);
-      boolean highlight = arrayController.getMarker(i) == Marker.SET;
+      stripIndices[i] = arrayModel.get(i);
+      boolean highlight = arrayModel.getMarker(i) == Marker.SET;
       stripHighlight[i] = highlight;
       if (highlight) {
         sound.playSound(i);

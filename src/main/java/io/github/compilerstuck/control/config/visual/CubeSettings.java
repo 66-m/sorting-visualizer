@@ -26,9 +26,11 @@ public record CubeSettings(
   public static final double SCENE_SCALE_DIVISOR_MAX = 8.0;
 
   public CubeSettings {
-    rotationSpeedRadPerSec = clamp(rotationSpeedRadPerSec, ROTATION_SPEED_MIN, ROTATION_SPEED_MAX);
-    fillOpacity = (int) Math.round(clamp(fillOpacity, FILL_OPACITY_MIN, FILL_OPACITY_MAX));
-    sceneScaleDivisor = clamp(sceneScaleDivisor, SCENE_SCALE_DIVISOR_MIN, SCENE_SCALE_DIVISOR_MAX);
+    rotationSpeedRadPerSec =
+        Numbers.clamp(rotationSpeedRadPerSec, ROTATION_SPEED_MIN, ROTATION_SPEED_MAX);
+    fillOpacity = (int) Math.round(Numbers.clamp(fillOpacity, FILL_OPACITY_MIN, FILL_OPACITY_MAX));
+    sceneScaleDivisor =
+        Numbers.clamp(sceneScaleDivisor, SCENE_SCALE_DIVISOR_MIN, SCENE_SCALE_DIVISOR_MAX);
   }
 
   public static CubeSettings defaults() {
@@ -42,9 +44,5 @@ public record CubeSettings(
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

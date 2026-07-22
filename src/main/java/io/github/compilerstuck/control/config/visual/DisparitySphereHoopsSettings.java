@@ -10,7 +10,7 @@ public record DisparitySphereHoopsSettings(double globeScale) implements Visuali
   public static final double GLOBE_SCALE_MAX = 1.0;
 
   public DisparitySphereHoopsSettings {
-    globeScale = clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
+    globeScale = Numbers.clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
   }
 
   public static DisparitySphereHoopsSettings defaults() {
@@ -20,9 +20,5 @@ public record DisparitySphereHoopsSettings(double globeScale) implements Visuali
   @Override
   public String visualizationId() {
     return ID;
-  }
-
-  private static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
   }
 }

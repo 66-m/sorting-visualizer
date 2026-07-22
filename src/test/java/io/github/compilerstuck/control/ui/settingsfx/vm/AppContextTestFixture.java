@@ -21,7 +21,7 @@ import java.awt.Color;
  */
 public final class AppContextTestFixture {
 
-  public final ArrayController arrayController;
+  public final ArrayController arrayModel;
   public final SnapshotPublisher snapshotPublisher;
   public final SortingStateManager stateManager;
   public final SortingSessionManager sessionManager;
@@ -37,12 +37,12 @@ public final class AppContextTestFixture {
   }
 
   public AppContextTestFixture(int arraySize) {
-    arrayController = new ArrayController(arraySize);
+    arrayModel = new ArrayController(arraySize);
     snapshotPublisher = new SnapshotPublisher();
-    snapshotPublisher.publish(arrayController);
+    snapshotPublisher.publish(arrayModel);
     stateManager = new SortingStateManager();
     sound = new SilentSound(snapshotPublisher.publishedView());
-    sessionManager = new SortingSessionManager(arrayController, sound, stateManager, 0, 0);
+    sessionManager = new SortingSessionManager(arrayModel, sound, stateManager, 0, 0);
     renderSystem = new FakeRenderSystem(200, 100);
     delayContext = () -> {};
     gradient = new ColorGradient(Color.BLACK, Color.RED, Color.WHITE, "Black -> Red");
@@ -56,14 +56,14 @@ public final class AppContextTestFixture {
     preferences.setSpeedLevel(SettingsDefaults.DEFAULT_SPEED_LEVEL);
     preferences.setMuted(SettingsDefaults.DEFAULT_MUTED);
 
-    app = new AppContext(arrayController, stateManager, sessionManager, preferences);
+    app = new AppContext(arrayModel, stateManager, sessionManager, preferences);
     app.setSize(arraySize);
     app.setSnapshotPublisher(snapshotPublisher);
     app.setSound(sound);
     app.setColorGradient(gradient);
     app.setGraphics(renderSystem, delayContext);
     app.setImageRepository(new FakeImageRepository());
-    arrayController.setDelayContext(delayContext);
+    arrayModel.setDelayContext(delayContext);
     app.setVisualization(
         new Bars(snapshotPublisher.publishedView(), gradient, sound, renderSystem));
   }

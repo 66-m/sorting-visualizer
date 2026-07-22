@@ -21,9 +21,8 @@ public class Hoops extends Visualization implements ConfigurableVisualization {
   private float[] xywh;
   private int[] argb;
 
-  public Hoops(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+  public Hoops(ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "Hoops";
   }
 
@@ -62,7 +61,7 @@ public class Hoops extends Visualization implements ConfigurableVisualization {
   @Override
   public void update(float delta) {
     HoopsSettings s = settings;
-    int length = arrayController.getLength();
+    int length = arrayModel.getLength();
     int maxRadius = (int) (Math.min(screenHeight, screenWidth) * s.radiusScale());
     int centerX = screenWidth / 2;
     int centerY = screenHeight / 2;
@@ -76,10 +75,9 @@ public class Hoops extends Visualization implements ConfigurableVisualization {
     rs.strokeWeight(0.5f);
 
     for (int i = 0; i < length; i++) {
-      Color color =
-          colorGradient.getMarkerColor(arrayController.get(i), arrayController.getMarker(i));
+      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(i) == Marker.SET) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
 

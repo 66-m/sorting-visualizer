@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.SwirlDotsSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -29,8 +28,7 @@ public final class SwirlDotsCustomizePanel implements VisualizationCustomizePane
           SwirlDotsSettings.POINT_SIZE_MAX,
           SwirlDotsSettings.DEFAULT_POINT_SIZE);
   private final Label pointSizeValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -42,7 +40,7 @@ public final class SwirlDotsCustomizePanel implements VisualizationCustomizePane
     CustomizePanelSupport.bindValueLabel(
         radiusScale, radiusScaleValue, v -> String.format("%.2f", v));
     CustomizePanelSupport.bindValueLabel(pointSize, pointSizeValue, v -> String.format("%.1f", v));
-    bindDraftChanges();
+    draft.bind(spiralTurns.valueProperty(), radiusScale.valueProperty(), pointSize.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -57,24 +55,21 @@ public final class SwirlDotsCustomizePanel implements VisualizationCustomizePane
             CustomizePanelSupport.sliderRow(
                 "Point size", pointSize, pointSizeValue, SwirlDotsSettings.DEFAULT_POINT_SIZE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     SwirlDotsSettings s =
-        settings instanceof SwirlDotsSettings c ? c : SwirlDotsSettings.defaults();
-    loading = true;
-    try {
-      spiralTurns.setValue(s.spiralTurns());
-      radiusScale.setValue(s.radiusScale());
-      pointSize.setValue(s.pointSize());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, SwirlDotsSettings.class, SwirlDotsSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          spiralTurns.setValue(s.spiralTurns());
+          radiusScale.setValue(s.radiusScale());
+          pointSize.setValue(s.pointSize());
+        });
   }
 
   @Override
@@ -90,18 +85,6 @@ public final class SwirlDotsCustomizePanel implements VisualizationCustomizePane
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    spiralTurns.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    radiusScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    pointSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

@@ -23,18 +23,18 @@ class SortingSessionManagerTest {
 
   private static final DelayContext NO_OP_PROCESSING = () -> {};
 
-  private ArrayController arrayController;
+  private ArrayController arrayModel;
   private FakeSound sound;
   private SortingStateManager stateManager;
   private SortingSessionManager sessionManager;
 
   @BeforeEach
   void setUp() {
-    arrayController = new ArrayController(5);
-    arrayController.setShuffleType(ShuffleType.SORTED);
-    sound = new FakeSound(arrayController);
+    arrayModel = new ArrayController(5);
+    arrayModel.setShuffleType(ShuffleType.SORTED);
+    sound = new FakeSound(arrayModel);
     stateManager = new SortingStateManager();
-    sessionManager = new SortingSessionManager(arrayController, sound, stateManager, 0, 0);
+    sessionManager = new SortingSessionManager(arrayModel, sound, stateManager, 0, 0);
   }
 
   @Test
@@ -53,7 +53,7 @@ class SortingSessionManagerTest {
   @Test
   @DisplayName("single instant algorithm completes with measurements and restart flag")
   void singleInstantAlgorithmCompletes() {
-    InstantSortAlgorithm algorithm = new InstantSortAlgorithm(arrayController);
+    InstantSortAlgorithm algorithm = new InstantSortAlgorithm(arrayModel);
     stateManager.setRunning(true);
 
     sessionManager.startSortingSession(List.of(algorithm));
@@ -77,7 +77,7 @@ class SortingSessionManagerTest {
     sessionManager.setFrameGate(gate);
     stateManager.setRunning(true);
 
-    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayController)));
+    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayModel)));
     sessionManager.waitForCompletion();
 
     assertEquals(0, gate.availableCredits());
@@ -89,7 +89,7 @@ class SortingSessionManagerTest {
   void postSortPauseDrainsLeftoverCredits() throws Exception {
     FrameGate gate = new FrameGate();
     SortingSessionManager delayedSession =
-        new SortingSessionManager(arrayController, sound, stateManager, 0, 250);
+        new SortingSessionManager(arrayModel, sound, stateManager, 0, 250);
     delayedSession.setFrameGate(gate);
     stateManager.setRunning(true);
 
@@ -114,7 +114,7 @@ class SortingSessionManagerTest {
     renderWaiter.start();
 
     delayedSession.startSortingSession(
-        List.of(new CreditLeavingSortAlgorithm(arrayController, gate, algorithmFinished)));
+        List.of(new CreditLeavingSortAlgorithm(arrayModel, gate, algorithmFinished)));
     delayedSession.waitForCompletion();
     renderWaiter.join(2000);
 
@@ -129,7 +129,7 @@ class SortingSessionManagerTest {
   void prepareClearsShufflingAndDrainsGate() {
     FrameGate gate = new FrameGate();
     sessionManager.setFrameGate(gate);
-    arrayController.setDelayContext(
+    arrayModel.setDelayContext(
         () -> {
           gate.grant(1);
           try {
@@ -140,7 +140,7 @@ class SortingSessionManagerTest {
         });
     stateManager.setRunning(true);
 
-    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayController)));
+    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayModel)));
     sessionManager.waitForCompletion();
 
     assertFalse(stateManager.isShuffling());
@@ -150,7 +150,7 @@ class SortingSessionManagerTest {
   @Test
   @DisplayName("cancel mid-run stops execution and clears running state")
   void cancelMidRunStopsExecution() {
-    UntilCancelledAlgorithm algorithm = new UntilCancelledAlgorithm(arrayController);
+    UntilCancelledAlgorithm algorithm = new UntilCancelledAlgorithm(arrayModel);
     stateManager.setRunning(true);
 
     sessionManager.startSortingSession(List.of(algorithm));
@@ -170,7 +170,7 @@ class SortingSessionManagerTest {
     stateManager.setShowComparisonTable(true);
     stateManager.setRunning(true);
 
-    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayController)));
+    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayModel)));
     sessionManager.waitForCompletion();
 
     assertTrue(stateManager.shouldShowResults());
@@ -179,7 +179,7 @@ class SortingSessionManagerTest {
   @Test
   @DisplayName("exportCsv writes header and algorithm name after completed run")
   void exportCsvWritesExpectedContent(@TempDir Path tempDir) throws Exception {
-    InstantSortAlgorithm algorithm = new InstantSortAlgorithm(arrayController);
+    InstantSortAlgorithm algorithm = new InstantSortAlgorithm(arrayModel);
     stateManager.setRunning(true);
 
     sessionManager.startSortingSession(List.of(algorithm));
@@ -200,7 +200,7 @@ class SortingSessionManagerTest {
   void prepareMutesSound() {
     stateManager.setRunning(true);
 
-    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayController)));
+    sessionManager.startSortingSession(List.of(new InstantSortAlgorithm(arrayModel)));
     sessionManager.waitForCompletion();
 
     List<Boolean> muteCalls = sound.getMuteCalls();
@@ -220,8 +220,8 @@ class SortingSessionManagerTest {
   private static final class FakeSound extends Sound {
     private final List<Boolean> muteCalls = new ArrayList<>();
 
-    FakeSound(ArrayModel arrayController) {
-      super(arrayController);
+    FakeSound(ArrayModel arrayModel) {
+      super(arrayModel);
     }
 
     @Override
@@ -240,9 +240,9 @@ class SortingSessionManagerTest {
   private static class InstantSortAlgorithm extends SortingAlgorithm {
     private final ArrayModel model;
 
-    InstantSortAlgorithm(ArrayModel arrayController) {
-      super(arrayController, NO_OP_PROCESSING);
-      model = arrayController;
+    InstantSortAlgorithm(ArrayModel arrayModel) {
+      super(arrayModel, NO_OP_PROCESSING);
+      model = arrayModel;
       name = "InstantSort";
       setDelay(false);
     }
@@ -262,10 +262,9 @@ class SortingSessionManagerTest {
     private final FrameGate gate;
     private final CountDownLatch finished;
 
-    CreditLeavingSortAlgorithm(
-        ArrayModel arrayController, FrameGate gate, CountDownLatch finished) {
-      super(arrayController, NO_OP_PROCESSING);
-      model = arrayController;
+    CreditLeavingSortAlgorithm(ArrayModel arrayModel, FrameGate gate, CountDownLatch finished) {
+      super(arrayModel, NO_OP_PROCESSING);
+      model = arrayModel;
       this.gate = gate;
       this.finished = finished;
       name = "CreditLeavingSort";
@@ -286,8 +285,8 @@ class SortingSessionManagerTest {
   private static class UntilCancelledAlgorithm extends SortingAlgorithm {
     private volatile boolean running;
 
-    UntilCancelledAlgorithm(ArrayModel arrayController) {
-      super(arrayController, NO_OP_PROCESSING);
+    UntilCancelledAlgorithm(ArrayModel arrayModel) {
+      super(arrayModel, NO_OP_PROCESSING);
       name = "UntilCancelled";
       setDelay(false);
     }

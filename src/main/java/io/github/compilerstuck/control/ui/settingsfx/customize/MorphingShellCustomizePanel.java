@@ -2,7 +2,6 @@ package io.github.compilerstuck.control.ui.settingsfx.customize;
 
 import io.github.compilerstuck.control.config.visual.MorphingShellSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsLayout;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -29,8 +28,7 @@ public final class MorphingShellCustomizePanel implements VisualizationCustomize
           MorphingShellSettings.SHELL_RADIUS_SCALE_MAX,
           MorphingShellSettings.DEFAULT_SHELL_RADIUS_SCALE);
   private final Label shellRadiusScaleValue = CustomizePanelSupport.valueLabel();
-  private Runnable onDraftChanged = () -> {};
-  private boolean loading;
+  private final CustomizePanelSupport.DraftSession draft = new CustomizePanelSupport.DraftSession();
 
   @Override
   public Node build() {
@@ -43,7 +41,10 @@ public final class MorphingShellCustomizePanel implements VisualizationCustomize
         sphereSize, sphereSizeValue, v -> String.format("%.1f", v));
     CustomizePanelSupport.bindValueLabel(
         shellRadiusScale, shellRadiusScaleValue, v -> String.format("%.2f", v));
-    bindDraftChanges();
+    draft.bind(
+        rotationSpeedRadPerSec.valueProperty(),
+        sphereSize.valueProperty(),
+        shellRadiusScale.valueProperty());
 
     VBox section =
         CustomizePanelSupport.section(
@@ -64,24 +65,21 @@ public final class MorphingShellCustomizePanel implements VisualizationCustomize
                 sphereSizeValue,
                 MorphingShellSettings.DEFAULT_SPHERE_SIZE));
 
-    VBox root = new VBox(SettingsLayout.GAP_MD, section);
-    root.getStyleClass().add("customize-panel");
-    root.setFillWidth(true);
-    return root;
+    return CustomizePanelSupport.panelRoot(section);
   }
 
   @Override
   public void load(VisualizationSettings settings) {
     MorphingShellSettings s =
-        settings instanceof MorphingShellSettings c ? c : MorphingShellSettings.defaults();
-    loading = true;
-    try {
-      rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
-      sphereSize.setValue(s.sphereSize());
-      shellRadiusScale.setValue(s.shellRadiusScale());
-    } finally {
-      loading = false;
-    }
+        CustomizePanelSupport.castOrDefaults(
+            settings, MorphingShellSettings.class, MorphingShellSettings::defaults);
+    CustomizePanelSupport.whileLoading(
+        draft,
+        () -> {
+          rotationSpeedRadPerSec.setValue(s.rotationSpeedRadPerSec());
+          sphereSize.setValue(s.sphereSize());
+          shellRadiusScale.setValue(s.shellRadiusScale());
+        });
   }
 
   @Override
@@ -97,18 +95,6 @@ public final class MorphingShellCustomizePanel implements VisualizationCustomize
 
   @Override
   public void setOnDraftChanged(Runnable listener) {
-    onDraftChanged = listener != null ? listener : () -> {};
-  }
-
-  private void bindDraftChanges() {
-    rotationSpeedRadPerSec.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    sphereSize.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-    shellRadiusScale.valueProperty().addListener((obs, o, v) -> fireDraftChanged());
-  }
-
-  private void fireDraftChanged() {
-    if (!loading) {
-      onDraftChanged.run();
-    }
+    draft.setListener(listener);
   }
 }

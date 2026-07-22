@@ -65,9 +65,8 @@ public class Cube extends Visualization implements ConfigurableVisualization {
   private float cachedMaxBoxSize = -1;
   private ColorGradient cachedGradient;
 
-  public Cube(
-      ArrayModel arrayController, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
-    super(arrayController, colorGradient, sound, rs);
+  public Cube(ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
+    super(arrayModel, colorGradient, sound, rs);
     name = "3D - Cube";
   }
 
@@ -138,7 +137,7 @@ public class Cube extends Visualization implements ConfigurableVisualization {
   }
 
   private void ensureSizesAndColors(int drawCount, int length, float maxBoxSize) {
-    long rev = arrayController.getVisualRevision();
+    long rev = arrayModel.getVisualRevision();
     if (cachedRevision == rev
         && cachedWidth == screenWidth
         && cachedHeight == screenHeight
@@ -149,10 +148,10 @@ public class Cube extends Visualization implements ConfigurableVisualization {
       return;
     }
     for (int i = 0; i < drawCount; i++) {
-      int value = arrayController.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayController.getMarker(i));
+      int value = arrayModel.get(i);
+      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
-      if (arrayController.getMarker(value) == Marker.SET) {
+      if (arrayModel.getMarker(value) == Marker.SET) {
         sound.playSound(value);
       }
 
@@ -227,12 +226,12 @@ public class Cube extends Visualization implements ConfigurableVisualization {
     float sinAa = (float) Math.sin(aa);
     float cosAa = (float) Math.cos(aa);
 
-    int xSize = (int) floor(Math.pow(arrayController.getLength(), 1 / 3f) + 0.1);
+    int xSize = (int) floor(Math.pow(arrayModel.getLength(), 1 / 3f) + 0.1);
     if (xSize < 1) {
       xSize = 1;
     }
-    int drawCount = Math.min(arrayController.getLength(), xSize * xSize * xSize);
-    int length = arrayController.getLength();
+    int drawCount = Math.min(arrayModel.getLength(), xSize * xSize * xSize);
+    int length = arrayModel.getLength();
     float maxBoxSize = radius * 2f / xSize;
 
     ensureBuffers(drawCount);

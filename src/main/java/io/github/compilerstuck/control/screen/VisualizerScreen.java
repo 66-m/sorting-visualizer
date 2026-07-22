@@ -6,14 +6,13 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import io.github.compilerstuck.control.AppContext;
 import io.github.compilerstuck.control.SortingVisualizerGame;
-import io.github.compilerstuck.control.config.MainControllerConfig;
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.SortingStateManager;
 import io.github.compilerstuck.control.render.GdxRenderSystem;
 import io.github.compilerstuck.control.render.HudRenderer;
 import io.github.compilerstuck.control.render.PerfOverlay;
 import io.github.compilerstuck.control.render.PerfOverlayContext;
-import io.github.compilerstuck.control.ui.settingsfx.SettingsFxController;
 import io.github.compilerstuck.visual.Visualization;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -131,11 +130,13 @@ public final class VisualizerScreen implements Screen {
         Thread.currentThread().interrupt();
       }
     }
-    game.publishArraySnapshot();
+    if (game.appContext() != null) {
+      game.appContext().publishArraySnapshot();
+    }
     if (game.appContext() != null) {
       int steps =
           game.stateManager().isShuffling()
-              ? MainControllerConfig.shuffleStepsForDelta(delta)
+              ? AppConfig.shuffleStepsForDelta(delta)
               : game.appContext().getStepsPerFrame();
       game.appContext().getFrameGate().grant(steps);
     }
@@ -149,7 +150,9 @@ public final class VisualizerScreen implements Screen {
     boolean boundary = progress <= 0 || progress >= 100;
     boolean due = game.progressPublishAccum() >= 0.1f || boundary;
     if (due && progress != game.lastPublishedProgress()) {
-      SettingsFxController.setProgress(progress);
+      if (game.appContext() != null) {
+        game.appContext().settingsBridge().setProgress(progress);
+      }
       game.setLastPublishedProgress(progress);
       game.setProgressPublishAccum(0f);
     }
@@ -167,8 +170,10 @@ public final class VisualizerScreen implements Screen {
     } else if (stateManager.requestedStart()) {
       stateManager.setShowResults(false);
       stateManager.setStartRequested(false);
-      game.setSetupDelayRemaining(MainControllerConfig.SETUP_DELAY / 1000f);
-      SettingsFxController.setInputsEnabled(false);
+      game.setSetupDelayRemaining(AppConfig.SETUP_DELAY / 1000f);
+      if (game.appContext() != null) {
+        game.appContext().settingsBridge().setInputsEnabled(false);
+      }
       game.setLastPublishedProgress(-1);
       game.setProgressPublishAccum(0f);
       game.publishThenDraw(delta);

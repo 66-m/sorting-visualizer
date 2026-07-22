@@ -14,8 +14,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntConsumer;
@@ -33,7 +33,7 @@ public final class VisualizationViewModel {
   private final AppContext app;
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
   private final List<VisualizationDescriptor> descriptors;
-  private final List<Visualization> visualizations;
+  private final Map<String, Visualization> visualizationsById = new HashMap<>();
 
   private String selectedId;
   private boolean needsImage;
@@ -46,23 +46,6 @@ public final class VisualizationViewModel {
   public VisualizationViewModel(AppContext app) {
     this.app = app;
     this.descriptors = VisualizationCatalog.all();
-    this.visualizations = new ArrayList<>();
-    Map<String, VisualizationSettings> stored = app.getPreferences().getVisualSettingsMap();
-    for (VisualizationDescriptor descriptor : descriptors) {
-      Visualization viz =
-          descriptor
-              .factory()
-              .create(
-                  app.getPublishedArray(),
-                  app.getColorGradient(),
-                  app.getSound(),
-                  app.getRenderSystem());
-      VisualizationSettings saved = stored.get(descriptor.id());
-      if (saved != null && viz instanceof ConfigurableVisualization configurableViz) {
-        configurableViz.applySettings(saved);
-      }
-      visualizations.add(viz);
-    }
     String id = app.getPreferences().getVisualizationId();
     int index = VisualizationCatalog.indexOfId(id);
     applySelection(index, false);
@@ -128,6 +111,36 @@ public final class VisualizationViewModel {
     return -1;
   }
 
+  private Visualization getOrCreate(String id) {
+    Visualization existing = visualizationsById.get(id);
+    if (existing != null) {
+      return existing;
+    }
+    // Adopt the composition-root instance for the initially selected id (avoids a duplicate).
+    Visualization fromApp = app.getVisualization();
+    if (fromApp != null
+        && visualizationsById.isEmpty()
+        && id.equals(app.getPreferences().getVisualizationId())) {
+      visualizationsById.put(id, fromApp);
+      return fromApp;
+    }
+    VisualizationDescriptor descriptor = VisualizationCatalog.findById(id);
+    Visualization viz =
+        descriptor
+            .factory()
+            .create(
+                app.getPublishedArray(),
+                app.getColorGradient(),
+                app.getSound(),
+                app.getRenderSystem());
+    VisualizationSettings saved = app.getPreferences().getVisualSettingsMap().get(id);
+    if (saved != null && viz instanceof ConfigurableVisualization configurableViz) {
+      configurableViz.applySettings(saved);
+    }
+    visualizationsById.put(id, viz);
+    return viz;
+  }
+
   public void selectVisualization(String id) {
     if (!inputsEnabled) {
       return;
@@ -156,8 +169,7 @@ public final class VisualizationViewModel {
       return false;
     }
 
-    int index = indexOfId(selectedId);
-    Visualization viz = visualizations.get(index);
+    Visualization viz = getOrCreate(selectedId);
     String absolute = path.toAbsolutePath().toString();
     boolean loaded = false;
     if (viz instanceof ImageSourceVisualization imageViz) {
@@ -194,11 +206,10 @@ public final class VisualizationViewModel {
   }
 
   public VisualizationSettings getCurrentCustomization() {
-    int index = indexOfId(selectedId);
-    if (index < 0) {
+    if (selectedId == null) {
       return null;
     }
-    Visualization viz = visualizations.get(index);
+    Visualization viz = getOrCreate(selectedId);
     if (viz instanceof ConfigurableVisualization configurableViz) {
       return configurableViz.currentSettings();
     }
@@ -229,7 +240,8 @@ public final class VisualizationViewModel {
   }
 
   /**
-   * Applies each visualization’s customize defaults live and clears persisted custom settings.
+   * Clears persisted custom settings and applies defaults live only to already-created
+   * visualizations (and the current selection). Other types keep defaults on next create.
    *
    * @return {@code true} if the reset ran (inputs enabled)
    */
@@ -237,15 +249,19 @@ public final class VisualizationViewModel {
     if (!inputsEnabled) {
       return false;
     }
-    for (int i = 0; i < visualizations.size(); i++) {
-      Visualization viz = visualizations.get(i);
-      if (!(viz instanceof ConfigurableVisualization configurableViz)) {
-        continue;
-      }
-      String id = descriptors.get(i).id();
-      VisualizationCustomizePanels.defaultsFor(id).ifPresent(configurableViz::applySettings);
-    }
     app.clearAllVisualizationSettings();
+    if (selectedId != null) {
+      getOrCreate(selectedId);
+    }
+    for (Map.Entry<String, Visualization> entry : visualizationsById.entrySet()) {
+      VisualizationCustomizePanels.defaultsFor(entry.getKey())
+          .ifPresent(
+              defaults -> {
+                if (entry.getValue() instanceof ConfigurableVisualization configurableViz) {
+                  configurableViz.applySettings(defaults);
+                }
+              });
+    }
     return true;
   }
 
@@ -256,11 +272,7 @@ public final class VisualizationViewModel {
     if (!settings.visualizationId().equals(selectedId)) {
       return null;
     }
-    int index = indexOfId(selectedId);
-    if (index < 0) {
-      return null;
-    }
-    Visualization viz = visualizations.get(index);
+    Visualization viz = getOrCreate(selectedId);
     if (!(viz instanceof ConfigurableVisualization configurableViz)) {
       return null;
     }
@@ -286,8 +298,9 @@ public final class VisualizationViewModel {
     boolean oldConfigurable = configurable;
     selectedId = descriptor.id();
     needsImage = constraints.requiresImage();
-    configurable = visualizations.get(index) instanceof ConfigurableVisualization;
-    app.setVisualization(visualizations.get(index));
+    Visualization viz = getOrCreate(selectedId);
+    configurable = viz instanceof ConfigurableVisualization;
+    app.setVisualization(viz);
     app.setVisualizationId(descriptor.id());
 
     if (fireEvents) {
