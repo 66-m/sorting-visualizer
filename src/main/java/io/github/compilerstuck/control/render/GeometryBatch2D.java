@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
  * World2D colored geometry without ShapeRenderer tessellation: filled circle/rect quads and stroked
- * lines/ellipses. Hairlines use {@code GL_LINES}; widths {@code > 1} use triangle quads (portable —
+ * lines/ellipses. Hairlines use {@code GL_LINES}; widths {@code > 1} use triangle quads (portable -
  * {@code glLineWidth} is ignored on many GL cores).
  */
 public final class GeometryBatch2D implements Disposable {
@@ -25,7 +25,7 @@ public final class GeometryBatch2D implements Disposable {
 
   private static final int INITIAL_QUADS = 4096;
 
-  /** Segments per ellipse outline — high enough that large rings read as circles, not polygons. */
+  /** Segments per ellipse outline - high enough that large rings read as circles, not polygons. */
   public static final int ELLIPSE_SEGMENTS = 64;
 
   private static final int INITIAL_LINE_SEGMENTS = 4096;

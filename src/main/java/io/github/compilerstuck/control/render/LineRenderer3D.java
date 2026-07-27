@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /**
  * World-space 3D line segments as a single {@link Mesh} draw. Hairlines use {@code GL_LINES};
- * widths {@code > 1} use camera-facing quads (portable — {@code glLineWidth} is ignored on many GL
+ * widths {@code > 1} use camera-facing quads (portable - {@code glLineWidth} is ignored on many GL
  * cores). Does not use ShapeRenderer or ModelBatch.
  */
 public final class LineRenderer3D implements Disposable {

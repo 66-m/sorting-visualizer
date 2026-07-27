@@ -4,7 +4,7 @@
 
 Sorting Algorithm Visualizer: a single-module Maven **desktop GUI** app (one JVM) that
 pairs a JavaFX/AtlantaFX Settings window with a libGDX/LWJGL3 OpenGL canvas. Standard
-build/run/test commands live in `README.md` and `CONTRIBUTING.md` — use those; notes
+build/run/test commands live in `README.md` and `CONTRIBUTING.md` - use those; notes
 below only cover non-obvious, environment-specific caveats.
 
 ### Toolchain
@@ -20,7 +20,7 @@ below only cover non-obvious, environment-specific caveats.
 - Full check (matches CI): `./mvnw --batch-mode clean verify -Dspotless.check.skip=true`.
   CI runs `spotless:check` as a separate step, then `verify` with the check skipped.
 - Tests are headless: JavaFX/TestFX use Monocle (`prism.order=sw`, headless glass),
-  configured in `pom.xml` surefire — no display needed for `mvn test`/`verify`.
+  configured in `pom.xml` surefire - no display needed for `mvn test`/`verify`.
 - Run the app: `./build` (or `./mvnw package`) then `./run` (needs `target/*.jar` +
   `target/dependency/*`). `./run` accepts the README launch flags.
 
@@ -29,8 +29,8 @@ below only cover non-obvious, environment-specific caveats.
   OpenGL (llvmpipe), which is enough for the libGDX canvas. No physical GPU is required.
 - **Sound is unavailable** in the VM (no ALSA/MIDI device). On startup the app logs
   `MidiUnavailableException` / `Sound system unavailable, running without audio` and
-  keeps running — this is expected, not a failure.
+  keeps running - this is expected, not a failure.
 - Closing the Settings window (or **Ctrl+Q** on the canvas) quits the whole app. **Esc** on
-  the canvas cancels a run or focuses Settings — it does not quit.
+  the canvas cancels a run or focuses Settings - it does not quit.
 - Two windows open (JavaFX Settings + libGDX Visualization). Use Alt+Tab to switch between
   them; they are not always tracked by `wmctrl`.
