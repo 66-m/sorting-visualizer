@@ -36,11 +36,19 @@ public final class VisualizerScreen implements Screen {
         new InputAdapter() {
           @Override
           public boolean keyDown(int keycode) {
-            if (keycode == Input.Keys.ESCAPE) {
-              if (game.sound() != null) {
-                game.sound().mute(true);
-              }
+            if (keycode == Input.Keys.Q
+                && (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)
+                    || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT))) {
               game.shutdown();
+              return true;
+            }
+            if (keycode == Input.Keys.ESCAPE) {
+              SortingStateManager state = game.stateManager();
+              if (state != null && state.isRunning()) {
+                game.cancelSorting();
+              } else {
+                focusSettingsWindow();
+              }
               return true;
             }
             return false;
@@ -108,8 +116,6 @@ public final class VisualizerScreen implements Screen {
     perfContext.width = renderSystem.getWidth();
     perfContext.height = renderSystem.getHeight();
     perfContext.arrayLength = arrayController != null ? arrayController.getLength() : 0;
-    perfContext.legacy3d = !renderSystem.usesInstancing();
-    perfContext.legacy2d = !renderSystem.usesGeometryBatch2D();
     perfContext.running = stateManager != null && stateManager.isRunning();
     AppContext app = game.appContext();
     if (app != null) {
@@ -119,6 +125,13 @@ public final class VisualizerScreen implements Screen {
     } else {
       perfContext.stepsPerFrame = 0;
       perfContext.visualization = "";
+    }
+  }
+
+  private void focusSettingsWindow() {
+    AppContext app = game.appContext();
+    if (app != null) {
+      app.settingsBridge().focusSettings();
     }
   }
 

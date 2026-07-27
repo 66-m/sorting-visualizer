@@ -13,8 +13,6 @@ public final class LaunchArgs {
   private static boolean launchPortrait;
   private static int launchDisplay;
   private static boolean launchPerfStats;
-  private static boolean launchLegacy3d;
-  private static boolean launchLegacy2d;
 
   private LaunchArgs() {}
 
@@ -27,8 +25,6 @@ public final class LaunchArgs {
     launchPortrait = false;
     launchDisplay = 0;
     launchPerfStats = false;
-    launchLegacy3d = false;
-    launchLegacy2d = false;
     if (passedArgs == null) {
       return;
     }
@@ -42,10 +38,11 @@ public final class LaunchArgs {
         launchPortrait = true;
       } else if ("--perf-stats".equalsIgnoreCase(arg)) {
         launchPerfStats = true;
-      } else if ("--legacy-3d".equalsIgnoreCase(arg)) {
-        launchLegacy3d = true;
-      } else if ("--legacy-2d".equalsIgnoreCase(arg)) {
-        launchLegacy2d = true;
+      } else if ("--legacy-3d".equalsIgnoreCase(arg) || "--legacy-2d".equalsIgnoreCase(arg)) {
+        LOGGER.warning(
+            "Ignoring removed flag "
+                + arg
+                + " (legacy ShapeRenderer/ModelBatch paths were retired; GL30 is required)");
       } else if (arg.regionMatches(true, 0, "--display=", 0, "--display=".length())) {
         launchDisplay = parseDisplayIndex(arg.substring("--display=".length()));
       }
@@ -91,18 +88,5 @@ public final class LaunchArgs {
   /** When true, show FrameStats overlay and log a summary every 60 frames. */
   public static boolean perfStats() {
     return launchPerfStats;
-  }
-
-  /**
-   * When true, force the pre-instancing ModelInstance 3D path (A/B with {@code --perf-stats}).
-   * Supported fallback when GL30/instancing is unavailable.
-   */
-  public static boolean legacy3d() {
-    return launchLegacy3d;
-  }
-
-  /** When true, force ShapeRenderer for World2D circles/ellipses (A/B with GeometryBatch2D). */
-  public static boolean legacy2d() {
-    return launchLegacy2d;
   }
 }

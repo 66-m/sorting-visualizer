@@ -155,6 +155,11 @@ public final class SettingsFxController implements SettingsBridge {
         });
   }
 
+  @Override
+  public void focusSettings() {
+    Platform.runLater(this::raiseAndShow);
+  }
+
   /** Creates and sizes the Stage with a lightweight placeholder scene (no section graph). */
   private void ensureChrome() {
     if (stage != null) {

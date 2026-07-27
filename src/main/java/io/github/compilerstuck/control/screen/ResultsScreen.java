@@ -28,11 +28,21 @@ public final class ResultsScreen implements Screen {
         new InputAdapter() {
           @Override
           public boolean keyDown(int keycode) {
-            if (keycode == Input.Keys.ESCAPE) {
-              if (game.sound() != null) {
-                game.sound().mute(true);
-              }
+            if (keycode == Input.Keys.Q
+                && (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)
+                    || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT))) {
               game.shutdown();
+              return true;
+            }
+            if (keycode == Input.Keys.ESCAPE) {
+              SortingStateManager state = game.stateManager();
+              if (state != null) {
+                state.setShowResults(false);
+              }
+              game.showVisualizer();
+              if (game.appContext() != null) {
+                game.appContext().settingsBridge().focusSettings();
+              }
               return true;
             }
             return false;

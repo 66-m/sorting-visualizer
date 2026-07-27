@@ -28,7 +28,7 @@ java --enable-native-access=ALL-UNNAMED \
   -jar sorting-visualizer.jar
 ```
 
-**Settings** is a JavaFX window (AtlantaFX). The visualization canvas is **libGDX** (`GdxRenderSystem`: batched 2D + ModelBatch 3D). Closing Settings or pressing **Esc** on the canvas quits the app.
+**Settings** is a JavaFX window (AtlantaFX). The visualization canvas is **libGDX** (`GdxRenderSystem`: batched World2D + instanced World3D). Closing **Settings** quits the app. On the canvas, **Esc** cancels a run or focuses Settings; **Ctrl+Q** quits.
 ### Launch flags
 
 Pass any of these after the JAR name (order does not matter; `fullscreen` wins over `portrait`):
@@ -82,7 +82,7 @@ Run one algorithm, or run a custom selection **in order** and optionally show a 
 | Sorting | Algorithm picker, run-all with drag-reorder dialog, shuffle type |
 | Speed | Five levels (steps per frame) |
 | Appearance | Gradient presets + custom colors |
-| Visualization | 30 modes; Customize (Cube); image path with validation for image viz |
+| Visualization | 30 modes; Customize for most modes (Bars / disparity graphs / Horizontal Pyramid have none); image path with validation for image viz |
 | Sound | MIDI tones mapped to values; sound-effects checkbox |
 | Display | Show measurements (sorted %, comparisons, swaps, main/aux writes, est. time); comparison table after run-all; export CSV |
 | Session | Cancel mid-run; prefs persist across launches |

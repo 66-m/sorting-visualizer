@@ -40,35 +40,20 @@ public final class PerfOverlay {
               viz + "  " + (ctx.running ? "running" : "idle") + "  steps " + ctx.stepsPerFrame,
               y,
               line);
-      line =
-          text(
-              rs,
-              "path 3d="
-                  + (ctx.legacy3d ? "legacy" : "instanced")
-                  + " 2d="
-                  + (ctx.legacy2d ? "legacy" : "geo"),
-              y,
-              line);
+      line = text(rs, "path 3d=instanced  2d=geo", y, line);
     }
 
     line = text(rs, "texts " + stats.textDraws + "  pixels " + stats.pixelUploads, y, line);
-    line = text(rs, "shapeBegins " + stats.shapeBegins, y, line);
     line =
         text(
             rs,
             "spriteCalls " + stats.spriteRenderCalls + " (ends " + stats.spriteEnds + ")",
             y,
             line);
-    line =
-        text(
-            rs,
-            "modelRenders " + stats.modelRenders + " instanced " + stats.instancedDraws,
-            y,
-            line);
+    line = text(rs, "instanced " + stats.instancedDraws, y, line);
     line = text(rs, "instances " + stats.instancesSubmitted, y, line);
     line = text(rs, "lineDraws " + stats.lineDraws, y, line);
-    line = text(rs, "geo2d " + stats.geo2dDraws + " prims " + stats.geo2dPrimitives, y, line);
-    text(rs, "modelRestarts " + stats.modelBatchRestarts, y, line);
+    text(rs, "geo2d " + stats.geo2dDraws + " prims " + stats.geo2dPrimitives, y, line);
   }
 
   private static int text(RenderSystem rs, String s, float y0, int line) {

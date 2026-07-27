@@ -30,7 +30,7 @@ below only cover non-obvious, environment-specific caveats.
 - **Sound is unavailable** in the VM (no ALSA/MIDI device). On startup the app logs
   `MidiUnavailableException` / `Sound system unavailable, running without audio` and
   keeps running — this is expected, not a failure.
-- Closing the Settings window or pressing **Esc** on the canvas quits the whole app, so
-  avoid Esc during manual testing.
-- Two windows open (JavaFX Settings + libGDX canvas). Use Alt+Tab to switch between them;
-  they are not always tracked by `wmctrl`.
+- Closing the Settings window (or **Ctrl+Q** on the canvas) quits the whole app. **Esc** on
+  the canvas cancels a run or focuses Settings — it does not quit.
+- Two windows open (JavaFX Settings + libGDX Visualization). Use Alt+Tab to switch between
+  them; they are not always tracked by `wmctrl`.

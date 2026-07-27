@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import io.github.compilerstuck.control.config.SettingsDefaults;
 import java.util.logging.Logger;
 
 /**
@@ -23,8 +22,12 @@ import java.util.logging.Logger;
 public final class InstanceRenderer3D implements Disposable {
   private static final Logger LOGGER = Logger.getLogger(InstanceRenderer3D.class.getName());
 
-  /** Cover {@link SettingsDefaults#ARRAY_SIZE_MAX} so the first large-N frame does not stall. */
-  private static final int INITIAL_MAX_INSTANCES = nextPowerOfTwo(SettingsDefaults.ARRAY_SIZE_MAX);
+  /**
+   * Start near a typical preview size; {@link #ensureCapacity} doubles up to large N so cold start
+   * does not allocate for {@link
+   * io.github.compilerstuck.control.config.SettingsDefaults#ARRAY_SIZE_MAX}.
+   */
+  private static final int INITIAL_MAX_INSTANCES = 4096;
 
   private static final String VERT_PATH = "shaders/instance_lit.vert";
   private static final String FRAG_PATH = "shaders/instance_lit.frag";
@@ -190,14 +193,6 @@ public final class InstanceRenderer3D implements Disposable {
         GL20.GL_TRIANGLES);
     SphereShapeBuilder.build(mb, 1f, 1f, 1f, 12, 12);
     return mb.end();
-  }
-
-  private static int nextPowerOfTwo(int value) {
-    int n = 1;
-    while (n < value) {
-      n *= 2;
-    }
-    return n;
   }
 
   @Override

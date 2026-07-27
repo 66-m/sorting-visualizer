@@ -10,7 +10,7 @@ Versioned overview of the Sorting Algorithm Visualizer desktop app (libGDX rende
 - **Ports**: `ArrayModel` (working + published snapshot), `DelayContext` / `FrameGate` (pacing + idle fence), `RenderSystem`, `Sound`, catalogs
 - **Snapshots**: `SnapshotPublisher` copies working → published after `FrameGate.awaitIdle()`; visuals never write markers
 
-Toolkit coexistence: bootstrap JavaFX with `Platform.startup` **before** `Lwjgl3Application`; Settings close or canvas Esc → full shutdown.
+Toolkit coexistence: bootstrap JavaFX with `Platform.startup` **before** `Lwjgl3Application`. Closing Settings (or Ctrl+Q on the canvas) shuts down both windows; canvas Esc cancels a run or focuses Settings.
 
 ## Coordinate spaces
 
@@ -68,28 +68,30 @@ flowchart TB
 | Piece | Role |
 |-------|------|
 | `SortingVisualizerGame` | Composition root: assets, AppContext, screen switch, shutdown |
-| `VisualizerScreen` | Idle / setup delay / active sort + HUD / Esc |
+| `VisualizerScreen` | Idle / setup delay / active sort + HUD; Esc cancels / focuses Settings; Ctrl+Q quits |
 | `ResultsScreen` | Comparison table via `ResultsTableRenderer` |
 | `AppContext` | Settings façade + snapshot publish + injected shutdown handler |
 | `ArrayController` | Working array mutated by the sort worker |
 | `SnapshotPublisher` | Copy-on-publish; `publishedView()` for visuals/sound |
 | `AppAssets` | Owns FreeType HUD fonts (`flip=true` for Overlay); disposed by composition root |
 | `ImageRepository` | Loads/resizes user images → `ImageHandle`; GDX impl uploads source texture once |
-| `GdxRenderSystem` | World2D/World3D batches + Overlay; circles/ellipses via `GeometryBatch2D` (or `--legacy-2d` ShapeRenderer) |
-| `GeometryBatch2D` | Colored circle quads + low-seg ellipse lines (Phase 8) |
+| `GdxRenderSystem` | World2D/World3D + Overlay; requires GL30 (`GeometryBatch2D`, instancing, `LineRenderer3D`) |
+| `GeometryBatch2D` | Colored rect/circle quads + stroked lines/ellipses (grow-on-demand buffers) |
+| `InstanceRenderer3D` | Hardware-instanced boxes / quads / spheres |
+| `LineRenderer3D` | World-space 3D line segments (hairline or thick camera-facing quads) |
 | `RenderSystem` | Idiomatic draw API: `fillRects` / `fillCircles` / `drawBoxes` / `drawImageRemap` / … |
 | `HudRenderer` | Overlay watermark and metrics (after world pass; counters from working controller) |
 | `FrameGateDelayContext` | Algorithm pacing; no graphics types |
 | `VisualizationCatalog` | All visualizations with size/image constraints |
 | `FrameGate` | Steps-per-frame engine + `awaitIdle` publish fence |
-| `ConfigurableVisualization` | Optional per-viz settings (`CubeSettings` today); Customize dialog drafts then Apply |
+| `ConfigurableVisualization` | Optional per-viz settings; Customize dialog drafts then Apply |
 | `VisualizationSettingsCodec` | Versioned JSON for clipboard export/import + `visualSettingsById` prefs blob |
 
 ## Lifecycle
 
-Closing Settings or pressing Esc on the canvas quits both windows.
+Closing the Settings window (or **Ctrl+Q** on the canvas) quits both windows. **Esc** on the canvas cancels an active sort, dismisses the results table, or focuses Settings when idle.
 
-Per-visualization appearance (Cube first): Settings → Customize beside the visualization combo opens a draft dialog (Cancel / Reset / Import / Export / Apply). Applied settings hot-update the live visual and persist under `UserPreferences.visualSettingsById`.
+Per-visualization appearance: Settings → Customize beside the visualization combo opens a draft dialog (Cancel / Reset / Import / Export / Apply) when the mode has knobs. Applied settings hot-update the live visual and persist under `UserPreferences.visualSettingsById`. Bars, Disparity Graph, Disparity Graph Mirrored, and Horizontal Pyramid intentionally have no Customize panel.
 
 ## Build & run
 

@@ -3,9 +3,11 @@ package io.github.compilerstuck.control.ui.settingsfx;
 /** UI strings for the JavaFX Settings shell (i18n-ready constants; English only for v1). */
 public final class SettingsStrings {
 
-  public static final String WINDOW_TITLE = "Sorting Algorithm Visualizer - Settings";
+  public static final String WINDOW_TITLE = "Sorting Algorithm Visualizer — Settings";
   public static final String TITLE = "Settings";
   public static final String LOADING = "Loading..";
+  public static final String WINDOW_HINT =
+      "Visualization is a separate window. Esc there cancels or focuses Settings; Ctrl+Q quits.";
 
   public static final String SECTION_ARRAY_SIZE = "ARRAY SIZE";
   public static final String SECTION_SORTING = "SORTING";

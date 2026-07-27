@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import io.github.compilerstuck.control.config.SettingsDefaults;
 
 /**
  * World-space 3D line segments as a single {@link Mesh} draw. Hairlines use {@code GL_LINES};
@@ -25,8 +24,12 @@ public final class LineRenderer3D implements Disposable {
   /** Floats per vertex: xyz + rgba. */
   private static final int FLOATS_PER_VERT = 7;
 
-  /** Cover max array size so first large-N line frame does not rebuild the mesh. */
-  private static final int INITIAL_SEGMENTS = SettingsDefaults.ARRAY_SIZE_MAX;
+  /**
+   * Start near a typical preview size; {@link #ensureVertCapacity} doubles up to large N so cold
+   * start does not allocate for {@link
+   * io.github.compilerstuck.control.config.SettingsDefaults#ARRAY_SIZE_MAX}.
+   */
+  private static final int INITIAL_SEGMENTS = 4096;
 
   private final ShaderProgram shader;
   private Mesh mesh;

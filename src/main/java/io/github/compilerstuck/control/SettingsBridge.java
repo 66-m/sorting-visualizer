@@ -12,6 +12,9 @@ public interface SettingsBridge {
 
   void setCancelEnabled(boolean enabled);
 
+  /** Bring the Settings window to the front (no-op if Settings is not open yet). */
+  void focusSettings();
+
   SettingsBridge NOOP =
       new SettingsBridge() {
         @Override
@@ -22,5 +25,8 @@ public interface SettingsBridge {
 
         @Override
         public void setCancelEnabled(boolean enabled) {}
+
+        @Override
+        public void focusSettings() {}
       };
 }

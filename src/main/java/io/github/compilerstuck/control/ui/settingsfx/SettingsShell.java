@@ -74,7 +74,11 @@ public final class SettingsShell {
     title.setId(TITLE_ID);
     title.getStyleClass().add("settings-title");
 
-    VBox header = new VBox(title);
+    Label hint = new Label(SettingsStrings.WINDOW_HINT);
+    hint.getStyleClass().add("settings-window-hint");
+    hint.setWrapText(true);
+
+    VBox header = new VBox(SettingsLayout.GAP_SM, title, hint);
     header.getStyleClass().add("settings-header");
     header.setPadding(new Insets(0, 0, SettingsLayout.GAP_LG, 0));
     return header;

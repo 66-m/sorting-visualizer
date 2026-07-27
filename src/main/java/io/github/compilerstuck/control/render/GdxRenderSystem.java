@@ -19,17 +19,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Production {@link RenderSystem}: World2D (Y-up) ShapeRenderer/SpriteBatch + instanced World3D
- * meshes (or legacy ModelBatch when {@code --legacy-3d} / no GL30). 3D lines use {@link
- * LineRenderer3D}. Overlay text/pixels use a separate Y-down camera.
+ * Production {@link RenderSystem}: World2D (Y-up) via {@link GeometryBatch2D} + SpriteBatch, and
+ * instanced World3D meshes via {@link InstanceRenderer3D}. 3D lines use {@link LineRenderer3D}.
+ * Overlay text/pixels use a separate Y-down camera. Requires GL30.
  *
  * <p>Delegates draw work to package-private pass helpers ({@link GdxWorld2DPass}, {@link
  * GdxWorld3DPass}, {@link GdxOverlayPass}) while owning cameras, {@link FramePipeline}, resize, and
  * dispose.
- *
- * <p><b>ModelBatch rule (legacy path):</b> do not bind shaders/textures or issue unrelated GL draws
- * between ModelBatch begin/end. See <a
- * href="https://libgdx.com/wiki/graphics/3d/modelbatch">ModelBatch wiki</a>.
  */
 public final class GdxRenderSystem implements RenderSystem, Disposable {
   private static final Logger LOGGER = Logger.getLogger(GdxRenderSystem.class.getName());
@@ -121,14 +117,12 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     return lastFrameStats.fps;
   }
 
-  /** {@code true} when the hardware-instanced 3D path is active. */
+  /** {@code true} when the hardware-instanced 3D path is active (always, GL30 required). */
   public boolean usesInstancing() {
     return world3d.usesInstancing();
   }
 
-  /**
-   * {@code true} when GeometryBatch2D handles rects/circles/ellipses (not ShapeRenderer legacy).
-   */
+  /** {@code true} when GeometryBatch2D handles World2D geometry (always, GL30 required). */
   public boolean usesGeometryBatch2D() {
     return world2d.usesGeometryBatch2D();
   }

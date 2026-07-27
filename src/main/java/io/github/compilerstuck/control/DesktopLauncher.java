@@ -23,7 +23,7 @@ public final class DesktopLauncher {
     boolean portrait = LaunchArgs.portrait();
 
     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-    config.setTitle("Sorting Algorithm Visualizer");
+    config.setTitle("Sorting Algorithm Visualizer — Visualization");
     config.useVsync(true);
     config.setForegroundFPS(AppConfig.TARGET_FRAME_RATE);
     // GL 3.0 (emulated by desktop OpenGL 3.2) required for mesh hardware instancing.

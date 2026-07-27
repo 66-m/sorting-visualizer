@@ -25,6 +25,11 @@
   -fx-font-weight: bold;
 }
 
+.settings-window-hint {
+  -fx-text-fill: -color-fg-muted;
+  -fx-font-size: 0.85em;
+}
+
 .settings-loading-label {
   -fx-text-fill: -color-fg-muted;
   -fx-font-size: 0.95em;

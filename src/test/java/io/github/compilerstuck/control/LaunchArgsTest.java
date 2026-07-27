@@ -70,21 +70,12 @@ class LaunchArgsTest {
   void perfStatsDefaultsOff() {
     LaunchArgs.parse(new String[0]);
     assertFalse(LaunchArgs.perfStats());
-    assertFalse(LaunchArgs.legacy3d());
-    assertFalse(LaunchArgs.legacy2d());
   }
 
   @Test
-  void legacy3dFlag() {
-    LaunchArgs.parse(new String[] {"--legacy-3d"});
-    assertTrue(LaunchArgs.legacy3d());
-    assertFalse(LaunchArgs.perfStats());
-  }
-
-  @Test
-  void legacy2dFlag() {
-    LaunchArgs.parse(new String[] {"--legacy-2d"});
-    assertTrue(LaunchArgs.legacy2d());
-    assertFalse(LaunchArgs.legacy3d());
+  void retiredLegacyFlagsAreIgnored() {
+    LaunchArgs.parse(new String[] {"--legacy-3d", "--legacy-2d", "--perf-stats"});
+    assertTrue(LaunchArgs.perfStats());
+    assertFalse(LaunchArgs.fullscreen());
   }
 }

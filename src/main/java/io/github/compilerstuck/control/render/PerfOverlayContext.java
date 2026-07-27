@@ -1,13 +1,11 @@
 package io.github.compilerstuck.control.render;
 
-/** Scene / session fields for {@link PerfOverlay} (not per-draw GPU counters). */
+/** Optional context for {@link PerfOverlay} (array size, viz name, run state). */
 public final class PerfOverlayContext {
   public int width;
   public int height;
   public int arrayLength;
-  public String visualization = "";
-  public boolean legacy3d;
-  public boolean legacy2d;
-  public int stepsPerFrame;
+  public String visualization;
   public boolean running;
+  public int stepsPerFrame;
 }
