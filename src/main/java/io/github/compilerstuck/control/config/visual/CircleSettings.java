@@ -1,0 +1,34 @@
+package io.github.compilerstuck.control.config.visual;
+
+/** Tunable parameters for the `circle` visualization. */
+public record CircleSettings(double radiusScale, double startAngleDeg, double lineThickness)
+    implements VisualizationSettings {
+
+  public static final String ID = "circle";
+
+  public static final double DEFAULT_RADIUS_SCALE = 1.0 / 2.4;
+  public static final double RADIUS_SCALE_MIN = 0.2;
+  public static final double RADIUS_SCALE_MAX = 0.5;
+  public static final double DEFAULT_START_ANGLE_DEG = 0.0;
+  public static final double START_ANGLE_DEG_MIN = 0.0;
+  public static final double START_ANGLE_DEG_MAX = 360.0;
+  public static final double DEFAULT_LINE_THICKNESS = 1.0;
+  public static final double LINE_THICKNESS_MIN = 0.5;
+  public static final double LINE_THICKNESS_MAX = 4.0;
+
+  public CircleSettings {
+    radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
+    startAngleDeg = Numbers.clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
+    lineThickness = Numbers.clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
+  }
+
+  public static CircleSettings defaults() {
+    return new CircleSettings(
+        DEFAULT_RADIUS_SCALE, DEFAULT_START_ANGLE_DEG, DEFAULT_LINE_THICKNESS);
+  }
+
+  @Override
+  public String visualizationId() {
+    return ID;
+  }
+}

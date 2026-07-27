@@ -1,7 +1,54 @@
-.idea/
-.vscode/
-*.iml
-*.iws
-log/
+# Maven build output and metadata
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Java compiled output and package artifacts
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.project
+.classpath
+.factorypath
+.settings/
+
+# VS Code
+.vscode/
+
+# Logs and runtime output
+log/
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Local executables (Windows build/run artifacts)
 *.exe
+
+.cursor/

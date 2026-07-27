@@ -1,0 +1,223 @@
+/* Brand accent override on top of AtlantaFX Primer Light (see 04-ui-ux-design-mockup §4.5). */
+.root {
+  -color-accent-emphasis: #6366F1; /* indigo-500 */
+  -color-accent-fg: #FFFFFF;
+  -color-accent-subtle: #EEF2FF; /* indigo-50 */
+}
+
+/*
+ * AtlantaFX sets -fx-cell-size: 0 on combo popup cells (variable-height), which forces VirtualFlow
+ * to measure every row on open. Fixed size matches Primer's padded cell height and keeps opens snappy.
+ */
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+  -fx-cell-size: 36px;
+}
+
+/* Invisible while PopupPrewarm opens skins once after Settings content loads. */
+.root.prewarming-popups .combo-box-popup,
+.root.prewarming-popups .color-palette {
+  -fx-opacity: 0;
+}
+
+/* --- Run Deck shell --- */
+.settings-title {
+  -fx-font-size: 1.35em;
+  -fx-font-weight: bold;
+}
+
+.settings-window-hint {
+  -fx-text-fill: -color-fg-muted;
+  -fx-font-size: 0.85em;
+}
+
+.settings-loading-label {
+  -fx-text-fill: -color-fg-muted;
+  -fx-font-size: 0.95em;
+}
+
+.settings-section-label {
+  -fx-font-size: 0.75em;
+  -fx-font-weight: bold;
+  -fx-text-fill: -color-fg-muted;
+  -fx-letter-spacing: 0.06em;
+  -fx-padding: 0 0 0 0;
+}
+
+/* Sections separated by column GAP_XL; no extra bottom pad (avoids fighting the stack gap). */
+.settings-section {
+  -fx-padding: 0;
+}
+
+.settings-field-label {
+  -fx-font-size: 0.9em;
+}
+
+.settings-value {
+  -fx-font-family: monospace;
+  -fx-font-size: 0.9em;
+  -fx-text-fill: -color-fg-muted;
+  -fx-alignment: center-right;
+}
+
+.settings-muted {
+  -fx-text-fill: -color-fg-muted;
+  -fx-font-size: 0.85em;
+}
+
+.settings-inline-status {
+  -fx-font-size: 0.85em;
+}
+
+.settings-inline-error {
+  -fx-text-fill: -color-danger-fg;
+  -fx-font-size: 0.85em;
+}
+
+.settings-inline-warning {
+  -fx-text-fill: -color-warning-fg;
+  -fx-font-size: 0.85em;
+}
+
+.settings-inline-success {
+  -fx-text-fill: -color-success-fg;
+  -fx-font-size: 0.85em;
+}
+
+/* --- Run-all order dialog --- */
+.run-all-order-dialog {
+  -fx-padding: 10 14 10 14;
+}
+
+.run-all-order-content {
+  -fx-spacing: 12;
+}
+
+.run-all-order-section {
+  -fx-spacing: 8;
+}
+
+.run-all-order-toolbar {
+  -fx-alignment: center-left;
+}
+
+.run-all-order-count {
+  -fx-font-variant-numeric: tabular-nums;
+}
+
+.settings-run-all-order-list {
+  -fx-background-insets: 0;
+  -fx-background-radius: 6;
+  -fx-border-color: -color-border-default;
+  -fx-border-radius: 6;
+  -fx-border-width: 1;
+  -fx-padding: 4;
+}
+
+.settings-run-all-order-list .list-cell {
+  -fx-padding: 6 10;
+  -fx-background-radius: 4;
+  -fx-background-color: transparent;
+}
+
+.settings-run-all-order-list .list-cell:filled:hover {
+  -fx-background-color: -color-bg-subtle;
+}
+
+.settings-run-all-order-list .list-cell:filled:selected,
+.settings-run-all-order-list .list-cell:filled:selected:focused {
+  -fx-background-color: -color-accent-subtle;
+}
+
+.settings-run-all-order-list .list-cell.settings-drag-over {
+  -fx-background-color: -color-accent-subtle;
+  -fx-border-color: -color-accent-emphasis transparent transparent transparent;
+  -fx-border-width: 2 0 0 0;
+}
+
+.settings-run-all-order-list .list-cell.settings-drag-source {
+  -fx-opacity: 0.45;
+}
+
+.settings-run-all-order-row {
+  -fx-alignment: center-left;
+}
+
+.run-all-order-index {
+  -fx-font-family: monospace;
+  -fx-font-size: 0.9em;
+  -fx-text-fill: -color-fg-muted;
+}
+
+.run-all-order-index-muted,
+.run-all-order-name-muted {
+  -fx-text-fill: -color-fg-muted;
+  -fx-opacity: 0.7;
+}
+
+.settings-drag-handle {
+  -fx-text-fill: -color-fg-muted;
+  -fx-cursor: move;
+  -fx-padding: 0 4 0 0;
+  -fx-font-size: 1.15em;
+  -fx-min-width: 18;
+}
+
+.settings-action-bar {
+  -fx-padding: 16 0 0 0;
+  -fx-spacing: 12;
+  -fx-alignment: center-left;
+  -fx-border-color: -color-border-default transparent transparent transparent;
+  -fx-border-width: 1 0 0 0;
+}
+
+.settings-header {
+  -fx-spacing: 2;
+}
+
+/* --- Visualization Customize dialog --- */
+.customize-dialog {
+  -fx-padding: 10 14 10 14;
+}
+
+.customize-dialog-content {
+  -fx-spacing: 8;
+}
+
+.customize-panel {
+  -fx-spacing: 12;
+}
+
+.customize-section {
+  -fx-spacing: 8;
+  -fx-padding: 0 0 2 0;
+}
+
+.customize-field-grid {
+  -fx-padding: 0;
+}
+
+.customize-field-label {
+  -fx-font-size: 0.95em;
+}
+
+.customize-value {
+  -fx-font-family: monospace;
+  -fx-alignment: center-right;
+}
+
+.customize-slider {
+  -fx-pref-height: 22;
+}
+
+.customize-reset {
+  -fx-padding: 2 6;
+}
+
+.customize-import-dialog {
+  -fx-padding: 8 12 8 12;
+}
+
+.customize-import-text {
+  -fx-font-family: monospace;
+  -fx-font-size: 0.9em;
+}

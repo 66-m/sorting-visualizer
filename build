@@ -1,13 +1,16 @@
 #!/bin/sh
 # build script for Unix-like systems
-# Use: ./build           — fast incremental build (no tests, no fat jar)
-#      ./build release   — full clean build with fat jar (for releases)
+# Use: ./build             — package with tests
+#      ./build skip-tests  — fast incremental build (no tests)
+#      ./build release     — full clean build with fat jar (for releases)
 
 # ensure Maven wrapper is executable
 chmod +x ./mvnw
 
 if [ "$1" = "release" ]; then
     ./mvnw clean package -Prelease
-else
+elif [ "$1" = "skip-tests" ]; then
     ./mvnw package -DskipTests
+else
+    ./mvnw package
 fi

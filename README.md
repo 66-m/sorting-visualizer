@@ -1,160 +1,120 @@
 <div align="center">
 
-  <img src="images/logo.png" alt="Logo" width="160" height="160">
+<img src="images/logo.png" alt="Logo" width="140" height="140">
 
-  <h1>Sorting Algorithm Visualizer</h1>
+# Sorting Algorithm Visualizer
 
-  <p>Visualize and audiolize sorting algorithms in real time — with 22 algorithms, 30 visualizations, and full 3D support.</p>
+See and hear sorting algorithms in real time - 22 algorithms, 30 visualizations on **libGDX**, live metrics, and MIDI audio.
 
-  [![Java CI with Maven](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/maven.yml)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Latest Release](https://img.shields.io/github/v/release/66-m/sorting-visualizer)](https://github.com/66-m/sorting-visualizer/releases/latest)
+[![CI](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Latest Release](https://img.shields.io/github/v/release/66-m/sorting-visualizer)](https://github.com/66-m/sorting-visualizer/releases/latest)
 
-  <br/>
+[Download](https://github.com/66-m/sorting-visualizer/releases/latest) · [Issues](https://github.com/66-m/sorting-visualizer/issues)
 
-  [**Download latest release »**](https://github.com/66-m/sorting-visualizer/releases/latest)
-  &nbsp;·&nbsp;
-  [Report a bug or request a feature](https://github.com/66-m/sorting-visualizer/issues)
-
-  <br/>
-
-  <img src="images/demo.png" alt="Program demo" width="80%">
+<img src="images/demo.png" alt="Demo screenshot" width="85%">
 
 </div>
 
----
+## Quick start
 
-## Table of Contents
+Requires **[JDK 26+](https://jdk.java.net/26/)**.
 
-- [Getting Started](#getting-started)
-- [Building from Source](#building-from-source)
-- [Features](#features)
-  - [Sorting Algorithms](#sorting-algorithms)
-  - [Visualizations](#visualizations)
-  - [Controls & Settings](#controls--settings)
-- [Acknowledgements](#acknowledgements)
-
----
-
-## Getting Started
-
-Download the [prebuilt JAR](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) and run it with:
+Download [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) from the latest release, then:
 
 ```sh
-java -jar sorting-visualizer.jar
+java --enable-native-access=ALL-UNNAMED \
+  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
+  -jar sorting-visualizer.jar
 ```
 
-> **Requires Java 25 or later.** Download from [jdk.java.net/25](https://jdk.java.net/25/).
+**Settings** is a JavaFX window (AtlantaFX). The visualization canvas is **libGDX** (`GdxRenderSystem`: batched World2D + instanced World3D). Closing **Settings** quits the app. On the canvas, **Esc** cancels a run or focuses Settings; **Ctrl+Q** quits.
+### Launch flags
 
----
+Pass any of these after the JAR name (order does not matter; `fullscreen` wins over `portrait`):
 
-## Building from Source
+| Flag | Effect |
+|------|--------|
+| `fullscreen` | Fullscreen visualization on the chosen display |
+| `portrait` | Tall portrait window (~9:16) |
+| `--display=N` | Visualization on display `N` (1-based; default is display 2 when multiple monitors exist, otherwise the primary). Settings always opens centered on the primary screen. |
 
-**Requirements:**
-- JDK 25 or later — [download here](https://jdk.java.net/25/)
-- Ensure your [JAVA_HOME environment variable](https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux) is set
+```sh
+java --enable-native-access=ALL-UNNAMED \
+  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
+  -jar sorting-visualizer.jar fullscreen --display=2
+```
 
-**Clone and build:**
+## Features
+
+### Algorithms (22)
+
+| | | |
+|---|---|---|
+| Quick Sort (middle / dual pivot) | Merge Sort | Heap Sort |
+| Shell Sort | Tim Sort | Insertion Sort |
+| Selection / Double Selection | Bubble / Cocktail Shaker | Comb Sort |
+| Gnome / Odd-Even / Cycle | Counting / Bucket / Pigeonhole | Radix LSD (base 10) |
+| American Flag Sort | Gravity Sort | Bogo Sort |
+
+Run one algorithm, or run a custom selection **in order** and optionally show a comparison table afterward.
+
+### Visualizations (30)
+
+| | | |
+|---|---|---|
+| Bars | Scatter Plot | Scatter Plot Linked |
+| Number Plot | Disparity Graph | Disparity Graph Mirrored |
+| Horizontal Pyramid | Color Gradient Graph | Circle |
+| Disparity Circle | Disparity Circle Scatter | Disparity Circle Scatter Linked |
+| Disparity Chords | Disparity Square Scatter | Swirl Dots |
+| Phyllotaxis | Image Vertical | Image Horizontal |
+| Hoops | Mosaic Squares | Morphing Shell (3D) |
+| Sphere (3D) | Sphere Hoops (3D) | Spheric Disparity Lines (3D) |
+| Disparity Sphere Hoops (3D) | Cube (3D) | Cubic Lines (3D) |
+| Pyramid (3D) | Plane (3D) | Disparity Plane (3D) |
+
+### Controls
+
+| Control | Options |
+|---------|---------|
+| Array | Size 3–100 000; shuffle: random, reverse, almost sorted, sorted |
+| Sorting | Algorithm picker, run-all with drag-reorder dialog, shuffle type |
+| Speed | Five levels (steps per frame) |
+| Appearance | Gradient presets + custom colors |
+| Visualization | 30 modes; Customize for most modes (Bars / disparity graphs / Horizontal Pyramid have none); image path with validation for image viz |
+| Sound | MIDI tones mapped to values; sound-effects checkbox |
+| Display | Show measurements (sorted %, comparisons, swaps, main/aux writes, est. time); comparison table after run-all; export CSV |
+| Session | Cancel mid-run; prefs persist across launches |
+
+## Build from source
 
 ```sh
 git clone https://github.com/66-m/sorting-visualizer.git
 cd sorting-visualizer
 
-# Build (using bundled Maven wrapper — recommended)
 ./mvnw clean package
-# or use the convenience script:
-./build
-```
-
-**Run:**
-
-```sh
-java -jar target/sorting-visualizer.jar
-# or:
 ./run
 ```
 
-> The `build` and `run` helper scripts are provided for Unix-like systems.
+| Command | What it does |
+|---------|----------------|
+| `./build` | Package with tests |
+| `./build skip-tests` | Fast package (skips tests) |
+| `./run` | Launch the local build |
 
----
+`./run` accepts the same [launch flags](#launch-flags) as the JAR. On Windows, use `build.cmd`, `run.cmd`, or `mvnw.cmd`.
 
-## Features
+For release fat JARs, SBOM, and `jpackage` builds, see [Contributing](CONTRIBUTING.md#packaging).
 
-### Sorting Algorithms
+## Docs
 
-22 algorithms available:
+- [Contributing](CONTRIBUTING.md)
+- [Architecture](docs/architecture.md)
+- [Add an algorithm](docs/add-algorithm.md)
 
-| | | |
-|---|---|---|
-| Quick Sort (Middle Pivot) | Quick Sort (Dual Pivot) | Merge Sort |
-| Shell Sort | Selection Sort | Double Selection Sort |
-| Insertion Sort | Heap Sort | Gravity Sort |
-| Radix Sort (LSD, Base 10) | Gnome Sort | Comb Sort |
-| Odd Even Sort | Bubble Sort | Cocktail Shaker Sort |
-| Cycle Sort | Counting Sort | American Flag Sort |
-| Bucket Sort | Pigeonhole Sort | Tim Sort |
-| Bogo Sort | | |
+## License
 
-**Algorithm run options:**
-- Run all algorithms in sequence
-- Change the execution order
-- Select which algorithms to include
+Copyright (C) 2020-2026 Marcel Mauel
 
-### Visualizations
-
-30 visualizations including 3D models:
-
-<details>
-<summary>2D Visualizations (20)</summary>
-
-- Bars
-- Scatter Plot / Scatter Plot Linked
-- Number Plot
-- Disparity Graph / Disparity Graph Mirrored
-- Horizontal Pyramid
-- Color Gradient Graph
-- Circle
-- Disparity Circle / Disparity Circle Scatter / Disparity Circle Scatter Linked
-- Disparity Chords
-- Disparity Square Scatter
-- Swirl Dots
-- Phyllotaxis
-- Image Vertical / Image Horizontal
-- Hoops
-- Morphing Shell
-- Mosaic Squares
-
-</details>
-
-<details>
-<summary>3D Visualizations (10)</summary>
-
-- Sphere
-- Sphere Hoops
-- Spheric Disparity Lines
-- Disparity Sphere Hoops
-- Cube
-- Cubic Lines
-- Pyramid
-- Plane
-- Disparity Plane
-
-</details>
-
-### Controls & Settings
-
-- **Array:** Configurable size and shuffle type (Random, Reverse, Almost Sorted, Sorted)
-- **Color gradients:** Choose from presets or create your own
-- **Speed:** Adjustable animation speed
-- **Sound:** Toggle mute at any time
-- **Live measurements:** sorted %, comparisons, swaps, array writes, auxiliary writes, estimated real time
-- **Comparison table:** Optionally display a summary after all algorithms have run
-- **Cancel:** Stop execution at any time
-
----
-
-## Acknowledgements
-
-Thanks to [w0rthy](https://www.youtube.com/c/w0rthyA) and [Musicombo](https://www.youtube.com/c/Musicombo) for their amazing videos and for inspiring this project.
-
-Thanks to [@micycle1](https://github.com/micycle1) for his mirror of the processing4 core library, making it available for Maven.
+Licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). See [`LICENSE`](LICENSE).
