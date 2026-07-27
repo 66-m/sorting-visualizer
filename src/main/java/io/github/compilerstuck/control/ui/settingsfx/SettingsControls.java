@@ -38,7 +38,7 @@ public final class SettingsControls {
     return label;
   }
 
-  /** Field label left, live value right — used above sliders. */
+  /** Field label left, live value right - used above sliders. */
   public static HBox labelValueHeader(String fieldText, Label value) {
     Region spacer = new Region();
     HBox.setHgrow(spacer, Priority.ALWAYS);

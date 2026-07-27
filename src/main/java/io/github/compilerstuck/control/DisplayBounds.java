@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 /**
  * Resolves monitor bounds and portrait window size for the libGDX visualization window (AWT).
- * Settings placement uses JavaFX {@code Screen.getPrimary().getVisualBounds()} instead — AWT and
+ * Settings placement uses JavaFX {@code Screen.getPrimary().getVisualBounds()} instead - AWT and
  * JavaFX coordinates can disagree on multi-monitor / HiDPI Linux.
  */
 public final class DisplayBounds {
