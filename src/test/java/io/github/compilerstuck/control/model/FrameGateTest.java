@@ -167,4 +167,39 @@ class FrameGateTest {
     assertEquals(0, gate.availableCredits());
     assertFalse(gate.isCancelled());
   }
+
+  @Test
+  @DisplayName("drain then awaitStep yields one visible frame despite multi-credit grant")
+  void drainThenAwaitGivesOneFrame() throws InterruptedException {
+    FrameGate gate = new FrameGate();
+    AtomicInteger columns = new AtomicInteger();
+    java.util.concurrent.CountDownLatch firstColumnReady =
+        new java.util.concurrent.CountDownLatch(1);
+    Thread sorter =
+        new Thread(
+            () -> {
+              try {
+                for (int i = 0; i < 3; i++) {
+                  columns.incrementAndGet(); // settle column (like GravitySort rewrite)
+                  if (i == 0) {
+                    firstColumnReady.countDown();
+                  }
+                  gate.drain(); // delayFrame: force publish
+                  gate.awaitStep();
+                }
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            },
+            "gravity-frame-sorter");
+    sorter.start();
+    assertTrue(firstColumnReady.await(2, java.util.concurrent.TimeUnit.SECONDS));
+    for (int expected = 1; expected <= 3; expected++) {
+      gate.awaitIdle();
+      assertEquals(expected, columns.get(), "one column per published frame");
+      gate.grant(25); // default speed budget — must not skip columns
+    }
+    sorter.join(2000);
+    assertEquals(3, columns.get());
+  }
 }

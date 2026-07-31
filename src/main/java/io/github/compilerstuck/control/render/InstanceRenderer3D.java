@@ -140,14 +140,36 @@ public final class InstanceRenderer3D implements Disposable {
       next *= 2;
     }
     LOGGER.info("Growing instance buffer " + maxInstances + " → " + next);
-    boxMesh.disableInstancedRendering();
-    quadMesh.disableInstancedRendering();
-    sphereMesh.disableInstancedRendering();
     maxInstances = next;
     instanceFloats = new float[maxInstances * InstanceTransform.FLOATS_PER_INSTANCE];
+    // Replacing InstanceData on an existing Mesh leaves the VAO stale; next bind aborts in
+    // glVertexAttribDivisor. Dispose + rebuild (same pattern as LineRenderer3D).
+    rebuildMeshes();
+  }
+
+  private void rebuildMeshes() {
+    disposeMeshes();
+    boxMesh = buildBox();
+    quadMesh = buildQuad();
+    sphereMesh = buildSphere();
     enableInstancing(boxMesh);
     enableInstancing(quadMesh);
     enableInstancing(sphereMesh);
+  }
+
+  private void disposeMeshes() {
+    if (boxMesh != null) {
+      boxMesh.dispose();
+      boxMesh = null;
+    }
+    if (quadMesh != null) {
+      quadMesh.dispose();
+      quadMesh = null;
+    }
+    if (sphereMesh != null) {
+      sphereMesh.dispose();
+      sphereMesh = null;
+    }
   }
 
   private void enableInstancing(Mesh mesh) {
@@ -197,18 +219,7 @@ public final class InstanceRenderer3D implements Disposable {
 
   @Override
   public void dispose() {
-    if (boxMesh != null) {
-      boxMesh.dispose();
-      boxMesh = null;
-    }
-    if (quadMesh != null) {
-      quadMesh.dispose();
-      quadMesh = null;
-    }
-    if (sphereMesh != null) {
-      sphereMesh.dispose();
-      sphereMesh = null;
-    }
+    disposeMeshes();
     if (shader != null) {
       shader.dispose();
     }

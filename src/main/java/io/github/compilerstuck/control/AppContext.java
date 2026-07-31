@@ -50,7 +50,7 @@ public final class AppContext {
   private Runnable shutdownHandler;
   private SettingsBridge settingsBridge = SettingsBridge.NOOP;
 
-  private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
+  private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–10, default Normal
   private int stepsPerFrame = SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
   private boolean perfStatsEnabled;
   private boolean fiveSecondStartDelay;
@@ -154,9 +154,9 @@ public final class AppContext {
     return speedLevel;
   }
 
-  /** Applies speed level 1–5 as steps granted per draw frame. */
-  public void setSpeedLevel(int level1to5) {
-    this.speedLevel = SettingsDefaults.clampSpeedLevel(level1to5);
+  /** Applies speed level 1–10 as steps granted per draw frame. */
+  public void setSpeedLevel(int level1to10) {
+    this.speedLevel = SettingsDefaults.clampSpeedLevel(level1to10);
     applySpeedLevel();
     preferences.setSpeedLevel(this.speedLevel);
     preferences.save();

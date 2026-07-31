@@ -12,7 +12,7 @@ public final class SettingsDefaults {
   public static final String DEFAULT_ALGORITHM_ID = "quicksort-middle";
   public static final String DEFAULT_VISUALIZATION_ID = "bars";
   public static final int DEFAULT_ARRAY_SIZE = 1280;
-  public static final int DEFAULT_SPEED_LEVEL = 3;
+  public static final int DEFAULT_SPEED_LEVEL = 5;
   public static final boolean DEFAULT_MUTED = false;
 
   /** Phase 4 additive defaults (missing prefs keys resolve to these, no version bump). */
@@ -42,10 +42,10 @@ public final class SettingsDefaults {
   public static final int ARRAY_SIZE_HIGH_WARNING_THRESHOLD = 20_000;
 
   public static final int SPEED_LEVEL_MIN = 1;
-  public static final int SPEED_LEVEL_MAX = 5;
+  public static final int SPEED_LEVEL_MAX = 10;
 
-  /** Speed levels 1–5 → steps granted per draw frame. */
-  private static final int[] STEPS_PER_FRAME = {1, 5, 25, 200, 2000};
+  /** Speed levels 1–10 → steps granted per draw frame (same min/max as the old 5-step scale). */
+  private static final int[] STEPS_PER_FRAME = {1, 2, 5, 12, 25, 50, 100, 250, 750, 2000};
 
   private SettingsDefaults() {}
 
@@ -57,7 +57,7 @@ public final class SettingsDefaults {
     return Math.max(SPEED_LEVEL_MIN, Math.min(SPEED_LEVEL_MAX, level));
   }
 
-  /** Steps granted per draw frame for a clamped speed level (1–5). */
+  /** Steps granted per draw frame for a clamped speed level (1–10). */
   public static int stepsPerFrame(int speedLevel) {
     int level = clampSpeedLevel(speedLevel);
     return STEPS_PER_FRAME[level - 1];

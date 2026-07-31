@@ -23,8 +23,12 @@ public class QuickSortDualPivot extends SortingAlgorithm {
     sort(arrayController, 0, arrayController.getLength() - 1);
   }
 
+  /**
+   * Dual-pivot quicksort. Recurses on the two smaller partitions and iterates on the largest so
+   * stack depth stays O(log n) even when outermost pivots degenerate (sorted / reverse input).
+   */
   private void sort(ArrayModel arrayController, int left, int right) {
-    if (right > left && !isCancelled()) {
+    while (right > left && !isCancelled()) {
       // Choose outermost elements as pivots
       if (arrayController.get(left) > arrayController.get(right)) {
         arrayController.swap(left, right);
@@ -75,10 +79,44 @@ public class QuickSortDualPivot extends SortingAlgorithm {
 
       delay(new int[] {left, right, l, g});
 
-      // Recursively sort partitions
-      sort(arrayController, left, l - 1);
-      sort(arrayController, l + 1, g - 1);
-      sort(arrayController, g + 1, right);
+      int leftLo = left;
+      int leftHi = l - 1;
+      int midLo = l + 1;
+      int midHi = g - 1;
+      int rightLo = g + 1;
+      int rightHi = right;
+
+      int leftLen = Math.max(0, leftHi - leftLo + 1);
+      int midLen = Math.max(0, midHi - midLo + 1);
+      int rightLen = Math.max(0, rightHi - rightLo + 1);
+
+      // Recurse into the two smaller segments; continue the loop on the largest.
+      if (leftLen >= midLen && leftLen >= rightLen) {
+        if (midLen > 0) {
+          sort(arrayController, midLo, midHi);
+        }
+        if (rightLen > 0) {
+          sort(arrayController, rightLo, rightHi);
+        }
+        right = leftHi;
+      } else if (midLen >= rightLen) {
+        if (leftLen > 0) {
+          sort(arrayController, leftLo, leftHi);
+        }
+        if (rightLen > 0) {
+          sort(arrayController, rightLo, rightHi);
+        }
+        left = midLo;
+        right = midHi;
+      } else {
+        if (leftLen > 0) {
+          sort(arrayController, leftLo, leftHi);
+        }
+        if (midLen > 0) {
+          sort(arrayController, midLo, midHi);
+        }
+        left = rightLo;
+      }
     }
   }
 }

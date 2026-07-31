@@ -16,7 +16,7 @@ class SettingsDefaultsTest {
     assertEquals("quicksort-middle", SettingsDefaults.DEFAULT_ALGORITHM_ID);
     assertEquals("bars", SettingsDefaults.DEFAULT_VISUALIZATION_ID);
     assertEquals(1280, SettingsDefaults.DEFAULT_ARRAY_SIZE);
-    assertEquals(3, SettingsDefaults.DEFAULT_SPEED_LEVEL);
+    assertEquals(5, SettingsDefaults.DEFAULT_SPEED_LEVEL);
     assertFalse(SettingsDefaults.DEFAULT_MUTED);
     assertFalse(SettingsDefaults.DEFAULT_PERF_STATS);
     assertFalse(SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY);
@@ -27,13 +27,18 @@ class SettingsDefaultsTest {
     assertEquals(24, SettingsDefaults.ARRAY_SIZE_FPS_WARNING_THRESHOLD);
     assertEquals(20_000, SettingsDefaults.ARRAY_SIZE_HIGH_WARNING_THRESHOLD);
     assertEquals(1, SettingsDefaults.SPEED_LEVEL_MIN);
-    assertEquals(5, SettingsDefaults.SPEED_LEVEL_MAX);
+    assertEquals(10, SettingsDefaults.SPEED_LEVEL_MAX);
 
     assertEquals(1, SettingsDefaults.stepsPerFrame(1));
-    assertEquals(5, SettingsDefaults.stepsPerFrame(2));
-    assertEquals(25, SettingsDefaults.stepsPerFrame(3));
-    assertEquals(200, SettingsDefaults.stepsPerFrame(4));
-    assertEquals(2000, SettingsDefaults.stepsPerFrame(5));
+    assertEquals(2, SettingsDefaults.stepsPerFrame(2));
+    assertEquals(5, SettingsDefaults.stepsPerFrame(3));
+    assertEquals(12, SettingsDefaults.stepsPerFrame(4));
+    assertEquals(25, SettingsDefaults.stepsPerFrame(5));
+    assertEquals(50, SettingsDefaults.stepsPerFrame(6));
+    assertEquals(100, SettingsDefaults.stepsPerFrame(7));
+    assertEquals(250, SettingsDefaults.stepsPerFrame(8));
+    assertEquals(750, SettingsDefaults.stepsPerFrame(9));
+    assertEquals(2000, SettingsDefaults.stepsPerFrame(10));
   }
 
   @Test
@@ -43,8 +48,8 @@ class SettingsDefaultsTest {
     assertEquals(1280, SettingsDefaults.clampArraySize(1280));
 
     assertEquals(1, SettingsDefaults.clampSpeedLevel(0));
-    assertEquals(5, SettingsDefaults.clampSpeedLevel(9));
-    assertEquals(3, SettingsDefaults.clampSpeedLevel(3));
+    assertEquals(10, SettingsDefaults.clampSpeedLevel(99));
+    assertEquals(5, SettingsDefaults.clampSpeedLevel(5));
   }
 
   @Test

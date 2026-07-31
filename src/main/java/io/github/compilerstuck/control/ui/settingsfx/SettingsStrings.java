@@ -101,6 +101,7 @@ public final class SettingsStrings {
   public static final String SHUFFLE = "Shuffle";
   public static final String SWATCH_HINT = "Click a swatch to edit";
   public static final String SPEED_SLOW = "Very Slow";
+  public static final String SPEED_DEFAULT = "Default";
   public static final String SPEED_FAST = "Max Fast";
   public static final String IMAGE_PATH_PROMPT = "Image path";
 

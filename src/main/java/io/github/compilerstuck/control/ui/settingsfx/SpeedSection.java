@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 /** Speed level slider with live value (disabled while running, G5). */
 public final class SpeedSection {
@@ -30,7 +31,22 @@ public final class SpeedSection {
     slider.setMinorTickCount(0);
     slider.setSnapToTicks(true);
     slider.setShowTickMarks(true);
-    slider.setShowTickLabels(false);
+    slider.setShowTickLabels(true);
+    slider.setLabelFormatter(
+        new StringConverter<Double>() {
+          @Override
+          public String toString(Double n) {
+            if (n != null && Math.round(n) == SettingsDefaults.DEFAULT_SPEED_LEVEL) {
+              return SettingsStrings.SPEED_DEFAULT;
+            }
+            return "";
+          }
+
+          @Override
+          public Double fromString(String s) {
+            return Double.NaN;
+          }
+        });
     slider
         .valueProperty()
         .addListener(
