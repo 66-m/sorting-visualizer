@@ -36,7 +36,8 @@ public final class AppConfig {
   // Frame rate and rendering (display cadence; sort pacing uses FrameGate)
   public static final int TARGET_FRAME_RATE = 60;
 
-  public static final int MAX_TEXT_SIZE = 50;
+  /** Upper clamp for FreeType HUD font generation (safety against pathological window widths). */
+  public static final int MAX_TEXT_SIZE = 128;
 
   // Timing (milliseconds)
   public static final int DELAY_BETWEEN_ALGORITHMS = 500;
