@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import io.github.compilerstuck.control.render.asset.AppAssets;
@@ -27,6 +28,7 @@ final class GdxOverlayPass implements Disposable {
 
   private final GdxRenderSystem host;
   private final AppAssets assets;
+  private final GlyphLayout glyphLayout = new GlyphLayout();
 
   private ImageRepository imageRepository;
   private ImageRemapRenderer imageRemapRenderer;
@@ -73,6 +75,14 @@ final class GdxOverlayPass implements Disposable {
     world2d.endSprites();
     host.pipeline().enterOverlay();
     host.applyOverlayViewport();
+  }
+
+  float measureTextWidth(String text, float sizePx) {
+    if (text == null || text.isEmpty()) {
+      return 0f;
+    }
+    glyphLayout.setText(assets.font(sizePx), text);
+    return glyphLayout.width;
   }
 
   void drawText(String text, float x, float y, float sizePx) {

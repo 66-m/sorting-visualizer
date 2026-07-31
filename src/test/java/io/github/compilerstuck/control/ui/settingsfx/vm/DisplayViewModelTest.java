@@ -24,6 +24,7 @@ class DisplayViewModelTest {
     assertTrue(vm.isPrintMeasurements());
     assertFalse(vm.isShowComparisonTable());
     assertFalse(vm.isFiveSecondStartDelay());
+    assertTrue(vm.isEqualizeSortDuration());
 
     vm.setPrintMeasurements(false);
     assertFalse(fx.app.getStateManager().shouldPrintMeasurements());
@@ -33,6 +34,9 @@ class DisplayViewModelTest {
 
     vm.setFiveSecondStartDelay(true);
     assertTrue(fx.app.isFiveSecondStartDelay());
+
+    vm.setEqualizeSortDuration(false);
+    assertFalse(fx.app.isEqualizeSortDuration());
   }
 
   @Test
@@ -48,5 +52,7 @@ class DisplayViewModelTest {
     assertFalse(vm.isShowComparisonTable());
     vm.setFiveSecondStartDelay(true);
     assertFalse(vm.isFiveSecondStartDelay());
+    vm.setEqualizeSortDuration(false);
+    assertTrue(vm.isEqualizeSortDuration());
   }
 }

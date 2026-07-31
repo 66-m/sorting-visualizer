@@ -3,6 +3,7 @@ package io.github.compilerstuck.control.ui.settingsfx;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tooltip;
 
 /** Debug toggles bound to {@link DebugViewModel}. */
 public final class DebugSection {
@@ -14,6 +15,7 @@ public final class DebugSection {
   public static Node build(DebugViewModel vm) {
     CheckBox perfStats = new CheckBox(SettingsStrings.SHOW_PERF_STATS);
     perfStats.setId(ROOT_ID);
+    perfStats.setTooltip(new Tooltip(SettingsStrings.SHOW_PERF_STATS_TOOLTIP));
     perfStats.setSelected(vm.isPerfStats());
     perfStats
         .selectedProperty()

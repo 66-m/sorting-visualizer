@@ -25,8 +25,10 @@ public final class DesktopLauncher {
     config.setTitle("Sorting Algorithm Visualizer - Visualization");
     config.useVsync(true);
     config.setForegroundFPS(AppConfig.TARGET_FRAME_RATE);
-    // GL 3.0 (emulated by desktop OpenGL 3.2) required for mesh hardware instancing.
-    config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+    // GLES 3.0 emulation needs desktop GL 3.3+: libGDX routes glVertexAttribDivisor via GL33.
+    config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 3);
+    // Default is 16-bit depth; World3D quads/boxes z-fight into black triangles without 24-bit.
+    config.setDepthBits(24);
     config.setWindowIcon("logo.png");
     config.setWindowSizeLimits(AppConfig.MIN_WINDOW_WIDTH, AppConfig.MIN_WINDOW_HEIGHT, -1, -1);
 

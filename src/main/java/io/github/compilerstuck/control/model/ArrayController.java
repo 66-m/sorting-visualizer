@@ -134,6 +134,20 @@ public class ArrayController implements ArrayModel {
     metricsDirty = true;
   }
 
+  /**
+   * Copies {@code snapshot} into the working array without incrementing write/swap counters. Used
+   * to restore state after an equalize dry-run.
+   */
+  public void restoreContents(int[] snapshot) {
+    if (snapshot == null || snapshot.length != length) {
+      throw new IllegalArgumentException("snapshot length must match array length");
+    }
+    System.arraycopy(snapshot, 0, array, 0, length);
+    resetMarkers();
+    markMetricsDirty();
+    bumpVisualRevision();
+  }
+
   public void resetArray() {
     for (int i = 0; i < length; i++) {
       array[i] = i;

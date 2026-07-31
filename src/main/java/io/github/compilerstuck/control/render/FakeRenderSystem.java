@@ -181,6 +181,15 @@ public final class FakeRenderSystem implements RenderSystem {
   }
 
   @Override
+  public float measureTextWidth(String text, float sizePx) {
+    if (text == null || text.isEmpty() || sizePx <= 0f) {
+      return 0f;
+    }
+    // Rough proportional advance for headless layout tests (Liberation Sans ~0.55em).
+    return text.length() * sizePx * 0.55f;
+  }
+
+  @Override
   public void drawTexts(String[] texts, float x, float[] ys, float sizePx, int count) {
     if (texts == null || count <= 0) {
       return;

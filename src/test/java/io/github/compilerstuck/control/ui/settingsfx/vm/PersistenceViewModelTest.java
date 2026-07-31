@@ -27,9 +27,11 @@ class PersistenceViewModelTest {
     fx.app.setPrintMeasurements(false);
     fx.app.setShowComparisonTable(true);
     fx.app.setFiveSecondStartDelay(true);
+    fx.app.setEqualizeSortDuration(true);
     assertFalse(fx.app.getPreferences().isPrintMeasurements());
     assertTrue(fx.app.getPreferences().isShowComparisonTable());
     assertTrue(fx.app.getPreferences().isFiveSecondStartDelay());
+    assertTrue(fx.app.getPreferences().isEqualizeSortDuration());
   }
 
   @Test

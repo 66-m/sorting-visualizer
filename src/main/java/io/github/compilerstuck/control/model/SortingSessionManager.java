@@ -1,7 +1,12 @@
 package io.github.compilerstuck.control.model;
 
 import io.github.compilerstuck.control.config.AppConfig;
+import io.github.compilerstuck.control.render.CountingDelayContext;
+import io.github.compilerstuck.control.render.DelayContext;
+import io.github.compilerstuck.control.render.TrackingDelayContext;
 import io.github.compilerstuck.control.ui.TimeEstimateFormat;
+import io.github.compilerstuck.sortingalgorithms.BogoSort;
+import io.github.compilerstuck.sortingalgorithms.GravitySort;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.Sound;
 import java.io.IOException;
@@ -10,7 +15,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +47,10 @@ public class SortingSessionManager {
   private Thread executionThread;
   private volatile CancellationToken cancellationToken = CancellationToken.alwaysActive();
   private volatile FrameGate frameGate;
+
+  private BooleanSupplier equalizeEnabled = () -> false;
+  private DoubleSupplier equalizeTargetSec = () -> 10.0;
+  private Supplier<DelayContext> productionDelayContext = () -> null;
 
   public SortingSessionManager(
       ArrayController arrayController, Sound sound, SortingStateManager stateManager) {
@@ -67,6 +81,19 @@ public class SortingSessionManager {
    */
   public void setFrameGate(FrameGate frameGate) {
     this.frameGate = frameGate;
+  }
+
+  /**
+   * Optional equalize-sort-duration support. {@code productionDelay} supplies the live FrameGate
+   * context (may be null in unit tests).
+   */
+  public void setEqualizeSupport(
+      BooleanSupplier enabled,
+      DoubleSupplier targetDurationSec,
+      Supplier<DelayContext> productionDelay) {
+    this.equalizeEnabled = enabled != null ? enabled : () -> false;
+    this.equalizeTargetSec = targetDurationSec != null ? targetDurationSec : () -> 10.0;
+    this.productionDelayContext = productionDelay != null ? productionDelay : () -> null;
   }
 
   /**
@@ -146,6 +173,7 @@ public class SortingSessionManager {
       stateManager.setRestart(true);
     } finally {
       stateManager.setFrameGateSuspended(false);
+      stateManager.equalizePacing().clear();
       // Drop unused step credits so the render thread cannot deadlock in awaitIdle().
       FrameGate gate = frameGate;
       if (gate != null) {
@@ -183,12 +211,169 @@ public class SortingSessionManager {
   }
 
   private void executeAlgorithm(SortingAlgorithm algorithm) {
-    algorithm.beginTiming();
+    DelayContext production = productionDelayContext.get();
+    DelayContext fallback =
+        production != null
+            ? production
+            : () -> {
+              /* no-op */
+            };
     try {
-      algorithm.sort();
+      if (tryArmEqualizePacing(algorithm, fallback)) {
+        algorithm.setDelayContext(
+            new TrackingDelayContext(fallback, stateManager.equalizePacing()));
+      } else {
+        if (algorithm instanceof GravitySort gravity) {
+          gravity.setColumnStride(1);
+        }
+        algorithm.setDelayContext(fallback);
+      }
+
+      algorithm.beginTiming();
+      try {
+        algorithm.sort();
+      } finally {
+        algorithm.endTiming();
+      }
+    } finally {
+      stateManager.equalizePacing().clear();
+      if (algorithm instanceof GravitySort gravity) {
+        gravity.setColumnStride(1);
+      }
+      algorithm.setDelayContext(fallback);
+    }
+  }
+
+  /**
+   * Silent dry-run that counts visual steps, restores the array, and arms {@link EqualizePacing}.
+   *
+   * @return true when equalize pacing was armed for the visual pass
+   */
+  boolean tryArmEqualizePacing(SortingAlgorithm algorithm, DelayContext production) {
+    if (!equalizeEnabled.getAsBoolean()) {
+      return false;
+    }
+    if (algorithm instanceof BogoSort) {
+      LOGGER.log(Level.INFO, "Equalize skipped for Bogo Sort (unbounded)");
+      return false;
+    }
+    if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+      return false;
+    }
+
+    float sliderTarget = (float) equalizeTargetSec.getAsDouble();
+
+    // Gravity's full column walk is O(n·max) CPU — impossible in a few seconds at 100k. Estimate
+    // beats, then raise columnStride so only ~budget samples are visualized/computed.
+    if (algorithm instanceof GravitySort gravity) {
+      int naturalBeats = GravitySort.estimateFrameBeats(arrayController);
+      if (naturalBeats <= 0) {
+        return false;
+      }
+      int n = arrayController.getLength();
+      int maxPerFrame = AppConfig.equalizeMaxFrameBeatsPerFrame(n);
+      int budget =
+          Math.max(
+              1,
+              Math.round(maxPerFrame * AppConfig.TARGET_FRAME_RATE * Math.max(0.1f, sliderTarget)));
+      int stride = Math.max(1, (naturalBeats + budget - 1) / budget);
+      gravity.setColumnStride(stride);
+      int visualBeats = GravitySort.countVisualBeats(naturalBeats, stride);
+      LOGGER.log(
+          Level.INFO,
+          "Gravity equalize stride={0} (naturalBeats={1}, budget={2}, visualBeats={3})",
+          new Object[] {stride, naturalBeats, budget, visualBeats});
+      return armEqualize(algorithm.getName(), visualBeats, visualBeats, sliderTarget);
+    }
+
+    int[] snapshot = Arrays.copyOf(arrayController.getArray(), arrayController.getLength());
+    OperationReporter previousReporter = stateManager::setCurrentOperation;
+    CancellationToken dryToken = new CancellationToken();
+    CancellationToken sessionToken = cancellationToken;
+    CountingDelayContext counter =
+        new CountingDelayContext(
+            System.nanoTime()
+                + TimeUnit.MILLISECONDS.toNanos(AppConfig.EQUALIZE_DRY_RUN_TIMEOUT_MS),
+            sessionToken::isCancelled,
+            dryToken::cancel);
+
+    stateManager.setCurrentOperation("Preparing…");
+    // Render must not grant FrameGate credits during the dry-run (nothing consumes them).
+    stateManager.setFrameGateSuspended(true);
+    FrameGate gate = frameGate;
+    if (gate != null) {
+      gate.drain();
+    }
+
+    algorithm.setDelayContext(counter);
+    algorithm.setOperationReporter(OperationReporter.NOOP);
+    algorithm.setCancellationToken(dryToken);
+
+    try {
+      sound.withMuted(algorithm::sort);
     } finally {
       algorithm.endTiming();
+      algorithm.setCancellationToken(sessionToken);
+      algorithm.setOperationReporter(previousReporter);
+      algorithm.setDelayContext(production);
+      arrayController.restoreContents(snapshot);
+      arrayController.resetMeasurements();
+      if (gate != null) {
+        gate.drain();
+      }
+      stateManager.setFrameGateSuspended(false);
     }
+
+    if (sessionToken.isCancelled() || !stateManager.shouldContinueExecution()) {
+      return false;
+    }
+    if (counter.timedOut()) {
+      LOGGER.log(
+          Level.INFO,
+          "Equalize dry-run timed out for {0}; using normal speed pacing",
+          algorithm.getName());
+      return false;
+    }
+    if (counter.aborted() || dryToken.isCancelled()) {
+      return false;
+    }
+
+    int totalSteps = clampToInt(counter.stepCount());
+    int frameBeats = clampToInt(counter.frameBeatCount());
+    if (totalSteps <= 0) {
+      return false;
+    }
+
+    return armEqualize(algorithm.getName(), totalSteps, frameBeats, sliderTarget);
+  }
+
+  private boolean armEqualize(
+      String algorithmName, int totalSteps, int frameBeats, float sliderTarget) {
+    stateManager
+        .equalizePacing()
+        .begin(totalSteps, frameBeats, sliderTarget, arrayController.getLength());
+    LOGGER.log(
+        Level.INFO,
+        "Equalize armed for {0}: steps={1}, frameBeats={2}, targetSec={3}, batch={4}, maxSteps/frame={5}",
+        new Object[] {
+          algorithmName,
+          totalSteps,
+          frameBeats,
+          sliderTarget,
+          stateManager.equalizePacing().batchBeats(),
+          stateManager.equalizePacing().maxStepsPerFrame()
+        });
+    return true;
+  }
+
+  private static int clampToInt(long value) {
+    if (value > Integer.MAX_VALUE) {
+      return Integer.MAX_VALUE;
+    }
+    if (value < 0) {
+      return 0;
+    }
+    return (int) value;
   }
 
   private void recordMeasurements() {

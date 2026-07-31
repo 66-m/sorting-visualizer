@@ -44,6 +44,7 @@ class UserPreferencesTest {
     assertTrue(prefs.getRunAllEntriesList().isEmpty());
     assertFalse(prefs.isPerfStats());
     assertFalse(prefs.isFiveSecondStartDelay());
+    assertTrue(prefs.isEqualizeSortDuration());
   }
 
   @Test
@@ -63,6 +64,7 @@ class UserPreferencesTest {
             new RunAllEntryPref("quicksort-middle", false)));
     prefs.setPerfStats(true);
     prefs.setFiveSecondStartDelay(true);
+    prefs.setEqualizeSortDuration(false);
     prefs.save(node);
 
     UserPreferences loaded = UserPreferences.load(node);
@@ -82,6 +84,7 @@ class UserPreferencesTest {
     assertFalse(entries.get(1).selected());
     assertTrue(loaded.isPerfStats());
     assertTrue(loaded.isFiveSecondStartDelay());
+    assertFalse(loaded.isEqualizeSortDuration());
   }
 
   @Test

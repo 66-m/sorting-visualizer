@@ -16,6 +16,7 @@ public final class DisplayViewModel {
   public static final String PROP_PRINT_MEASUREMENTS = "printMeasurements";
   public static final String PROP_SHOW_COMPARISON_TABLE = "showComparisonTable";
   public static final String PROP_FIVE_SECOND_START_DELAY = "fiveSecondStartDelay";
+  public static final String PROP_EQUALIZE_SORT_DURATION = "equalizeSortDuration";
   public static final String PROP_CAN_EXPORT = "canExport";
   public static final String PROP_INPUTS_ENABLED = "inputsEnabled";
 
@@ -25,6 +26,7 @@ public final class DisplayViewModel {
   private boolean printMeasurements;
   private boolean showComparisonTable;
   private boolean fiveSecondStartDelay;
+  private boolean equalizeSortDuration;
   private boolean inputsEnabled = true;
 
   public DisplayViewModel(AppContext app) {
@@ -32,6 +34,7 @@ public final class DisplayViewModel {
     this.printMeasurements = app.getStateManager().shouldPrintMeasurements();
     this.showComparisonTable = app.getStateManager().shouldShowComparisonTable();
     this.fiveSecondStartDelay = app.isFiveSecondStartDelay();
+    this.equalizeSortDuration = app.isEqualizeSortDuration();
   }
 
   public boolean isPrintMeasurements() {
@@ -75,6 +78,20 @@ public final class DisplayViewModel {
     fiveSecondStartDelay = enabled;
     app.setFiveSecondStartDelay(enabled);
     pcs.firePropertyChange(PROP_FIVE_SECOND_START_DELAY, old, enabled);
+  }
+
+  public boolean isEqualizeSortDuration() {
+    return equalizeSortDuration;
+  }
+
+  public void setEqualizeSortDuration(boolean enabled) {
+    if (!inputsEnabled || equalizeSortDuration == enabled) {
+      return;
+    }
+    boolean old = equalizeSortDuration;
+    equalizeSortDuration = enabled;
+    app.setEqualizeSortDuration(enabled);
+    pcs.firePropertyChange(PROP_EQUALIZE_SORT_DURATION, old, enabled);
   }
 
   public boolean canExport() {

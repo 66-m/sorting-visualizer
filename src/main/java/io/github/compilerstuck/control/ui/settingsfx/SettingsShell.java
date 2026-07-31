@@ -1,6 +1,8 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
 import atlantafx.base.theme.Styles;
+import io.github.compilerstuck.control.config.AppConfig;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,6 +13,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -92,18 +95,60 @@ public final class SettingsShell {
             section(SettingsStrings.SECTION_APPEARANCE, sections.appearance()),
             section(SettingsStrings.SECTION_OPTIONS, sections.options()));
 
-    HBox columns = new HBox(SettingsLayout.GAP_COL, left, right);
-    columns.setAlignment(Pos.TOP_LEFT);
+    HBox sideBySide = new HBox(SettingsLayout.GAP_COL);
+    sideBySide.setAlignment(Pos.TOP_LEFT);
     HBox.setHgrow(left, Priority.ALWAYS);
     HBox.setHgrow(right, Priority.ALWAYS);
     left.setMaxWidth(Double.MAX_VALUE);
     right.setMaxWidth(Double.MAX_VALUE);
+    sideBySide.getChildren().setAll(left, right);
 
-    ScrollPane scroll = new ScrollPane(columns);
+    VBox stacked = new VBox(SettingsLayout.GAP_XL);
+    stacked.setFillWidth(true);
+    stacked.setAlignment(Pos.TOP_LEFT);
+
+    StackPane host = new StackPane(sideBySide);
+    host.setMaxWidth(Double.MAX_VALUE);
+    StackPane.setAlignment(sideBySide, Pos.TOP_LEFT);
+
+    ScrollPane scroll = new ScrollPane(host);
     scroll.setFitToWidth(true);
     scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     scroll.setFocusTraversable(false);
+
+    scroll
+        .viewportBoundsProperty()
+        .addListener(
+            (obs, oldBounds, bounds) ->
+                applyColumnLayout(host, sideBySide, stacked, left, right, bounds));
+    applyColumnLayout(host, sideBySide, stacked, left, right, scroll.getViewportBounds());
+
     return scroll;
+  }
+
+  private static void applyColumnLayout(
+      StackPane host, HBox sideBySide, VBox stacked, VBox left, VBox right, Bounds viewport) {
+    double width = viewport == null ? 0 : viewport.getWidth();
+    boolean shouldStack = width > 0 && width < AppConfig.SETTINGS_STACK_BREAKPOINT;
+    boolean isStacked = !host.getChildren().isEmpty() && host.getChildren().getFirst() == stacked;
+    if (width <= 0) {
+      return;
+    }
+    if (shouldStack == isStacked
+        && (!sideBySide.getChildren().isEmpty() || !stacked.getChildren().isEmpty())) {
+      return;
+    }
+    if (shouldStack) {
+      sideBySide.getChildren().clear();
+      stacked.getChildren().setAll(left, right);
+      host.getChildren().setAll(stacked);
+      StackPane.setAlignment(stacked, Pos.TOP_LEFT);
+    } else {
+      stacked.getChildren().clear();
+      sideBySide.getChildren().setAll(left, right);
+      host.getChildren().setAll(sideBySide);
+      StackPane.setAlignment(sideBySide, Pos.TOP_LEFT);
+    }
   }
 
   private static VBox column(Node... sectionNodes) {

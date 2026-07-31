@@ -60,6 +60,7 @@ public final class SortingSection {
 
     ToggleSwitch runAll = new ToggleSwitch();
     runAll.setSelected(vm.isRunAll());
+    runAll.setTooltip(new Tooltip(SettingsStrings.RUN_ALL_TOOLTIP));
     runAll
         .selectedProperty()
         .addListener(
@@ -86,11 +87,9 @@ public final class SortingSection {
     HBox.setHgrow(runAllSpacer, Priority.ALWAYS);
     HBox runAllControls = new HBox(SettingsLayout.GAP_SM, runAll, runAllSpacer, configureHost);
     runAllControls.setAlignment(Pos.CENTER_LEFT);
-    VBox runAllField =
-        new VBox(
-            SettingsLayout.GAP_XS,
-            SettingsControls.fieldLabel(SettingsStrings.RUN_ALL),
-            runAllControls);
+    var runAllLabel = SettingsControls.fieldLabel(SettingsStrings.RUN_ALL);
+    runAllLabel.setTooltip(new Tooltip(SettingsStrings.RUN_ALL_TOOLTIP));
+    VBox runAllField = new VBox(SettingsLayout.GAP_XS, runAllLabel, runAllControls);
 
     ComboBox<ShuffleType> shuffle = new ComboBox<>();
     shuffle.getItems().setAll(vm.getShuffleTypes());

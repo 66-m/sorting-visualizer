@@ -38,6 +38,15 @@ public final class SettingsControls {
     return label;
   }
 
+  /** Muted micro-header + content for Options subgroups (Display / Audio / Debug). */
+  public static VBox optionGroup(String title, Node content) {
+    Label label = new Label(title);
+    label.getStyleClass().add("settings-option-group-label");
+    VBox group = new VBox(SettingsLayout.GAP_XS, label, content);
+    group.setFillWidth(true);
+    return group;
+  }
+
   /** Field label left, live value right - used above sliders. */
   public static HBox labelValueHeader(String fieldText, Label value) {
     Region spacer = new Region();

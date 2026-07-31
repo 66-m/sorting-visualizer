@@ -2,6 +2,7 @@ package io.github.compilerstuck.control.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ class SettingsDefaultsTest {
     assertEquals("quicksort-middle", SettingsDefaults.DEFAULT_ALGORITHM_ID);
     assertEquals("bars", SettingsDefaults.DEFAULT_VISUALIZATION_ID);
     assertEquals(1280, SettingsDefaults.DEFAULT_ARRAY_SIZE);
-    assertEquals(3, SettingsDefaults.DEFAULT_SPEED_LEVEL);
+    assertEquals(5, SettingsDefaults.DEFAULT_SPEED_LEVEL);
     assertFalse(SettingsDefaults.DEFAULT_MUTED);
     assertFalse(SettingsDefaults.DEFAULT_PERF_STATS);
     assertFalse(SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY);
@@ -27,13 +28,30 @@ class SettingsDefaultsTest {
     assertEquals(24, SettingsDefaults.ARRAY_SIZE_FPS_WARNING_THRESHOLD);
     assertEquals(20_000, SettingsDefaults.ARRAY_SIZE_HIGH_WARNING_THRESHOLD);
     assertEquals(1, SettingsDefaults.SPEED_LEVEL_MIN);
-    assertEquals(5, SettingsDefaults.SPEED_LEVEL_MAX);
+    assertEquals(10, SettingsDefaults.SPEED_LEVEL_MAX);
 
     assertEquals(1, SettingsDefaults.stepsPerFrame(1));
-    assertEquals(5, SettingsDefaults.stepsPerFrame(2));
-    assertEquals(25, SettingsDefaults.stepsPerFrame(3));
-    assertEquals(200, SettingsDefaults.stepsPerFrame(4));
-    assertEquals(2000, SettingsDefaults.stepsPerFrame(5));
+    assertEquals(2, SettingsDefaults.stepsPerFrame(2));
+    assertEquals(5, SettingsDefaults.stepsPerFrame(3));
+    assertEquals(12, SettingsDefaults.stepsPerFrame(4));
+    assertEquals(25, SettingsDefaults.stepsPerFrame(5));
+    assertEquals(50, SettingsDefaults.stepsPerFrame(6));
+    assertEquals(100, SettingsDefaults.stepsPerFrame(7));
+    assertEquals(250, SettingsDefaults.stepsPerFrame(8));
+    assertEquals(750, SettingsDefaults.stepsPerFrame(9));
+    assertEquals(2000, SettingsDefaults.stepsPerFrame(10));
+
+    assertTrue(SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION);
+    assertEquals(30f, SettingsDefaults.equalizedDurationSec(1));
+    assertEquals(10f, SettingsDefaults.equalizedDurationSec(5));
+    assertEquals(2f, SettingsDefaults.equalizedDurationSec(10));
+
+    assertEquals("1", SettingsDefaults.speedTickLabel(1, false));
+    assertEquals("25", SettingsDefaults.speedTickLabel(5, false));
+    assertEquals("2k", SettingsDefaults.speedTickLabel(10, false));
+    assertEquals("30s", SettingsDefaults.speedTickLabel(1, true));
+    assertEquals("10s", SettingsDefaults.speedTickLabel(5, true));
+    assertEquals("2s", SettingsDefaults.speedTickLabel(10, true));
   }
 
   @Test
@@ -43,8 +61,8 @@ class SettingsDefaultsTest {
     assertEquals(1280, SettingsDefaults.clampArraySize(1280));
 
     assertEquals(1, SettingsDefaults.clampSpeedLevel(0));
-    assertEquals(5, SettingsDefaults.clampSpeedLevel(9));
-    assertEquals(3, SettingsDefaults.clampSpeedLevel(3));
+    assertEquals(10, SettingsDefaults.clampSpeedLevel(99));
+    assertEquals(5, SettingsDefaults.clampSpeedLevel(5));
   }
 
   @Test

@@ -67,6 +67,7 @@ final class GdxWorld3DPass implements Disposable {
     }
     host.applyWorld3DViewport();
     Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+    Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
     Gdx.gl.glEnable(GL20.GL_BLEND);
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
   }

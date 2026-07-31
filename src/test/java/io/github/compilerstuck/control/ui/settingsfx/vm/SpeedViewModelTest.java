@@ -24,9 +24,9 @@ class SpeedViewModelTest {
 
   @Test
   void setSpeedLevelPropagates() {
-    vm.setSpeedLevel(5);
-    assertEquals(5, vm.getSpeedLevel());
-    assertEquals(5, fx.app.getSpeedLevel());
+    vm.setSpeedLevel(10);
+    assertEquals(10, vm.getSpeedLevel());
+    assertEquals(10, fx.app.getSpeedLevel());
   }
 
   @Test

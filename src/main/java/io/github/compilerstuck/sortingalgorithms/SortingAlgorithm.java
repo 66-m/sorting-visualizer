@@ -109,6 +109,22 @@ public abstract class SortingAlgorithm {
    * not included in {@link ArrayModel#getRealTime()}.
    */
   public void delay(int[] markers) {
+    pace(markers, false);
+  }
+
+  /**
+   * Like {@link #delay(int[])}, but forces one published frame (see {@link
+   * DelayContext#delayFrame()}).
+   */
+  public void delayFrame(int[] markers) {
+    pace(markers, true);
+  }
+
+  public void delay() {
+    delay(new int[0]);
+  }
+
+  private void pace(int[] markers, boolean wholeFrame) {
     if (isCancelled()) {
       return;
     }
@@ -123,12 +139,12 @@ public abstract class SortingAlgorithm {
         arrayController.setMarker(i, Marker.SET);
       }
 
-      proc.delay();
+      if (wholeFrame) {
+        proc.delayFrame();
+      } else {
+        proc.delay();
+      }
       startTime = System.nanoTime();
     }
-  }
-
-  public void delay() {
-    delay(new int[0]);
   }
 }

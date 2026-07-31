@@ -64,7 +64,8 @@ public final class VisualizationSection {
 
     Button resetAll = new Button(SettingsStrings.RESET_ALL_VISUALS);
     resetAll.setId(RESET_ALL_BUTTON_ID);
-    resetAll.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    resetAll.getStyleClass().add("settings-secondary-action");
+    resetAll.setTooltip(new Tooltip(SettingsStrings.RESET_ALL_VISUALS_TOOLTIP));
     resetAll.setOnAction(
         e -> {
           if (confirmResetAll(resetAll.getScene().getWindow())) {
@@ -105,6 +106,13 @@ public final class VisualizationSection {
         });
 
     path.setOnAction(e -> vm.setImagePath(Path.of(path.getText().trim())));
+    path.focusedProperty()
+        .addListener(
+            (obs, wasFocused, isFocused) -> {
+              if (wasFocused && !isFocused) {
+                vm.setImagePath(Path.of(path.getText().trim()));
+              }
+            });
 
     Label error = new Label(vm.getImageError());
     error.getStyleClass().add("settings-inline-error");

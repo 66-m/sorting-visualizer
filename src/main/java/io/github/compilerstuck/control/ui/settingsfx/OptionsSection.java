@@ -5,12 +5,14 @@ import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
 /**
  * Combined Options section: display toggles, sound, and debug.
  *
- * <p>Keeps both Settings columns at three sections so heights stay balanced.
+ * <p>Keeps both Settings columns at three sections so heights stay balanced. Equalize-sort-duration
+ * lives in {@link SpeedSection} next to the dial it remaps.
  */
 public final class OptionsSection {
 
@@ -21,6 +23,7 @@ public final class OptionsSection {
   public static Node build(
       DisplayViewModel displayVm, SoundViewModel soundVm, DebugViewModel debugVm) {
     CheckBox measurements = new CheckBox(SettingsStrings.SHOW_MEASUREMENTS);
+    measurements.setTooltip(new Tooltip(SettingsStrings.SHOW_MEASUREMENTS_TOOLTIP));
     measurements.setSelected(displayVm.isPrintMeasurements());
     measurements
         .selectedProperty()
@@ -32,6 +35,7 @@ public final class OptionsSection {
             });
 
     CheckBox comparison = new CheckBox(SettingsStrings.SHOW_COMPARISON_TABLE);
+    comparison.setTooltip(new Tooltip(SettingsStrings.SHOW_COMPARISON_TABLE_TOOLTIP));
     comparison.setSelected(displayVm.isShowComparisonTable());
     comparison
         .selectedProperty()
@@ -43,6 +47,7 @@ public final class OptionsSection {
             });
 
     CheckBox startDelay = new CheckBox(SettingsStrings.FIVE_SECOND_START_DELAY);
+    startDelay.setTooltip(new Tooltip(SettingsStrings.FIVE_SECOND_START_DELAY_TOOLTIP));
     startDelay.setSelected(displayVm.isFiveSecondStartDelay());
     startDelay
         .selectedProperty()
@@ -104,7 +109,12 @@ public final class OptionsSection {
         displayVm::addPropertyChangeListener,
         DisplayViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, display, sound, debug);
+    VBox root =
+        new VBox(
+            SettingsLayout.GAP_MD,
+            SettingsControls.optionGroup(SettingsStrings.OPTIONS_GROUP_DISPLAY, display),
+            SettingsControls.optionGroup(SettingsStrings.OPTIONS_GROUP_AUDIO, sound),
+            SettingsControls.optionGroup(SettingsStrings.OPTIONS_GROUP_DEBUG, debug));
     root.setId(ROOT_ID);
     return root;
   }

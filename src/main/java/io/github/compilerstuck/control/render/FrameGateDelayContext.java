@@ -18,4 +18,12 @@ public final class FrameGateDelayContext implements DelayContext {
       Thread.currentThread().interrupt();
     }
   }
+
+  @Override
+  public void delayFrame() {
+    // Drop leftover credits from this frame's grant so awaitIdle can publish now, then wait for
+    // the next grant (one visible frame per call regardless of steps-per-frame).
+    frameGate.drain();
+    delay();
+  }
 }
