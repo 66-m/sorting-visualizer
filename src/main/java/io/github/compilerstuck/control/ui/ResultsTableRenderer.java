@@ -28,14 +28,18 @@ public final class ResultsTableRenderer {
     rs.clear(bg, bg, bg);
 
     float textSize = AppConfig.scaleToWidth(AppConfig.FONT_SIZE_RATIO, width);
+    float topRow = AppConfig.scaleToWidth(AppConfig.TABLE_TOP_ROW, width);
+    float cellPad = AppConfig.scaleToWidth(AppConfig.TABLE_CELL_PADDING, width);
 
     drawGrid(rs, width, height);
-    drawHeaders(rs, width, textSize);
+    drawHeaders(rs, width, textSize, cellPad);
     drawData(
         rs,
         width,
         height,
         textSize,
+        topRow,
+        cellPad,
         algorithms,
         comparisons,
         realTime,
@@ -73,17 +77,18 @@ public final class ResultsTableRenderer {
     rs.strokeLines(gridLines, gridArgb, count);
   }
 
-  private void drawHeaders(RenderSystem rs, int width, float textSize) {
+  private void drawHeaders(RenderSystem rs, int width, float textSize, float cellPad) {
     float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
     float textY = textSize;
+    float halfPad = cellPad * 0.5f;
 
-    rs.drawText("Alg. name", columnWidth * 0 + 10, textY, textSize);
-    rs.drawText("Elements", columnWidth * 1 + columnWidth / 2 + 5, textY, textSize);
-    rs.drawText("Comparisons", columnWidth * 2 + 10, textY, textSize);
-    rs.drawText("Est. real time", columnWidth * 3 + 10, textY, textSize);
-    rs.drawText("Swaps", columnWidth * 4 + 10, textY, textSize);
-    rs.drawText("Writes main", columnWidth * 5 + 10, textY, textSize);
-    rs.drawText("Writes aux", columnWidth * 6 + 10, textY, textSize);
+    rs.drawText("Alg. name", columnWidth * 0 + cellPad, textY, textSize);
+    rs.drawText("Elements", columnWidth * 1 + columnWidth / 2 + halfPad, textY, textSize);
+    rs.drawText("Comparisons", columnWidth * 2 + cellPad, textY, textSize);
+    rs.drawText("Est. real time", columnWidth * 3 + cellPad, textY, textSize);
+    rs.drawText("Swaps", columnWidth * 4 + cellPad, textY, textSize);
+    rs.drawText("Writes main", columnWidth * 5 + cellPad, textY, textSize);
+    rs.drawText("Writes aux", columnWidth * 6 + cellPad, textY, textSize);
   }
 
   private void drawData(
@@ -91,6 +96,8 @@ public final class ResultsTableRenderer {
       int width,
       int height,
       float textSize,
+      float topRow,
+      float cellPad,
       List<SortingAlgorithm> algorithms,
       List<String> comparisons,
       List<String> realTime,
@@ -102,7 +109,7 @@ public final class ResultsTableRenderer {
     }
 
     float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
-    float rowHeight = (height - AppConfig.TABLE_TOP_ROW) / algorithms.size();
+    float rowHeight = (height - topRow) / algorithms.size();
     int textColor = packGray(AppConfig.RESULTS_TABLE_TEXT_COLOR);
 
     if (rowLines == null || rowLines.length < algorithms.size() * 4) {
@@ -111,7 +118,7 @@ public final class ResultsTableRenderer {
     }
 
     for (int i = 0; i < algorithms.size(); i++) {
-      float rowY = AppConfig.TABLE_TOP_ROW + rowHeight * i;
+      float rowY = topRow + rowHeight * i;
       int o = i * 4;
       rowLines[o] = 0;
       rowLines[o + 1] = rowY;
@@ -123,6 +130,8 @@ public final class ResultsTableRenderer {
           rs,
           height,
           textSize,
+          topRow,
+          cellPad,
           i,
           columnWidth,
           rowY,
@@ -140,6 +149,8 @@ public final class ResultsTableRenderer {
       RenderSystem rs,
       int height,
       float textSize,
+      float topRow,
+      float cellPad,
       int index,
       float columnWidth,
       float rowY,
@@ -150,19 +161,19 @@ public final class ResultsTableRenderer {
       List<String> writesMain,
       List<String> writesAux) {
     SortingAlgorithm alg = algorithms.get(index);
-    float rowCenterY = rowY + 10 + (height - AppConfig.TABLE_TOP_ROW) / algorithms.size() / 2;
+    float rowCenterY = rowY + cellPad + (height - topRow) / algorithms.size() / 2;
 
-    rs.drawText(alg.getName(), columnWidth * 0 + 10, rowCenterY, textSize);
+    rs.drawText(alg.getName(), columnWidth * 0 + cellPad, rowCenterY, textSize);
     rs.drawText(
         String.valueOf(alg.getAlternativeSize()),
-        (int) (columnWidth * 1 + columnWidth / 2) + 10,
+        columnWidth * 1 + columnWidth / 2 + cellPad,
         rowCenterY,
         textSize);
 
     if (index < comparisons.size()) {
       rs.drawText(
           String.format("%,d", Long.parseLong(comparisons.get(index))),
-          (int) (columnWidth * 2) + 10,
+          columnWidth * 2 + cellPad,
           rowCenterY,
           textSize);
     }
@@ -170,13 +181,13 @@ public final class ResultsTableRenderer {
     if (index < realTime.size()) {
       String timeStr =
           "~" + TimeEstimateFormat.format(Double.parseDouble(realTime.get(index))) + "ms";
-      rs.drawText(timeStr, (int) (columnWidth * 3) + 10, rowCenterY, textSize);
+      rs.drawText(timeStr, columnWidth * 3 + cellPad, rowCenterY, textSize);
     }
 
     if (index < swaps.size()) {
       rs.drawText(
           String.format("%,d", Long.parseLong(swaps.get(index))),
-          (int) (columnWidth * 4) + 10,
+          columnWidth * 4 + cellPad,
           rowCenterY,
           textSize);
     }
@@ -184,7 +195,7 @@ public final class ResultsTableRenderer {
     if (index < writesMain.size()) {
       rs.drawText(
           String.format("%,d", Long.parseLong(writesMain.get(index))),
-          (int) (columnWidth * 5) + 10,
+          columnWidth * 5 + cellPad,
           rowCenterY,
           textSize);
     }
@@ -192,7 +203,7 @@ public final class ResultsTableRenderer {
     if (index < writesAux.size()) {
       rs.drawText(
           String.format("%,d", Long.parseLong(writesAux.get(index))),
-          (int) (columnWidth * 6) + 10,
+          columnWidth * 6 + cellPad,
           rowCenterY,
           textSize);
     }

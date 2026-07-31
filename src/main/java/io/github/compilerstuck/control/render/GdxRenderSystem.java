@@ -141,8 +141,10 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
     cam3d.viewportWidth = width;
     cam3d.viewportHeight = height;
     cam3d.fieldOfView = 60f;
-    cam3d.near = 0.1f;
-    cam3d.far = Math.max(width, height) * 20f;
+    // Match GdxWorld3DPass eye distance; keep a tight near/far ratio for depth precision.
+    float eyeZ = (height * 0.5f) / (float) Math.tan(Math.toRadians(30));
+    cam3d.near = Math.max(1f, eyeZ * 0.05f);
+    cam3d.far = Math.max(cam3d.near + 1f, eyeZ * 4f);
     world3d.syncEngineScene(width, height);
   }
 
@@ -275,6 +277,11 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   @Override
   public void drawText(String text, float x, float y, float sizePx) {
     overlay.drawText(text, x, y, sizePx);
+  }
+
+  @Override
+  public float measureTextWidth(String text, float sizePx) {
+    return overlay.measureTextWidth(text, sizePx);
   }
 
   @Override

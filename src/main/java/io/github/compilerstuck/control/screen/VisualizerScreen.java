@@ -147,10 +147,13 @@ public final class VisualizerScreen implements Screen {
       game.appContext().publishArraySnapshot();
     }
     if (game.appContext() != null) {
-      int steps =
-          game.stateManager().isShuffling()
-              ? AppConfig.shuffleStepsForDelta(delta)
-              : game.appContext().getStepsPerFrame();
+      int steps;
+      if (game.stateManager().isShuffling()) {
+        steps = AppConfig.shuffleStepsForDelta(delta);
+      } else {
+        int equalized = game.stateManager().equalizePacing().stepsForDelta(delta);
+        steps = equalized >= 0 ? equalized : game.appContext().getStepsPerFrame();
+      }
       game.appContext().getFrameGate().grant(steps);
     }
     game.drawWorld(delta);

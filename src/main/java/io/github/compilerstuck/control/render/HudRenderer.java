@@ -28,19 +28,19 @@ public final class HudRenderer {
   private int cachedTextX;
   private int cachedTextSize;
   private int cachedLineHeight;
+  private int cachedWatermarkX;
+  private int cachedWatermarkSize;
   private boolean labelsInitialized;
 
   public void drawWatermark(RenderSystem rs) {
-    int w = rs.getWidth();
-    ensureLayout(w);
+    ensureLayout(rs);
     // Match first metrics line (e.g. "Waiting") so the watermark isn't flush to the top.
-    rs.drawText(Brand.WATERMARK, w - 190, labelYs[0], 25);
+    rs.drawText(Brand.WATERMARK, cachedWatermarkX, labelYs[0], cachedWatermarkSize);
   }
 
   public void drawMeasurements(
       RenderSystem rs, SortingStateManager stateManager, ArrayController arrayController) {
-    int width = rs.getWidth();
-    ensureLayout(width);
+    ensureLayout(rs);
     rebuildLabelsIfDirty(stateManager, arrayController);
     rs.drawTexts(labels, cachedTextX, labelYs, cachedTextSize, LABEL_COUNT);
   }
@@ -59,7 +59,8 @@ public final class HudRenderer {
     return sameKeys(readMetrics(stateManager, arrayController));
   }
 
-  private void ensureLayout(int width) {
+  private void ensureLayout(RenderSystem rs) {
+    int width = rs.getWidth();
     if (width == cachedLayoutWidth) {
       return;
     }
@@ -67,6 +68,10 @@ public final class HudRenderer {
     cachedTextSize = AppConfig.scaleToWidth(AppConfig.TEXT_Y_OFFSET, width);
     cachedTextX = AppConfig.scaleToWidth(AppConfig.TEXT_X_OFFSET, width);
     cachedLineHeight = AppConfig.scaleToWidth(AppConfig.LINE_HEIGHT_OFFSET, width);
+    cachedWatermarkSize = AppConfig.scaleToWidth(AppConfig.WATERMARK_TEXT_SIZE, width);
+    // Pin the trailing glyph to the same inset as left-side metrics (not a fixed text-width guess).
+    float watermarkW = rs.measureTextWidth(Brand.WATERMARK, cachedWatermarkSize);
+    cachedWatermarkX = Math.round(width - watermarkW - cachedTextX);
     for (int i = 0; i < LABEL_COUNT; i++) {
       labelYs[i] = cachedLineHeight * (i + 1);
     }

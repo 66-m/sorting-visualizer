@@ -10,7 +10,8 @@ import javafx.scene.layout.VBox;
 /**
  * Combined Options section: display toggles, sound, and debug.
  *
- * <p>Keeps both Settings columns at three sections so heights stay balanced.
+ * <p>Keeps both Settings columns at three sections so heights stay balanced. Equalize-sort-duration
+ * lives in {@link SpeedSection} next to the dial it remaps.
  */
 public final class OptionsSection {
 

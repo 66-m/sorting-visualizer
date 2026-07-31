@@ -1,10 +1,9 @@
 package io.github.compilerstuck.control.render;
 
+import io.github.compilerstuck.control.config.AppConfig;
+
 /** Screen-space debug overlay for {@link FrameStats} (enabled via {@code --perf-stats}). */
 public final class PerfOverlay {
-  private static final float TEXT_SIZE = 16f;
-  private static final float LINE = 18f;
-  private static final float MARGIN_X = 8f;
 
   public void draw(RenderSystem rs, FrameStats stats) {
     draw(rs, stats, null);
@@ -14,50 +13,57 @@ public final class PerfOverlay {
     if (rs == null || stats == null) {
       return;
     }
-    int h = rs.getHeight();
-    float y = h - 8f - LINE;
-    int line = 0;
+    Layout layout = Layout.forWidth(rs.getWidth(), rs.getHeight());
 
-    line = text(rs, "fps " + stats.fps, y, line);
-    line =
-        text(
-            rs,
-            String.format(
-                "frame %.2f ms  avg %.2f  1%%low %.0f fps",
-                stats.frameMs, stats.avgFrameMs, stats.onePercentLowFps),
-            y,
-            line);
-    line =
-        text(rs, String.format("heap %.1f / %.1f MB", stats.heapUsedMb, stats.heapMaxMb), y, line);
+    layout.line(rs, "fps " + stats.fps);
+    layout.line(
+        rs,
+        String.format(
+            "frame %.2f ms  avg %.2f  1%%low %.0f fps",
+            stats.frameMs, stats.avgFrameMs, stats.onePercentLowFps));
+    layout.line(rs, String.format("heap %.1f / %.1f MB", stats.heapUsedMb, stats.heapMaxMb));
 
     if (ctx != null) {
-      line = text(rs, ctx.width + "x" + ctx.height + "  N=" + ctx.arrayLength, y, line);
+      layout.line(rs, ctx.width + "x" + ctx.height + "  N=" + ctx.arrayLength);
       String viz =
           ctx.visualization == null || ctx.visualization.isEmpty() ? "?" : ctx.visualization;
-      line =
-          text(
-              rs,
-              viz + "  " + (ctx.running ? "running" : "idle") + "  steps " + ctx.stepsPerFrame,
-              y,
-              line);
-      line = text(rs, "path 3d=instanced  2d=geo", y, line);
+      layout.line(
+          rs, viz + "  " + (ctx.running ? "running" : "idle") + "  steps " + ctx.stepsPerFrame);
+      layout.line(rs, "path 3d=instanced  2d=geo");
     }
 
-    line = text(rs, "texts " + stats.textDraws + "  pixels " + stats.pixelUploads, y, line);
-    line =
-        text(
-            rs,
-            "spriteCalls " + stats.spriteRenderCalls + " (ends " + stats.spriteEnds + ")",
-            y,
-            line);
-    line = text(rs, "instanced " + stats.instancedDraws, y, line);
-    line = text(rs, "instances " + stats.instancesSubmitted, y, line);
-    line = text(rs, "lineDraws " + stats.lineDraws, y, line);
-    text(rs, "geo2d " + stats.geo2dDraws + " prims " + stats.geo2dPrimitives, y, line);
+    layout.line(rs, "texts " + stats.textDraws + "  pixels " + stats.pixelUploads);
+    layout.line(rs, "spriteCalls " + stats.spriteRenderCalls + " (ends " + stats.spriteEnds + ")");
+    layout.line(rs, "instanced " + stats.instancedDraws);
+    layout.line(rs, "instances " + stats.instancesSubmitted);
+    layout.line(rs, "lineDraws " + stats.lineDraws);
+    layout.line(rs, "geo2d " + stats.geo2dDraws + " prims " + stats.geo2dPrimitives);
   }
 
-  private static int text(RenderSystem rs, String s, float y0, int line) {
-    rs.drawText(s, MARGIN_X, y0 - line * LINE, TEXT_SIZE);
-    return line + 1;
+  private static final class Layout {
+    private final float x;
+    private final float y0;
+    private final float lineH;
+    private final float textSize;
+    private int line;
+
+    private Layout(float x, float y0, float lineH, float textSize) {
+      this.x = x;
+      this.y0 = y0;
+      this.lineH = lineH;
+      this.textSize = textSize;
+    }
+
+    static Layout forWidth(int width, int height) {
+      float textSize = AppConfig.scaleToWidth(AppConfig.PERF_TEXT_SIZE, width);
+      float lineH = AppConfig.scaleToWidth(AppConfig.PERF_LINE_HEIGHT, width);
+      float margin = AppConfig.scaleToWidth(AppConfig.PERF_MARGIN, width);
+      return new Layout(margin, height - margin - lineH, lineH, textSize);
+    }
+
+    void line(RenderSystem rs, String s) {
+      rs.drawText(s, x, y0 - line * lineH, textSize);
+      line++;
+    }
   }
 }

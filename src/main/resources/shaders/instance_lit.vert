@@ -1,4 +1,4 @@
-precision mediump float;
+precision highp float;
 
 in vec3 a_position;
 in vec3 a_normal;
@@ -23,7 +23,8 @@ void main() {
 
   mat3 worldN = mat3(world);
   vec3 n = normalize(worldN * a_normal);
-  float ndl = max(dot(n, normalize(-u_lightDir)), 0.0);
+  // Two-sided: quads are drawn without culling, so back faces need light too.
+  float ndl = abs(dot(n, normalize(-u_lightDir)));
   vec3 lit = u_ambient + u_lightColor * ndl;
   v_color = vec4(clamp(lit, 0.0, 1.0) * i_color.rgb, i_color.a);
 }

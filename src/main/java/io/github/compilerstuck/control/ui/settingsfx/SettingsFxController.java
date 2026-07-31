@@ -233,7 +233,7 @@ public final class SettingsFxController implements SettingsBridge {
             new SectionNodes(
                 ArraySizeSection.build(arraySizeVm),
                 SortingSection.build(algorithmVm),
-                SpeedSection.build(speedVm),
+                SpeedSection.build(speedVm, displayVm),
                 VisualizationSection.build(visualizationVm),
                 AppearanceSection.build(appearanceVm),
                 OptionsSection.build(displayVm, soundVm, debugVm)));

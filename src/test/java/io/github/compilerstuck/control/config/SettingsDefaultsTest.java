@@ -2,6 +2,7 @@ package io.github.compilerstuck.control.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,18 @@ class SettingsDefaultsTest {
     assertEquals(250, SettingsDefaults.stepsPerFrame(8));
     assertEquals(750, SettingsDefaults.stepsPerFrame(9));
     assertEquals(2000, SettingsDefaults.stepsPerFrame(10));
+
+    assertTrue(SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION);
+    assertEquals(30f, SettingsDefaults.equalizedDurationSec(1));
+    assertEquals(10f, SettingsDefaults.equalizedDurationSec(5));
+    assertEquals(2f, SettingsDefaults.equalizedDurationSec(10));
+
+    assertEquals("1", SettingsDefaults.speedTickLabel(1, false));
+    assertEquals("25", SettingsDefaults.speedTickLabel(5, false));
+    assertEquals("2k", SettingsDefaults.speedTickLabel(10, false));
+    assertEquals("30s", SettingsDefaults.speedTickLabel(1, true));
+    assertEquals("10s", SettingsDefaults.speedTickLabel(5, true));
+    assertEquals("2s", SettingsDefaults.speedTickLabel(10, true));
   }
 
   @Test

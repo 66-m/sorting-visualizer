@@ -39,6 +39,7 @@ public final class UserPreferences {
   private static final String KEY_RUN_ALL_ENTRIES = "runAllEntries";
   private static final String KEY_PERF_STATS = "perfStats";
   private static final String KEY_FIVE_SECOND_START_DELAY = "fiveSecondStartDelay";
+  private static final String KEY_EQUALIZE_SORT_DURATION = "equalizeSortDuration";
   private static final String KEY_VISUAL_SETTINGS_BY_ID = "visualSettingsById";
   private static final int CURRENT_DEFAULTS_VERSION = 1;
 
@@ -62,6 +63,7 @@ public final class UserPreferences {
   private String runAllEntries = SettingsDefaults.DEFAULT_RUN_ALL_ENTRIES;
   private boolean perfStats = SettingsDefaults.DEFAULT_PERF_STATS;
   private boolean fiveSecondStartDelay = SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY;
+  private boolean equalizeSortDuration = SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION;
   private String visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
 
   public static UserPreferences load() {
@@ -103,6 +105,9 @@ public final class UserPreferences {
     prefs.fiveSecondStartDelay =
         node.getBoolean(
             KEY_FIVE_SECOND_START_DELAY, SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY);
+    prefs.equalizeSortDuration =
+        node.getBoolean(
+            KEY_EQUALIZE_SORT_DURATION, SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION);
     prefs.visualSettingsById =
         node.get(KEY_VISUAL_SETTINGS_BY_ID, SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
     if (prefs.visualSettingsById == null) {
@@ -136,6 +141,7 @@ public final class UserPreferences {
     node.put(KEY_RUN_ALL_ENTRIES, runAllEntries != null ? runAllEntries : "");
     node.putBoolean(KEY_PERF_STATS, perfStats);
     node.putBoolean(KEY_FIVE_SECOND_START_DELAY, fiveSecondStartDelay);
+    node.putBoolean(KEY_EQUALIZE_SORT_DURATION, equalizeSortDuration);
     node.put(
         KEY_VISUAL_SETTINGS_BY_ID,
         visualSettingsById != null
@@ -292,6 +298,14 @@ public final class UserPreferences {
 
   public void setFiveSecondStartDelay(boolean fiveSecondStartDelay) {
     this.fiveSecondStartDelay = fiveSecondStartDelay;
+  }
+
+  public boolean isEqualizeSortDuration() {
+    return equalizeSortDuration;
+  }
+
+  public void setEqualizeSortDuration(boolean equalizeSortDuration) {
+    this.equalizeSortDuration = equalizeSortDuration;
   }
 
   public String getVisualSettingsById() {

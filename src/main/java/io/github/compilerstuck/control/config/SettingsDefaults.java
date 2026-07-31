@@ -28,6 +28,7 @@ public final class SettingsDefaults {
   public static final String DEFAULT_RUN_ALL_ENTRIES = "";
   public static final boolean DEFAULT_PERF_STATS = false;
   public static final boolean DEFAULT_FIVE_SECOND_START_DELAY = false;
+  public static final boolean DEFAULT_EQUALIZE_SORT_DURATION = true;
 
   /** JSON map of visualizationId → settings object (see VisualizationSettingsCodec). */
   public static final String DEFAULT_VISUAL_SETTINGS_BY_ID = "{}";
@@ -47,6 +48,13 @@ public final class SettingsDefaults {
   /** Speed levels 1–10 → steps granted per draw frame (same min/max as the old 5-step scale). */
   private static final int[] STEPS_PER_FRAME = {1, 2, 5, 12, 25, 50, 100, 250, 750, 2000};
 
+  /**
+   * Speed levels 1–10 → target sort duration in seconds while equalize-sort-duration mode is on.
+   */
+  private static final float[] EQUALIZED_DURATION_SEC = {
+    30f, 20f, 15f, 12f, 10f, 8f, 6f, 4f, 3f, 2f
+  };
+
   private SettingsDefaults() {}
 
   public static int clampArraySize(int size) {
@@ -61,5 +69,27 @@ public final class SettingsDefaults {
   public static int stepsPerFrame(int speedLevel) {
     int level = clampSpeedLevel(speedLevel);
     return STEPS_PER_FRAME[level - 1];
+  }
+
+  /** Target wall-clock sort duration (seconds) for a clamped speed level when equalizing. */
+  public static float equalizedDurationSec(int speedLevel) {
+    int level = clampSpeedLevel(speedLevel);
+    return EQUALIZED_DURATION_SEC[level - 1];
+  }
+
+  /**
+   * Compact tick label for the speed slider: steps/frame (e.g. {@code 25}, {@code 2k}) or equalized
+   * duration (e.g. {@code 10s}).
+   */
+  public static String speedTickLabel(int speedLevel, boolean equalizeDuration) {
+    int level = clampSpeedLevel(speedLevel);
+    if (equalizeDuration) {
+      return Math.round(EQUALIZED_DURATION_SEC[level - 1]) + "s";
+    }
+    int steps = STEPS_PER_FRAME[level - 1];
+    if (steps >= 1000) {
+      return (steps / 1000) + "k";
+    }
+    return Integer.toString(steps);
   }
 }

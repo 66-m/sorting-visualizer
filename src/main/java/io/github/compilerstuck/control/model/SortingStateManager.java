@@ -22,6 +22,8 @@ public class SortingStateManager {
    */
   private final AtomicBoolean frameGateSuspended = new AtomicBoolean(false);
 
+  private final EqualizePacing equalizePacing = new EqualizePacing();
+
   private volatile String currentOperation = "Waiting";
 
   /**
@@ -109,6 +111,11 @@ public class SortingStateManager {
     frameGateSuspended.set(value);
   }
 
+  /** Equalize-sort-duration pacing for the active algorithm (inactive when mode is off). */
+  public EqualizePacing equalizePacing() {
+    return equalizePacing;
+  }
+
   public String getCurrentOperation() {
     return currentOperation;
   }
@@ -125,6 +132,7 @@ public class SortingStateManager {
     shouldRestart.set(false);
     shuffling.set(false);
     frameGateSuspended.set(false);
+    equalizePacing.clear();
     currentOperation = "Waiting";
   }
 }

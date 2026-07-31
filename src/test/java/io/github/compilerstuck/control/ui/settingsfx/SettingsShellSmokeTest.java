@@ -102,7 +102,7 @@ class SettingsShellSmokeTest extends ApplicationTest {
         new SectionNodes(
             ArraySizeSection.build(arrayVm),
             SortingSection.build(new AlgorithmViewModel(fx.app)),
-            SpeedSection.build(new SpeedViewModel(fx.app)),
+            SpeedSection.build(new SpeedViewModel(fx.app), new DisplayViewModel(fx.app)),
             VisualizationSection.build(vizVm),
             AppearanceSection.build(new AppearanceViewModel(fx.app)),
             OptionsSection.build(

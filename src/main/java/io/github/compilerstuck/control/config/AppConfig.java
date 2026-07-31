@@ -56,6 +56,27 @@ public final class AppConfig {
   /** Frame-gate steps fired across one shuffle animation ({@link #SHUFFLE_DURATION_SEC}). */
   public static final int SHUFFLE_VISUAL_STEPS = 1000;
 
+  /**
+   * Max wall time for the silent dry-run that counts visual steps before an equalized sort. On
+   * timeout, equalization is skipped for that algorithm.
+   */
+  public static final long EQUALIZE_DRY_RUN_TIMEOUT_MS = 2000L;
+
+  /**
+   * Soft cap on equalize step credits granted per draw frame (plain {@code delay()} algorithms).
+   * Prevents a single frame from executing hundreds of thousands of visualized ops.
+   */
+  public static final int EQUALIZE_MAX_STEPS_PER_FRAME = 500;
+
+  /**
+   * Approx bar-update budget per frame when batching {@code delayFrame} algorithms (e.g. Gravity
+   * rewrites all {@code n} bars each beat). Cap beats/frame as {@code budget / n}.
+   */
+  public static final int EQUALIZE_FRAME_BEAT_ELEMENT_BUDGET = 250_000;
+
+  /** Upper bound on batched frame-beats granted in one draw frame. */
+  public static final int EQUALIZE_MAX_FRAME_BEATS_PER_FRAME = 64;
+
   // Visualization
   public static final int RESULTS_TABLE_BACKGROUND = 15;
   public static final int RESULTS_TABLE_TEXT_COLOR = 255;
@@ -81,10 +102,60 @@ public final class AppConfig {
     return Math.max(1, Math.round(SHUFFLE_VISUAL_STEPS * deltaSeconds / SHUFFLE_DURATION_SEC));
   }
 
-  // Text positioning
+  /**
+   * Lower-bound wall time for {@code frameBeats} whole-frame paces ({@code delayFrame}), assuming
+   * {@link #TARGET_FRAME_RATE}.
+   */
+  public static float equalizeFrameFloorSec(int frameBeats) {
+    if (frameBeats <= 0) {
+      return 0f;
+    }
+    return frameBeats / (float) TARGET_FRAME_RATE;
+  }
+
+  /**
+   * Effective equalize target: slider duration, but never shorter than the {@code delayFrame}
+   * floor.
+   */
+  public static float effectiveEqualizeTargetSec(float sliderTargetSec, int frameBeats) {
+    return Math.max(Math.max(0f, sliderTargetSec), equalizeFrameFloorSec(frameBeats));
+  }
+
+  /**
+   * Steps to grant this frame so {@code totalSteps} complete in {@code effectiveTargetSec}. Used
+   * when equalize-sort-duration mode is active (schedule correction may pass remaining steps/time).
+   */
+  public static int equalizedSortStepsForDelta(
+      float deltaSeconds, int totalSteps, float effectiveTargetSec) {
+    if (totalSteps <= 0) {
+      return 1;
+    }
+    if (deltaSeconds <= 0f || effectiveTargetSec <= 0f) {
+      return 1;
+    }
+    return Math.max(1, Math.round(totalSteps * deltaSeconds / effectiveTargetSec));
+  }
+
+  /**
+   * Max {@code delayFrame} beats to batch into one published frame for an array of {@code
+   * arrayLength}, keeping roughly {@link #EQUALIZE_FRAME_BEAT_ELEMENT_BUDGET} element updates per
+   * frame.
+   */
+  public static int equalizeMaxFrameBeatsPerFrame(int arrayLength) {
+    int n = Math.max(1, arrayLength);
+    int byBudget = EQUALIZE_FRAME_BEAT_ELEMENT_BUDGET / n;
+    return Math.max(1, Math.min(EQUALIZE_MAX_FRAME_BEATS_PER_FRAME, byBudget));
+  }
+
+  // Text positioning (design px at {@link #WINDOW_RATIO_WIDTH}; use {@link #scaleToWidth})
   public static final float TEXT_X_OFFSET = 5.0f;
   public static final float TEXT_Y_OFFSET = 23.0f;
   public static final float LINE_HEIGHT_OFFSET = 20.0f;
+  public static final float WATERMARK_TEXT_SIZE = 25.0f;
+  public static final float PERF_TEXT_SIZE = 16.0f;
+  public static final float PERF_LINE_HEIGHT = 18.0f;
+  public static final float PERF_MARGIN = 8.0f;
   public static final float TABLE_COLUMN_WIDTH_RATIO = 1.0f / 7.0f;
   public static final float TABLE_TOP_ROW = 50.0f;
+  public static final float TABLE_CELL_PADDING = 10.0f;
 }

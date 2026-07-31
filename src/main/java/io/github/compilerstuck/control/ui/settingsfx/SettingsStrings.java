@@ -21,10 +21,14 @@ public final class SettingsStrings {
   public static final String ARRAY_SIZE_HIGH_WARNING =
       "Large array sizes can lag the preview and sorting.\nConsider staying at 20,000 or fewer if performance matters.";
   public static final String LEVEL = "Level";
+  public static final String SPEED_HEADER = "Speed";
+  public static final String SPEED_DURATION_HEADER = "Target duration";
   public static final String PRESET = "Preset";
   public static final String IMAGE = "Image";
   public static final String COLORS = "Colors";
   public static final String SPEED_LEVEL_FORMAT = "%d / %d";
+  public static final String SPEED_STEPS_VALUE_FORMAT = "%d steps/frame";
+  public static final String SPEED_DURATION_VALUE_FORMAT = "~%d s";
 
   public static final String RUN = "Run";
   public static final String CANCEL = "Cancel";
@@ -95,14 +99,19 @@ public final class SettingsStrings {
   public static final String RUN_ALL = "Run all";
   public static final String SOUND_EFFECTS = "Sound effects";
   public static final String SHOW_MEASUREMENTS = "Show measurements";
-  public static final String SHOW_COMPARISON_TABLE = "Show comparison table";
+  public static final String SHOW_COMPARISON_TABLE = "Show comparison table when finished";
   public static final String FIVE_SECOND_START_DELAY = "5 second start delay";
+  public static final String EQUALIZE_SORT_DURATION = "Equalize sort duration";
+  public static final String EQUALIZE_SORT_DURATION_TOOLTIP =
+      "Pace each sort to the speed slider's target time. Frame-synced steps (e.g. Gravity Sort) may take longer.";
   public static final String SHOW_PERF_STATS = "Show render performance stats";
   public static final String SHUFFLE = "Shuffle";
   public static final String SWATCH_HINT = "Click a swatch to edit";
-  public static final String SPEED_SLOW = "Very Slow";
+  public static final String SPEED_SLOW = "Slow";
   public static final String SPEED_DEFAULT = "Default";
-  public static final String SPEED_FAST = "Max Fast";
+  public static final String SPEED_FAST = "Fast";
+  public static final String SPEED_EQUALIZE_SLOW = "Longer";
+  public static final String SPEED_EQUALIZE_FAST = "Faster";
   public static final String IMAGE_PATH_PROMPT = "Image path";
 
   private SettingsStrings() {}

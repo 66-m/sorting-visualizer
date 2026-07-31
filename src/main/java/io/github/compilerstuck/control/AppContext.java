@@ -54,6 +54,7 @@ public final class AppContext {
   private int stepsPerFrame = SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
   private boolean perfStatsEnabled;
   private boolean fiveSecondStartDelay;
+  private boolean equalizeSortDuration;
 
   public AppContext(
       ArrayController arrayController,
@@ -68,8 +69,13 @@ public final class AppContext {
     this.speedLevel = this.preferences.getSpeedLevel();
     this.perfStatsEnabled = this.preferences.isPerfStats();
     this.fiveSecondStartDelay = this.preferences.isFiveSecondStartDelay();
+    this.equalizeSortDuration = this.preferences.isEqualizeSortDuration();
     if (sessionManager != null) {
       sessionManager.setFrameGate(frameGate);
+      sessionManager.setEqualizeSupport(
+          () -> equalizeSortDuration,
+          () -> SettingsDefaults.equalizedDurationSec(speedLevel),
+          () -> delayContext);
     }
     applySpeedLevel();
   }
@@ -89,6 +95,7 @@ public final class AppContext {
     preferences.setShowComparisonTable(stateManager.shouldShowComparisonTable());
     preferences.setPerfStats(perfStatsEnabled);
     preferences.setFiveSecondStartDelay(fiveSecondStartDelay);
+    preferences.setEqualizeSortDuration(equalizeSortDuration);
     if (colorGradient != null) {
       preferences.setGradientName(colorGradient.getName());
       if (colorGradient.getColor1() != null) {
@@ -369,6 +376,16 @@ public final class AppContext {
   public void setFiveSecondStartDelay(boolean enabled) {
     fiveSecondStartDelay = enabled;
     preferences.setFiveSecondStartDelay(enabled);
+    preferences.save();
+  }
+
+  public boolean isEqualizeSortDuration() {
+    return equalizeSortDuration;
+  }
+
+  public void setEqualizeSortDuration(boolean enabled) {
+    equalizeSortDuration = enabled;
+    preferences.setEqualizeSortDuration(enabled);
     preferences.save();
   }
 
