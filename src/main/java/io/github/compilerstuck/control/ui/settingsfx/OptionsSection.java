@@ -42,7 +42,18 @@ public final class OptionsSection {
               }
             });
 
-    VBox display = new VBox(SettingsLayout.GAP_SM, measurements, comparison);
+    CheckBox startDelay = new CheckBox(SettingsStrings.FIVE_SECOND_START_DELAY);
+    startDelay.setSelected(displayVm.isFiveSecondStartDelay());
+    startDelay
+        .selectedProperty()
+        .addListener(
+            (obs, old, selected) -> {
+              if (selected != displayVm.isFiveSecondStartDelay()) {
+                displayVm.setFiveSecondStartDelay(selected);
+              }
+            });
+
+    VBox display = new VBox(SettingsLayout.GAP_SM, measurements, comparison, startDelay);
     display.setId(DisplaySection.ROOT_ID);
 
     Node sound = SoundSection.build(soundVm);
@@ -66,6 +77,14 @@ public final class OptionsSection {
                     comparison.setSelected(value);
                   }
                 });
+          } else if (DisplayViewModel.PROP_FIVE_SECOND_START_DELAY.equals(evt.getPropertyName())) {
+            boolean value = Boolean.TRUE.equals(evt.getNewValue());
+            VmBindings.runFx(
+                () -> {
+                  if (startDelay.isSelected() != value) {
+                    startDelay.setSelected(value);
+                  }
+                });
           }
         });
 
@@ -76,6 +95,11 @@ public final class OptionsSection {
         DisplayViewModel.PROP_INPUTS_ENABLED);
     VmBindings.bindInputsEnabled(
         comparison,
+        displayVm::isInputsEnabled,
+        displayVm::addPropertyChangeListener,
+        DisplayViewModel.PROP_INPUTS_ENABLED);
+    VmBindings.bindInputsEnabled(
+        startDelay,
         displayVm::isInputsEnabled,
         displayVm::addPropertyChangeListener,
         DisplayViewModel.PROP_INPUTS_ENABLED);

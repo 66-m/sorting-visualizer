@@ -26,8 +26,10 @@ class PersistenceViewModelTest {
   void displayTogglesPersistOnAppContext() {
     fx.app.setPrintMeasurements(false);
     fx.app.setShowComparisonTable(true);
+    fx.app.setFiveSecondStartDelay(true);
     assertFalse(fx.app.getPreferences().isPrintMeasurements());
     assertTrue(fx.app.getPreferences().isShowComparisonTable());
+    assertTrue(fx.app.getPreferences().isFiveSecondStartDelay());
   }
 
   @Test

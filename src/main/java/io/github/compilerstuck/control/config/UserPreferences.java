@@ -38,6 +38,7 @@ public final class UserPreferences {
   private static final String KEY_RUN_ALL = "runAll";
   private static final String KEY_RUN_ALL_ENTRIES = "runAllEntries";
   private static final String KEY_PERF_STATS = "perfStats";
+  private static final String KEY_FIVE_SECOND_START_DELAY = "fiveSecondStartDelay";
   private static final String KEY_VISUAL_SETTINGS_BY_ID = "visualSettingsById";
   private static final int CURRENT_DEFAULTS_VERSION = 1;
 
@@ -60,6 +61,7 @@ public final class UserPreferences {
   private boolean runAll = SettingsDefaults.DEFAULT_RUN_ALL;
   private String runAllEntries = SettingsDefaults.DEFAULT_RUN_ALL_ENTRIES;
   private boolean perfStats = SettingsDefaults.DEFAULT_PERF_STATS;
+  private boolean fiveSecondStartDelay = SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY;
   private String visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
 
   public static UserPreferences load() {
@@ -98,6 +100,9 @@ public final class UserPreferences {
       prefs.runAllEntries = SettingsDefaults.DEFAULT_RUN_ALL_ENTRIES;
     }
     prefs.perfStats = node.getBoolean(KEY_PERF_STATS, SettingsDefaults.DEFAULT_PERF_STATS);
+    prefs.fiveSecondStartDelay =
+        node.getBoolean(
+            KEY_FIVE_SECOND_START_DELAY, SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY);
     prefs.visualSettingsById =
         node.get(KEY_VISUAL_SETTINGS_BY_ID, SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
     if (prefs.visualSettingsById == null) {
@@ -130,6 +135,7 @@ public final class UserPreferences {
     node.putBoolean(KEY_RUN_ALL, runAll);
     node.put(KEY_RUN_ALL_ENTRIES, runAllEntries != null ? runAllEntries : "");
     node.putBoolean(KEY_PERF_STATS, perfStats);
+    node.putBoolean(KEY_FIVE_SECOND_START_DELAY, fiveSecondStartDelay);
     node.put(
         KEY_VISUAL_SETTINGS_BY_ID,
         visualSettingsById != null
@@ -278,6 +284,14 @@ public final class UserPreferences {
 
   public void setPerfStats(boolean perfStats) {
     this.perfStats = perfStats;
+  }
+
+  public boolean isFiveSecondStartDelay() {
+    return fiveSecondStartDelay;
+  }
+
+  public void setFiveSecondStartDelay(boolean fiveSecondStartDelay) {
+    this.fiveSecondStartDelay = fiveSecondStartDelay;
   }
 
   public String getVisualSettingsById() {

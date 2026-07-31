@@ -23,12 +23,16 @@ class DisplayViewModelTest {
   void togglesUpdateStateManager() {
     assertTrue(vm.isPrintMeasurements());
     assertFalse(vm.isShowComparisonTable());
+    assertFalse(vm.isFiveSecondStartDelay());
 
     vm.setPrintMeasurements(false);
     assertFalse(fx.app.getStateManager().shouldPrintMeasurements());
 
     vm.setShowComparisonTable(true);
     assertTrue(fx.app.getStateManager().shouldShowComparisonTable());
+
+    vm.setFiveSecondStartDelay(true);
+    assertTrue(fx.app.isFiveSecondStartDelay());
   }
 
   @Test
@@ -42,5 +46,7 @@ class DisplayViewModelTest {
     vm.setInputsEnabled(false);
     vm.setShowComparisonTable(true);
     assertFalse(vm.isShowComparisonTable());
+    vm.setFiveSecondStartDelay(true);
+    assertFalse(vm.isFiveSecondStartDelay());
   }
 }

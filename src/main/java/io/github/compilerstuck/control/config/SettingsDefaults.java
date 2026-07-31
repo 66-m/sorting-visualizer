@@ -27,6 +27,7 @@ public final class SettingsDefaults {
   public static final boolean DEFAULT_RUN_ALL = false;
   public static final String DEFAULT_RUN_ALL_ENTRIES = "";
   public static final boolean DEFAULT_PERF_STATS = false;
+  public static final boolean DEFAULT_FIVE_SECOND_START_DELAY = false;
 
   /** JSON map of visualizationId → settings object (see VisualizationSettingsCodec). */
   public static final String DEFAULT_VISUAL_SETTINGS_BY_ID = "{}";

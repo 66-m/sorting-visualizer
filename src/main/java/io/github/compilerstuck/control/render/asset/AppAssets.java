@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.Disposable;
+import io.github.compilerstuck.control.config.AppConfig;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,21 +34,16 @@ public final class AppAssets implements Disposable {
     }
   }
 
-  /** Nearest cached size (same behavior as legacy {@code GdxRenderSystem.fontFor}). */
+  /**
+   * Returns a FreeType font at the exact requested pixel size (rounded, clamped to {@code
+   * 1..AppConfig.MAX_TEXT_SIZE}). Generated fonts are cached by size.
+   */
   public BitmapFont font(float sizePx) {
-    int nearest = FONT_SIZES[0];
-    float best = Math.abs(sizePx - nearest);
-    for (int s : FONT_SIZES) {
-      float d = Math.abs(sizePx - s);
-      if (d < best) {
-        best = d;
-        nearest = s;
-      }
-    }
-    BitmapFont font = fonts.get(nearest);
+    int size = Math.max(1, Math.min(AppConfig.MAX_TEXT_SIZE, Math.round(sizePx)));
+    BitmapFont font = fonts.get(size);
     if (font == null) {
-      font = createFont(nearest);
-      fonts.put(nearest, font);
+      font = createFont(size);
+      fonts.put(size, font);
     }
     return font;
   }

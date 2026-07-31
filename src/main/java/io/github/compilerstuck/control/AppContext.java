@@ -53,6 +53,7 @@ public final class AppContext {
   private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–5, default Normal
   private int stepsPerFrame = SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
   private boolean perfStatsEnabled;
+  private boolean fiveSecondStartDelay;
 
   public AppContext(
       ArrayController arrayController,
@@ -66,6 +67,7 @@ public final class AppContext {
     this.size = this.preferences.getArraySize();
     this.speedLevel = this.preferences.getSpeedLevel();
     this.perfStatsEnabled = this.preferences.isPerfStats();
+    this.fiveSecondStartDelay = this.preferences.isFiveSecondStartDelay();
     if (sessionManager != null) {
       sessionManager.setFrameGate(frameGate);
     }
@@ -86,6 +88,7 @@ public final class AppContext {
     preferences.setPrintMeasurements(stateManager.shouldPrintMeasurements());
     preferences.setShowComparisonTable(stateManager.shouldShowComparisonTable());
     preferences.setPerfStats(perfStatsEnabled);
+    preferences.setFiveSecondStartDelay(fiveSecondStartDelay);
     if (colorGradient != null) {
       preferences.setGradientName(colorGradient.getName());
       if (colorGradient.getColor1() != null) {
@@ -356,6 +359,16 @@ public final class AppContext {
   public void setPerfStatsEnabled(boolean enabled) {
     perfStatsEnabled = enabled;
     preferences.setPerfStats(enabled);
+    preferences.save();
+  }
+
+  public boolean isFiveSecondStartDelay() {
+    return fiveSecondStartDelay;
+  }
+
+  public void setFiveSecondStartDelay(boolean enabled) {
+    fiveSecondStartDelay = enabled;
+    preferences.setFiveSecondStartDelay(enabled);
     preferences.save();
   }
 
