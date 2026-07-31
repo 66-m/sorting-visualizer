@@ -32,7 +32,7 @@ Optional flags (after the JAR name; `fullscreen` wins over `portrait`):
 
 | Flag | Effect |
 |------|--------|
-| `fullscreen` | Fullscreen visualization |
+| `fullscreen` | Exclusive fullscreen visualization (hides desktop panels) |
 | `portrait` | Tall ~9:16 window |
 | `--display=N` | Visualization on display `N` (1-based; default is 2 when multiple monitors exist) |
 

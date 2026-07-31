@@ -18,7 +18,6 @@ public final class DesktopLauncher {
     AppIcons.installApplicationIcons();
     JavaFxBootstrap.start();
 
-    Rectangle bounds = DisplayBounds.resolveBounds(LaunchArgs.display());
     boolean fullscreen = LaunchArgs.fullscreen();
     boolean portrait = LaunchArgs.portrait();
 
@@ -32,16 +31,19 @@ public final class DesktopLauncher {
     config.setWindowSizeLimits(AppConfig.MIN_WINDOW_WIDTH, AppConfig.MIN_WINDOW_HEIGHT, -1, -1);
 
     if (fullscreen) {
-      config.setDecorated(false);
-      config.setWindowedMode(Math.max(1, bounds.width), Math.max(1, bounds.height));
-      config.setWindowPosition(bounds.x, bounds.y);
+      // Exclusive fullscreen (GLFW monitor) so desktop panels auto-hide on Linux/Windows/macOS.
+      config.setFullscreenMode(
+          Lwjgl3ApplicationConfiguration.getDisplayMode(
+              DisplayBounds.resolveMonitor(LaunchArgs.display())));
     } else if (portrait) {
+      Rectangle bounds = DisplayBounds.resolveBounds(LaunchArgs.display());
       Dimension portraitDim = DisplayBounds.portraitSize(bounds);
       config.setWindowedMode(portraitDim.width, portraitDim.height);
       int x = bounds.x + Math.max(0, (bounds.width - portraitDim.width) / 2);
       int y = bounds.y + Math.max(0, (bounds.height - portraitDim.height) / 2);
       config.setWindowPosition(x, y);
     } else {
+      Rectangle bounds = DisplayBounds.resolveBounds(LaunchArgs.display());
       config.setWindowedMode(Math.max(1, bounds.width), Math.max(1, bounds.height));
       config.setWindowPosition(bounds.x, bounds.y);
       config.setMaximized(true);
