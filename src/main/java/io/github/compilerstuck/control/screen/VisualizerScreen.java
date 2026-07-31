@@ -44,7 +44,7 @@ public final class VisualizerScreen implements Screen {
             }
             if (keycode == Input.Keys.ESCAPE) {
               SortingStateManager state = game.stateManager();
-              if (state != null && state.isRunning()) {
+              if (state != null && (state.isRunning() || game.setupDelayRemaining() >= 0f)) {
                 game.cancelSorting();
               } else {
                 focusSettingsWindow();
@@ -174,6 +174,11 @@ public final class VisualizerScreen implements Screen {
   private void handleIdleState(float delta) {
     SortingStateManager stateManager = game.stateManager();
     if (game.setupDelayRemaining() >= 0f) {
+      if (!stateManager.shouldContinueExecution()) {
+        game.finishSession(true);
+        game.publishThenDraw(delta);
+        return;
+      }
       game.publishThenDraw(delta);
       game.setSetupDelayRemaining(game.setupDelayRemaining() - delta);
       if (game.setupDelayRemaining() <= 0f) {
@@ -183,7 +188,12 @@ public final class VisualizerScreen implements Screen {
     } else if (stateManager.requestedStart()) {
       stateManager.setShowResults(false);
       stateManager.setStartRequested(false);
-      game.setSetupDelayRemaining(AppConfig.SETUP_DELAY / 1000f);
+      stateManager.setContinueExecution(true);
+      int delayMs =
+          game.appContext() != null && game.appContext().isFiveSecondStartDelay()
+              ? AppConfig.SETUP_DELAY_LONG
+              : AppConfig.SETUP_DELAY;
+      game.setSetupDelayRemaining(delayMs / 1000f);
       if (game.appContext() != null) {
         game.appContext().settingsBridge().setInputsEnabled(false);
       }

@@ -43,6 +43,9 @@ public final class AppConfig {
   public static final int DELAY_AFTER_SORT_RESULT = 1500;
   public static final int SETUP_DELAY = 500;
 
+  /** Longer setup delay when the user needs time to switch to the visualization window. */
+  public static final int SETUP_DELAY_LONG = 5000;
+
   /**
    * Shuffle animation length in seconds. Pacing uses a fixed visual-step budget (not the sort speed
    * setting).

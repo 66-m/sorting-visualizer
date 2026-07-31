@@ -19,6 +19,7 @@ class SettingsDefaultsTest {
     assertEquals(3, SettingsDefaults.DEFAULT_SPEED_LEVEL);
     assertFalse(SettingsDefaults.DEFAULT_MUTED);
     assertFalse(SettingsDefaults.DEFAULT_PERF_STATS);
+    assertFalse(SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY);
     assertEquals("{}", SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
 
     assertEquals(3, SettingsDefaults.ARRAY_SIZE_MIN);

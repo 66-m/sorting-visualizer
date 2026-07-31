@@ -96,6 +96,7 @@ public final class SettingsStrings {
   public static final String SOUND_EFFECTS = "Sound effects";
   public static final String SHOW_MEASUREMENTS = "Show measurements";
   public static final String SHOW_COMPARISON_TABLE = "Show comparison table";
+  public static final String FIVE_SECOND_START_DELAY = "5 second start delay";
   public static final String SHOW_PERF_STATS = "Show render performance stats";
   public static final String SHUFFLE = "Shuffle";
   public static final String SWATCH_HINT = "Click a swatch to edit";

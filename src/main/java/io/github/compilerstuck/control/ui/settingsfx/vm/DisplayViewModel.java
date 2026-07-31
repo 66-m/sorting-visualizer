@@ -15,6 +15,7 @@ public final class DisplayViewModel {
 
   public static final String PROP_PRINT_MEASUREMENTS = "printMeasurements";
   public static final String PROP_SHOW_COMPARISON_TABLE = "showComparisonTable";
+  public static final String PROP_FIVE_SECOND_START_DELAY = "fiveSecondStartDelay";
   public static final String PROP_CAN_EXPORT = "canExport";
   public static final String PROP_INPUTS_ENABLED = "inputsEnabled";
 
@@ -23,12 +24,14 @@ public final class DisplayViewModel {
 
   private boolean printMeasurements;
   private boolean showComparisonTable;
+  private boolean fiveSecondStartDelay;
   private boolean inputsEnabled = true;
 
   public DisplayViewModel(AppContext app) {
     this.app = app;
     this.printMeasurements = app.getStateManager().shouldPrintMeasurements();
     this.showComparisonTable = app.getStateManager().shouldShowComparisonTable();
+    this.fiveSecondStartDelay = app.isFiveSecondStartDelay();
   }
 
   public boolean isPrintMeasurements() {
@@ -58,6 +61,20 @@ public final class DisplayViewModel {
     app.setShowComparisonTable(show);
     pcs.firePropertyChange(PROP_SHOW_COMPARISON_TABLE, old, show);
     pcs.firePropertyChange(PROP_CAN_EXPORT, null, canExport());
+  }
+
+  public boolean isFiveSecondStartDelay() {
+    return fiveSecondStartDelay;
+  }
+
+  public void setFiveSecondStartDelay(boolean enabled) {
+    if (!inputsEnabled || fiveSecondStartDelay == enabled) {
+      return;
+    }
+    boolean old = fiveSecondStartDelay;
+    fiveSecondStartDelay = enabled;
+    app.setFiveSecondStartDelay(enabled);
+    pcs.firePropertyChange(PROP_FIVE_SECOND_START_DELAY, old, enabled);
   }
 
   public boolean canExport() {
