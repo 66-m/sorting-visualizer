@@ -38,6 +38,30 @@
   -fx-padding: 0 0 0 0;
 }
 
+.settings-option-group-label {
+  -fx-font-size: 0.7em;
+  -fx-font-weight: bold;
+  -fx-text-fill: -color-fg-muted;
+  -fx-letter-spacing: 0.03em;
+}
+
+.settings-secondary-action {
+  -fx-text-fill: -color-fg-muted;
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-padding: 4 8;
+  -fx-cursor: hand;
+}
+
+.settings-secondary-action:hover {
+  -fx-text-fill: -color-fg-default;
+  -fx-background-color: -color-bg-subtle;
+}
+
+.settings-secondary-action:disabled {
+  -fx-opacity: 0.5;
+}
+
 /* Sections separated by column GAP_XL; no extra bottom pad (avoids fighting the stack gap). */
 .settings-section {
   -fx-padding: 0;

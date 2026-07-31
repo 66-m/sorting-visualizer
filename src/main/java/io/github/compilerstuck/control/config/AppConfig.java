@@ -17,10 +17,17 @@ public final class AppConfig {
 
   public static final int MIN_WINDOW_HEIGHT = 360;
 
-  /** Minimum settings frame size so 1/4-area windows remain usable on small screens. */
-  public static final int SETTINGS_MIN_WIDTH = 480;
+  /** Minimum settings frame size so a stacked one-pager remains usable on small screens. */
+  public static final int SETTINGS_MIN_WIDTH = 560;
 
   public static final int SETTINGS_MIN_HEIGHT = 360;
+
+  /**
+   * Viewport width below which the Settings body stacks columns vertically instead of side-by-side.
+   * Measured against the ScrollPane viewport (already inset by shell padding); a 720-wide scene
+   * stays side-by-side.
+   */
+  public static final int SETTINGS_STACK_BREAKPOINT = 640;
 
   /**
    * Fallback settings size when the primary screen is unavailable. Live size is 3/4 of {@code

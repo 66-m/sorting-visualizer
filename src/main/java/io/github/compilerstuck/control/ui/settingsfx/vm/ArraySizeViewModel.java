@@ -3,6 +3,7 @@ package io.github.compilerstuck.control.ui.settingsfx.vm;
 import io.github.compilerstuck.control.AppContext;
 import io.github.compilerstuck.control.catalog.VisualConstraints;
 import io.github.compilerstuck.control.config.SettingsDefaults;
+import io.github.compilerstuck.control.ui.settingsfx.SettingsStrings;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.function.Supplier;
@@ -79,7 +80,7 @@ public final class ArraySizeViewModel {
       validationMessage = "";
     } else {
       textValid = false;
-      validationMessage = "Enter a whole number";
+      validationMessage = SettingsStrings.ARRAY_SIZE_WHOLE_NUMBER;
     }
     pcs.firePropertyChange(PROP_TEXT, oldText, text);
     pcs.firePropertyChange(PROP_TEXT_VALID, oldValid, textValid);

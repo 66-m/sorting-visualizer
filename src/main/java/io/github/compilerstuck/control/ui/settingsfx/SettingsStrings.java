@@ -5,7 +5,7 @@ public final class SettingsStrings {
 
   public static final String WINDOW_TITLE = "Sorting Algorithm Visualizer - Settings";
   public static final String TITLE = "Settings";
-  public static final String LOADING = "Loading..";
+  public static final String LOADING = "Loading…";
 
   public static final String SECTION_ARRAY_SIZE = "ARRAY SIZE";
   public static final String SECTION_SORTING = "SORTING";
@@ -14,19 +14,22 @@ public final class SettingsStrings {
   public static final String SECTION_APPEARANCE = "APPEARANCE";
   public static final String SECTION_OPTIONS = "OPTIONS";
 
+  public static final String OPTIONS_GROUP_DISPLAY = "Display";
+  public static final String OPTIONS_GROUP_AUDIO = "Audio";
+  public static final String OPTIONS_GROUP_DEBUG = "Debug";
+
   public static final String ALGORITHM = "Algorithm";
   public static final String SIZE = "Size";
   public static final String ARRAY_SIZE_FPS_WARNING =
       "Preview is below 24 FPS at this size.\nSorting will be even heavier, consider fewer elements.";
   public static final String ARRAY_SIZE_HIGH_WARNING =
       "Large array sizes can lag the preview and sorting.\nConsider staying at 20,000 or fewer if performance matters.";
-  public static final String LEVEL = "Level";
+  public static final String ARRAY_SIZE_WHOLE_NUMBER = "Enter a whole number";
   public static final String SPEED_HEADER = "Speed";
   public static final String SPEED_DURATION_HEADER = "Target duration";
   public static final String PRESET = "Preset";
   public static final String IMAGE = "Image";
   public static final String COLORS = "Colors";
-  public static final String SPEED_LEVEL_FORMAT = "%d / %d";
   public static final String SPEED_STEPS_VALUE_FORMAT = "%d steps/frame";
   public static final String SPEED_DURATION_VALUE_FORMAT = "~%d s";
 
@@ -44,6 +47,8 @@ public final class SettingsStrings {
   public static final String RESET_ALL_VISUALS_MESSAGE =
       "Reset every visualization's customization to its defaults? Saved settings will be cleared.";
   public static final String RESET_ALL_VISUALS_CONFIRM = "Reset all";
+  public static final String RESET_ALL_VISUALS_TOOLTIP =
+      "Clear customizations for every visualization.";
   public static final String RESET_ALL_VISUALS_BUSY_TOOLTIP = "Unavailable while sorting.";
   public static final String CONFIGURE_ORDER_UNAVAILABLE_TOOLTIP =
       "Enable Run all to configure the algorithm order.";
@@ -97,14 +102,26 @@ public final class SettingsStrings {
   public static final String CLEAR_SELECTION = "Clear";
   public static final String DRAG_HANDLE = "⠿";
   public static final String RUN_ALL = "Run all";
+  public static final String RUN_ALL_TOOLTIP =
+      "Run the selected algorithms in order instead of a single algorithm.";
   public static final String SOUND_EFFECTS = "Sound effects";
+  public static final String SOUND_EFFECTS_TOOLTIP =
+      "Play pitch cues as the array is accessed during sorting.";
   public static final String SHOW_MEASUREMENTS = "Show measurements";
+  public static final String SHOW_MEASUREMENTS_TOOLTIP =
+      "Show comparison, swap, and write counters on the visualization.";
   public static final String SHOW_COMPARISON_TABLE = "Show comparison table when finished";
+  public static final String SHOW_COMPARISON_TABLE_TOOLTIP =
+      "Overlay a results table after sorting finishes.";
   public static final String FIVE_SECOND_START_DELAY = "5 second start delay";
+  public static final String FIVE_SECOND_START_DELAY_TOOLTIP =
+      "Pause before the shuffle so you can switch to the visualization window.";
   public static final String EQUALIZE_SORT_DURATION = "Equalize sort duration";
   public static final String EQUALIZE_SORT_DURATION_TOOLTIP =
       "Pace each sort to the speed slider's target time. Frame-synced steps (e.g. Gravity Sort) may take longer.";
   public static final String SHOW_PERF_STATS = "Show render performance stats";
+  public static final String SHOW_PERF_STATS_TOOLTIP =
+      "Show FPS and render timing on the visualization (available while sorting).";
   public static final String SHUFFLE = "Shuffle";
   public static final String SWATCH_HINT = "Click a swatch to edit";
   public static final String SPEED_SLOW = "Slow";
