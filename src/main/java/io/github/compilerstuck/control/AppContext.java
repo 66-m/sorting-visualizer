@@ -335,6 +335,11 @@ public final class AppContext {
     sessionManager.cancel();
   }
 
+  /** Skips the current algorithm during a multi-algorithm session; continues with the next. */
+  public void skipCurrentAlgorithm() {
+    sessionManager.skipCurrent();
+  }
+
   public void setAlgorithms(List<SortingAlgorithm> algorithmList) {
     algorithms.clear();
     for (SortingAlgorithm alg : algorithmList) {

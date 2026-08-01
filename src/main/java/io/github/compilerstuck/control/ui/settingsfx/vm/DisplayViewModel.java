@@ -116,7 +116,7 @@ public final class DisplayViewModel {
       if (target != null && !target.toString().toLowerCase(Locale.ROOT).endsWith(".csv")) {
         target = Path.of(target + ".csv");
       }
-      app.getSessionManager().exportCsv(target, app.getAlgorithms());
+      app.getSessionManager().exportCsv(target, app.getSessionManager().getCompletedAlgorithms());
       return true;
     } catch (Exception ex) {
       LOGGER.log(Level.WARNING, "Failed to export CSV", ex);

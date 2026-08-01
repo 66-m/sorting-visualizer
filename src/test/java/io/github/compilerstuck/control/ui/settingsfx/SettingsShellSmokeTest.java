@@ -61,6 +61,11 @@ class SettingsShellSmokeTest extends ApplicationTest {
     assertNotNull(cancel);
     assertEquals(SettingsStrings.CANCEL, cancel.getText());
 
+    Button skip = lookup("#" + SettingsShell.SKIP_BUTTON_ID).queryAs(Button.class);
+    assertNotNull(skip);
+    assertEquals(SettingsStrings.SKIP, skip.getText());
+    assertTrue(skip.isDisable());
+
     assertNotNull(lookup("#" + SoundSection.ROOT_ID).query());
     assertNotNull(lookup("#" + SpeedSection.ROOT_ID).query());
     assertNotNull(lookup("#" + DisplaySection.ROOT_ID).query());

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github.compilerstuck.control.config.AppConfig;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.render.CountingDelayContext;
 import io.github.compilerstuck.control.render.DelayContext;
@@ -52,6 +53,77 @@ class EqualizeSortDurationSessionTest {
     assertEquals(7, stateManager.equalizePacing().totalSteps());
     assertEquals(0, stateManager.equalizePacing().frameBeats());
     assertEquals(10f, stateManager.equalizePacing().effectiveTargetSec());
+    assertEquals(1, algorithm.getDelayStride());
+    assertFalse(stateManager.isEqualizePreparing());
+  }
+
+  @Test
+  @DisplayName("step count above equalize budget applies frame-based delay stride")
+  void excessStepsApplyDelayStride() {
+    // frameBudget = 60 * 0.1 = 6; highThroughput = 500 * 6 = 3000
+    // rawSteps 10_000 > 3000 → stride = ceil(10000/6) = 1667, visualSteps = 6, maxSPF = 1
+    sessionManager.setEqualizeSupport(() -> true, () -> 0.1, () -> NO_OP);
+    CountingSortStub algorithm = new CountingSortStub(array, 10_000);
+    assertTrue(sessionManager.tryArmEqualizePacing(algorithm, NO_OP));
+
+    assertEquals(1667, algorithm.getDelayStride());
+    EqualizePacing pacing = stateManager.equalizePacing();
+    assertTrue(pacing.isActive());
+    assertEquals(6, pacing.totalSteps());
+    assertEquals(1, pacing.maxStepsPerFrame());
+  }
+
+  @Test
+  @DisplayName("planDelayStride uses multi-credit budget when steps fit, else one beat per frame")
+  void planDelayStrideChoosesMode() {
+    SortingSessionManager.DelayStridePlan fits = SortingSessionManager.planDelayStride(1_000, 2f);
+    assertEquals(1, fits.stride());
+    assertEquals(1_000, fits.visualSteps());
+    assertEquals(AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME, fits.maxStepsPerFrame());
+
+    // 2s → 120 frames; 1.25e9 steps need a large stride and 1 credit/frame
+    long bubbleRaw = SortingSessionManager.maxSwapDelaysUpperBound(50_000);
+    SortingSessionManager.DelayStridePlan strided =
+        SortingSessionManager.planDelayStride(bubbleRaw, 2f);
+    assertTrue(strided.stride() > 1);
+    assertEquals(1, strided.maxStepsPerFrame());
+    assertTrue(strided.visualSteps() <= 120 + 1, () -> "visual=" + strided.visualSteps());
+    assertTrue(strided.visualSteps() >= 120 - 1, () -> "visual=" + strided.visualSteps());
+  }
+
+  @Test
+  @DisplayName("dry-run timeout still arms equalize with estimated stride")
+  void dryRunTimeoutArmsWithEstimate() throws Exception {
+    sessionManager.setEqualizeSupport(() -> true, () -> 2.0, () -> NO_OP);
+    TimeoutAfterPartialStub algorithm = new TimeoutAfterPartialStub(array, 50, 2100);
+    assertTrue(sessionManager.tryArmEqualizePacing(algorithm, NO_OP));
+
+    assertTrue(algorithm.getDelayStride() >= 1);
+    assertTrue(stateManager.equalizePacing().isActive());
+    assertTrue(stateManager.equalizePacing().totalSteps() > 0);
+    assertFalse(stateManager.isEqualizePreparing());
+    assertFalse(stateManager.isFrameGateSuspended());
+  }
+
+  @Test
+  @DisplayName("estimateRawSteps distinguishes sparse vs swap-dense timeouts")
+  void estimateRawStepsExtrapolatesAndClamps() {
+    assertEquals(100, SortingSessionManager.estimateRawSteps(false, 100, 0.5, 40));
+    // Completed counts are not clamped to the swap upper bound.
+    assertEquals(10_000, SortingSessionManager.estimateRawSteps(false, 10_000, 0, 40));
+
+    // Swap-dense timeout (partial ≥ n): quadratic upper bound.
+    assertEquals(
+        SortingSessionManager.maxSwapDelaysUpperBound(40),
+        SortingSessionManager.estimateRawSteps(true, 40, 0.01, 40));
+    assertEquals(
+        SortingSessionManager.maxSwapDelaysUpperBound(50),
+        SortingSessionManager.estimateRawSteps(true, 0, 0, 50));
+
+    // Sparse timeout (Selection-like, partial < n): extrapolate toward ~n, not n²/2.
+    long sparse = SortingSessionManager.estimateRawSteps(true, 5, 5.0 / 50_000, 50_000);
+    assertEquals(50_000, sparse);
+    assertTrue(sparse < SortingSessionManager.maxSwapDelaysUpperBound(50_000) / 100);
   }
 
   @Test
@@ -146,6 +218,7 @@ class EqualizeSortDurationSessionTest {
 
     SlowCountingStub slow = new SlowCountingStub(array, 3, 80);
     boolean[] sawSuspended = {false};
+    boolean[] sawPreparing = {false};
     Thread sampler =
         new Thread(
             () -> {
@@ -153,6 +226,11 @@ class EqualizeSortDurationSessionTest {
               while (System.nanoTime() < deadline) {
                 if (stateManager.isFrameGateSuspended()) {
                   sawSuspended[0] = true;
+                }
+                if (stateManager.isEqualizePreparing()) {
+                  sawPreparing[0] = true;
+                }
+                if (sawSuspended[0] && sawPreparing[0]) {
                   return;
                 }
                 Thread.onSpinWait();
@@ -163,7 +241,9 @@ class EqualizeSortDurationSessionTest {
     assertTrue(sessionManager.tryArmEqualizePacing(slow, NO_OP));
     sampler.join(3000);
     assertTrue(sawSuspended[0], "dry-run should suspend FrameGate while counting");
+    assertTrue(sawPreparing[0], "dry-run should set equalizePreparing while counting");
     assertFalse(stateManager.isFrameGateSuspended());
+    assertFalse(stateManager.isEqualizePreparing());
     assertEquals(0, gate.availableCredits());
   }
 
@@ -253,6 +333,37 @@ class EqualizeSortDurationSessionTest {
         Thread.currentThread().interrupt();
       }
       for (int i = 0; i < steps && !isCancelled(); i++) {
+        delay();
+      }
+    }
+  }
+
+  /**
+   * Fires {@code partialSteps} delays, sleeps past the equalize dry-run deadline, then attempts
+   * more delays so {@link CountingDelayContext} times out with a non-zero partial count.
+   */
+  private static final class TimeoutAfterPartialStub extends SortingAlgorithm {
+    private final int partialSteps;
+    private final long sleepMs;
+
+    TimeoutAfterPartialStub(ArrayModel model, int partialSteps, long sleepMs) {
+      super(model, NO_OP);
+      this.partialSteps = partialSteps;
+      this.sleepMs = sleepMs;
+      this.name = "TimeoutAfterPartialStub";
+    }
+
+    @Override
+    public void sort() {
+      for (int i = 0; i < partialSteps && !isCancelled(); i++) {
+        delay();
+      }
+      try {
+        Thread.sleep(sleepMs);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      for (int i = 0; i < partialSteps && !isCancelled(); i++) {
         delay();
       }
     }

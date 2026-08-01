@@ -25,6 +25,7 @@ public final class SettingsShell {
   public static final String TITLE_ID = "settings-title";
   public static final String RUN_BUTTON_ID = "settings-run";
   public static final String CANCEL_BUTTON_ID = "settings-cancel";
+  public static final String SKIP_BUTTON_ID = "settings-skip";
   public static final String PROGRESS_ID = "settings-progress";
 
   private SettingsShell() {}
@@ -54,6 +55,12 @@ public final class SettingsShell {
     progress.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(progress, Priority.ALWAYS);
 
+    Button skip = new Button(SettingsStrings.SKIP);
+    skip.setId(SKIP_BUTTON_ID);
+    skip.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    skip.setDisable(true);
+    StackPane skipHost = SettingsControls.wrapForDisabledTooltip(skip);
+
     Button cancel = new Button(SettingsStrings.CANCEL);
     cancel.setId(CANCEL_BUTTON_ID);
     cancel.getStyleClass().add(Styles.BUTTON_OUTLINED);
@@ -64,12 +71,12 @@ public final class SettingsShell {
     run.getStyleClass().add(Styles.ACCENT);
     run.setDefaultButton(true);
 
-    HBox bar = new HBox(SettingsLayout.GAP_MD, progress, cancel, run);
+    HBox bar = new HBox(SettingsLayout.GAP_MD, progress, skipHost, cancel, run);
     bar.setAlignment(Pos.CENTER_LEFT);
     bar.getStyleClass().add("settings-action-bar");
     root.setBottom(bar);
 
-    return new ShellResult(root, progress, run, cancel);
+    return new ShellResult(root, progress, run, cancel, skip);
   }
 
   private static Node buildHeader() {

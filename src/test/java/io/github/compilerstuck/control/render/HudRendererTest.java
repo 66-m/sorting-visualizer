@@ -57,4 +57,34 @@ class HudRendererTest {
     assertEquals("Bubble Sort", hud.labelsForTest()[0]);
     assertTrue(hud.wouldSkipRebuild(state, array, rs.getWidth()));
   }
+
+  @Test
+  void prepareKeepsEndOfShuffleMetricsFrozenAgainstCounterChurn() {
+    for (int i = 0; i < 16; i++) {
+      array.set(i, 15 - i);
+    }
+    array.update();
+    state.setCurrentOperation("Shuffling");
+    hud.drawMeasurements(rs, state, array);
+    String sortedLine = hud.labelsForTest()[1];
+    String comparisonsLine = hud.labelsForTest()[2];
+
+    state.setCurrentOperation("Prepare.. 0%");
+    state.setEqualizePreparing(true);
+    array.addComparisons(1_000);
+    array.addWritesAux(50);
+    hud.drawMeasurements(rs, state, array);
+
+    String[] labels = hud.labelsForTest();
+    assertEquals("Prepare.. 0%", labels[0]);
+    assertEquals(sortedLine, labels[1], "sorted % must stay at end-of-shuffle value");
+    assertEquals(comparisonsLine, labels[2], "counters must stay frozen during Prepare..");
+    assertEquals("16 Elements", labels[7]);
+
+    state.setCurrentOperation("Prepare.. 42%");
+    hud.drawMeasurements(rs, state, array);
+    assertEquals("Prepare.. 42%", hud.labelsForTest()[0]);
+    assertEquals(sortedLine, hud.labelsForTest()[1]);
+    assertTrue(hud.wouldSkipRebuild(state, array, rs.getWidth()));
+  }
 }

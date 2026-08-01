@@ -49,6 +49,8 @@ class SortingStateManagerTest {
     state.setShowResults(true);
     state.setRestart(true);
     state.setShuffling(true);
+    state.setFrameGateSuspended(true);
+    state.setEqualizePreparing(true);
     state.setCurrentOperation("Bubble Sort");
 
     state.resetForNewRun();
@@ -58,6 +60,8 @@ class SortingStateManagerTest {
     assertFalse(state.shouldShowResults());
     assertFalse(state.shouldRestart());
     assertFalse(state.isShuffling());
+    assertFalse(state.isFrameGateSuspended());
+    assertFalse(state.isEqualizePreparing());
     assertEquals("Waiting", state.getCurrentOperation());
   }
 
@@ -79,6 +83,23 @@ class SortingStateManagerTest {
     assertTrue(state.isFrameGateSuspended());
     state.resetForNewRun();
     assertFalse(state.isFrameGateSuspended());
+  }
+
+  @Test
+  @DisplayName("equalizePreparing flag round-trips and clears on reset")
+  void equalizePreparingRoundTrip() {
+    assertFalse(state.isEqualizePreparing());
+    state.setEqualizePreparing(true);
+    state.setEqualizePrepareProgress(40);
+    assertTrue(state.isEqualizePreparing());
+    assertEquals(40, state.getEqualizePrepareProgress());
+    state.setEqualizePreparing(false);
+    assertEquals(0, state.getEqualizePrepareProgress());
+    state.setEqualizePreparing(true);
+    state.setEqualizePrepareProgress(80);
+    state.resetForNewRun();
+    assertFalse(state.isEqualizePreparing());
+    assertEquals(0, state.getEqualizePrepareProgress());
   }
 
   @Test

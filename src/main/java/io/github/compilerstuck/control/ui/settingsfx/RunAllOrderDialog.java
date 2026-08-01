@@ -3,13 +3,18 @@ package io.github.compilerstuck.control.ui.settingsfx;
 import atlantafx.base.theme.Styles;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmEntry;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -30,14 +35,22 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 /**
- * Modal dialog to include/exclude run-all algorithms and drag-reorder them.
+ * Modal dialog to include/exclude algorithms and drag-reorder them for the dropdown and Run all.
  *
  * <p>Layout: hint → selection summary + bulk actions → numbered reorderable list → Cancel / Apply.
+ * Closing with unsaved changes offers save, discard, or keep editing (same pattern as customize).
  */
 public final class RunAllOrderDialog {
 
   public static final String DIALOG_ID = "run-all-order-dialog";
   public static final String LIST_ID = "run-all-order-list";
+  public static final String DISCARD_CONFIRM_ID = "run-all-order-discard-confirm";
+
+  private enum UnsavedCloseChoice {
+    SAVE,
+    DISCARD,
+    CANCEL
+  }
 
   private RunAllOrderDialog() {}
 
@@ -46,6 +59,8 @@ public final class RunAllOrderDialog {
     for (AlgorithmEntry entry : vm.getEntries()) {
       rows.add(new DraftRow(entry.getId(), entry.getName(), entry.isSelected()));
     }
+    List<BaselineRow> baseline = snapshotBaseline(rows);
+    AtomicBoolean closingConfirmed = new AtomicBoolean(false);
 
     Label hint = new Label(SettingsStrings.RUN_ALL_ORDER_HINT);
     hint.getStyleClass().add("settings-muted");
@@ -136,29 +151,172 @@ public final class RunAllOrderDialog {
           if (selectedCount(rows) == 0) {
             e.consume();
             showStatus(status, SettingsStrings.RUN_ALL_ORDER_EMPTY, true);
+          } else {
+            // Avoid a second unsaved prompt if window close also fires on Apply.
+            closingConfirmed.set(true);
           }
         });
 
     Button cancelButton = (Button) dialog.getDialogPane().lookupButton(cancelType);
     cancelButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    cancelButton.addEventFilter(
+        javafx.event.ActionEvent.ACTION,
+        e -> {
+          if (closingConfirmed.get()) {
+            return;
+          }
+          if (!confirmCloseIfDirty(vm, rows, baseline, status, dialog)) {
+            e.consume();
+          } else {
+            closingConfirmed.set(true);
+          }
+        });
 
     var css = SettingsStylesheets.cssUrl();
     if (css != null) {
       dialog.getDialogPane().getStylesheets().add(css.toExternalForm());
     }
 
-    dialog
+    // Window close (X): same dirty confirmation as Cancel.
+    dialog.setOnShown(
+        e -> {
+          Window window = dialog.getDialogPane().getScene().getWindow();
+          if (window == null) {
+            return;
+          }
+          window.setOnCloseRequest(
+              closeEvent -> {
+                if (closingConfirmed.get()) {
+                  return;
+                }
+                if (!confirmCloseIfDirty(vm, rows, baseline, status, dialog)) {
+                  closeEvent.consume();
+                } else {
+                  closingConfirmed.set(true);
+                }
+              });
+        });
+
+    dialog.showAndWait().filter(applyType::equals).ifPresent(ignored -> applyDraft(vm, rows));
+  }
+
+  /**
+   * @return {@code true} if the dialog may close (clean, saved, or discarded)
+   */
+  private static boolean confirmCloseIfDirty(
+      AlgorithmViewModel vm,
+      ObservableList<DraftRow> rows,
+      List<BaselineRow> baseline,
+      Label status,
+      Dialog<?> dialog) {
+    if (!isDirty(rows, baseline)) {
+      return true;
+    }
+    UnsavedCloseChoice choice =
+        askUnsavedCloseChoice(dialog.getDialogPane().getScene().getWindow());
+    return switch (choice) {
+      case SAVE -> {
+        if (selectedCount(rows) == 0) {
+          showStatus(status, SettingsStrings.RUN_ALL_ORDER_EMPTY, true);
+          yield false;
+        }
+        applyDraft(vm, rows);
+        yield true;
+      }
+      case DISCARD -> true;
+      case CANCEL -> false;
+    };
+  }
+
+  private static void applyDraft(AlgorithmViewModel vm, ObservableList<DraftRow> rows) {
+    Set<String> selected =
+        rows.stream()
+            .filter(r -> r.selected)
+            .map(r -> r.id)
+            .collect(Collectors.toCollection(HashSet::new));
+    vm.applyRunAllOrder(rows.stream().map(r -> r.id).toList(), selected);
+  }
+
+  /** Package-visible for unit tests. */
+  static boolean isDirty(List<DraftRow> rows, List<BaselineRow> baseline) {
+    if (rows.size() != baseline.size()) {
+      return true;
+    }
+    for (int i = 0; i < rows.size(); i++) {
+      DraftRow row = rows.get(i);
+      BaselineRow expected = baseline.get(i);
+      if (!row.id.equals(expected.id()) || row.selected != expected.selected()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static List<BaselineRow> snapshotBaseline(List<DraftRow> rows) {
+    List<BaselineRow> baseline = new ArrayList<>(rows.size());
+    for (DraftRow row : rows) {
+      baseline.add(new BaselineRow(row.id, row.selected));
+    }
+    return List.copyOf(baseline);
+  }
+
+  /**
+   * Unsaved-close layout (same as customize):
+   *
+   * <pre>
+   * [Discard changes]              [Keep editing]  [Save and close]
+   * </pre>
+   */
+  private static UnsavedCloseChoice askUnsavedCloseChoice(Window owner) {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.initOwner(owner);
+    alert.setTitle(SettingsStrings.CUSTOMIZE_UNSAVED_TITLE);
+    alert.setHeaderText(null);
+    alert.setContentText(SettingsStrings.RUN_ALL_ORDER_UNSAVED_MESSAGE);
+    alert.getDialogPane().setId(DISCARD_CONFIRM_ID);
+
+    ButtonType discard =
+        new ButtonType(SettingsStrings.CUSTOMIZE_DISCARD, ButtonBar.ButtonData.LEFT);
+    ButtonType keepEditing =
+        new ButtonType(SettingsStrings.CUSTOMIZE_KEEP_EDITING, ButtonBar.ButtonData.CANCEL_CLOSE);
+    ButtonType saveAndClose =
+        new ButtonType(SettingsStrings.CUSTOMIZE_SAVE_AND_CLOSE, ButtonBar.ButtonData.OK_DONE);
+    alert.getButtonTypes().setAll(discard, keepEditing, saveAndClose);
+
+    var css = SettingsStylesheets.cssUrl();
+    if (css != null) {
+      alert.getDialogPane().getStylesheets().add(css.toExternalForm());
+    }
+
+    alert.setOnShown(
+        e -> {
+          Node barNode = alert.getDialogPane().lookup(".button-bar");
+          if (barNode instanceof ButtonBar bar) {
+            bar.setButtonOrder("L+CO");
+          }
+          Button saveButton = (Button) alert.getDialogPane().lookupButton(saveAndClose);
+          if (saveButton != null) {
+            saveButton.getStyleClass().add(Styles.ACCENT);
+          }
+          Button discardButton = (Button) alert.getDialogPane().lookupButton(discard);
+          if (discardButton != null) {
+            discardButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+          }
+        });
+
+    return alert
         .showAndWait()
-        .filter(applyType::equals)
-        .ifPresent(
-            ignored -> {
-              Set<String> selected =
-                  rows.stream()
-                      .filter(r -> r.selected)
-                      .map(r -> r.id)
-                      .collect(Collectors.toCollection(HashSet::new));
-              vm.applyRunAllOrder(rows.stream().map(r -> r.id).toList(), selected);
-            });
+        .map(
+            type -> {
+              if (saveAndClose.equals(type)) {
+                return UnsavedCloseChoice.SAVE;
+              }
+              if (discard.equals(type)) {
+                return UnsavedCloseChoice.DISCARD;
+              }
+              return UnsavedCloseChoice.CANCEL;
+            })
+        .orElse(UnsavedCloseChoice.CANCEL);
   }
 
   private static void refreshChrome(ObservableList<DraftRow> rows, Label countLabel, Label status) {
@@ -197,7 +355,11 @@ public final class RunAllOrderDialog {
     status.setManaged(false);
   }
 
-  private static final class DraftRow {
+  /** Package-visible for unit tests. */
+  record BaselineRow(String id, boolean selected) {}
+
+  /** Package-visible for unit tests. */
+  static final class DraftRow {
     final String id;
     final String name;
     boolean selected;

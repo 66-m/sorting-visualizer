@@ -235,7 +235,7 @@ public final class SortingVisualizerGame extends Game {
 
     sound.cutNotes();
 
-    sessionManager.printTimestampsToConsole(new ArrayList<>(currentAlgorithms()));
+    sessionManager.printTimestampsToConsole(sessionManager.getCompletedAlgorithms());
     arrayController.resetMeasurements();
     stateManager.setCurrentOperation("Waiting");
 

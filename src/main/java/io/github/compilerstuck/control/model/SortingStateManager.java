@@ -1,6 +1,7 @@
 package io.github.compilerstuck.control.model;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Thread-safe state manager for sorting visualization. Encapsulates all mutable state that is
@@ -21,6 +22,15 @@ public class SortingStateManager {
    * draw without granting FrameGate credits; the worker is not consuming steps.
    */
   private final AtomicBoolean frameGateSuspended = new AtomicBoolean(false);
+
+  /**
+   * True during the equalize dry-run. Render must draw the last published snapshot without
+   * republishing live mutations (avoids a fast-sort flash before restore).
+   */
+  private final AtomicBoolean equalizePreparing = new AtomicBoolean(false);
+
+  /** 0–100 progress for the equalize Prepare.. phase (settings bar + tests). */
+  private final AtomicInteger equalizePrepareProgress = new AtomicInteger(0);
 
   private final EqualizePacing equalizePacing = new EqualizePacing();
 
@@ -111,6 +121,27 @@ public class SortingStateManager {
     frameGateSuspended.set(value);
   }
 
+  /** True while equalize is counting visual steps on the live array. */
+  public boolean isEqualizePreparing() {
+    return equalizePreparing.get();
+  }
+
+  public void setEqualizePreparing(boolean value) {
+    equalizePreparing.set(value);
+    if (!value) {
+      equalizePrepareProgress.set(0);
+    }
+  }
+
+  /** Progress percent for the Prepare.. dry-run (0–100). */
+  public int getEqualizePrepareProgress() {
+    return equalizePrepareProgress.get();
+  }
+
+  public void setEqualizePrepareProgress(int percent) {
+    equalizePrepareProgress.set(Math.max(0, Math.min(100, percent)));
+  }
+
   /** Equalize-sort-duration pacing for the active algorithm (inactive when mode is off). */
   public EqualizePacing equalizePacing() {
     return equalizePacing;
@@ -132,6 +163,8 @@ public class SortingStateManager {
     shouldRestart.set(false);
     shuffling.set(false);
     frameGateSuspended.set(false);
+    equalizePreparing.set(false);
+    equalizePrepareProgress.set(0);
     equalizePacing.clear();
     currentOperation = "Waiting";
   }

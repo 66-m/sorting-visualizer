@@ -148,6 +148,29 @@ class SortingSessionManagerTest {
   }
 
   @Test
+  @DisplayName("skip mid-run advances to the next algorithm without recording the skipped one")
+  void skipCurrentAdvancesToNextAlgorithm() {
+    UntilCancelledAlgorithm first = new UntilCancelledAlgorithm(arrayModel);
+    InstantSortAlgorithm second = new InstantSortAlgorithm(arrayModel);
+    stateManager.setRunning(true);
+    stateManager.setShowComparisonTable(true);
+
+    sessionManager.startSortingSession(List.of(first, second));
+
+    awaitUntilRunning(first);
+    sessionManager.skipCurrent();
+    sessionManager.waitForCompletion();
+
+    assertTrue(stateManager.shouldContinueExecution());
+    assertEquals(1, sessionManager.getCompletedAlgorithms().size());
+    assertEquals("InstantSort", sessionManager.getCompletedAlgorithms().get(0).getName());
+    assertEquals(1, sessionManager.getComparisons().size());
+    assertTrue(stateManager.shouldShowResults());
+    assertTrue(stateManager.shouldRestart());
+    assertFalse(stateManager.isRunning());
+  }
+
+  @Test
   @DisplayName("cancel mid-run stops execution and clears running state")
   void cancelMidRunStopsExecution() {
     UntilCancelledAlgorithm algorithm = new UntilCancelledAlgorithm(arrayModel);
