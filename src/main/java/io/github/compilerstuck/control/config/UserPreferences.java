@@ -40,6 +40,7 @@ public final class UserPreferences {
   private static final String KEY_PERF_STATS = "perfStats";
   private static final String KEY_FIVE_SECOND_START_DELAY = "fiveSecondStartDelay";
   private static final String KEY_EQUALIZE_SORT_DURATION = "equalizeSortDuration";
+  private static final String KEY_CANVAS_BACKGROUND = "canvasBackground";
   private static final String KEY_VISUAL_SETTINGS_BY_ID = "visualSettingsById";
   private static final int CURRENT_DEFAULTS_VERSION = 1;
 
@@ -64,6 +65,7 @@ public final class UserPreferences {
   private boolean perfStats = SettingsDefaults.DEFAULT_PERF_STATS;
   private boolean fiveSecondStartDelay = SettingsDefaults.DEFAULT_FIVE_SECOND_START_DELAY;
   private boolean equalizeSortDuration = SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION;
+  private CanvasBackground canvasBackground = SettingsDefaults.DEFAULT_CANVAS_BACKGROUND;
   private String visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
 
   public static UserPreferences load() {
@@ -108,6 +110,9 @@ public final class UserPreferences {
     prefs.equalizeSortDuration =
         node.getBoolean(
             KEY_EQUALIZE_SORT_DURATION, SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION);
+    prefs.canvasBackground =
+        CanvasBackground.fromName(
+            node.get(KEY_CANVAS_BACKGROUND, SettingsDefaults.DEFAULT_CANVAS_BACKGROUND.name()));
     prefs.visualSettingsById =
         node.get(KEY_VISUAL_SETTINGS_BY_ID, SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
     if (prefs.visualSettingsById == null) {
@@ -142,6 +147,11 @@ public final class UserPreferences {
     node.putBoolean(KEY_PERF_STATS, perfStats);
     node.putBoolean(KEY_FIVE_SECOND_START_DELAY, fiveSecondStartDelay);
     node.putBoolean(KEY_EQUALIZE_SORT_DURATION, equalizeSortDuration);
+    node.put(
+        KEY_CANVAS_BACKGROUND,
+        canvasBackground != null
+            ? canvasBackground.name()
+            : SettingsDefaults.DEFAULT_CANVAS_BACKGROUND.name());
     node.put(
         KEY_VISUAL_SETTINGS_BY_ID,
         visualSettingsById != null
@@ -306,6 +316,15 @@ public final class UserPreferences {
 
   public void setEqualizeSortDuration(boolean equalizeSortDuration) {
     this.equalizeSortDuration = equalizeSortDuration;
+  }
+
+  public CanvasBackground getCanvasBackground() {
+    return canvasBackground;
+  }
+
+  public void setCanvasBackground(CanvasBackground canvasBackground) {
+    this.canvasBackground =
+        canvasBackground != null ? canvasBackground : SettingsDefaults.DEFAULT_CANVAS_BACKGROUND;
   }
 
   public String getVisualSettingsById() {

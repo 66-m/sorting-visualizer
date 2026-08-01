@@ -6,6 +6,7 @@ import io.github.compilerstuck.control.catalog.AlgorithmCatalog;
 import io.github.compilerstuck.control.catalog.AlgorithmDescriptor;
 import io.github.compilerstuck.control.catalog.VisualizationCatalog;
 import io.github.compilerstuck.control.catalog.VisualizationDescriptor;
+import io.github.compilerstuck.control.config.CanvasBackground;
 import io.github.compilerstuck.control.config.GradientPreferences;
 import io.github.compilerstuck.control.config.UserPreferences;
 import io.github.compilerstuck.control.model.ArrayController;
@@ -205,7 +206,11 @@ public final class SortingVisualizerGame extends Game {
   }
 
   public void drawWorld(float delta) {
-    renderSystem.clear(15 / 255f, 15 / 255f, 15 / 255f);
+    CanvasBackground background =
+        appContext != null ? appContext.getCanvasBackground() : CanvasBackground.DARK;
+    float clear = background.clearComponent();
+    renderSystem.clear(clear, clear, clear);
+    renderSystem.setOverlayTextGray(background.overlayTextGray());
     currentVisualization().render(delta);
   }
 

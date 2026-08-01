@@ -1,5 +1,6 @@
 package io.github.compilerstuck.control;
 
+import io.github.compilerstuck.control.config.CanvasBackground;
 import io.github.compilerstuck.control.config.RunAllEntryPref;
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import io.github.compilerstuck.control.config.ShuffleType;
@@ -55,6 +56,7 @@ public final class AppContext {
   private boolean perfStatsEnabled;
   private boolean fiveSecondStartDelay;
   private boolean equalizeSortDuration;
+  private CanvasBackground canvasBackground;
 
   public AppContext(
       ArrayController arrayController,
@@ -70,6 +72,7 @@ public final class AppContext {
     this.perfStatsEnabled = this.preferences.isPerfStats();
     this.fiveSecondStartDelay = this.preferences.isFiveSecondStartDelay();
     this.equalizeSortDuration = this.preferences.isEqualizeSortDuration();
+    this.canvasBackground = this.preferences.getCanvasBackground();
     if (sessionManager != null) {
       sessionManager.setFrameGate(frameGate);
       sessionManager.setEqualizeSupport(
@@ -96,6 +99,7 @@ public final class AppContext {
     preferences.setPerfStats(perfStatsEnabled);
     preferences.setFiveSecondStartDelay(fiveSecondStartDelay);
     preferences.setEqualizeSortDuration(equalizeSortDuration);
+    preferences.setCanvasBackground(canvasBackground);
     if (colorGradient != null) {
       preferences.setGradientName(colorGradient.getName());
       if (colorGradient.getColor1() != null) {
@@ -189,6 +193,7 @@ public final class AppContext {
     this.colorGradient = colorGradient;
     if (this.colorGradient != null) {
       this.colorGradient.updateGradient(size);
+      applyCanvasBackgroundToGradient();
       preferences.setGradientName(this.colorGradient.getName());
       if (this.colorGradient.getColor1() != null) {
         preferences.setGradientColor1Rgb(this.colorGradient.getColor1().getRGB());
@@ -281,6 +286,7 @@ public final class AppContext {
   public void setGraphics(RenderSystem renderSystem, DelayContext delay) {
     this.renderSystem = renderSystem;
     this.delayContext = delay;
+    applyCanvasBackgroundToRenderSystem();
   }
 
   /** Resizes the array and dependent components; refuses while a sort is running. */
@@ -387,6 +393,38 @@ public final class AppContext {
     equalizeSortDuration = enabled;
     preferences.setEqualizeSortDuration(enabled);
     preferences.save();
+  }
+
+  public CanvasBackground getCanvasBackground() {
+    return canvasBackground;
+  }
+
+  public void setCanvasBackground(CanvasBackground background) {
+    CanvasBackground next =
+        background != null ? background : SettingsDefaults.DEFAULT_CANVAS_BACKGROUND;
+    if (canvasBackground == next) {
+      return;
+    }
+    canvasBackground = next;
+    preferences.setCanvasBackground(next);
+    preferences.save();
+    applyCanvasBackgroundToGradient();
+    applyCanvasBackgroundToRenderSystem();
+  }
+
+  private void applyCanvasBackgroundToGradient() {
+    if (colorGradient == null || canvasBackground == null) {
+      return;
+    }
+    colorGradient.setLightBackgroundMarkerOverride(
+        canvasBackground.isLight() ? canvasBackground.markerSetFallback() : null);
+  }
+
+  private void applyCanvasBackgroundToRenderSystem() {
+    if (renderSystem == null || canvasBackground == null) {
+      return;
+    }
+    renderSystem.setOverlayTextGray(canvasBackground.overlayTextGray());
   }
 
   public void setShuffleType(ShuffleType shuffleType) {

@@ -1,7 +1,6 @@
 package io.github.compilerstuck.control.render;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -95,7 +94,7 @@ final class GdxOverlayPass implements Disposable {
     world2d.beginSprites();
     host.frameStats().textDraws++;
     BitmapFont font = assets.font(sizePx);
-    font.setColor(Color.WHITE);
+    font.setColor(host.overlayTextR(), host.overlayTextG(), host.overlayTextB(), 1f);
     float drawY = y - font.getCapHeight();
     font.draw(world2d.sprites(), text, x, drawY);
   }
@@ -109,7 +108,7 @@ final class GdxOverlayPass implements Disposable {
     enterOverlayPass();
     world2d.beginSprites();
     BitmapFont font = assets.font(sizePx);
-    font.setColor(Color.WHITE);
+    font.setColor(host.overlayTextR(), host.overlayTextG(), host.overlayTextB(), 1f);
     float cap = font.getCapHeight();
     SpriteBatch sprites = world2d.sprites();
     FrameStats frameStats = host.frameStats();
@@ -133,7 +132,7 @@ final class GdxOverlayPass implements Disposable {
     enterOverlayPass();
     world2d.beginSprites();
     BitmapFont font = assets.font(sizePx);
-    font.setColor(Color.WHITE);
+    font.setColor(host.overlayTextR(), host.overlayTextG(), host.overlayTextB(), 1f);
     float cap = font.getCapHeight();
     SpriteBatch sprites = world2d.sprites();
     FrameStats frameStats = host.frameStats();

@@ -14,6 +14,12 @@ public class ColorGradient {
   private final String name;
   protected Color[] colorGradient;
 
+  /**
+   * When non-null, opaque-white {@link Marker#SET} colors resolve to this instead (light canvas
+   * contrast).
+   */
+  private Color lightBackgroundMarkerOverride;
+
   public ColorGradient(Color color1, Color color2, Color markerSetColor, String name) {
     this(color1, color2, markerSetColor, name, DEFAULT_SIZE);
   }
@@ -60,10 +66,33 @@ public class ColorGradient {
       }
       return gradient[i];
     } else if (m == Marker.SET) {
-      return markerSetColor;
+      return effectiveMarkerSetColor();
     } else {
       return Color.BLACK;
     }
+  }
+
+  /**
+   * On a light canvas, remaps opaque-white SET markers to {@code override} so highlights stay
+   * visible. Pass {@code null} to restore the preset marker color.
+   */
+  public void setLightBackgroundMarkerOverride(Color override) {
+    this.lightBackgroundMarkerOverride = override;
+  }
+
+  public Color getMarkerSetColor() {
+    return markerSetColor;
+  }
+
+  private Color effectiveMarkerSetColor() {
+    if (lightBackgroundMarkerOverride != null && isOpaqueWhite(markerSetColor)) {
+      return lightBackgroundMarkerOverride;
+    }
+    return markerSetColor;
+  }
+
+  private static boolean isOpaqueWhite(Color c) {
+    return c != null && c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 255;
   }
 
   public void setColor1(Color color1) {

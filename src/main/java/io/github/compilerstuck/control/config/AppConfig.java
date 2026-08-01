@@ -84,9 +84,15 @@ public final class AppConfig {
   /** Upper bound on batched frame-beats granted in one draw frame. */
   public static final int EQUALIZE_MAX_FRAME_BEATS_PER_FRAME = 64;
 
-  // Visualization
-  public static final int RESULTS_TABLE_BACKGROUND = 15;
-  public static final int RESULTS_TABLE_TEXT_COLOR = 255;
+  // Visualization / canvas
+  /** Default (dark) canvas clear gray — RGB {@code #0F0F0F}. */
+  public static final int CANVAS_BACKGROUND_DARK = 15;
+
+  /** Alternate canvas clear gray — RGB {@code #FFFFFF}. */
+  public static final int CANVAS_BACKGROUND_WHITE = 255;
+
+  public static final int RESULTS_TABLE_BACKGROUND = CANVAS_BACKGROUND_DARK;
+  public static final int RESULTS_TABLE_TEXT_COLOR = CANVAS_BACKGROUND_WHITE;
   public static final int FONT_SIZE_RATIO = 20;
   public static final int WINDOW_RATIO_WIDTH = 1280;
 
