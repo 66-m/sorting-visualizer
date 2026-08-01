@@ -67,6 +67,25 @@ class EqualizePacingTest {
   }
 
   @Test
+  void exhaustedBudgetSprintsAtMaxStepsPerFrame() {
+    EqualizePacing pacing = new EqualizePacing();
+    pacing.begin(10, 0, 10f);
+    for (int i = 0; i < 10; i++) {
+      pacing.recordStep();
+    }
+    assertEquals(0, Math.max(0, pacing.totalSteps() - pacing.stepsConsumed()));
+    assertEquals(pacing.maxStepsPerFrame(), pacing.stepsForDelta(1f / 60f));
+  }
+
+  @Test
+  void stridedOverrideCapsGrantsToOnePerFrame() {
+    EqualizePacing pacing = new EqualizePacing();
+    pacing.begin(120, 0, 2f, 0, 1);
+    assertEquals(1, pacing.maxStepsPerFrame());
+    assertEquals(1, pacing.stepsForDelta(1f / 60f));
+  }
+
+  @Test
   void frameFloorHelperUnchanged() {
     assertEquals(2f, AppConfig.equalizeFrameFloorSec(120), 1e-4f);
     assertEquals(2f, AppConfig.effectiveEqualizeTargetSec(1f, 120), 1e-4f);

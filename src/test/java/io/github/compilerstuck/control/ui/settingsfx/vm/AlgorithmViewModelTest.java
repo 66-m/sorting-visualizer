@@ -81,6 +81,8 @@ class AlgorithmViewModelTest {
     vm.applyRunAllOrder(ordered, Set.of(secondId));
     assertEquals(secondId, vm.getEntries().get(0).getId());
     assertEquals(firstId, vm.getEntries().get(1).getId());
+    assertEquals(secondId, vm.getDescriptors().get(0).id());
+    assertEquals(firstId, vm.getDescriptors().get(1).id());
     assertTrue(vm.getEntries().get(0).isSelected());
     assertFalse(vm.getEntries().get(1).isSelected());
   }

@@ -24,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
@@ -49,6 +50,10 @@ public final class SettingsFxController implements SettingsBridge {
   private ProgressBar progressBar;
   private Button runButton;
   private Button cancelButton;
+  private Button skipButton;
+  private StackPane skipHost;
+  private Tooltip skipDisabledTip;
+  private boolean cancelEnabled;
   private boolean contentReady;
 
   private SoundViewModel soundVm;
@@ -130,9 +135,11 @@ public final class SettingsFxController implements SettingsBridge {
   public void setCancelEnabled(boolean enabled) {
     Platform.runLater(
         () -> {
+          cancelEnabled = enabled;
           if (cancelButton != null) {
             cancelButton.setDisable(!enabled);
           }
+          syncSkipEnabled();
         });
   }
 
@@ -241,8 +248,16 @@ public final class SettingsFxController implements SettingsBridge {
     progressBar = shell.progress();
     runButton = shell.run();
     cancelButton = shell.cancel();
+    skipButton = shell.skip();
+    if (skipButton.getParent() instanceof StackPane host) {
+      skipHost = host;
+      skipDisabledTip = SettingsControls.disabledTooltip();
+      SettingsControls.setDisabledTooltip(
+          skipHost, skipDisabledTip, SettingsStrings.SKIP_UNAVAILABLE_TOOLTIP);
+    }
     wireActionBar();
     updateRunEnabled();
+    syncSkipEnabled();
 
     Scene scene = new Scene(shell.root());
     applyAppStylesheet(scene);
@@ -303,7 +318,13 @@ public final class SettingsFxController implements SettingsBridge {
           if (AlgorithmViewModel.PROP_CAN_START.equals(evt.getPropertyName())
               || AlgorithmViewModel.PROP_RUN_ALL.equals(evt.getPropertyName())
               || AlgorithmViewModel.PROP_ENTRIES.equals(evt.getPropertyName())) {
-            VmBindings.runFx(this::updateRunEnabled);
+            VmBindings.runFx(
+                () -> {
+                  updateRunEnabled();
+                  if (AlgorithmViewModel.PROP_RUN_ALL.equals(evt.getPropertyName())) {
+                    syncSkipEnabled();
+                  }
+                });
           }
         });
   }
@@ -315,13 +336,18 @@ public final class SettingsFxController implements SettingsBridge {
           arraySizeVm.applyText();
           algorithmVm.applySelectionToAppContext();
           app.setStart(true);
+          cancelEnabled = true;
           cancelButton.setDisable(false);
+          syncSkipEnabled();
         });
     cancelButton.setOnAction(
         e -> {
           app.cancelSorting();
+          cancelEnabled = false;
           cancelButton.setDisable(true);
+          syncSkipEnabled();
         });
+    skipButton.setOnAction(e -> app.skipCurrentAlgorithm());
   }
 
   private void updateRunEnabled() {
@@ -330,5 +356,25 @@ public final class SettingsFxController implements SettingsBridge {
     }
     boolean enabled = inputsEnabled && arraySizeVm.canRun() && algorithmVm.canStart();
     runButton.setDisable(!enabled);
+  }
+
+  private void syncSkipEnabled() {
+    if (skipButton == null) {
+      return;
+    }
+    boolean enabled = cancelEnabled && algorithmVm != null && algorithmVm.isRunAll();
+    skipButton.setDisable(!enabled);
+    if (enabled) {
+      if (skipHost != null && skipDisabledTip != null) {
+        SettingsControls.setDisabledTooltip(skipHost, skipDisabledTip, null);
+      }
+      skipButton.setTooltip(new Tooltip(SettingsStrings.SKIP_TOOLTIP));
+    } else {
+      skipButton.setTooltip(null);
+      if (skipHost != null && skipDisabledTip != null) {
+        SettingsControls.setDisabledTooltip(
+            skipHost, skipDisabledTip, SettingsStrings.SKIP_UNAVAILABLE_TOOLTIP);
+      }
+    }
   }
 }

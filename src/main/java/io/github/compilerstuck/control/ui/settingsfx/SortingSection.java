@@ -121,6 +121,8 @@ public final class SortingSection {
                     }
                   }
                 });
+          } else if (AlgorithmViewModel.PROP_ENTRIES.equals(evt.getPropertyName())) {
+            VmBindings.runFx(() -> rebuildAlgorithmCombo(algorithm, nameToId, vm));
           } else if (AlgorithmViewModel.PROP_RUN_ALL.equals(evt.getPropertyName())) {
             boolean value = Boolean.TRUE.equals(evt.getNewValue());
             VmBindings.runFx(
@@ -165,17 +167,29 @@ public final class SortingSection {
     return root;
   }
 
+  private static void rebuildAlgorithmCombo(
+      ComboBox<String> algorithm, Map<String, String> nameToId, AlgorithmViewModel vm) {
+    String selectedId = vm.getSelectedId();
+    String selectedName = null;
+    nameToId.clear();
+    algorithm.getItems().clear();
+    for (AlgorithmDescriptor descriptor : vm.getDescriptors()) {
+      algorithm.getItems().add(descriptor.displayName());
+      nameToId.put(descriptor.displayName(), descriptor.id());
+      if (descriptor.id().equals(selectedId)) {
+        selectedName = descriptor.displayName();
+      }
+    }
+    if (selectedName != null) {
+      algorithm.getSelectionModel().select(selectedName);
+    }
+  }
+
   private static void syncConfigureState(
       Button configure, StackPane host, Tooltip tip, AlgorithmViewModel vm) {
-    boolean runAll = vm.isRunAll();
     boolean inputsEnabled = vm.isInputsEnabled();
-    configure.setDisable(!runAll || !inputsEnabled);
-    String reason = null;
-    if (!inputsEnabled) {
-      reason = SettingsStrings.CONFIGURE_ORDER_BUSY_TOOLTIP;
-    } else if (!runAll) {
-      reason = SettingsStrings.CONFIGURE_ORDER_UNAVAILABLE_TOOLTIP;
-    }
+    configure.setDisable(!inputsEnabled);
+    String reason = inputsEnabled ? null : SettingsStrings.CONFIGURE_ORDER_BUSY_TOOLTIP;
     SettingsControls.setDisabledTooltip(host, tip, reason);
   }
 }

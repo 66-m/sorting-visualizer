@@ -20,6 +20,14 @@ public abstract class SortingAlgorithm {
   protected OperationReporter operationReporter = OperationReporter.NOOP;
   protected CancellationToken cancellationToken = CancellationToken.alwaysActive();
 
+  /**
+   * Under equalize mode, only every {@code delayStride}-th {@link #delay}/{@link #delayFrame} waits
+   * on the FrameGate so huge step counts can still hit the duration target.
+   */
+  private int delayStride = 1;
+
+  private int delayPhase;
+
   ArrayModel arrayController;
 
   public SortingAlgorithm(ArrayModel arrayController) {
@@ -124,27 +132,44 @@ public abstract class SortingAlgorithm {
     delay(new int[0]);
   }
 
+  /** Visualize only every {@code stride}-th paced step (minimum 1). Resets the phase counter. */
+  public void setDelayStride(int stride) {
+    delayStride = Math.max(1, stride);
+    delayPhase = 0;
+  }
+
+  public int getDelayStride() {
+    return delayStride;
+  }
+
   private void pace(int[] markers, boolean wholeFrame) {
     if (isCancelled()) {
       return;
     }
-    if (delay) {
-      if (!timing) {
-        beginTiming();
-      } else {
-        arrayController.addRealTime((double) (System.nanoTime() - startTime));
-      }
-
-      for (int i : markers) {
-        arrayController.setMarker(i, Marker.SET);
-      }
-
-      if (wholeFrame) {
-        proc.delayFrame();
-      } else {
-        proc.delay();
-      }
-      startTime = System.nanoTime();
+    if (!delay) {
+      return;
     }
+
+    delayPhase++;
+    if (delayPhase % delayStride != 0) {
+      return;
+    }
+
+    if (!timing) {
+      beginTiming();
+    } else {
+      arrayController.addRealTime((double) (System.nanoTime() - startTime));
+    }
+
+    for (int i : markers) {
+      arrayController.setMarker(i, Marker.SET);
+    }
+
+    if (wholeFrame) {
+      proc.delayFrame();
+    } else {
+      proc.delay();
+    }
+    startTime = System.nanoTime();
   }
 }

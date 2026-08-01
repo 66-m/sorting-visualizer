@@ -75,7 +75,11 @@ public final class VisualizerScreen implements Screen {
         game.finishSession(true);
         game.publishThenDraw(frameDelta);
       } else if (stateManager.isRunning()) {
-        if (stateManager.isFrameGateSuspended()) {
+        if (stateManager.isEqualizePreparing()) {
+          // Dry-run mutates the live array; keep the last published (shuffled) snapshot on screen.
+          game.drawWorld(frameDelta);
+          publishProgressIfDue(frameDelta, stateManager.getEqualizePrepareProgress());
+        } else if (stateManager.isFrameGateSuspended()) {
           // Worker is in a timed pause (not consuming credits); keep animating without pacing.
           game.publishThenDraw(frameDelta);
         } else {

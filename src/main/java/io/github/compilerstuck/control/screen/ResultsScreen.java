@@ -84,7 +84,7 @@ public final class ResultsScreen implements Screen {
         resultsTableRenderer.render(
             renderSystem,
             background,
-            game.currentAlgorithms(),
+            game.sessionManager().getCompletedAlgorithms(),
             game.sessionManager().getComparisons(),
             game.sessionManager().getRealTime(),
             game.sessionManager().getSwaps(),

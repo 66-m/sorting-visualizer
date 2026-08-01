@@ -51,9 +51,12 @@ public final class SettingsStrings {
   public static final String RESET_ALL_VISUALS_TOOLTIP =
       "Clear customizations for every visualization.";
   public static final String RESET_ALL_VISUALS_BUSY_TOOLTIP = "Unavailable while sorting.";
-  public static final String CONFIGURE_ORDER_UNAVAILABLE_TOOLTIP =
-      "Enable Run all to configure the algorithm order.";
   public static final String CONFIGURE_ORDER_BUSY_TOOLTIP = "Unavailable while sorting.";
+  public static final String SKIP = "Skip";
+  public static final String SKIP_TOOLTIP =
+      "Skip the current algorithm and continue with the next.";
+  public static final String SKIP_UNAVAILABLE_TOOLTIP =
+      "Skip is available while a Run-all session is running.";
   public static final String RESET_ALL = "Reset all";
   public static final String RESET_SETTING = "Reset";
   public static final String IMPORT = "Import";
@@ -89,13 +92,15 @@ public final class SettingsStrings {
   public static final String RESET_SETTING_TOOLTIP = "Reset to default";
   public static final String BROWSE = "Browse…";
   public static final String CONFIGURE_ORDER = "Configure order…";
-  public static final String RUN_ALL_ORDER_TITLE = "Configure run-all";
+  public static final String RUN_ALL_ORDER_TITLE = "Configure algorithms";
   public static final String RUN_ALL_ORDER_HINT =
-      "Check algorithms to include, then drag the handle to set the order they will run.";
+      "Drag to set the order for the algorithm dropdown and Run all. Check algorithms to include when Run all is on.";
   public static final String RUN_ALL_ORDER_SECTION = "ALGORITHMS";
   public static final String RUN_ALL_ORDER_COUNT = "%d selected";
   public static final String RUN_ALL_ORDER_COUNT_ONE = "1 selected";
   public static final String RUN_ALL_ORDER_EMPTY = "Select at least one algorithm to run.";
+  public static final String RUN_ALL_ORDER_UNSAVED_MESSAGE =
+      "Save your changes before closing, or discard them.";
   public static final String RUN_ALL_ORDER_SKIPPED = "-";
   public static final String RUN_ALL_ORDER_DRAG_TOOLTIP = "Drag to reorder";
   public static final String DONE = "Done";

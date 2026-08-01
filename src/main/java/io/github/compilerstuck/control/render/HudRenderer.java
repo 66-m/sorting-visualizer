@@ -24,6 +24,7 @@ public final class HudRenderer {
   private long cachedWritesAux = Long.MIN_VALUE;
   private int cachedLength = Integer.MIN_VALUE;
   private String cachedRealTimeFormatted;
+  private boolean cachedPreparing;
   private int cachedLayoutWidth = Integer.MIN_VALUE;
   private int cachedTextX;
   private int cachedTextSize;
@@ -96,6 +97,7 @@ public final class HudRenderer {
     cachedWritesAux = m.writesAux;
     cachedLength = m.length;
     cachedRealTimeFormatted = m.realTime;
+    cachedPreparing = m.preparing;
 
     labels[0] = m.operation;
     labels[1] = buildSortedLine(m.sortedPct, m.segments);
@@ -108,8 +110,38 @@ public final class HudRenderer {
     labelsInitialized = true;
   }
 
-  private static Metrics readMetrics(
-      SortingStateManager stateManager, ArrayController arrayController) {
+  private Metrics readMetrics(SortingStateManager stateManager, ArrayController arrayController) {
+    int length = arrayController.getLength();
+    if (stateManager.isEqualizePreparing()) {
+      // Keep end-of-shuffle numbers; only the operation line switches to Prepare..
+      if (labelsInitialized) {
+        return new Metrics(
+            stateManager.getCurrentOperation(),
+            cachedSortedPct,
+            cachedSegments,
+            cachedComparisons,
+            cachedSwaps,
+            cachedWrites,
+            cachedWritesAux,
+            length,
+            cachedRealTimeFormatted != null
+                ? cachedRealTimeFormatted
+                : TimeEstimateFormat.format(0),
+            true);
+      }
+      // No prior HUD frame (tests / first draw): show zeros, never live dry-run counters.
+      return new Metrics(
+          stateManager.getCurrentOperation(),
+          0,
+          0,
+          0L,
+          0L,
+          0L,
+          0L,
+          length,
+          TimeEstimateFormat.format(0),
+          true);
+    }
     return new Metrics(
         stateManager.getCurrentOperation(),
         (int) (arrayController.getSortedPercentage() * 100),
@@ -118,12 +150,14 @@ public final class HudRenderer {
         arrayController.getSwaps(),
         arrayController.getWrites(),
         arrayController.getWritesAux(),
-        arrayController.getLength(),
-        TimeEstimateFormat.format(arrayController.getRealTime()));
+        length,
+        TimeEstimateFormat.format(arrayController.getRealTime()),
+        false);
   }
 
   private boolean sameKeys(Metrics m) {
-    return m.sortedPct == cachedSortedPct
+    return m.preparing == cachedPreparing
+        && m.sortedPct == cachedSortedPct
         && m.segments == cachedSegments
         && m.comparisons == cachedComparisons
         && m.swaps == cachedSwaps
@@ -161,5 +195,6 @@ public final class HudRenderer {
       long writes,
       long writesAux,
       int length,
-      String realTime) {}
+      String realTime,
+      boolean preparing) {}
 }

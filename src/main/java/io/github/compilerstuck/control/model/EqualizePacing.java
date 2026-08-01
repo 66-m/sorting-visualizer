@@ -105,6 +105,19 @@ public final class EqualizePacing {
    * @param arrayLength used to cap batched {@code delayFrame} beats per draw frame on large arrays
    */
   public void begin(int totalSteps, int frameBeats, float sliderTargetSec, int arrayLength) {
+    begin(totalSteps, frameBeats, sliderTargetSec, arrayLength, 0);
+  }
+
+  /**
+   * @param maxStepsPerFrameOverride when {@code > 0}, caps grants per frame (e.g. {@code 1} for
+   *     strided {@code delay()} algorithms so {@code awaitIdle} cannot stall on leftover credits)
+   */
+  public void begin(
+      int totalSteps,
+      int frameBeats,
+      float sliderTargetSec,
+      int arrayLength,
+      int maxStepsPerFrameOverride) {
     if (totalSteps <= 0) {
       clear();
       return;
@@ -112,10 +125,14 @@ public final class EqualizePacing {
     this.totalSteps = totalSteps;
     this.frameBeats = Math.max(0, frameBeats);
     this.sliderTargetSec = Math.max(0f, sliderTargetSec);
-    this.maxStepsPerFrame =
-        this.frameBeats > 0
-            ? AppConfig.equalizeMaxFrameBeatsPerFrame(arrayLength)
-            : AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME;
+    if (maxStepsPerFrameOverride > 0) {
+      this.maxStepsPerFrame = maxStepsPerFrameOverride;
+    } else {
+      this.maxStepsPerFrame =
+          this.frameBeats > 0
+              ? AppConfig.equalizeMaxFrameBeatsPerFrame(arrayLength)
+              : AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME;
+    }
     this.stepsConsumed.set(0);
     this.frameBeatsConsumed.set(0);
     this.frameWaitDebt = 0d;
@@ -158,7 +175,9 @@ public final class EqualizePacing {
     }
     int remainingSteps = Math.max(0, totalSteps - stepsConsumed.get());
     if (remainingSteps == 0) {
-      return 1;
+      // Budget exhausted but the worker may still be awaiting (underestimated step count /
+      // delay stride). Sprint at the per-frame cap instead of dripping 1 credit/frame.
+      return maxStepsPerFrame;
     }
     float elapsedSec = (System.nanoTime() - startNanos) / 1_000_000_000f;
     float remainingTime = Math.max(MIN_REMAINING_SEC, sliderTargetSec - elapsedSec);
