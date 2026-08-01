@@ -171,6 +171,24 @@ class SortingSessionManagerTest {
   }
 
   @Test
+  @DisplayName("skip mid-run resets to sorted before the next algorithm's shuffle")
+  void skipResetsToSortedBeforeNextShuffle() {
+    arrayModel.setShuffleType(ShuffleType.REVERSE);
+    ScrambleThenWaitAlgorithm first = new ScrambleThenWaitAlgorithm(arrayModel);
+    CaptureStartAlgorithm second = new CaptureStartAlgorithm(arrayModel);
+    stateManager.setRunning(true);
+
+    sessionManager.startSortingSession(List.of(first, second));
+
+    awaitUntilRunning(first);
+    sessionManager.skipCurrent();
+    sessionManager.waitForCompletion();
+
+    // Reverse of identity [0,1,2,3,4] — not reverse of the scrambled mid-skip state.
+    assertArrayEquals(new int[] {4, 3, 2, 1, 0}, second.startSnapshot());
+  }
+
+  @Test
   @DisplayName("cancel mid-run stops execution and clears running state")
   void cancelMidRunStopsExecution() {
     UntilCancelledAlgorithm algorithm = new UntilCancelledAlgorithm(arrayModel);
@@ -233,6 +251,14 @@ class SortingSessionManagerTest {
   }
 
   private static void awaitUntilRunning(UntilCancelledAlgorithm algorithm) {
+    long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(500);
+    while (!algorithm.isRunning() && System.nanoTime() < deadline) {
+      Thread.onSpinWait();
+    }
+    assertTrue(algorithm.isRunning(), "algorithm thread should have entered sort()");
+  }
+
+  private static void awaitUntilRunning(ScrambleThenWaitAlgorithm algorithm) {
     long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(500);
     while (!algorithm.isRunning() && System.nanoTime() < deadline) {
       Thread.onSpinWait();
@@ -324,6 +350,64 @@ class SortingSessionManagerTest {
       report(name);
       while (!isCancelled()) {
         Thread.onSpinWait();
+      }
+    }
+  }
+
+  /** Leaves a non-identity permutation, then waits so Skip can abort mid-run. */
+  private static class ScrambleThenWaitAlgorithm extends SortingAlgorithm {
+    private final ArrayModel model;
+    private volatile boolean running;
+
+    ScrambleThenWaitAlgorithm(ArrayModel arrayModel) {
+      super(arrayModel, NO_OP_PROCESSING);
+      model = arrayModel;
+      name = "ScrambleThenWait";
+      setDelay(false);
+    }
+
+    boolean isRunning() {
+      return running;
+    }
+
+    @Override
+    public void sort() {
+      report(name);
+      // Distinct from identity and from reverse(identity): reverse of this is {3,4,2,1,0}.
+      model.set(0, 0);
+      model.set(1, 1);
+      model.set(2, 2);
+      model.set(3, 4);
+      model.set(4, 3);
+      running = true;
+      while (!isCancelled()) {
+        Thread.onSpinWait();
+      }
+    }
+  }
+
+  /** Records the array at the start of {@link #sort()} (after prepare/shuffle). */
+  private static class CaptureStartAlgorithm extends SortingAlgorithm {
+    private final ArrayModel model;
+    private int[] startSnapshot = new int[0];
+
+    CaptureStartAlgorithm(ArrayModel arrayModel) {
+      super(arrayModel, NO_OP_PROCESSING);
+      model = arrayModel;
+      name = "CaptureStart";
+      setDelay(false);
+    }
+
+    int[] startSnapshot() {
+      return startSnapshot;
+    }
+
+    @Override
+    public void sort() {
+      report(name);
+      startSnapshot = model.getArray().clone();
+      for (int i = 0; i < model.getLength(); i++) {
+        model.set(i, i);
       }
     }
   }

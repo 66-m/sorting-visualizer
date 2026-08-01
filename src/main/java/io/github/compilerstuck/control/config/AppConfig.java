@@ -58,22 +58,38 @@ public final class AppConfig {
    * Shuffle animation length in seconds. Pacing uses a fixed visual-step budget (not the sort speed
    * setting).
    */
-  public static final float SHUFFLE_DURATION_SEC = 1f;
+  public static final float SHUFFLE_DURATION_SEC = 1.5f;
 
   /** Frame-gate steps fired across one shuffle animation ({@link #SHUFFLE_DURATION_SEC}). */
   public static final int SHUFFLE_VISUAL_STEPS = 1000;
 
   /**
    * Max wall time for the silent dry-run that counts visual steps before an equalized sort. On
-   * timeout, equalization is skipped for that algorithm.
+   * timeout, step totals are extrapolated via {@code estimateRawSteps}. Matches {@link
+   * #SHUFFLE_DURATION_SEC} so prep fits under the shuffle visual cover; {@code n log n} sorts
+   * usually finish with an exact count inside this budget.
    */
-  public static final long EQUALIZE_DRY_RUN_TIMEOUT_MS = 2000L;
+  public static final long EQUALIZE_DRY_RUN_TIMEOUT_MS = Math.round(SHUFFLE_DURATION_SEC * 1000f);
 
   /**
    * Soft cap on equalize step credits granted per draw frame (plain {@code delay()} algorithms).
    * Prevents a single frame from executing hundreds of thousands of visualized ops.
    */
   public static final int EQUALIZE_MAX_STEPS_PER_FRAME = 500;
+
+  /**
+   * Cap on {@code delayStride}: max undelayed {@code delay()} calls between FrameGate waits.
+   * Without this, Bubble/Shaker at large n use multi-million strides and freeze the UI for seconds
+   * per frame.
+   */
+  public static final int EQUALIZE_MAX_DELAY_STRIDE = 250_000;
+
+  /**
+   * Soft cap on undelayed equalize work (delay×stride) credited in one draw frame when catch-up
+   * grants are enabled. Keeps large-n strided runs nearer the slider target without multi-second
+   * freezes.
+   */
+  public static final int EQUALIZE_MAX_WORK_PER_FRAME = 1_000_000;
 
   /**
    * Approx bar-update budget per frame when batching {@code delayFrame} algorithms (e.g. Gravity
