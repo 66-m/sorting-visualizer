@@ -3,6 +3,10 @@ package io.github.compilerstuck.control.ui.settingsfx.vm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import io.github.compilerstuck.control.config.AppConfig;
+import io.github.compilerstuck.control.config.CanvasBackground;
+import io.github.compilerstuck.visual.Marker;
+import io.github.compilerstuck.visual.gradient.ColorGradient;
 import java.awt.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,5 +53,29 @@ class AppearanceViewModelTest {
     vm.selectPreset(0);
     assertEquals(before, vm.getSelectedIndex());
     assertFalse(vm.isInputsEnabled());
+  }
+
+  @Test
+  void canvasBackgroundDefaultsToDark() {
+    assertEquals(CanvasBackground.DARK, vm.getCanvasBackground());
+  }
+
+  @Test
+  void setCanvasBackgroundUpdatesAppContextAndRemapsWhiteMarkers() {
+    ColorGradient gradient = fx.app.getColorGradient();
+    assertEquals(Color.WHITE, gradient.getMarkerColor(0, Marker.SET));
+
+    vm.setCanvasBackground(CanvasBackground.WHITE);
+    assertEquals(CanvasBackground.WHITE, fx.app.getCanvasBackground());
+    assertEquals(CanvasBackground.WHITE, fx.app.getPreferences().getCanvasBackground());
+    Color expected =
+        new Color(
+            AppConfig.CANVAS_BACKGROUND_DARK,
+            AppConfig.CANVAS_BACKGROUND_DARK,
+            AppConfig.CANVAS_BACKGROUND_DARK);
+    assertEquals(expected, gradient.getMarkerColor(0, Marker.SET));
+
+    vm.setCanvasBackground(CanvasBackground.DARK);
+    assertEquals(Color.WHITE, gradient.getMarkerColor(0, Marker.SET));
   }
 }

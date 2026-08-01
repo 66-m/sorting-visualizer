@@ -28,6 +28,7 @@ public final class SettingsStrings {
   public static final String SPEED_HEADER = "Speed";
   public static final String SPEED_DURATION_HEADER = "Target duration";
   public static final String PRESET = "Preset";
+  public static final String BACKGROUND = "Background";
   public static final String IMAGE = "Image";
   public static final String COLORS = "Colors";
   public static final String SPEED_STEPS_VALUE_FORMAT = "%d steps/frame";

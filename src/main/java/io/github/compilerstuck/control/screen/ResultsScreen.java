@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import io.github.compilerstuck.control.SortingVisualizerGame;
+import io.github.compilerstuck.control.config.CanvasBackground;
 import io.github.compilerstuck.control.model.SortingStateManager;
 import io.github.compilerstuck.control.render.GdxRenderSystem;
 import io.github.compilerstuck.control.ui.ResultsTableRenderer;
@@ -76,8 +77,13 @@ public final class ResultsScreen implements Screen {
       }
 
       if (stateManager.shouldContinueExecution()) {
+        CanvasBackground background =
+            game.appContext() != null
+                ? game.appContext().getCanvasBackground()
+                : CanvasBackground.DARK;
         resultsTableRenderer.render(
             renderSystem,
+            background,
             game.currentAlgorithms(),
             game.sessionManager().getComparisons(),
             game.sessionManager().getRealTime(),

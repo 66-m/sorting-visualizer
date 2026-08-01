@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github.compilerstuck.control.config.CanvasBackground;
 import io.github.compilerstuck.control.config.RunAllEntryPref;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
@@ -49,6 +50,12 @@ class PersistenceViewModelTest {
     assertEquals("Custom Gradient", fx.app.getPreferences().getGradientName());
     assertEquals(Color.YELLOW.getRGB(), fx.app.getPreferences().getGradientColor1Rgb());
     assertEquals(Color.CYAN.getRGB(), fx.app.getPreferences().getGradientColor2Rgb());
+  }
+
+  @Test
+  void canvasBackgroundPersistsOnAppContext() {
+    fx.app.setCanvasBackground(CanvasBackground.WHITE);
+    assertEquals(CanvasBackground.WHITE, fx.app.getPreferences().getCanvasBackground());
   }
 
   @Test

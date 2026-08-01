@@ -1,5 +1,6 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
+import io.github.compilerstuck.control.config.CanvasBackground;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppearanceViewModel;
 import java.util.List;
 import javafx.scene.Node;
@@ -11,7 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-/** Gradient preset combo + custom color pickers. */
+/** Gradient preset combo, canvas background, and custom color pickers. */
 public final class AppearanceSection {
 
   public static final String ROOT_ID = "section-appearance";
@@ -36,6 +37,25 @@ public final class AppearanceSection {
               }
             });
     VBox presetField = SettingsControls.labeledField(SettingsStrings.PRESET, presets);
+    HBox.setHgrow(presetField, Priority.ALWAYS);
+
+    ComboBox<CanvasBackground> background = new ComboBox<>();
+    background.getItems().setAll(vm.getCanvasBackgroundOptions());
+    background.getSelectionModel().select(vm.getCanvasBackground());
+    background.setMaxWidth(Double.MAX_VALUE);
+    background
+        .getSelectionModel()
+        .selectedItemProperty()
+        .addListener(
+            (obs, old, selected) -> {
+              if (selected != null && selected != vm.getCanvasBackground()) {
+                vm.setCanvasBackground(selected);
+              }
+            });
+    VBox backgroundField = SettingsControls.labeledField(SettingsStrings.BACKGROUND, background);
+    HBox.setHgrow(backgroundField, Priority.ALWAYS);
+
+    HBox presetRow = new HBox(SettingsLayout.GAP_SM, presetField, backgroundField);
 
     Label colorsLabel = SettingsControls.fieldLabel(SettingsStrings.COLORS);
     ColorPicker color1 = new ColorPicker(toFx(vm.getColor1()));
@@ -67,11 +87,24 @@ public final class AppearanceSection {
           } else if (AppearanceViewModel.PROP_COLOR2.equals(evt.getPropertyName())) {
             Color fx = toFx((java.awt.Color) evt.getNewValue());
             VmBindings.runFx(() -> color2.setValue(fx));
+          } else if (AppearanceViewModel.PROP_CANVAS_BACKGROUND.equals(evt.getPropertyName())) {
+            CanvasBackground value = (CanvasBackground) evt.getNewValue();
+            VmBindings.runFx(
+                () -> {
+                  if (background.getSelectionModel().getSelectedItem() != value) {
+                    background.getSelectionModel().select(value);
+                  }
+                });
           }
         });
 
     VmBindings.bindInputsEnabled(
         presets,
+        vm::isInputsEnabled,
+        vm::addPropertyChangeListener,
+        AppearanceViewModel.PROP_INPUTS_ENABLED);
+    VmBindings.bindInputsEnabled(
+        background,
         vm::isInputsEnabled,
         vm::addPropertyChangeListener,
         AppearanceViewModel.PROP_INPUTS_ENABLED);
@@ -86,7 +119,7 @@ public final class AppearanceSection {
         vm::addPropertyChangeListener,
         AppearanceViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, presetField, colorsField);
+    VBox root = new VBox(SettingsLayout.GAP_SM, presetRow, colorsField);
     root.setId(ROOT_ID);
     return root;
   }

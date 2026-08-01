@@ -42,6 +42,7 @@ class SettingsDefaultsTest {
     assertEquals(2000, SettingsDefaults.stepsPerFrame(10));
 
     assertTrue(SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION);
+    assertEquals(CanvasBackground.DARK, SettingsDefaults.DEFAULT_CANVAS_BACKGROUND);
     assertEquals(30f, SettingsDefaults.equalizedDurationSec(1));
     assertEquals(10f, SettingsDefaults.equalizedDurationSec(5));
     assertEquals(2f, SettingsDefaults.equalizedDurationSec(10));

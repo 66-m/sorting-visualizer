@@ -29,6 +29,7 @@ public final class SettingsDefaults {
   public static final boolean DEFAULT_PERF_STATS = false;
   public static final boolean DEFAULT_FIVE_SECOND_START_DELAY = false;
   public static final boolean DEFAULT_EQUALIZE_SORT_DURATION = true;
+  public static final CanvasBackground DEFAULT_CANVAS_BACKGROUND = CanvasBackground.DARK;
 
   /** JSON map of visualizationId → settings object (see VisualizationSettingsCodec). */
   public static final String DEFAULT_VISUAL_SETTINGS_BY_ID = "{}";

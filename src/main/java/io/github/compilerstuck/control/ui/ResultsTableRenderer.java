@@ -1,6 +1,7 @@
 package io.github.compilerstuck.control.ui;
 
 import io.github.compilerstuck.control.config.AppConfig;
+import io.github.compilerstuck.control.config.CanvasBackground;
 import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import java.util.List;
@@ -15,6 +16,7 @@ public final class ResultsTableRenderer {
 
   public void render(
       RenderSystem rs,
+      CanvasBackground background,
       List<SortingAlgorithm> algorithms,
       List<String> comparisons,
       List<String> realTime,
@@ -24,14 +26,16 @@ public final class ResultsTableRenderer {
     int width = rs.getWidth();
     int height = rs.getHeight();
 
-    float bg = AppConfig.RESULTS_TABLE_BACKGROUND / 255f;
-    rs.clear(bg, bg, bg);
+    CanvasBackground bg = background != null ? background : CanvasBackground.DARK;
+    float clear = bg.clearComponent();
+    rs.clear(clear, clear, clear);
+    rs.setOverlayTextGray(bg.overlayTextGray());
 
     float textSize = AppConfig.scaleToWidth(AppConfig.FONT_SIZE_RATIO, width);
     float topRow = AppConfig.scaleToWidth(AppConfig.TABLE_TOP_ROW, width);
     float cellPad = AppConfig.scaleToWidth(AppConfig.TABLE_CELL_PADDING, width);
 
-    drawGrid(rs, width, height);
+    drawGrid(rs, width, height, bg);
     drawHeaders(rs, width, textSize, cellPad);
     drawData(
         rs,
@@ -40,6 +44,7 @@ public final class ResultsTableRenderer {
         textSize,
         topRow,
         cellPad,
+        bg,
         algorithms,
         comparisons,
         realTime,
@@ -48,7 +53,7 @@ public final class ResultsTableRenderer {
         writesAux);
   }
 
-  private void drawGrid(RenderSystem rs, int width, int height) {
+  private void drawGrid(RenderSystem rs, int width, int height, CanvasBackground background) {
     float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
     // 1 center divider + 5 column dividers
     int count = 6;
@@ -56,7 +61,7 @@ public final class ResultsTableRenderer {
       gridLines = new float[count * 4];
       gridArgb = new int[count];
     }
-    int textColor = packGray(AppConfig.RESULTS_TABLE_TEXT_COLOR);
+    int textColor = packGray(background.overlayTextGray());
 
     float x0 = columnWidth + columnWidth / 2;
     gridLines[0] = x0;
@@ -98,6 +103,7 @@ public final class ResultsTableRenderer {
       float textSize,
       float topRow,
       float cellPad,
+      CanvasBackground background,
       List<SortingAlgorithm> algorithms,
       List<String> comparisons,
       List<String> realTime,
@@ -110,7 +116,7 @@ public final class ResultsTableRenderer {
 
     float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
     float rowHeight = (height - topRow) / algorithms.size();
-    int textColor = packGray(AppConfig.RESULTS_TABLE_TEXT_COLOR);
+    int textColor = packGray(background.overlayTextGray());
 
     if (rowLines == null || rowLines.length < algorithms.size() * 4) {
       rowLines = new float[algorithms.size() * 4];

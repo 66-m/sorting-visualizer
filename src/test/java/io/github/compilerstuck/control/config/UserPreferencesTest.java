@@ -45,6 +45,7 @@ class UserPreferencesTest {
     assertFalse(prefs.isPerfStats());
     assertFalse(prefs.isFiveSecondStartDelay());
     assertTrue(prefs.isEqualizeSortDuration());
+    assertEquals(SettingsDefaults.DEFAULT_CANVAS_BACKGROUND, prefs.getCanvasBackground());
   }
 
   @Test
@@ -65,6 +66,7 @@ class UserPreferencesTest {
     prefs.setPerfStats(true);
     prefs.setFiveSecondStartDelay(true);
     prefs.setEqualizeSortDuration(false);
+    prefs.setCanvasBackground(CanvasBackground.WHITE);
     prefs.save(node);
 
     UserPreferences loaded = UserPreferences.load(node);
@@ -85,14 +87,17 @@ class UserPreferencesTest {
     assertTrue(loaded.isPerfStats());
     assertTrue(loaded.isFiveSecondStartDelay());
     assertFalse(loaded.isEqualizeSortDuration());
+    assertEquals(CanvasBackground.WHITE, loaded.getCanvasBackground());
   }
 
   @Test
   void malformedShuffleAndRunAllFallBackSafely() {
     node.put("shuffleType", "NOT_A_REAL_SHUFFLE");
     node.put("runAllEntries", "bad-token,ok-id:1,:0,nope:");
+    node.put("canvasBackground", "NOT_A_BACKGROUND");
     UserPreferences prefs = UserPreferences.load(node);
     assertEquals(SettingsDefaults.DEFAULT_SHUFFLE_TYPE, prefs.getShuffleType());
+    assertEquals(SettingsDefaults.DEFAULT_CANVAS_BACKGROUND, prefs.getCanvasBackground());
     List<RunAllEntryPref> entries = prefs.getRunAllEntriesList();
     assertEquals(1, entries.size());
     assertEquals("ok-id", entries.get(0).id());

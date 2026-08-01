@@ -63,6 +63,12 @@ public interface RenderSystem {
   void drawText(String text, float x, float y, float sizePx);
 
   /**
+   * Overlay: gray channel (0–255) for subsequent {@link #drawText} / {@link #drawTexts} calls.
+   * Default implementations ignore the value (white text).
+   */
+  default void setOverlayTextGray(int gray0to255) {}
+
+  /**
    * Overlay: advance width of {@code text} at {@code sizePx}. Returns {@code 0} when unknown (e.g.
    * null/empty text).
    */

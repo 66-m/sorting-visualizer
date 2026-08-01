@@ -46,6 +46,9 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   private final GdxOverlayPass overlay;
 
   private volatile Thread renderThread;
+  private float overlayTextR = 1f;
+  private float overlayTextG = 1f;
+  private float overlayTextB = 1f;
 
   public GdxRenderSystem(AppAssets assets) {
     Objects.requireNonNull(assets, "assets");
@@ -277,6 +280,26 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   @Override
   public void drawText(String text, float x, float y, float sizePx) {
     overlay.drawText(text, x, y, sizePx);
+  }
+
+  @Override
+  public void setOverlayTextGray(int gray0to255) {
+    float c = Math.max(0, Math.min(255, gray0to255)) / 255f;
+    overlayTextR = c;
+    overlayTextG = c;
+    overlayTextB = c;
+  }
+
+  float overlayTextR() {
+    return overlayTextR;
+  }
+
+  float overlayTextG() {
+    return overlayTextG;
+  }
+
+  float overlayTextB() {
+    return overlayTextB;
   }
 
   @Override
