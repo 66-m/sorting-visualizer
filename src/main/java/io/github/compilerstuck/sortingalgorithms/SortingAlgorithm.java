@@ -28,6 +28,11 @@ public abstract class SortingAlgorithm {
 
   private int delayPhase;
 
+  /** Indices highlighted on the previous visualized pace; cleared before the next highlight. */
+  private int[] lastMarkers = EMPTY_MARKERS;
+
+  private static final int[] EMPTY_MARKERS = new int[0];
+
   ArrayModel arrayController;
 
   public SortingAlgorithm(ArrayModel arrayController) {
@@ -161,9 +166,13 @@ public abstract class SortingAlgorithm {
       arrayController.addRealTime((double) (System.nanoTime() - startTime));
     }
 
+    // Replace highlights instead of accumulating — fast equalize batches would otherwise paint
+    // most of the array white before the next publish.
+    clearLastMarkers();
     for (int i : markers) {
       arrayController.setMarker(i, Marker.SET);
     }
+    lastMarkers = markers.length == 0 ? EMPTY_MARKERS : markers;
 
     if (wholeFrame) {
       proc.delayFrame();
@@ -171,5 +180,13 @@ public abstract class SortingAlgorithm {
       proc.delay();
     }
     startTime = System.nanoTime();
+  }
+
+  private void clearLastMarkers() {
+    for (int i : lastMarkers) {
+      if (i >= 0 && i < arrayController.getLength()) {
+        arrayController.setMarker(i, Marker.NORMAL);
+      }
+    }
   }
 }

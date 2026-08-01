@@ -12,9 +12,11 @@ import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.sortingalgorithms.BogoSort;
 import io.github.compilerstuck.sortingalgorithms.BubbleSort;
 import io.github.compilerstuck.sortingalgorithms.GravitySort;
+import io.github.compilerstuck.sortingalgorithms.MergeSort;
 import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.Sound;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,21 +83,28 @@ class EqualizeSortDurationSessionTest {
     assertEquals(1_000, fits.visualSteps());
     assertEquals(AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME, fits.maxStepsPerFrame());
 
-    // 2s → 120 frames; 1.25e9 steps need a large stride and 1 credit/frame
+    // 2s → 120 frames; 1.25e9 Bubble steps exceed responsive work budget → fast-forward.
     long bubbleRaw = SortingSessionManager.maxSwapDelaysUpperBound(50_000);
     SortingSessionManager.DelayStridePlan strided =
         SortingSessionManager.planDelayStride(bubbleRaw, 2f);
-    assertTrue(strided.stride() > 1);
-    assertEquals(1, strided.maxStepsPerFrame());
-    assertTrue(strided.visualSteps() <= 120 + 1, () -> "visual=" + strided.visualSteps());
-    assertTrue(strided.visualSteps() >= 120 - 1, () -> "visual=" + strided.visualSteps());
+    assertTrue(strided.fastForward());
+
+    // Fits in work budget with capped stride + catch-up credits.
+    long mediumRaw = SortingSessionManager.maxSwapDelaysUpperBound(5_000);
+    SortingSessionManager.DelayStridePlan medium =
+        SortingSessionManager.planDelayStride(mediumRaw, 2f);
+    assertFalse(medium.fastForward());
+    assertTrue(medium.stride() > 1);
+    assertTrue(medium.stride() <= AppConfig.EQUALIZE_MAX_DELAY_STRIDE);
+    assertTrue(medium.maxStepsPerFrame() >= 1);
   }
 
   @Test
   @DisplayName("dry-run timeout still arms equalize with estimated stride")
   void dryRunTimeoutArmsWithEstimate() throws Exception {
     sessionManager.setEqualizeSupport(() -> true, () -> 2.0, () -> NO_OP);
-    TimeoutAfterPartialStub algorithm = new TimeoutAfterPartialStub(array, 50, 2100);
+    TimeoutAfterPartialStub algorithm =
+        new TimeoutAfterPartialStub(array, 50, AppConfig.EQUALIZE_DRY_RUN_TIMEOUT_MS + 100);
     assertTrue(sessionManager.tryArmEqualizePacing(algorithm, NO_OP));
 
     assertTrue(algorithm.getDelayStride() >= 1);
@@ -124,6 +133,26 @@ class EqualizeSortDurationSessionTest {
     long sparse = SortingSessionManager.estimateRawSteps(true, 5, 5.0 / 50_000, 50_000);
     assertEquals(50_000, sparse);
     assertTrue(sparse < SortingSessionManager.maxSwapDelaysUpperBound(50_000) / 100);
+
+    // Timed-out mid Merge-like sample with ≥ n delays uses Bubble bound (exact Merge counts
+    // come from a completed dry-run with timedOut=false instead).
+    assertEquals(
+        SortingSessionManager.maxSwapDelaysUpperBound(50_000),
+        SortingSessionManager.estimateRawSteps(true, 50_000, 0.10, 50_000));
+  }
+
+  @Test
+  @DisplayName("Merge Sort dry-run completes with exact step count (not Bubble n² bound)")
+  void mergeDryRunCompletesWithExactCount() {
+    reverseInPlace(array);
+    MergeSort merge = new MergeSort(array);
+    assertTrue(sessionManager.tryArmEqualizePacing(merge, NO_OP));
+
+    EqualizePacing pacing = stateManager.equalizePacing();
+    assertTrue(pacing.isActive());
+    // n=32 Merge is well under the dry-run timeout; exact count ≪ n²/2.
+    assertTrue(pacing.totalSteps() < SortingSessionManager.maxSwapDelaysUpperBound(32));
+    assertEquals(1, merge.getDelayStride());
   }
 
   @Test
@@ -210,6 +239,122 @@ class EqualizeSortDurationSessionTest {
   }
 
   @Test
+  @DisplayName("peer clone dry-run arms pacing without Prepare UI")
+  void cloneDryRunDoesNotSetPreparing() {
+    reverseInPlace(array);
+    int[] before = Arrays.copyOf(array.getArray(), array.getLength());
+    BubbleSort bubble = new BubbleSort(array);
+
+    boolean[] sawPreparing = {false};
+    Thread sampler =
+        new Thread(
+            () -> {
+              long deadline = System.nanoTime() + 2_000_000_000L;
+              while (System.nanoTime() < deadline) {
+                if (stateManager.isEqualizePreparing()) {
+                  sawPreparing[0] = true;
+                  return;
+                }
+                Thread.onSpinWait();
+              }
+            },
+            "prepare-sampler");
+    sampler.start();
+    assertTrue(sessionManager.tryArmEqualizePacing(bubble, NO_OP));
+    try {
+      sampler.join(3000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
+    assertFalse(sawPreparing[0], "clone dry-run must not set equalizePreparing");
+    assertArrayEquals(before, array.getArray());
+    assertTrue(stateManager.equalizePacing().isActive());
+    assertTrue(stateManager.equalizePacing().totalSteps() > 0);
+    assertFalse(stateManager.isEqualizePreparing());
+  }
+
+  @Test
+  @DisplayName("overlapped prepare hides Prepare and arms pacing under shuffle cover")
+  void overlappedPrepareHidesPrepareUi() throws Exception {
+    array.setShuffleType(ShuffleType.REVERSE);
+    array.setDelayContext(NO_OP);
+    array.setOperationReporter(OperationReporter.NOOP);
+
+    BubbleSort bubble = new BubbleSort(array);
+    boolean[] sawPreparing = {false};
+    Thread sampler =
+        new Thread(
+            () -> {
+              long deadline = System.nanoTime() + 5_000_000_000L;
+              while (System.nanoTime() < deadline) {
+                if (stateManager.isEqualizePreparing()) {
+                  sawPreparing[0] = true;
+                  return;
+                }
+                if (stateManager.shouldRestart()) {
+                  return;
+                }
+                Thread.onSpinWait();
+              }
+            },
+            "overlap-prepare-sampler");
+    sampler.start();
+
+    stateManager.setRunning(true);
+    sessionManager.startSortingSession(List.of(bubble));
+    sessionManager.waitForCompletion();
+    sampler.join(1000);
+
+    assertFalse(sawPreparing[0], "Prepare UI must stay hidden during overlapped prepare");
+    assertTrue(sessionManager.hasResults());
+    assertTrue(array.isSorted());
+    assertFalse(stateManager.isEqualizePreparing());
+    assertFalse(stateManager.isShuffling());
+  }
+
+  @Test
+  @DisplayName("cancel during overlapped prepare aborts without leaving Prepare stuck")
+  void cancelDuringOverlappedPrepare() throws Exception {
+    array.setShuffleType(ShuffleType.SORTED);
+    array.setDelayContext(NO_OP);
+    sessionManager.setEqualizeSupport(() -> true, () -> 10.0, () -> NO_OP);
+
+    SlowPeerSort slow = new SlowPeerSort(array);
+    stateManager.setRunning(true);
+    sessionManager.startSortingSession(List.of(slow));
+
+    long deadline = System.nanoTime() + 2_000_000_000L;
+    while (!stateManager.isShuffling() && System.nanoTime() < deadline) {
+      Thread.onSpinWait();
+    }
+    sessionManager.cancel();
+    sessionManager.waitForCompletion();
+
+    assertFalse(stateManager.isEqualizePreparing());
+    assertFalse(stateManager.isShuffling());
+    assertFalse(stateManager.isRunning());
+    assertFalse(sessionManager.hasResults());
+  }
+
+  @Test
+  @DisplayName("createPeerAlgorithm copies alternativeSize when present")
+  void createPeerCopiesAlternativeSize() {
+    BubbleSort bubble = new BubbleSort(array);
+    bubble.setAlternativeSize(99);
+    SortingAlgorithm peer = SortingSessionManager.createPeerAlgorithm(bubble, array);
+    assertTrue(peer instanceof BubbleSort);
+    assertEquals(99, peer.getAlternativeSize());
+  }
+
+  @Test
+  @DisplayName("createPeerAlgorithm returns null for stubs without ArrayModel ctor")
+  void createPeerReturnsNullForStub() {
+    CountingSortStub stub = new CountingSortStub(array, 3);
+    assertEquals(null, SortingSessionManager.createPeerAlgorithm(stub, array));
+  }
+
+  @Test
   @DisplayName("non-Gravity dry-run suspends FrameGate and drains leftover credits")
   void dryRunSuspendsFrameGate() throws Exception {
     FrameGate gate = new FrameGate();
@@ -241,7 +386,7 @@ class EqualizeSortDurationSessionTest {
     assertTrue(sessionManager.tryArmEqualizePacing(slow, NO_OP));
     sampler.join(3000);
     assertTrue(sawSuspended[0], "dry-run should suspend FrameGate while counting");
-    assertTrue(sawPreparing[0], "dry-run should set equalizePreparing while counting");
+    assertTrue(sawPreparing[0], "live fallback should set equalizePreparing while counting");
     assertFalse(stateManager.isFrameGateSuspended());
     assertFalse(stateManager.isEqualizePreparing());
     assertEquals(0, gate.availableCredits());
@@ -333,6 +478,26 @@ class EqualizeSortDurationSessionTest {
         Thread.currentThread().interrupt();
       }
       for (int i = 0; i < steps && !isCancelled(); i++) {
+        delay();
+      }
+    }
+  }
+
+  /** Peer-constructible algorithm that sleeps so cancel can hit mid dry-run / shuffle cover. */
+  private static final class SlowPeerSort extends SortingAlgorithm {
+    SlowPeerSort(ArrayModel model) {
+      super(model, NO_OP);
+      this.name = "SlowPeerSort";
+    }
+
+    @Override
+    public void sort() {
+      try {
+        Thread.sleep(1_500);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      for (int i = 0; i < 5 && !isCancelled(); i++) {
         delay();
       }
     }

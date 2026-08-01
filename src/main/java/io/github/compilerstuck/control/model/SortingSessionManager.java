@@ -5,6 +5,7 @@ import io.github.compilerstuck.control.render.CountingDelayContext;
 import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.control.render.PrepareProgressDelayContext;
 import io.github.compilerstuck.control.render.TrackingDelayContext;
+import io.github.compilerstuck.control.shuffle.RecordedShuffle;
 import io.github.compilerstuck.control.ui.TimeEstimateFormat;
 import io.github.compilerstuck.sortingalgorithms.BogoSort;
 import io.github.compilerstuck.sortingalgorithms.GravitySort;
@@ -12,12 +13,14 @@ import io.github.compilerstuck.sortingalgorithms.SortingAlgorithm;
 import io.github.compilerstuck.sound.Sound;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -53,6 +56,13 @@ public class SortingSessionManager {
   private BooleanSupplier equalizeEnabled = () -> false;
   private DoubleSupplier equalizeTargetSec = () -> 10.0;
   private Supplier<DelayContext> productionDelayContext = () -> null;
+
+  /**
+   * When equalize cannot hit the slider target without multi-million undelayed batches, the visual
+   * pass runs with {@code delay=false} under a suspended FrameGate (full-speed CPU, live
+   * publishes).
+   */
+  private boolean equalizeFastForward;
 
   public SortingSessionManager(
       ArrayController arrayController, Sound sound, SortingStateManager stateManager) {
@@ -160,7 +170,7 @@ public class SortingSessionManager {
         }
 
         armAlgorithmToken(algorithm);
-        prepareForAlgorithm();
+        prepareForAlgorithm(algorithm);
 
         if (!stateManager.shouldContinueExecution()) {
           LOGGER.log(Level.INFO, "Sorting session cancelled by user");
@@ -226,8 +236,19 @@ public class SortingSessionManager {
     timestamps.add((int) (System.currentTimeMillis() / 1000L) - startTime);
   }
 
-  private void prepareForAlgorithm() {
+  private void prepareForAlgorithm(SortingAlgorithm algorithm) {
     sound.cutNotes();
+    stateManager.equalizePacing().clear();
+    equalizeFastForward = false;
+
+    // After a skip (or any incomplete sort) the working array is mid-permutation; always start the
+    // next shuffle from the identity so the animation begins from a fully sorted bar chart.
+    arrayController.resetArray();
+
+    if (shouldOverlapEqualizePrepare(algorithm)) {
+      prepareWithOverlappedEqualize(algorithm);
+      return;
+    }
 
     stateManager.setShuffling(true);
     try {
@@ -249,6 +270,185 @@ public class SortingSessionManager {
     arrayController.resetMeasurements();
   }
 
+  /** True when equalize dry-run can run under a shuffle visual cover (not Gravity/Bogo). */
+  private boolean shouldOverlapEqualizePrepare(SortingAlgorithm algorithm) {
+    return equalizeEnabled.getAsBoolean()
+        && algorithm != null
+        && !(algorithm instanceof BogoSort)
+        && !(algorithm instanceof GravitySort);
+  }
+
+  /**
+   * Mute-shuffle, dry-run on a clone in parallel, cover with a paced shuffle replay so Prepare..
+   * never appears on the happy path.
+   */
+  private void prepareWithOverlappedEqualize(SortingAlgorithm algorithm) {
+    // Mute capture must not run under an unsuspended gate: otherwise the render thread grants
+    // sort-speed credits nobody consumes, and replay drains that backlog in an instant.
+    stateManager.setFrameGateSuspended(true);
+    RecordedShuffle recorded;
+    CancellationToken dryToken = new CancellationToken();
+    long prepareStartNanos = System.nanoTime();
+    CompletableFuture<DryRunOutcome> dryRun;
+    try {
+      recorded = arrayController.captureMuteShuffle();
+      if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+        return;
+      }
+      dryRun = startBackgroundDryRun(algorithm, recorded.post(), dryToken, prepareStartNanos);
+    } finally {
+      FrameGate gate = frameGate;
+      if (gate != null) {
+        gate.drain();
+      }
+      // Leave suspended only if we're about to enter the paced replay below; cancel exits here.
+      if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+        stateManager.setFrameGateSuspended(false);
+      }
+    }
+
+    if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+      return;
+    }
+
+    int[] shuffled = recorded.post();
+    stateManager.setShuffling(true);
+    stateManager.setFrameGateSuspended(false);
+    try {
+      arrayController.replayRecordedShuffle(recorded);
+      joinDryRunUnderShuffleCover(dryRun, dryToken);
+    } finally {
+      stateManager.setShuffling(false);
+      sound.cutNotes();
+      FrameGate gate = frameGate;
+      if (gate != null) {
+        gate.drain();
+      }
+    }
+
+    arrayController.restoreContents(shuffled);
+
+    if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+      dryToken.cancel();
+      dryRun.cancel(true);
+      return;
+    }
+
+    DryRunOutcome outcome;
+    try {
+      outcome = dryRun.get(AppConfig.EQUALIZE_DRY_RUN_TIMEOUT_MS + 500L, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      dryToken.cancel();
+      LOGGER.log(Level.WARNING, "Equalize dry-run failed; falling back to live Prepare", e);
+      outcome = null;
+    }
+
+    float sliderTarget = (float) equalizeTargetSec.getAsDouble();
+    if (outcome == null) {
+      // Peer construction failed or dry-run crashed: sync live fallback (may show Prepare..).
+      DelayContext production = productionDelayContext.get();
+      DelayContext fallback =
+          production != null
+              ? production
+              : () -> {
+                /* no-op */
+              };
+      tryArmEqualizePacingLive(algorithm, fallback, sliderTarget);
+    } else if (!outcome.aborted()) {
+      armFromDryRunOutcome(algorithm, outcome, sliderTarget);
+    }
+
+    if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+      return;
+    }
+
+    sleepWithoutStepCredits(delayBetweenMs, "Thread interrupted during delay");
+    arrayController.resetMeasurements();
+  }
+
+  private CompletableFuture<DryRunOutcome> startBackgroundDryRun(
+      SortingAlgorithm algorithm,
+      int[] shuffled,
+      CancellationToken dryToken,
+      long prepareStartNanos) {
+    ArrayController clone = new ArrayController(shuffled.length);
+    clone.restoreContents(shuffled);
+    SortingAlgorithm peer = createPeerAlgorithm(algorithm, clone);
+    if (peer == null) {
+      return CompletableFuture.completedFuture(null);
+    }
+
+    CancellationToken sessionToken = cancellationToken;
+    long prepareTimeoutNanos = TimeUnit.MILLISECONDS.toNanos(AppConfig.EQUALIZE_DRY_RUN_TIMEOUT_MS);
+    CountingDelayContext counter =
+        new CountingDelayContext(
+            prepareStartNanos + prepareTimeoutNanos, sessionToken::isCancelled, dryToken::cancel);
+
+    return CompletableFuture.supplyAsync(
+        () -> {
+          peer.setDelayStride(1);
+          peer.setDelayContext(counter);
+          peer.setOperationReporter(OperationReporter.NOOP);
+          peer.setCancellationToken(dryToken);
+          try {
+            // CountingDelayContext does not play sound; avoid withMuted races with the session
+            // thread.
+            peer.sort();
+          } finally {
+            peer.endTiming();
+          }
+          clone.update();
+          return new DryRunOutcome(
+              counter.stepCount(),
+              counter.frameBeatCount(),
+              clone.getSortedPercentage(),
+              counter.timedOut(),
+              counter.aborted());
+        });
+  }
+
+  /**
+   * After the ~1s shuffle replay, wait for the dry-run if needed — without extending the shuffle
+   * animation/UI past {@link AppConfig#SHUFFLE_DURATION_SEC}. Suspends FrameGate and cuts MIDI.
+   */
+  private void joinDryRunUnderShuffleCover(
+      CompletableFuture<DryRunOutcome> dryRun, CancellationToken dryToken) {
+    // Suspend first so the next render frame republishes (markers cleared) instead of re-triggering
+    // noteOn from the last shuffle snapshot, then cut any note already sounding.
+    stateManager.setFrameGateSuspended(true);
+    sound.cutNotes();
+    if (dryRun.isDone()) {
+      stateManager.setFrameGateSuspended(false);
+      return;
+    }
+    // Keep shuffle label at 100% — do not stretch "Shuffling.." with prepare elapsed time.
+    stateManager.setCurrentOperation("Shuffling.. 100%");
+    try {
+      FrameGate gate = frameGate;
+      if (gate != null) {
+        gate.drain();
+      }
+      while (!dryRun.isDone()) {
+        if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+          dryToken.cancel();
+          dryRun.cancel(true);
+          break;
+        }
+        try {
+          Thread.sleep(16L);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          dryToken.cancel();
+          dryRun.cancel(true);
+          break;
+        }
+      }
+    } finally {
+      stateManager.setFrameGateSuspended(false);
+      sound.cutNotes();
+    }
+  }
+
   private void executeAlgorithm(SortingAlgorithm algorithm) {
     DelayContext production = productionDelayContext.get();
     DelayContext fallback =
@@ -258,16 +458,45 @@ public class SortingSessionManager {
               /* no-op */
             };
     try {
-      algorithm.setDelayStride(1);
-      if (tryArmEqualizePacing(algorithm, fallback)) {
+      if (!equalizeFastForward && stateManager.equalizePacing().isActive()) {
+        // Armed during overlapped prepare; keep delayStride already set on the algorithm.
         algorithm.setDelayContext(
             new TrackingDelayContext(fallback, stateManager.equalizePacing()));
-      } else {
+      } else if (!equalizeFastForward && tryArmEqualizePacing(algorithm, fallback)) {
+        algorithm.setDelayContext(
+            new TrackingDelayContext(fallback, stateManager.equalizePacing()));
+      } else if (!equalizeFastForward) {
         if (algorithm instanceof GravitySort gravity) {
           gravity.setColumnStride(1);
         }
         algorithm.setDelayStride(1);
         algorithm.setDelayContext(fallback);
+      }
+
+      if (equalizeFastForward) {
+        // Work exceeds what responsive FrameGate pacing can finish near the target — run unbound.
+        // Keep delay=true so marker side-effects (and thus audio) still run; use a no-op
+        // DelayContext
+        // so nothing waits on the FrameGate.
+        algorithm.setDelay(true);
+        algorithm.setDelayStride(1);
+        algorithm.setDelayContext(
+            () -> {
+              /* no-op */
+            });
+        stateManager.setFrameGateSuspended(true);
+        sound.cutNotes();
+        FrameGate gate = frameGate;
+        if (gate != null) {
+          gate.drain();
+        }
+        algorithm.beginTiming();
+        try {
+          algorithm.sort();
+        } finally {
+          algorithm.endTiming();
+        }
+        return;
       }
 
       algorithm.beginTiming();
@@ -277,10 +506,13 @@ public class SortingSessionManager {
         algorithm.endTiming();
       }
     } finally {
+      equalizeFastForward = false;
+      stateManager.setFrameGateSuspended(false);
       stateManager.equalizePacing().clear();
       if (algorithm instanceof GravitySort gravity) {
         gravity.setColumnStride(1);
       }
+      algorithm.setDelay(true);
       algorithm.setDelayStride(1);
       algorithm.setDelayContext(fallback);
       // Drop unused equalize credits so awaitIdle cannot stall after a short/strided run.
@@ -296,6 +528,9 @@ public class SortingSessionManager {
    * When the counted (or estimated) step total exceeds the equalize frame budget, a delay stride is
    * applied so the visual pass can still hit the slider target.
    *
+   * <p>Prefer a clone + peer algorithm (no {@code Prepare..} UI). Falls back to a live dry-run with
+   * Prepare progress when a peer cannot be constructed (e.g. test stubs).
+   *
    * @return true when equalize pacing was armed for the visual pass
    */
   boolean tryArmEqualizePacing(SortingAlgorithm algorithm, DelayContext production) {
@@ -308,6 +543,9 @@ public class SortingSessionManager {
     }
     if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
       return false;
+    }
+    if (stateManager.equalizePacing().isActive()) {
+      return true;
     }
 
     float sliderTarget = (float) equalizeTargetSec.getAsDouble();
@@ -335,6 +573,30 @@ public class SortingSessionManager {
       return armEqualize(algorithm.getName(), visualBeats, visualBeats, sliderTarget, 0);
     }
 
+    int[] snapshot = Arrays.copyOf(arrayController.getArray(), arrayController.getLength());
+    ArrayController clone = new ArrayController(snapshot.length);
+    clone.restoreContents(snapshot);
+    SortingAlgorithm peer = createPeerAlgorithm(algorithm, clone);
+    if (peer != null) {
+      DryRunOutcome outcome = runDryRunOn(peer, clone, /* reportPrepare= */ false);
+      if (outcome == null || outcome.aborted()) {
+        return false;
+      }
+      if (!stateManager.shouldContinueExecution() || cancellationToken.isCancelled()) {
+        return false;
+      }
+      return armFromDryRunOutcome(algorithm, outcome, sliderTarget);
+    }
+
+    return tryArmEqualizePacingLive(algorithm, production, sliderTarget);
+  }
+
+  /**
+   * Live-array dry-run with {@code Prepare..} progress. Used when a peer algorithm cannot be
+   * constructed.
+   */
+  private boolean tryArmEqualizePacingLive(
+      SortingAlgorithm algorithm, DelayContext production, float sliderTarget) {
     int[] snapshot = Arrays.copyOf(arrayController.getArray(), arrayController.getLength());
     OperationReporter previousReporter = stateManager::setCurrentOperation;
     CancellationToken dryToken = new CancellationToken();
@@ -368,6 +630,8 @@ public class SortingSessionManager {
     long partialSteps = 0L;
     long partialFrameBeats = 0L;
     double progressSample = 0d;
+    boolean timedOut;
+    boolean aborted;
     try {
       sound.withMuted(algorithm::sort);
       progressCounter.complete();
@@ -375,6 +639,8 @@ public class SortingSessionManager {
       // Sample progress before restore so timeout extrapolation sees dry-run work.
       partialSteps = counter.stepCount();
       partialFrameBeats = counter.frameBeatCount();
+      timedOut = counter.timedOut();
+      aborted = counter.aborted();
       arrayController.update();
       progressSample = arrayController.getSortedPercentage();
 
@@ -394,27 +660,108 @@ public class SortingSessionManager {
     if (sessionToken.isCancelled() || !stateManager.shouldContinueExecution()) {
       return false;
     }
-    if (counter.aborted()) {
+    if (aborted) {
       return false;
     }
 
+    return armFromDryRunOutcome(
+        algorithm,
+        new DryRunOutcome(partialSteps, partialFrameBeats, progressSample, timedOut, false),
+        sliderTarget);
+  }
+
+  private DryRunOutcome runDryRunOn(
+      SortingAlgorithm peer, ArrayController target, boolean reportPrepare) {
+    CancellationToken dryToken = new CancellationToken();
+    CancellationToken sessionToken = cancellationToken;
+    long prepareStartNanos = System.nanoTime();
+    long prepareTimeoutNanos = TimeUnit.MILLISECONDS.toNanos(AppConfig.EQUALIZE_DRY_RUN_TIMEOUT_MS);
+    CountingDelayContext counter =
+        new CountingDelayContext(
+            prepareStartNanos + prepareTimeoutNanos, sessionToken::isCancelled, dryToken::cancel);
+    DelayContext delays = counter;
+    if (reportPrepare) {
+      delays =
+          new PrepareProgressDelayContext(
+              counter,
+              prepareStartNanos,
+              prepareTimeoutNanos,
+              stateManager::setCurrentOperation,
+              stateManager::setEqualizePrepareProgress);
+    }
+
+    peer.setDelayStride(1);
+    stateManager.setFrameGateSuspended(true);
+    if (reportPrepare) {
+      stateManager.setEqualizePreparing(true);
+    }
+    FrameGate gate = frameGate;
+    if (gate != null) {
+      gate.drain();
+    }
+
+    peer.setDelayContext(delays);
+    peer.setOperationReporter(OperationReporter.NOOP);
+    peer.setCancellationToken(dryToken);
+    try {
+      sound.withMuted(peer::sort);
+      if (delays instanceof PrepareProgressDelayContext progress) {
+        progress.complete();
+      }
+    } finally {
+      peer.endTiming();
+      if (gate != null) {
+        gate.drain();
+      }
+      if (reportPrepare) {
+        stateManager.setEqualizePreparing(false);
+      }
+      stateManager.setFrameGateSuspended(false);
+    }
+
+    if (sessionToken.isCancelled() || !stateManager.shouldContinueExecution()) {
+      return new DryRunOutcome(0, 0, 0, false, true);
+    }
+    target.update();
+    return new DryRunOutcome(
+        counter.stepCount(),
+        counter.frameBeatCount(),
+        target.getSortedPercentage(),
+        counter.timedOut(),
+        counter.aborted());
+  }
+
+  private boolean armFromDryRunOutcome(
+      SortingAlgorithm algorithm, DryRunOutcome outcome, float sliderTarget) {
     int n = arrayController.getLength();
-    long rawSteps = estimateRawSteps(counter.timedOut(), partialSteps, progressSample, n);
+    long rawSteps =
+        estimateRawSteps(outcome.timedOut(), outcome.partialSteps(), outcome.progressSample(), n);
     if (rawSteps <= 0) {
       return false;
     }
 
     DelayStridePlan plan = planDelayStride(rawSteps, sliderTarget);
+    if (plan.fastForward()) {
+      equalizeFastForward = true;
+      algorithm.setDelayStride(1);
+      LOGGER.log(
+          Level.INFO,
+          "Equalize fast-forward for {0}: rawSteps={1} exceeds responsive budget for {2}s target",
+          new Object[] {algorithm.getName(), rawSteps, sliderTarget});
+      return false;
+    }
+
     int stride = plan.stride();
     int visualSteps = plan.visualSteps();
 
-    long rawFrameBeats = partialFrameBeats;
-    if (counter.timedOut() && partialFrameBeats > 0L && partialSteps > 0L) {
-      // Scale frame-beat estimate in the same proportion as steps when extrapolating.
+    long rawFrameBeats = outcome.partialFrameBeats();
+    if (outcome.timedOut() && outcome.partialFrameBeats() > 0L && outcome.partialSteps() > 0L) {
       rawFrameBeats =
           Math.max(
-              partialFrameBeats,
-              Math.round(partialFrameBeats * ((double) rawSteps / (double) partialSteps)));
+              outcome.partialFrameBeats(),
+              Math.round(
+                  outcome.partialFrameBeats()
+                      * ((double) rawSteps / (double) outcome.partialSteps())));
     }
     int visualFrameBeats = 0;
     if (rawFrameBeats > 0L) {
@@ -422,7 +769,7 @@ public class SortingSessionManager {
     }
 
     algorithm.setDelayStride(stride);
-    if (counter.timedOut()) {
+    if (outcome.timedOut()) {
       LOGGER.log(
           Level.INFO,
           "Equalize dry-run timed out for {0}; estimated steps={1}, stride={2}, visualSteps={3}, maxSteps/frame={4}",
@@ -441,13 +788,45 @@ public class SortingSessionManager {
   }
 
   /**
+   * Constructs a fresh algorithm instance bound to {@code model} via the standard {@code
+   * (ArrayModel)} constructor. Returns null when that ctor is unavailable (test stubs).
+   */
+  static SortingAlgorithm createPeerAlgorithm(SortingAlgorithm prototype, ArrayModel model) {
+    if (prototype == null || model == null) {
+      return null;
+    }
+    try {
+      Constructor<? extends SortingAlgorithm> ctor =
+          prototype.getClass().getConstructor(ArrayModel.class);
+      SortingAlgorithm peer = ctor.newInstance(model);
+      if (prototype.getAlternativeSize() != 0) {
+        peer.setAlternativeSize(prototype.getAlternativeSize());
+      }
+      return peer;
+    } catch (ReflectiveOperationException e) {
+      return null;
+    }
+  }
+
+  /** Counts collected by a silent equalize dry-run. */
+  record DryRunOutcome(
+      long partialSteps,
+      long partialFrameBeats,
+      double progressSample,
+      boolean timedOut,
+      boolean aborted) {}
+
+  /**
    * Chooses delay stride so equalize can hit {@code sliderTarget}.
    *
    * <ul>
    *   <li>If {@code rawSteps} fits in {@code EQUALIZE_MAX_STEPS_PER_FRAME × 60 × target}, stride is
    *       1 and multi-credit frames are used.
-   *   <li>Otherwise stride is {@code ceil(rawSteps / (60 × target))} (one visual beat per frame)
-   *       and grants are capped at 1 so {@code awaitIdle} cannot stall on leftover credits.
+   *   <li>Otherwise stride is {@code ceil(rawSteps / (60 × target))}, capped at {@link
+   *       AppConfig#EQUALIZE_MAX_DELAY_STRIDE}. When the cap binds, multiple credits per frame are
+   *       allowed (up to the work budget) so the run can still approach the target.
+   *   <li>If even {@link AppConfig#EQUALIZE_MAX_WORK_PER_FRAME} × frameBudget cannot cover {@code
+   *       rawSteps}, {@link DelayStridePlan#fastForward()} is set — caller should run unbound.
    * </ul>
    */
   static DelayStridePlan planDelayStride(long rawSteps, float sliderTarget) {
@@ -457,15 +836,34 @@ public class SortingSessionManager {
     long highThroughputBudget = (long) AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME * frameBudget;
     if (rawSteps <= highThroughputBudget) {
       return new DelayStridePlan(
-          1, clampToInt(rawSteps), AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME, highThroughputBudget);
+          1,
+          clampToInt(rawSteps),
+          AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME,
+          highThroughputBudget,
+          false);
     }
-    int stride = clampToInt(Math.max(1L, (rawSteps + frameBudget - 1L) / frameBudget));
+
+    long maxWork = (long) AppConfig.EQUALIZE_MAX_WORK_PER_FRAME * frameBudget;
+    if (rawSteps > maxWork) {
+      // Cannot finish near the target without multi-million batches per frame.
+      return new DelayStridePlan(1, 1, 1, frameBudget, true);
+    }
+
+    int idealStride = clampToInt(Math.max(1L, (rawSteps + frameBudget - 1L) / frameBudget));
+    int stride = Math.min(idealStride, AppConfig.EQUALIZE_MAX_DELAY_STRIDE);
     int visualSteps = clampToInt(Math.max(1L, (rawSteps + (long) stride - 1L) / stride));
-    return new DelayStridePlan(stride, visualSteps, 1, frameBudget);
+    int maxStepsPerFrame = 1;
+    if (stride < idealStride) {
+      int needed = clampToInt(Math.max(1L, ((long) visualSteps + frameBudget - 1L) / frameBudget));
+      int byWork = Math.max(1, AppConfig.EQUALIZE_MAX_WORK_PER_FRAME / Math.max(1, stride));
+      maxStepsPerFrame = Math.min(needed, byWork);
+    }
+    return new DelayStridePlan(stride, visualSteps, maxStepsPerFrame, frameBudget, false);
   }
 
   /** Result of {@link #planDelayStride(long, float)}. */
-  record DelayStridePlan(int stride, int visualSteps, int maxStepsPerFrame, long budget) {}
+  record DelayStridePlan(
+      int stride, int visualSteps, int maxStepsPerFrame, long budget, boolean fastForward) {}
 
   /**
    * Raw delay count for equalize arming. Completed dry-runs keep the counted total.
@@ -479,6 +877,10 @@ public class SortingSessionManager {
    *       sorted progress (floored at {@code n}) so we do not arm a Bubble-sized stride that skips
    *       almost every real delay and stalls {@code FrameGate.awaitIdle}.
    * </ul>
+   *
+   * <p>{@code n log n} sorts (Merge/Quick/…) are expected to finish the dry-run inside the timeout
+   * with an exact count ({@code timedOut == false}); do not apply the Bubble bound to a partial
+   * mid-run sample.
    */
   static long estimateRawSteps(boolean timedOut, long partialSteps, double progressSample, int n) {
     if (!timedOut) {

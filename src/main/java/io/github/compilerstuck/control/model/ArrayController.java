@@ -5,9 +5,13 @@ import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.render.DelayContext;
 import io.github.compilerstuck.control.shuffle.AlmostSortedShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.RandomShuffleStrategy;
+import io.github.compilerstuck.control.shuffle.RecordedShuffle;
 import io.github.compilerstuck.control.shuffle.ReverseShuffleStrategy;
 import io.github.compilerstuck.control.shuffle.SortedShuffleStrategy;
+import io.github.compilerstuck.control.shuffle.SwapRecordingModel;
 import io.github.compilerstuck.visual.Marker;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ArrayController implements ArrayModel {
@@ -265,6 +269,64 @@ public class ArrayController implements ArrayModel {
     shuffleStrategy.shuffle(this, delayContext, operationReporter, cancellationToken);
     markMetricsDirty();
     bumpVisualRevision();
+  }
+
+  /**
+   * Runs the configured shuffle with no pacing, recording swap pairs so {@link
+   * #replayRecordedShuffle(RecordedShuffle)} can animate the same permutation.
+   */
+  public RecordedShuffle captureMuteShuffle() {
+    int[] pre = Arrays.copyOf(array, length);
+    if (cancellationToken.isCancelled()) {
+      return new RecordedShuffle(pre, pre, new int[0]);
+    }
+    List<Integer> pairs = SwapRecordingModel.newPairList();
+    SwapRecordingModel recorder = new SwapRecordingModel(this, pairs);
+    DelayContext noop =
+        () -> {
+          /* mute */
+        };
+    shuffleStrategy.shuffle(recorder, noop, OperationReporter.NOOP, cancellationToken);
+    markMetricsDirty();
+    bumpVisualRevision();
+    int[] post = Arrays.copyOf(array, length);
+    return new RecordedShuffle(pre, post, recorder.swapPairsArray());
+  }
+
+  /**
+   * Restores the pre-shuffle state, replays recorded swaps (or a marker sweep) with the current
+   * {@link DelayContext}, then forces the post-shuffle permutation.
+   */
+  public void replayRecordedShuffle(RecordedShuffle recorded) {
+    if (recorded == null) {
+      throw new IllegalArgumentException("recorded");
+    }
+    if (recorded.length() != length) {
+      throw new IllegalArgumentException("recording length must match array length");
+    }
+    restoreContents(recorded.pre());
+    int swaps = recorded.swapCount();
+    if (swaps == 0) {
+      int n = Math.max(1, length);
+      for (int i = 0; i < length && !cancellationToken.isCancelled(); i++) {
+        setMarker(i, Marker.SET);
+        int denom = Math.max(1, n - 1);
+        operationReporter.report("Shuffling.. " + (int) ((double) i / denom * 100) + "%");
+        RandomShuffleStrategy.maybeDelay(delayContext, i, n);
+      }
+    } else {
+      for (int s = 0; s < swaps && !cancellationToken.isCancelled(); s++) {
+        int i = recorded.swapI(s);
+        int j = recorded.swapJ(s);
+        swap(i, j);
+        setMarker(i, Marker.SET);
+        setMarker(j, Marker.SET);
+        int denom = Math.max(1, swaps - 1);
+        operationReporter.report("Shuffling.. " + (int) ((double) s / denom * 100) + "%");
+        RandomShuffleStrategy.maybeDelay(delayContext, s, swaps);
+      }
+    }
+    restoreContents(recorded.post());
   }
 
   public void setDelayContext(DelayContext delayContext) {

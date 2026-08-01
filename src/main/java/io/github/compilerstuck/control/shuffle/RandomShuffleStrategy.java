@@ -30,7 +30,7 @@ public class RandomShuffleStrategy implements ShuffleStrategy {
    * steps (0-based index {@code i}). Small loops fire multiple delays per step so total pacing
    * stays ~1s.
    */
-  static void maybeDelay(DelayContext ctx, int i, int iterations) {
+  public static void maybeDelay(DelayContext ctx, int i, int iterations) {
     int steps = AppConfig.SHUFFLE_VISUAL_STEPS;
     int n = Math.max(1, iterations);
     int due = (int) ((long) (i + 1) * steps / n);
