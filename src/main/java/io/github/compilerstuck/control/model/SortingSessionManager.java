@@ -475,7 +475,8 @@ public class SortingSessionManager {
 
       if (equalizeFastForward) {
         // Work exceeds what responsive FrameGate pacing can finish near the target — run unbound.
-        // Keep delay=true so marker side-effects (and thus audio) still run; use a no-op DelayContext
+        // Keep delay=true so marker side-effects (and thus audio) still run; use a no-op
+        // DelayContext
         // so nothing waits on the FrameGate.
         algorithm.setDelay(true);
         algorithm.setDelayStride(1);
