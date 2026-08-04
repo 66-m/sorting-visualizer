@@ -1,20 +1,26 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
+import atlantafx.base.theme.Styles;
+import io.github.compilerstuck.control.ui.settingsfx.vm.AudioSettingsViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tooltip;
 
-/** Sound effects checkbox bound to {@link SoundViewModel}. */
+/**
+ * Sound effects checkbox bound to {@link SoundViewModel}, plus an "Audio Settings…" button that
+ * opens {@link AudioSettingsDialog} for MIDI voice/level/pitch customization.
+ */
 public final class SoundSection {
 
   public static final String ROOT_ID = "section-sound";
+  public static final String AUDIO_SETTINGS_BUTTON_ID = "audio-settings-button";
 
   private SoundSection() {}
 
-  public static Node build(SoundViewModel vm) {
+  public static Node build(SoundViewModel vm, AudioSettingsViewModel audioSettingsVm) {
     CheckBox soundEffects = new CheckBox(SettingsStrings.SOUND_EFFECTS);
-    soundEffects.setId(ROOT_ID);
     soundEffects.setTooltip(new Tooltip(SettingsStrings.SOUND_EFFECTS_TOOLTIP));
     soundEffects.setSelected(vm.isSoundEnabled());
     soundEffects
@@ -43,6 +49,15 @@ public final class SoundSection {
         vm::addPropertyChangeListener,
         SoundViewModel.PROP_INPUTS_ENABLED);
 
-    return soundEffects;
+    Button audioSettings = new Button(SettingsStrings.AUDIO_SETTINGS_BUTTON);
+    audioSettings.setId(AUDIO_SETTINGS_BUTTON_ID);
+    audioSettings.getStyleClass().addAll(Styles.BUTTON_OUTLINED, Styles.SMALL);
+    audioSettings.setTooltip(new Tooltip(SettingsStrings.AUDIO_SETTINGS_TOOLTIP));
+    audioSettings.setOnAction(
+        e -> AudioSettingsDialog.show(audioSettings.getScene().getWindow(), audioSettingsVm));
+
+    Node root = SettingsControls.controlWithAction(soundEffects, audioSettings);
+    root.setId(ROOT_ID);
+    return root;
   }
 }

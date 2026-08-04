@@ -108,10 +108,6 @@
 }
 
 .run-all-order-content {
-  -fx-spacing: 12;
-}
-
-.run-all-order-section {
   -fx-spacing: 8;
 }
 
@@ -125,11 +121,15 @@
 
 .settings-run-all-order-list {
   -fx-background-insets: 0;
-  -fx-background-radius: 6;
-  -fx-border-color: -color-border-default;
-  -fx-border-radius: 6;
-  -fx-border-width: 1;
-  -fx-padding: 4;
+  -fx-background-color: transparent;
+  -fx-background-radius: 0;
+  -fx-border-color: transparent;
+  -fx-border-width: 0;
+  -fx-padding: 0;
+}
+
+.settings-run-all-order-list > .virtual-flow {
+  -fx-background-color: transparent;
 }
 
 .settings-run-all-order-list .list-cell {
@@ -211,6 +211,21 @@
   -fx-padding: 0 0 2 0;
 }
 
+/* Card-grouped section chrome, shared by visualization customize panels and Audio Settings. */
+.settings-form-card {
+  -fx-spacing: 10;
+  -fx-padding: 14;
+  -fx-background-color: -color-bg-subtle;
+  -fx-background-radius: 8;
+  -fx-border-color: -color-border-default;
+  -fx-border-radius: 8;
+  -fx-border-width: 1;
+}
+
+.settings-form-stack {
+  -fx-spacing: 18;
+}
+
 .customize-field-grid {
   -fx-padding: 0;
 }
@@ -239,4 +254,51 @@
 .customize-import-text {
   -fx-font-family: monospace;
   -fx-font-size: 0.9em;
+}
+
+.customize-icon-reset {
+  -fx-padding: 2 0 2 0;
+  -fx-min-width: 28;
+  -fx-pref-width: 28;
+  -fx-max-width: 28;
+  -fx-font-size: 0.95em;
+  -fx-alignment: center;
+}
+
+/* --- Audio Settings dialog: collapsible Advanced section + instrument stepper (audio-only) --- */
+#audio-settings-dialog .titled-pane {
+  -fx-background-color: transparent;
+}
+
+#audio-settings-dialog .titled-pane > .title {
+  -fx-background-color: -color-bg-subtle;
+  -fx-background-radius: 8;
+  -fx-border-color: -color-border-default;
+  -fx-border-radius: 8;
+  -fx-border-width: 1;
+  -fx-padding: 8 12;
+}
+
+#audio-settings-dialog .titled-pane:expanded > .title {
+  -fx-background-radius: 8 8 0 0;
+  -fx-border-radius: 8 8 0 0;
+  -fx-border-width: 1 1 0 1;
+}
+
+#audio-settings-dialog .titled-pane > *.content {
+  -fx-background-color: -color-bg-subtle;
+  -fx-background-radius: 0 0 8 8;
+  -fx-border-color: -color-border-default;
+  -fx-border-width: 0 1 1 1;
+  -fx-border-radius: 0 0 8 8;
+  -fx-padding: 12 14 14 14;
+}
+
+.audio-instrument-stepper {
+  -fx-spacing: 1;
+}
+
+.audio-instrument-stepper .button {
+  -fx-padding: 0 6 0 6;
+  -fx-font-size: 0.7em;
 }

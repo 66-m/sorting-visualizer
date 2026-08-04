@@ -59,11 +59,20 @@ public final class ArraySizeViewModel {
     return size > SettingsDefaults.ARRAY_SIZE_MIN;
   }
 
+  /** Live preview while dragging; resizes without writing preferences. */
   public void setSizeFromSlider(int requested) {
     if (!inputsEnabled) {
       return;
     }
-    applyFitted(fit(requested));
+    applyFitted(fit(requested), false);
+  }
+
+  /** Writes the current size to preferences once the slider is released. */
+  public void commitSizeFromSlider() {
+    if (!inputsEnabled) {
+      return;
+    }
+    app.flushPreferences();
   }
 
   /** Updates the text buffer and validity without applying to AppContext. */
@@ -93,7 +102,7 @@ public final class ArraySizeViewModel {
       return false;
     }
     int value = Integer.parseInt(text);
-    applyFitted(fit(value));
+    applyFitted(fit(value), true);
     return true;
   }
 
@@ -168,7 +177,7 @@ public final class ArraySizeViewModel {
     pcs.firePropertyChange(PROP_HIGH_SIZE_WARNING, old, warn);
   }
 
-  private void applyFitted(int fitted) {
+  private void applyFitted(int fitted, boolean persist) {
     if (app.isRunning()) {
       return;
     }
@@ -180,6 +189,9 @@ public final class ArraySizeViewModel {
     textValid = true;
     validationMessage = "";
     app.updateArraySize(fitted);
+    if (persist) {
+      app.flushPreferences();
+    }
     updateHighSizeWarning(oldSize, fitted);
     pcs.firePropertyChange(PROP_SIZE, oldSize, size);
     pcs.firePropertyChange(PROP_TEXT, oldText, text);

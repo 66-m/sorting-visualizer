@@ -1,5 +1,6 @@
 package io.github.compilerstuck.control.ui.settingsfx;
 
+import io.github.compilerstuck.control.ui.settingsfx.vm.AudioSettingsViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
@@ -21,7 +22,10 @@ public final class OptionsSection {
   private OptionsSection() {}
 
   public static Node build(
-      DisplayViewModel displayVm, SoundViewModel soundVm, DebugViewModel debugVm) {
+      DisplayViewModel displayVm,
+      SoundViewModel soundVm,
+      AudioSettingsViewModel audioSettingsVm,
+      DebugViewModel debugVm) {
     CheckBox measurements = new CheckBox(SettingsStrings.SHOW_MEASUREMENTS);
     measurements.setTooltip(new Tooltip(SettingsStrings.SHOW_MEASUREMENTS_TOOLTIP));
     measurements.setSelected(displayVm.isPrintMeasurements());
@@ -61,7 +65,7 @@ public final class OptionsSection {
     VBox display = new VBox(SettingsLayout.GAP_SM, measurements, comparison, startDelay);
     display.setId(DisplaySection.ROOT_ID);
 
-    Node sound = SoundSection.build(soundVm);
+    Node sound = SoundSection.build(soundVm, audioSettingsVm);
     Node debug = DebugSection.build(debugVm);
 
     displayVm.addPropertyChangeListener(

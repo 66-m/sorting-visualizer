@@ -1,4 +1,4 @@
-package io.github.compilerstuck.control.config.visual.json;
+package io.github.compilerstuck.control.config.json;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

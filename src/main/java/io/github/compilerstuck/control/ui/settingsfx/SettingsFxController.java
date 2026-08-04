@@ -8,6 +8,7 @@ import io.github.compilerstuck.control.ui.AppIcons;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppearanceViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.ArraySizeViewModel;
+import io.github.compilerstuck.control.ui.settingsfx.vm.AudioSettingsViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
@@ -57,6 +58,7 @@ public final class SettingsFxController implements SettingsBridge {
   private boolean contentReady;
 
   private SoundViewModel soundVm;
+  private AudioSettingsViewModel audioSettingsVm;
   private SpeedViewModel speedVm;
   private DisplayViewModel displayVm;
   private DebugViewModel debugVm;
@@ -243,7 +245,7 @@ public final class SettingsFxController implements SettingsBridge {
                 SpeedSection.build(speedVm, displayVm),
                 VisualizationSection.build(visualizationVm),
                 AppearanceSection.build(appearanceVm),
-                OptionsSection.build(displayVm, soundVm, debugVm)));
+                OptionsSection.build(displayVm, soundVm, audioSettingsVm, debugVm)));
 
     progressBar = shell.progress();
     runButton = shell.run();
@@ -305,6 +307,7 @@ public final class SettingsFxController implements SettingsBridge {
     appearanceVm = new AppearanceViewModel(appContext);
     displayVm = new DisplayViewModel(appContext);
     soundVm = new SoundViewModel(appContext);
+    audioSettingsVm = new AudioSettingsViewModel(appContext);
     debugVm = new DebugViewModel(appContext);
 
     arraySizeVm.addPropertyChangeListener(

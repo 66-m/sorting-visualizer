@@ -5,6 +5,7 @@ import io.github.compilerstuck.control.config.RunAllEntryPref;
 import io.github.compilerstuck.control.config.SettingsDefaults;
 import io.github.compilerstuck.control.config.ShuffleType;
 import io.github.compilerstuck.control.config.UserPreferences;
+import io.github.compilerstuck.control.config.audio.AudioSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.model.ArrayController;
 import io.github.compilerstuck.control.model.ArrayModel;
@@ -87,11 +88,23 @@ public final class AppContext {
     return preferences;
   }
 
+  /** Full shutdown sync: writes every session-backed field, then flushes to disk. */
   public void persistPreferences() {
+    flushPreferences();
+  }
+
+  /** Syncs in-memory session state into {@link #preferences}, then saves. Single save path. */
+  public void flushPreferences() {
+    syncSessionToPreferences();
+    preferences.save();
+  }
+
+  private void syncSessionToPreferences() {
     preferences.setArraySize(size);
     preferences.setSpeedLevel(speedLevel);
     if (sound != null) {
       preferences.setMuted(sound.isMuted());
+      preferences.setAudioSettings(sound.getSettings());
     }
     preferences.setShuffleType(arrayController.getShuffleType());
     preferences.setPrintMeasurements(stateManager.shouldPrintMeasurements());
@@ -109,7 +122,6 @@ public final class AppContext {
         preferences.setGradientColor2Rgb(colorGradient.getColor2().getRGB());
       }
     }
-    preferences.save();
   }
 
   public ArrayController getArrayController() {
@@ -170,7 +182,7 @@ public final class AppContext {
     this.speedLevel = SettingsDefaults.clampSpeedLevel(level1to10);
     applySpeedLevel();
     preferences.setSpeedLevel(this.speedLevel);
-    preferences.save();
+    flushPreferences();
   }
 
   private void applySpeedLevel() {
@@ -183,6 +195,7 @@ public final class AppContext {
 
   public void setSound(Sound sound) {
     this.sound = sound != null ? sound : new SilentSound(arrayController);
+    this.sound.applySettings(preferences.getAudioSettings());
   }
 
   public ColorGradient getColorGradient() {
@@ -201,7 +214,7 @@ public final class AppContext {
       if (this.colorGradient.getColor2() != null) {
         preferences.setGradientColor2Rgb(this.colorGradient.getColor2().getRGB());
       }
-      preferences.save();
+      flushPreferences();
     }
     if (visualization != null && this.colorGradient != null) {
       visualization.updateColorGradient(this.colorGradient);
@@ -222,7 +235,7 @@ public final class AppContext {
 
   public void setVisualizationId(String id) {
     preferences.setVisualizationId(id);
-    preferences.save();
+    flushPreferences();
   }
 
   /** Persists per-visualization appearance settings (JSON map in prefs). */
@@ -231,18 +244,18 @@ public final class AppContext {
       return;
     }
     preferences.putVisualSettings(settings);
-    preferences.save();
+    flushPreferences();
   }
 
   /** Clears all persisted visualization customizations. */
   public void clearAllVisualizationSettings() {
     preferences.clearVisualSettings();
-    preferences.save();
+    flushPreferences();
   }
 
   public void setAlgorithmId(String id) {
     preferences.setAlgorithmId(id);
-    preferences.save();
+    flushPreferences();
   }
 
   public void setMuted(boolean muted) {
@@ -250,7 +263,20 @@ public final class AppContext {
       sound.setIsMuted(muted);
     }
     preferences.setMuted(muted);
-    preferences.save();
+    flushPreferences();
+  }
+
+  public AudioSettings getAudioSettings() {
+    return sound != null ? sound.getSettings() : preferences.getAudioSettings();
+  }
+
+  public void setAudioSettings(AudioSettings settings) {
+    AudioSettings next = settings != null ? settings : AudioSettings.defaults();
+    if (sound != null) {
+      sound.applySettings(next);
+    }
+    preferences.setAudioSettings(next);
+    flushPreferences();
   }
 
   public List<SortingAlgorithm> getAlgorithms() {
@@ -318,8 +344,6 @@ public final class AppContext {
         visualization.updateColorGradient(colorGradient);
       }
     }
-    preferences.setArraySize(newSize);
-    preferences.save();
   }
 
   public void setStart(boolean shouldStart) {
@@ -361,13 +385,13 @@ public final class AppContext {
   public void setShowComparisonTable(boolean show) {
     stateManager.setShowComparisonTable(show);
     preferences.setShowComparisonTable(show);
-    preferences.save();
+    flushPreferences();
   }
 
   public void setPrintMeasurements(boolean print) {
     stateManager.setPrintMeasurements(print);
     preferences.setPrintMeasurements(print);
-    preferences.save();
+    flushPreferences();
   }
 
   public boolean isPerfStatsEnabled() {
@@ -377,7 +401,7 @@ public final class AppContext {
   public void setPerfStatsEnabled(boolean enabled) {
     perfStatsEnabled = enabled;
     preferences.setPerfStats(enabled);
-    preferences.save();
+    flushPreferences();
   }
 
   public boolean isFiveSecondStartDelay() {
@@ -387,7 +411,7 @@ public final class AppContext {
   public void setFiveSecondStartDelay(boolean enabled) {
     fiveSecondStartDelay = enabled;
     preferences.setFiveSecondStartDelay(enabled);
-    preferences.save();
+    flushPreferences();
   }
 
   public boolean isEqualizeSortDuration() {
@@ -397,7 +421,7 @@ public final class AppContext {
   public void setEqualizeSortDuration(boolean enabled) {
     equalizeSortDuration = enabled;
     preferences.setEqualizeSortDuration(enabled);
-    preferences.save();
+    flushPreferences();
   }
 
   public CanvasBackground getCanvasBackground() {
@@ -412,7 +436,7 @@ public final class AppContext {
     }
     canvasBackground = next;
     preferences.setCanvasBackground(next);
-    preferences.save();
+    flushPreferences();
     applyCanvasBackgroundToGradient();
     applyCanvasBackgroundToRenderSystem();
   }
@@ -435,12 +459,12 @@ public final class AppContext {
   public void setShuffleType(ShuffleType shuffleType) {
     arrayController.setShuffleType(shuffleType);
     preferences.setShuffleType(shuffleType);
-    preferences.save();
+    flushPreferences();
   }
 
   public void setImagePath(String path) {
     preferences.setImagePath(path != null ? path : "");
-    preferences.save();
+    flushPreferences();
   }
 
   public ImageRepository getImageRepository() {
@@ -488,7 +512,7 @@ public final class AppContext {
   public void persistRunAll(boolean runAll, List<RunAllEntryPref> entries) {
     preferences.setRunAll(runAll);
     preferences.setRunAllEntries(entries);
-    preferences.save();
+    flushPreferences();
   }
 
   public void shutdown() {

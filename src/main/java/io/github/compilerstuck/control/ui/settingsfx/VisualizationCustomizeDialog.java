@@ -11,12 +11,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.Clipboard;
@@ -37,12 +38,6 @@ public final class VisualizationCustomizeDialog {
   public static final String DISCARD_CONFIRM_ID = "visualization-customize-discard-confirm";
   public static final String IMPORT_DIALOG_ID = "visualization-customize-import-dialog";
   public static final String IMPORT_TEXT_ID = "visualization-customize-import-text";
-
-  private enum UnsavedCloseChoice {
-    SAVE,
-    DISCARD,
-    CANCEL
-  }
 
   private VisualizationCustomizeDialog() {}
 
@@ -92,12 +87,14 @@ public final class VisualizationCustomizeDialog {
     ButtonType applyType = new ButtonType(SettingsStrings.APPLY, ButtonBar.ButtonData.APPLY);
     ButtonType closeType = new ButtonType(SettingsStrings.CLOSE, ButtonBar.ButtonData.CANCEL_CLOSE);
     ButtonType resetType = new ButtonType(SettingsStrings.RESET_ALL, ButtonBar.ButtonData.LEFT);
-    ButtonType importType = new ButtonType(SettingsStrings.IMPORT, ButtonBar.ButtonData.LEFT);
-    ButtonType exportType = new ButtonType(SettingsStrings.EXPORT, ButtonBar.ButtonData.LEFT);
-    dialog
-        .getDialogPane()
-        .getButtonTypes()
-        .addAll(closeType, resetType, exportType, importType, applyType);
+    dialog.getDialogPane().getButtonTypes().addAll(closeType, resetType, applyType);
+
+    MenuItem exportItem = new MenuItem(SettingsStrings.EXPORT);
+    MenuItem importItem = new MenuItem(SettingsStrings.IMPORT);
+    MenuButton exportImportMenu =
+        new MenuButton(SettingsStrings.EXPORT_IMPORT_MENU, null, exportItem, importItem);
+    exportImportMenu.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    ButtonBar.setButtonData(exportImportMenu, ButtonBar.ButtonData.LEFT);
 
     Button applyButton = (Button) dialog.getDialogPane().lookupButton(applyType);
     applyButton.getStyleClass().add(Styles.ACCENT);
@@ -126,12 +123,8 @@ public final class VisualizationCustomizeDialog {
           clearStatus(status);
         });
 
-    Button importButton = (Button) dialog.getDialogPane().lookupButton(importType);
-    importButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-    importButton.addEventFilter(
-        javafx.event.ActionEvent.ACTION,
+    importItem.setOnAction(
         e -> {
-          e.consume();
           Optional<VisualizationSettingsCodec.DecodeResult> imported =
               showImportDialog(dialog.getDialogPane().getScene().getWindow(), vm.getSelectedId());
           if (imported.isEmpty()) {
@@ -146,12 +139,8 @@ public final class VisualizationCustomizeDialog {
           }
         });
 
-    Button exportButton = (Button) dialog.getDialogPane().lookupButton(exportType);
-    exportButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-    exportButton.addEventFilter(
-        javafx.event.ActionEvent.ACTION,
+    exportItem.setOnAction(
         e -> {
-          e.consume();
           String json = VisualizationSettingsCodec.encodeEnvelope(panel.toSettings());
           ClipboardContent contentClip = new ClipboardContent();
           contentClip.putString(json);
@@ -177,6 +166,13 @@ public final class VisualizationCustomizeDialog {
                   closeEvent.consume();
                 }
               });
+          Node barNode = dialog.getDialogPane().lookup(".button-bar");
+          if (barNode instanceof ButtonBar bar) {
+            bar.setButtonOrder("L+CA");
+            if (!bar.getButtons().contains(exportImportMenu)) {
+              bar.getButtons().add(exportImportMenu);
+            }
+          }
         });
 
     // Close: same dirty confirmation as the window X.
@@ -211,8 +207,11 @@ public final class VisualizationCustomizeDialog {
     if (!isDirty(panel, baseline)) {
       return true;
     }
-    UnsavedCloseChoice choice =
-        askUnsavedCloseChoice(dialog.getDialogPane().getScene().getWindow());
+    UnsavedChangesDialog.Choice choice =
+        UnsavedChangesDialog.ask(
+            dialog.getDialogPane().getScene().getWindow(),
+            DISCARD_CONFIRM_ID,
+            SettingsStrings.CUSTOMIZE_UNSAVED_MESSAGE);
     return switch (choice) {
       case SAVE -> {
         if (!panel.isValid()) {
@@ -342,69 +341,6 @@ public final class VisualizationCustomizeDialog {
       return current != null;
     }
     return !baseline.equals(current);
-  }
-
-  /**
-   * Unsaved-close layout (platform-stable via ButtonBar order):
-   *
-   * <pre>
-   * [Discard changes]              [Keep editing]  [Save and close]
-   * </pre>
-   *
-   * <p>Destructive action is isolated on the left; Escape → keep editing; Enter → save.
-   */
-  private static UnsavedCloseChoice askUnsavedCloseChoice(Window owner) {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.initOwner(owner);
-    alert.setTitle(SettingsStrings.CUSTOMIZE_UNSAVED_TITLE);
-    alert.setHeaderText(null);
-    alert.setContentText(SettingsStrings.CUSTOMIZE_UNSAVED_MESSAGE);
-    alert.getDialogPane().setId(DISCARD_CONFIRM_ID);
-
-    // LEFT = far left; CANCEL_CLOSE = Escape; OK_DONE = Enter / default.
-    ButtonType discard =
-        new ButtonType(SettingsStrings.CUSTOMIZE_DISCARD, ButtonBar.ButtonData.LEFT);
-    ButtonType keepEditing =
-        new ButtonType(SettingsStrings.CUSTOMIZE_KEEP_EDITING, ButtonBar.ButtonData.CANCEL_CLOSE);
-    ButtonType saveAndClose =
-        new ButtonType(SettingsStrings.CUSTOMIZE_SAVE_AND_CLOSE, ButtonBar.ButtonData.OK_DONE);
-    alert.getButtonTypes().setAll(discard, keepEditing, saveAndClose);
-
-    var css = SettingsStylesheets.cssUrl();
-    if (css != null) {
-      alert.getDialogPane().getStylesheets().add(css.toExternalForm());
-    }
-
-    alert.setOnShown(
-        e -> {
-          Node barNode = alert.getDialogPane().lookup(".button-bar");
-          if (barNode instanceof ButtonBar bar) {
-            // L = LEFT, C = CANCEL_CLOSE, O = OK_DONE; + = flexible gap.
-            bar.setButtonOrder("L+CO");
-          }
-          Button saveButton = (Button) alert.getDialogPane().lookupButton(saveAndClose);
-          if (saveButton != null) {
-            saveButton.getStyleClass().add(Styles.ACCENT);
-          }
-          Button discardButton = (Button) alert.getDialogPane().lookupButton(discard);
-          if (discardButton != null) {
-            discardButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-          }
-        });
-
-    return alert
-        .showAndWait()
-        .map(
-            type -> {
-              if (saveAndClose.equals(type)) {
-                return UnsavedCloseChoice.SAVE;
-              }
-              if (discard.equals(type)) {
-                return UnsavedCloseChoice.DISCARD;
-              }
-              return UnsavedCloseChoice.CANCEL;
-            })
-        .orElse(UnsavedCloseChoice.CANCEL);
   }
 
   private static void showStatus(Label status, String message, boolean error) {
