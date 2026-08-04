@@ -1,7 +1,6 @@
 package io.github.compilerstuck.control.config;
 
 import java.awt.Color;
-import java.util.Set;
 
 /**
  * Single source of truth for Settings / session defaults (G10). Referenced by {@link
@@ -10,12 +9,7 @@ import java.util.Set;
  */
 public final class SettingsDefaults {
 
-  public static final String DEFAULT_ALGORITHM_ID = "merge-sort";
-
-  /** Algorithms listed last in the catalog and unchecked until the user enables them. */
-  private static final Set<String> DESELECTED_BY_DEFAULT_ALGORITHM_IDS =
-      Set.of("pigeonhole-sort", "bogo-sort");
-
+  public static final String DEFAULT_ALGORITHM_ID = "quicksort-middle";
   public static final String DEFAULT_VISUALIZATION_ID = "bars";
   public static final int DEFAULT_ARRAY_SIZE = 1280;
   public static final int DEFAULT_SPEED_LEVEL = 5;
@@ -66,10 +60,6 @@ public final class SettingsDefaults {
   };
 
   private SettingsDefaults() {}
-
-  public static boolean isAlgorithmSelectedByDefault(String algorithmId) {
-    return algorithmId != null && !DESELECTED_BY_DEFAULT_ALGORITHM_IDS.contains(algorithmId);
-  }
 
   public static int clampArraySize(int size) {
     return Math.max(ARRAY_SIZE_MIN, Math.min(ARRAY_SIZE_MAX, size));
