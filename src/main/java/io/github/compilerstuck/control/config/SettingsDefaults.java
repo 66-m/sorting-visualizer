@@ -34,6 +34,9 @@ public final class SettingsDefaults {
   /** JSON map of visualizationId → settings object (see VisualizationSettingsCodec). */
   public static final String DEFAULT_VISUAL_SETTINGS_BY_ID = "{}";
 
+  /** JSON blob of customizable MIDI audio settings (see AudioSettingsCodec). */
+  public static final String DEFAULT_AUDIO_SETTINGS_JSON = "{}";
+
   public static final int ARRAY_SIZE_MIN = 3;
   public static final int ARRAY_SIZE_MAX = 100_000;
 

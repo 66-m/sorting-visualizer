@@ -1,5 +1,7 @@
 package io.github.compilerstuck.control.config;
 
+import io.github.compilerstuck.control.config.audio.AudioSettings;
+import io.github.compilerstuck.control.config.audio.AudioSettingsCodec;
 import io.github.compilerstuck.control.config.visual.VisualizationSettings;
 import io.github.compilerstuck.control.config.visual.VisualizationSettingsCodec;
 import java.util.LinkedHashMap;
@@ -7,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -42,6 +45,7 @@ public final class UserPreferences {
   private static final String KEY_EQUALIZE_SORT_DURATION = "equalizeSortDuration";
   private static final String KEY_CANVAS_BACKGROUND = "canvasBackground";
   private static final String KEY_VISUAL_SETTINGS_BY_ID = "visualSettingsById";
+  private static final String KEY_AUDIO_SETTINGS = "audioSettings";
   private static final int CURRENT_DEFAULTS_VERSION = 1;
 
   public static final String DEFAULT_ALGORITHM_ID = SettingsDefaults.DEFAULT_ALGORITHM_ID;
@@ -67,6 +71,7 @@ public final class UserPreferences {
   private boolean equalizeSortDuration = SettingsDefaults.DEFAULT_EQUALIZE_SORT_DURATION;
   private CanvasBackground canvasBackground = SettingsDefaults.DEFAULT_CANVAS_BACKGROUND;
   private String visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
+  private String audioSettingsJson = SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON;
 
   public static UserPreferences load() {
     return load(Preferences.userRoot().node(NODE));
@@ -118,6 +123,11 @@ public final class UserPreferences {
     if (prefs.visualSettingsById == null) {
       prefs.visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
     }
+    prefs.audioSettingsJson =
+        node.get(KEY_AUDIO_SETTINGS, SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON);
+    if (prefs.audioSettingsJson == null) {
+      prefs.audioSettingsJson = SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON;
+    }
     return prefs;
   }
 
@@ -157,6 +167,16 @@ public final class UserPreferences {
         visualSettingsById != null
             ? visualSettingsById
             : SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID);
+    node.put(
+        KEY_AUDIO_SETTINGS,
+        audioSettingsJson != null
+            ? audioSettingsJson
+            : SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON);
+    try {
+      node.flush();
+    } catch (BackingStoreException ex) {
+      LOGGER.log(Level.WARNING, "Failed to flush preferences to backing store", ex);
+    }
   }
 
   private static ShuffleType parseShuffleType(String raw) {
@@ -354,6 +374,17 @@ public final class UserPreferences {
   /** Clears persisted per-visualization settings (all vizs revert to code defaults on load). */
   public void clearVisualSettings() {
     visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
+  }
+
+  public AudioSettings getAudioSettings() {
+    return AudioSettingsCodec.decodeStore(audioSettingsJson);
+  }
+
+  public void setAudioSettings(AudioSettings settings) {
+    this.audioSettingsJson =
+        settings != null
+            ? AudioSettingsCodec.encodeStore(settings)
+            : SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON;
   }
 
   private static int clampSize(int size) {

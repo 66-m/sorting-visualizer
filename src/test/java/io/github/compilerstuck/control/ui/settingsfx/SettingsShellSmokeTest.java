@@ -9,6 +9,7 @@ import io.github.compilerstuck.control.ui.settingsfx.vm.AlgorithmViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppContextTestFixture;
 import io.github.compilerstuck.control.ui.settingsfx.vm.AppearanceViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.ArraySizeViewModel;
+import io.github.compilerstuck.control.ui.settingsfx.vm.AudioSettingsViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DebugViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.DisplayViewModel;
 import io.github.compilerstuck.control.ui.settingsfx.vm.SoundViewModel;
@@ -113,6 +114,7 @@ class SettingsShellSmokeTest extends ApplicationTest {
             OptionsSection.build(
                 new DisplayViewModel(fx.app),
                 new SoundViewModel(fx.app),
+                new AudioSettingsViewModel(fx.app),
                 new DebugViewModel(fx.app))));
   }
 }

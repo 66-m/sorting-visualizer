@@ -37,6 +37,18 @@ public final class CustomizePanelSupport {
     Label heading = new Label(title);
     heading.getStyleClass().add("settings-section-label");
 
+    GridPane body = sectionBody(rows);
+
+    VBox section = new VBox(SettingsLayout.GAP_SM, heading, body);
+    section.getStyleClass().addAll("customize-section", "settings-form-card");
+    return section;
+  }
+
+  /**
+   * Field grid without a heading label - for callers that already render their own header (e.g. a
+   * {@code TitledPane} title).
+   */
+  public static GridPane sectionBody(FieldRow... rows) {
     GridPane body = new GridPane();
     body.getStyleClass().add("customize-field-grid");
     body.setHgap(SettingsLayout.GAP_SM);
@@ -57,10 +69,7 @@ public final class CustomizePanelSupport {
       GridPane.setValignment(fieldRow.reset(), VPos.CENTER);
       GridPane.setHgrow(fieldRow.control(), Priority.ALWAYS);
     }
-
-    VBox section = new VBox(SettingsLayout.GAP_SM, heading, body);
-    section.getStyleClass().add("customize-section");
-    return section;
+    return body;
   }
 
   public static ColumnConstraints[] columnConstraints() {
@@ -91,7 +100,7 @@ public final class CustomizePanelSupport {
       String labelText, Slider slider, Label value, double defaultValue) {
     Label label = fieldLabel(labelText);
     label.setLabelFor(slider);
-    Button reset = resetButton(() -> slider.setValue(defaultValue));
+    Button reset = iconResetButton(() -> slider.setValue(defaultValue));
     return new FieldRow(label, slider, value, reset);
   }
 
@@ -99,7 +108,7 @@ public final class CustomizePanelSupport {
     Label label = fieldLabel(labelText);
     label.setLabelFor(checkBox);
     checkBox.setText("");
-    Button reset = resetButton(() -> checkBox.setSelected(defaultValue));
+    Button reset = iconResetButton(() -> checkBox.setSelected(defaultValue));
     Region valuePlaceholder = new Region();
     valuePlaceholder.setMinWidth(VALUE_WIDTH);
     valuePlaceholder.setPrefWidth(VALUE_WIDTH);
@@ -111,7 +120,7 @@ public final class CustomizePanelSupport {
     Label label = fieldLabel(labelText);
     label.setLabelFor(combo);
     combo.setMaxWidth(Double.MAX_VALUE);
-    Button reset = resetButton(() -> combo.getSelectionModel().select(defaultValue));
+    Button reset = iconResetButton(() -> combo.getSelectionModel().select(defaultValue));
     Region valuePlaceholder = new Region();
     valuePlaceholder.setMinWidth(VALUE_WIDTH);
     valuePlaceholder.setPrefWidth(VALUE_WIDTH);
@@ -161,18 +170,53 @@ public final class CustomizePanelSupport {
     return button;
   }
 
+  /**
+   * Compact icon-only reset affordance ("↺") for dialogs that want less visual weight than {@link
+   * #resetButton(Runnable)}'s text pill. Same click target semantics, narrower footprint.
+   */
+  public static Button iconResetButton(Runnable action) {
+    Button button = new Button("\u21BA");
+    button.getStyleClass().addAll(Styles.BUTTON_OUTLINED, Styles.SMALL, "customize-icon-reset");
+    button.setTooltip(new Tooltip(SettingsStrings.RESET_SETTING_TOOLTIP));
+    button.setOnAction(e -> action.run());
+    return button;
+  }
+
   public static void bindValueLabel(Slider slider, Label label, DoubleFunction<String> format) {
     Runnable update = () -> label.setText(format.apply(slider.getValue()));
     update.run();
     slider.valueProperty().addListener((obs, old, value) -> update.run());
   }
 
-  /** Wraps section(s) in the standard customize-panel root. */
+  /**
+   * Wraps section(s) in the standard customize-panel root.
+   *
+   * <p>When there is only one section, card chrome and the section title are stripped — a lone
+   * "DISPLAY" card around a single checkbox is just visual noise. Multi-section panels (e.g. Cube)
+   * keep cards and titles so categories stay scannable.
+   */
   public static VBox panelRoot(Node... sections) {
+    if (sections.length == 1 && sections[0] instanceof VBox sole) {
+      flattenSingleSection(sole);
+      VBox root = new VBox(SettingsLayout.GAP_MD, sole);
+      root.getStyleClass().add("customize-panel");
+      root.setFillWidth(true);
+      return root;
+    }
     VBox root = new VBox(SettingsLayout.GAP_MD, sections);
-    root.getStyleClass().add("customize-panel");
+    root.getStyleClass().addAll("customize-panel", "settings-form-stack");
     root.setFillWidth(true);
     return root;
+  }
+
+  /** Drops card border/padding and the uppercase section heading for a lone section. */
+  private static void flattenSingleSection(VBox section) {
+    section.getStyleClass().remove("settings-form-card");
+    if (!section.getChildren().isEmpty()
+        && section.getChildren().getFirst() instanceof Label heading
+        && heading.getStyleClass().contains("settings-section-label")) {
+      section.getChildren().remove(heading);
+    }
   }
 
   /** Guards {@code load()} so draft-changed listeners do not fire. */

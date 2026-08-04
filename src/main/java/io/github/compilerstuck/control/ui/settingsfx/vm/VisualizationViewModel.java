@@ -289,6 +289,9 @@ public final class VisualizationViewModel {
               app.getSize(), SettingsDefaults.ARRAY_SIZE_MIN, SettingsDefaults.ARRAY_SIZE_MAX);
       if (fitted != app.getSize() && !app.isRunning()) {
         app.updateArraySize(fitted);
+        // Flushed again below via setVisualizationId, but do it here too so the resized array
+        // size is persisted even if visualization id somehow doesn't change.
+        app.flushPreferences();
         sizeDisplaySync.accept(fitted);
       }
     }

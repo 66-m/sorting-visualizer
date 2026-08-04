@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github.compilerstuck.control.config.audio.AudioSettings;
 import java.awt.Color;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,7 @@ class UserPreferencesTest {
     assertFalse(prefs.isFiveSecondStartDelay());
     assertTrue(prefs.isEqualizeSortDuration());
     assertEquals(SettingsDefaults.DEFAULT_CANVAS_BACKGROUND, prefs.getCanvasBackground());
+    assertEquals(AudioSettings.defaults(), prefs.getAudioSettings());
   }
 
   @Test
@@ -67,6 +69,8 @@ class UserPreferencesTest {
     prefs.setFiveSecondStartDelay(true);
     prefs.setEqualizeSortDuration(false);
     prefs.setCanvasBackground(CanvasBackground.WHITE);
+    AudioSettings customAudio = new AudioSettings(80, 110, 100, 32, 20, 90, 10, 5, 70, 60, 90);
+    prefs.setAudioSettings(customAudio);
     prefs.save(node);
 
     UserPreferences loaded = UserPreferences.load(node);
@@ -88,6 +92,7 @@ class UserPreferencesTest {
     assertTrue(loaded.isFiveSecondStartDelay());
     assertFalse(loaded.isEqualizeSortDuration());
     assertEquals(CanvasBackground.WHITE, loaded.getCanvasBackground());
+    assertEquals(customAudio, loaded.getAudioSettings());
   }
 
   @Test

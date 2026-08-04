@@ -1,6 +1,6 @@
 package io.github.compilerstuck.control.config.visual;
 
-import io.github.compilerstuck.control.config.visual.json.JsonObject;
+import io.github.compilerstuck.control.config.json.JsonObject;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;

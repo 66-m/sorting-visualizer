@@ -45,6 +45,8 @@ public final class ArraySizeSection {
                 vm.setSizeFromSlider(size);
               }
             });
+    // Live-resize while dragging; only write preferences once the drag gesture ends.
+    slider.setOnMouseReleased(e -> vm.commitSizeFromSlider());
 
     HBox header = SettingsControls.labelValueHeader(SettingsStrings.SIZE, value);
 

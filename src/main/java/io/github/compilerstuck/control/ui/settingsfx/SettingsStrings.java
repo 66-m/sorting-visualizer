@@ -61,6 +61,7 @@ public final class SettingsStrings {
   public static final String RESET_SETTING = "Reset";
   public static final String IMPORT = "Import";
   public static final String EXPORT = "Export";
+  public static final String EXPORT_IMPORT_MENU = "Export / Import";
   public static final String CUSTOMIZE_EXPORT_COPIED = "Settings copied to clipboard.";
   public static final String CUSTOMIZE_IMPORT_TITLE = "Import settings";
   public static final String CUSTOMIZE_IMPORT_HINT =
@@ -93,9 +94,6 @@ public final class SettingsStrings {
   public static final String BROWSE = "Browse…";
   public static final String CONFIGURE_ORDER = "Configure order…";
   public static final String RUN_ALL_ORDER_TITLE = "Configure algorithms";
-  public static final String RUN_ALL_ORDER_HINT =
-      "Drag to set the order for the algorithm dropdown and Run all. Check algorithms to include when Run all is on.";
-  public static final String RUN_ALL_ORDER_SECTION = "ALGORITHMS";
   public static final String RUN_ALL_ORDER_COUNT = "%d selected";
   public static final String RUN_ALL_ORDER_COUNT_ONE = "1 selected";
   public static final String RUN_ALL_ORDER_EMPTY = "Select at least one algorithm to run.";
@@ -113,6 +111,56 @@ public final class SettingsStrings {
   public static final String SOUND_EFFECTS = "Sound effects";
   public static final String SOUND_EFFECTS_TOOLTIP =
       "Play pitch cues as the array is accessed during sorting.";
+  public static final String AUDIO_SETTINGS_BUTTON = "Audio Settings…";
+  public static final String AUDIO_SETTINGS_TOOLTIP = "Customize the MIDI sound cues.";
+  public static final String AUDIO_SETTINGS_TITLE = "Audio Settings";
+  public static final String AUDIO_SECTION_VOICE = "VOICE";
+  public static final String AUDIO_SECTION_LEVELS = "LEVELS";
+  public static final String AUDIO_SECTION_PITCH = "PITCH MAPPING";
+  public static final String AUDIO_SECTION_ADVANCED = "ADVANCED";
+  public static final String AUDIO_ADVANCED_HINT =
+      "Experimental GM2 sound controllers. Audible effect depends on your system's sound bank.";
+  public static final String AUDIO_INSTRUMENT = "Instrument";
+  public static final String AUDIO_VOLUME = "Volume";
+  public static final String AUDIO_VELOCITY = "Velocity";
+  public static final String AUDIO_PAN = "Pan";
+  public static final String AUDIO_LOW_NOTE = "Lowest pitch";
+  public static final String AUDIO_HIGH_NOTE = "Highest pitch";
+  public static final String AUDIO_REVERB = "Reverb";
+  public static final String AUDIO_CHORUS = "Chorus";
+  public static final String AUDIO_ATTACK_TIME = "Attack time";
+  public static final String AUDIO_RELEASE_TIME = "Release time";
+  public static final String AUDIO_BRIGHTNESS = "Brightness";
+  public static final String AUDIO_PAN_CENTER = "C (center)";
+  public static final String AUDIO_PAN_LEFT_FORMAT = "%dL";
+  public static final String AUDIO_PAN_RIGHT_FORMAT = "%dR";
+  public static final String AUDIO_PLAY_TEST_TONE = "▶ Play test tone";
+  public static final String AUDIO_SIMULATE_SHUFFLE = "▶ Simulate shuffle (0.5s)";
+  public static final String AUDIO_SIMULATE_PITCH_SWEEP = "▶ Simulate low→high (0.5s)";
+  public static final String AUDIO_AUTOPLAY_LABEL = "Autoplay on change";
+  public static final String AUDIO_AUTOPLAY_TOOLTIP =
+      "Automatically preview a sound shortly after you change any setting below.";
+  public static final String AUDIO_AUTOPLAY_OFF = "Off";
+  public static final String AUDIO_AUTOPLAY_TEST_TONE = "Test tone";
+  public static final String AUDIO_AUTOPLAY_SHUFFLE = "Simulate shuffle";
+  public static final String AUDIO_AUTOPLAY_PITCH_SWEEP = "Simulate low→high";
+  public static final String AUDIO_STEPPER_UP_TOOLTIP = "Previous instrument";
+  public static final String AUDIO_STEPPER_DOWN_TOOLTIP = "Next instrument";
+  public static final String AUDIO_SECTION_PREVIEW = "PREVIEW";
+  public static final String AUDIO_RESET_ALL = "Reset all";
+  public static final String AUDIO_EXPORT_COPIED = "Audio settings copied to clipboard.";
+  public static final String AUDIO_APPLY_SUCCESS = "Audio settings applied.";
+  public static final String AUDIO_IMPORT_TITLE = "Import audio settings";
+  public static final String AUDIO_IMPORT_HINT = "Paste an exported audio config below.";
+  public static final String AUDIO_IMPORT_PLACEHOLDER =
+      "{\"schemaVersion\":1,\"audioSettings\":{…}}";
+  public static final String AUDIO_IMPORT_PASTE = "Paste from clipboard";
+  public static final String AUDIO_IMPORT_LOAD = "Import";
+  public static final String AUDIO_IMPORT_SUCCESS = "Audio settings imported.";
+  public static final String AUDIO_IMPORT_EMPTY = "Paste a config to import.";
+  public static final String AUDIO_IMPORT_INVALID = "This is not a valid audio config.";
+  public static final String AUDIO_IMPORT_CLAMPED =
+      "Settings imported. Some values were outside the allowed range and were clamped.";
   public static final String SHOW_MEASUREMENTS = "Show measurements";
   public static final String SHOW_MEASUREMENTS_TOOLTIP =
       "Show comparison, swap, and write counters on the visualization.";

@@ -13,8 +13,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -37,20 +35,14 @@ import javafx.stage.Window;
 /**
  * Modal dialog to include/exclude algorithms and drag-reorder them for the dropdown and Run all.
  *
- * <p>Layout: hint → selection summary + bulk actions → numbered reorderable list → Cancel / Apply.
- * Closing with unsaved changes offers save, discard, or keep editing (same pattern as customize).
+ * <p>Layout: bulk actions + selection count → numbered reorderable list → Cancel / Apply. Closing
+ * with unsaved changes offers save, discard, or keep editing (same pattern as customize).
  */
 public final class RunAllOrderDialog {
 
   public static final String DIALOG_ID = "run-all-order-dialog";
   public static final String LIST_ID = "run-all-order-list";
   public static final String DISCARD_CONFIRM_ID = "run-all-order-discard-confirm";
-
-  private enum UnsavedCloseChoice {
-    SAVE,
-    DISCARD,
-    CANCEL
-  }
 
   private RunAllOrderDialog() {}
 
@@ -61,13 +53,6 @@ public final class RunAllOrderDialog {
     }
     List<BaselineRow> baseline = snapshotBaseline(rows);
     AtomicBoolean closingConfirmed = new AtomicBoolean(false);
-
-    Label hint = new Label(SettingsStrings.RUN_ALL_ORDER_HINT);
-    hint.getStyleClass().add("settings-muted");
-    hint.setWrapText(true);
-
-    Label sectionLabel = new Label(SettingsStrings.RUN_ALL_ORDER_SECTION);
-    sectionLabel.getStyleClass().add("settings-section-label");
 
     Label countLabel = new Label();
     countLabel.getStyleClass().addAll("settings-muted", "run-all-order-count");
@@ -114,10 +99,7 @@ public final class RunAllOrderDialog {
     toolbar.setAlignment(Pos.CENTER_LEFT);
     toolbar.getStyleClass().add("run-all-order-toolbar");
 
-    VBox listBlock = new VBox(SettingsLayout.GAP_SM, sectionLabel, toolbar, list);
-    listBlock.getStyleClass().add("run-all-order-section");
-
-    VBox content = new VBox(SettingsLayout.GAP_MD, hint, listBlock, status);
+    VBox content = new VBox(SettingsLayout.GAP_SM, toolbar, list, status);
     content.getStyleClass().add("run-all-order-content");
     content.setPadding(
         new Insets(
@@ -212,8 +194,11 @@ public final class RunAllOrderDialog {
     if (!isDirty(rows, baseline)) {
       return true;
     }
-    UnsavedCloseChoice choice =
-        askUnsavedCloseChoice(dialog.getDialogPane().getScene().getWindow());
+    UnsavedChangesDialog.Choice choice =
+        UnsavedChangesDialog.ask(
+            dialog.getDialogPane().getScene().getWindow(),
+            DISCARD_CONFIRM_ID,
+            SettingsStrings.RUN_ALL_ORDER_UNSAVED_MESSAGE);
     return switch (choice) {
       case SAVE -> {
         if (selectedCount(rows) == 0) {
@@ -258,65 +243,6 @@ public final class RunAllOrderDialog {
       baseline.add(new BaselineRow(row.id, row.selected));
     }
     return List.copyOf(baseline);
-  }
-
-  /**
-   * Unsaved-close layout (same as customize):
-   *
-   * <pre>
-   * [Discard changes]              [Keep editing]  [Save and close]
-   * </pre>
-   */
-  private static UnsavedCloseChoice askUnsavedCloseChoice(Window owner) {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.initOwner(owner);
-    alert.setTitle(SettingsStrings.CUSTOMIZE_UNSAVED_TITLE);
-    alert.setHeaderText(null);
-    alert.setContentText(SettingsStrings.RUN_ALL_ORDER_UNSAVED_MESSAGE);
-    alert.getDialogPane().setId(DISCARD_CONFIRM_ID);
-
-    ButtonType discard =
-        new ButtonType(SettingsStrings.CUSTOMIZE_DISCARD, ButtonBar.ButtonData.LEFT);
-    ButtonType keepEditing =
-        new ButtonType(SettingsStrings.CUSTOMIZE_KEEP_EDITING, ButtonBar.ButtonData.CANCEL_CLOSE);
-    ButtonType saveAndClose =
-        new ButtonType(SettingsStrings.CUSTOMIZE_SAVE_AND_CLOSE, ButtonBar.ButtonData.OK_DONE);
-    alert.getButtonTypes().setAll(discard, keepEditing, saveAndClose);
-
-    var css = SettingsStylesheets.cssUrl();
-    if (css != null) {
-      alert.getDialogPane().getStylesheets().add(css.toExternalForm());
-    }
-
-    alert.setOnShown(
-        e -> {
-          Node barNode = alert.getDialogPane().lookup(".button-bar");
-          if (barNode instanceof ButtonBar bar) {
-            bar.setButtonOrder("L+CO");
-          }
-          Button saveButton = (Button) alert.getDialogPane().lookupButton(saveAndClose);
-          if (saveButton != null) {
-            saveButton.getStyleClass().add(Styles.ACCENT);
-          }
-          Button discardButton = (Button) alert.getDialogPane().lookupButton(discard);
-          if (discardButton != null) {
-            discardButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-          }
-        });
-
-    return alert
-        .showAndWait()
-        .map(
-            type -> {
-              if (saveAndClose.equals(type)) {
-                return UnsavedCloseChoice.SAVE;
-              }
-              if (discard.equals(type)) {
-                return UnsavedCloseChoice.DISCARD;
-              }
-              return UnsavedCloseChoice.CANCEL;
-            })
-        .orElse(UnsavedCloseChoice.CANCEL);
   }
 
   private static void refreshChrome(ObservableList<DraftRow> rows, Label countLabel, Label status) {
