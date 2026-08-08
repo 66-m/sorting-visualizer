@@ -40,7 +40,7 @@ public record AudioSettings(
   public static final int DEFAULT_PAN = 64;
   public static final int DEFAULT_LOW_NOTE = 28;
   public static final int DEFAULT_HIGH_NOTE = 68;
-  public static final int DEFAULT_REVERB = 0;
+  public static final int DEFAULT_REVERB = 31;
   public static final int DEFAULT_CHORUS = 0;
   public static final int DEFAULT_ATTACK_TIME = 64;
   public static final int DEFAULT_RELEASE_TIME = 64;

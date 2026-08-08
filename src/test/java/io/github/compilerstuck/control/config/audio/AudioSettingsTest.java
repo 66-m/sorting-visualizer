@@ -10,9 +10,16 @@ class AudioSettingsTest {
   void defaultsMatchCurrentHardcodedBehavior() {
     AudioSettings d = AudioSettings.defaults();
     assertEquals(4, d.instrumentProgram());
+    assertEquals(100, d.volume());
     assertEquals(90, d.velocity());
+    assertEquals(64, d.pan());
     assertEquals(28, d.lowNote());
     assertEquals(68, d.highNote());
+    assertEquals(31, d.reverb());
+    assertEquals(0, d.chorus());
+    assertEquals(64, d.attackTime());
+    assertEquals(64, d.releaseTime());
+    assertEquals(64, d.brightness());
   }
 
   @Test
