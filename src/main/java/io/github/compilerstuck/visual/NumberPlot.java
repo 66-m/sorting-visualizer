@@ -17,10 +17,12 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
   private int cachedLength = -1;
   private int cachedWidth = -1;
   private int cachedHeight = -1;
+  private long cachedRevision = Long.MIN_VALUE;
   private int[] cachedValues;
   private int[] barHeights;
   private String[] labels;
   private float[] drawYs;
+  private boolean drawYsDirty = true;
 
   public NumberPlot(
       ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
@@ -46,8 +48,12 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
   }
 
   private void ensureSlotCaches(int length, int heightScale) {
+    long rev = arrayModel.getVisualRevision();
     boolean layoutChanged =
         cachedLength != length || cachedWidth != screenWidth || cachedHeight != screenHeight;
+    if (!layoutChanged && cachedRevision == rev) {
+      return;
+    }
     if (layoutChanged) {
       cachedLength = length;
       cachedWidth = screenWidth;
@@ -61,6 +67,7 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
           cachedValues[i] = Integer.MIN_VALUE;
         }
       }
+      drawYsDirty = true;
     }
     for (int i = 0; i < length; i++) {
       int value = arrayModel.get(i);
@@ -68,8 +75,20 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
         cachedValues[i] = value;
         barHeights[i] = (value + 1) * heightScale / length;
         labels[i] = String.valueOf(value + 1);
+        drawYsDirty = true;
       }
     }
+    cachedRevision = rev;
+  }
+
+  private void ensureDrawYs(int length) {
+    if (!drawYsDirty) {
+      return;
+    }
+    for (int i = 0; i < length; i++) {
+      drawYs[i] = worldYToOverlayY(barHeights[i]);
+    }
+    drawYsDirty = false;
   }
 
   @Override
@@ -81,12 +100,12 @@ public class NumberPlot extends Visualization implements ConfigurableVisualizati
     indexXCache.ensure(length, screenWidth);
     float[] xs = indexXCache.xs();
     ensureSlotCaches(length, heightScale);
+    ensureDrawYs(length);
 
     for (int i = 0; i < length; i++) {
       if (arrayModel.getMarker(i) == Marker.SET) {
         sound.playSound(i);
       }
-      drawYs[i] = worldYToOverlayY(barHeights[i]);
     }
 
     if (length > 0) {

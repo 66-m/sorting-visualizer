@@ -7,13 +7,25 @@ import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.Color;
 
 public class DisparitySphereHoops extends Visualization implements ConfigurableVisualization {
 
   private volatile DisparitySphereHoopsSettings settings = DisparitySphereHoopsSettings.defaults();
 
   private static final int SEGMENTS = 48;
+
+  /** cos/sin of {@code t = 2π·seg/SEGMENTS}; identical for every hoop, so computed once. */
+  private static final float[] SEG_COS = new float[SEGMENTS + 1];
+
+  private static final float[] SEG_SIN = new float[SEGMENTS + 1];
+
+  static {
+    for (int seg = 0; seg <= SEGMENTS; seg++) {
+      float t = (float) (2 * Math.PI * seg / SEGMENTS);
+      SEG_COS[seg] = (float) Math.cos(t);
+      SEG_SIN[seg] = (float) Math.sin(t);
+    }
+  }
 
   private float[] wiBase;
   private float[] zOffsets;
@@ -28,9 +40,17 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
   private int cachedLength = -1;
   private int cachedRadius = -1;
   private ColorGradient cachedGradient;
+  private boolean dataDirty = true;
 
   private float[] xyzxyz;
   private int[] lineArgb;
+  private int lineCount;
+
+  private long linesRevision = Long.MIN_VALUE;
+  private int linesWidth = -1;
+  private int linesHeight = -1;
+  private int linesLength = -1;
+  private int linesRadius = -1;
 
   public DisparitySphereHoops(
       ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
@@ -47,6 +67,8 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
   public void applySettings(VisualizationSettings next) {
     if (next instanceof DisparitySphereHoopsSettings s) {
       settings = s;
+      cachedRevision = Long.MIN_VALUE;
+      dataDirty = true;
     }
   }
 
@@ -71,6 +93,7 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
       wiBase[i] = (float) Math.sqrt(1 - Math.pow((float) i / length * 2 - 1, 2));
       zOffsets[i] = radius / 2f - VisMath.map(i, 0, length, 0, radius);
     }
+    dataDirty = true;
   }
 
   private void ensureSphereWiAndColors(int length, int radius) {
@@ -85,17 +108,9 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
     }
     for (int i = 0; i < length; i++) {
       int value = arrayModel.get(i);
-      Color color = colorGradient.getMarkerColor(value, arrayModel.getMarker(i));
 
       float barHeight =
-          -(float)
-              (1f
-                  / length
-                  * (length
-                      - 2
-                          * Math.min(
-                              Math.min(Math.abs(i - value), Math.abs(i - length - value)),
-                              Math.abs(i + length - value))));
+          -(float) (1f / length * (length - 2 * VisMath.circularDistance(i, value, length)));
       float wi = wiBase[i] * barHeight;
       sphereWi[i] = (int) VisMath.map(wi, 0, 1, 0, radius);
 
@@ -103,7 +118,7 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
         sound.playSound(i);
       }
 
-      colorsRgb[i] = color.getRGB();
+      colorsRgb[i] = colorGradient.getMarkerArgb(value, arrayModel.getMarker(i));
     }
     cachedRevision = rev;
     cachedWidth = screenWidth;
@@ -111,41 +126,38 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
     cachedLength = length;
     cachedRadius = radius;
     cachedGradient = colorGradient;
+    dataDirty = true;
   }
 
-  @Override
-  public void update(float delta) {
-    DisparitySphereHoopsSettings s = settings;
-    int screenMin = Math.min(screenHeight, screenWidth);
-    int radius = (int) (screenMin * s.globeScale());
-    int length = arrayModel.getLength();
-    float centerZ = -(int) (screenMin / 10);
-    float centerX = (float) screenWidth / 2;
-    float centerY = (float) screenHeight / 2;
+  private boolean linesNeedRebuild(int length, int radius) {
+    return dataDirty
+        || linesRevision != cachedRevision
+        || linesWidth != screenWidth
+        || linesHeight != screenHeight
+        || linesLength != length
+        || linesRadius != radius
+        || xyzxyz == null;
+  }
 
-    rebuildGeometry(length, radius);
-    ensureSphereWiAndColors(length, radius);
-
-    float rotX = VisMath.PI / 3;
-    float cosX = (float) Math.cos(rotX);
-    float sinX = (float) Math.sin(rotX);
-
+  private void rebuildLines(int length, int radius, float centerX, float centerY, float centerZ) {
     int maxLines = length * SEGMENTS;
     if (xyzxyz == null || xyzxyz.length < maxLines * 6) {
       xyzxyz = new float[maxLines * 6];
       lineArgb = new int[maxLines];
     }
 
-    int lineCount = 0;
+    float cosX = VisMath.COS_ROT_X_PI_3;
+    float sinX = VisMath.SIN_ROT_X_PI_3;
+
+    lineCount = 0;
     for (int i = 0; i < length; i++) {
       float w = sphereWi[i];
       float zLocal = zOffsets[i];
       int rgb = colorsRgb[i];
       float prevX = 0, prevY = 0, prevZ = 0;
       for (int seg = 0; seg <= SEGMENTS; seg++) {
-        float t = (float) (2 * Math.PI * seg / SEGMENTS);
-        float lx = (w * 0.5f) * (float) Math.cos(t);
-        float ly = (w * 0.5f) * (float) Math.sin(t);
+        float lx = (w * 0.5f) * SEG_COS[seg];
+        float ly = (w * 0.5f) * SEG_SIN[seg];
         float lz = zLocal;
         float y2 = cosX * ly - sinX * lz;
         float z2 = sinX * ly + cosX * lz;
@@ -167,6 +179,29 @@ public class DisparitySphereHoops extends Visualization implements ConfigurableV
         prevY = wy;
         prevZ = wz;
       }
+    }
+    linesRevision = cachedRevision;
+    linesWidth = screenWidth;
+    linesHeight = screenHeight;
+    linesLength = length;
+    linesRadius = radius;
+    dataDirty = false;
+  }
+
+  @Override
+  public void update(float delta) {
+    DisparitySphereHoopsSettings s = settings;
+    int screenMin = Math.min(screenHeight, screenWidth);
+    int radius = (int) (screenMin * s.globeScale());
+    int length = arrayModel.getLength();
+    float centerZ = -(int) (screenMin / 10);
+    float centerX = (float) screenWidth / 2;
+    float centerY = (float) screenHeight / 2;
+
+    rebuildGeometry(length, radius);
+    ensureSphereWiAndColors(length, radius);
+    if (linesNeedRebuild(length, radius)) {
+      rebuildLines(length, radius, centerX, centerY, centerZ);
     }
 
     rs.begin3D();

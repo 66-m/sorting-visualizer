@@ -9,7 +9,6 @@ import io.github.compilerstuck.control.render.CoordinateSpace;
 import io.github.compilerstuck.control.render.RenderSystem;
 import io.github.compilerstuck.sound.Sound;
 import io.github.compilerstuck.visual.gradient.ColorGradient;
-import java.awt.Color;
 
 public class MosaicSquares extends Visualization implements ConfigurableVisualization {
 
@@ -25,6 +24,13 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
   private float cachedTileDimY;
   private float[] xywh;
   private int[] argb;
+
+  private long packedRevision = Long.MIN_VALUE;
+  private int packedWidth = -1;
+  private int packedHeight = -1;
+  private int packedDrawCount = -1;
+  private double packedGap = Double.NaN;
+  private ColorGradient packedGradient;
 
   public MosaicSquares(
       ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
@@ -42,6 +48,7 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
     if (next instanceof MosaicSquaresSettings s) {
       settings = s;
       cachedDrawCount = -1;
+      packedRevision = Long.MIN_VALUE;
     }
   }
 
@@ -73,6 +80,42 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
     cachedHeight = screenHeight;
   }
 
+  private void ensurePacked(int drawCount, float gap) {
+    long rev = arrayModel.getVisualRevision();
+    if (packedRevision == rev
+        && packedWidth == screenWidth
+        && packedHeight == screenHeight
+        && packedDrawCount == drawCount
+        && packedGap == gap
+        && packedGradient == colorGradient) {
+      return;
+    }
+    if (xywh == null || xywh.length < drawCount * 4) {
+      xywh = new float[drawCount * 4];
+      argb = new int[drawCount];
+    }
+    float inset = gap * 0.5f;
+    float w = Math.max(0.5f, cachedTileDimX - gap);
+    float h = Math.max(0.5f, cachedTileDimY - gap);
+    for (int i = 0; i < drawCount; i++) {
+      if (arrayModel.getMarker(i) == Marker.SET) {
+        sound.playSound(i);
+      }
+      int o = i * 4;
+      xywh[o] = tileX[i] + inset;
+      xywh[o + 1] = tileY[i] + inset;
+      xywh[o + 2] = w;
+      xywh[o + 3] = h;
+      argb[i] = colorGradient.getMarkerArgb(arrayModel.get(i), arrayModel.getMarker(i));
+    }
+    packedRevision = rev;
+    packedWidth = screenWidth;
+    packedHeight = screenHeight;
+    packedDrawCount = drawCount;
+    packedGap = gap;
+    packedGradient = colorGradient;
+  }
+
   @Override
   public void update(float delta) {
     int nextN = (int) floor(Math.pow(arrayModel.getLength(), 1 / 2.) + 0.1);
@@ -80,29 +123,7 @@ public class MosaicSquares extends Visualization implements ConfigurableVisualiz
     int drawCount = Math.min(arrayModel.getLength(), nextN * nextN);
 
     ensureTileOrigins(drawCount, nextN, squareRoot);
-
-    if (xywh == null || xywh.length < drawCount * 4) {
-      xywh = new float[drawCount * 4];
-      argb = new int[drawCount];
-    }
-
-    for (int i = 0; i < drawCount; i++) {
-      Color color = colorGradient.getMarkerColor(arrayModel.get(i), arrayModel.getMarker(i));
-
-      if (arrayModel.getMarker(i) == Marker.SET) {
-        sound.playSound(i);
-      }
-
-      MosaicSquaresSettings s = settings;
-      float gap = (float) s.tileGapPx();
-      float inset = gap * 0.5f;
-      int o = i * 4;
-      xywh[o] = tileX[i] + inset;
-      xywh[o + 1] = tileY[i] + inset;
-      xywh[o + 2] = Math.max(0.5f, cachedTileDimX - gap);
-      xywh[o + 3] = Math.max(0.5f, cachedTileDimY - gap);
-      argb[i] = color.getRGB();
-    }
+    ensurePacked(drawCount, (float) settings.tileGapPx());
     rs.fillRects(xywh, argb, drawCount);
   }
 }

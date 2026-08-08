@@ -17,6 +17,8 @@ public class ColorGradientGraph extends Visualization implements ConfigurableVis
 
   private float[] xywh;
   private int[] argb;
+  private float[] div;
+  private int[] divArgb;
 
   public ColorGradientGraph(
       ArrayModel arrayModel, ColorGradient colorGradient, Sound sound, RenderSystem rs) {
@@ -70,8 +72,10 @@ public class ColorGradientGraph extends Visualization implements ConfigurableVis
     rs.fillRects(xywh, argb, length);
 
     if (settings.showIndexDividers() && length > 1) {
-      float[] div = new float[Math.max(4, (length - 1) * 4)];
-      int[] divArgb = new int[Math.max(1, length - 1)];
+      if (div == null || div.length < (length - 1) * 4) {
+        div = new float[(length - 1) * 4];
+        divArgb = new int[length - 1];
+      }
       for (int i = 1; i < length; i++) {
         float x = i * slotWidth;
         int o = (i - 1) * 4;
