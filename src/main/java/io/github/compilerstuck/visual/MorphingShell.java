@@ -136,7 +136,9 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
     int colCnt = 0;
     for (int i = 0; i < length; i++) {
       int markerIndex = rowCnt + colCnt * colSize;
-      double barHeight = arrayModel.get(markerIndex);
+      // Map values into [0, screenWidth] so X extent stays screen-relative (not N-dependent).
+      // Legacy raw values only looked right near N≈screenWidth (~2000).
+      float barHeight = screenWidth * arrayModel.get(markerIndex) / (float) length;
 
       float sinLon = sinAa * lonCos[i] + cosAa * lonSin[i];
       float cosLon = cosAa * lonCos[i] - sinAa * lonSin[i];
@@ -145,7 +147,7 @@ public class MorphingShell extends Visualization implements ConfigurableVisualiz
 
       float z = radiusThird * sinLon * cosLat;
       float x = radius * sinLon * sinLat;
-      float y = (float) (radius * cosLon + barHeight);
+      float y = radius * cosLon + barHeight;
 
       // Legacy Processing pos (W/4 + y/2, H/2 + x/2, centerZ+z) → world
       float wx = y / 2f - halfW * 0.5f;
