@@ -23,9 +23,7 @@ Requires **[JDK 26+](https://jdk.java.net/26/)**.
 Download [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar), then:
 
 ```sh
-java --enable-native-access=ALL-UNNAMED \
-  --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED \
-  -jar sorting-visualizer.jar
+java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar
 ```
 
 Optional flags (after the JAR name; `fullscreen` wins over `portrait`):
