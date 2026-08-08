@@ -31,7 +31,9 @@ java --enable-native-access=ALL-UNNAMED \
   -jar target/sorting-visualizer-jar-with-dependencies.jar
 ```
 
-`-Prelease` also writes a CycloneDX SBOM to `target/bom.json`.
+`-Prelease` also writes a CycloneDX SBOM to `target/bom.json`, and pulls OpenJFX
+`javafx-graphics` natives for **win / linux / mac** so the Linux-built fat JAR runs on
+those desktops (host-only resolution would ship Linux `.so` files alone).
 
 Linux app-image (requires JDK `jpackage`, Linux host):
 

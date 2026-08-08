@@ -141,6 +141,35 @@
     <profiles>
         <profile>
             <id>release</id>
+            <!--
+              OpenJFX resolves only the *host* platform classifier by default. Releases are built
+              on Linux, so the fat JAR would otherwise ship libglass.so / GTK only and fail on
+              Windows/macOS at Platform.startup (missing glass.dll / libglass.dylib and
+              com.sun.glass.ui.win|mac). Explicit classifiers match the OpenJFX cross-platform
+              fat-JAR recipe: https://openjfx.io/openjfx-docs/#modular
+              (win / linux / mac; aarch64 jars reuse the same native filenames and cannot ship
+              alongside x64 in one fat JAR.)
+            -->
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -160,6 +189,9 @@
                                                 io.github.compilerstuck.control.DesktopLauncher
                                             </mainClass>
                                         </manifest>
+                                        <manifestEntries>
+                                            <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
+                                        </manifestEntries>
                                     </archive>
                                     <appendAssemblyId>true</appendAssemblyId>
                                     <descriptorRefs>
