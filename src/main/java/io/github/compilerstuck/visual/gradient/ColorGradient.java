@@ -14,6 +14,9 @@ public class ColorGradient {
   private final String name;
   protected Color[] colorGradient;
 
+  /** Parallel ARGB LUT for {@link #getMarkerArgb}; rebuilt with {@link #colorGradient}. */
+  private int[] colorGradientArgb;
+
   /**
    * When non-null, opaque-white {@link Marker#SET} colors resolve to this instead (light canvas
    * contrast).
@@ -30,6 +33,7 @@ public class ColorGradient {
     this.markerSetColor = markerSetColor;
     this.name = name;
     this.colorGradient = this.getColorGradient(size);
+    rebuildArgbLut();
   }
 
   protected Color[] getColorGradient(int size) {
@@ -50,6 +54,21 @@ public class ColorGradient {
 
   public void updateGradient(int size) {
     colorGradient = getColorGradient(size);
+    rebuildArgbLut();
+  }
+
+  private void rebuildArgbLut() {
+    Color[] gradient = colorGradient;
+    if (gradient == null) {
+      colorGradientArgb = null;
+      return;
+    }
+    int[] argb = new int[gradient.length];
+    for (int i = 0; i < gradient.length; i++) {
+      Color c = gradient[i];
+      argb[i] = c != null ? c.getRGB() : 0xFF000000;
+    }
+    colorGradientArgb = argb;
   }
 
   public Color getMarkerColor(int index, Marker m) {
@@ -69,6 +88,30 @@ public class ColorGradient {
       return effectiveMarkerSetColor();
     } else {
       return Color.BLACK;
+    }
+  }
+
+  /**
+   * Same resolution as {@link #getMarkerColor} but returns packed ARGB without allocating or boxing
+   * through {@link Color#getRGB()} on the hot path.
+   */
+  public int getMarkerArgb(int index, Marker m) {
+    if (m == Marker.NORMAL) {
+      int[] argb = colorGradientArgb;
+      if (argb == null || argb.length == 0) {
+        return 0xFF000000;
+      }
+      int i = index;
+      if (i < 0) {
+        i = 0;
+      } else if (i >= argb.length) {
+        i = argb.length - 1;
+      }
+      return argb[i];
+    } else if (m == Marker.SET) {
+      return effectiveMarkerSetColor().getRGB();
+    } else {
+      return 0xFF000000;
     }
   }
 

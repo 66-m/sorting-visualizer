@@ -167,17 +167,25 @@ class EqualizeSortDurationSessionTest {
   @DisplayName("Bubble Sort visual steps differ strongly by shuffle type")
   void bubbleStepsVaryByShuffle() {
     int n = 40;
+    // Deterministic stand-ins for ALMOST_SORTED / REVERSE: Math.random() almost-sorted swaps
+    // make a fixed 5× ratio flaky, while reverse is always n(n-1)/2 Bubble swaps.
     ArrayController almost = new ArrayController(n);
-    almost.setShuffleType(ShuffleType.ALMOST_SORTED);
-    shuffleSilent(almost);
+    int[] a = almost.getArray();
+    int nearSortedSwaps = Math.max(1, n / 10);
+    for (int i = 0; i < nearSortedSwaps; i++) {
+      int idx = 5 + i * 8;
+      int tmp = a[idx];
+      a[idx] = a[idx + 1];
+      a[idx + 1] = tmp;
+    }
 
     ArrayController reverse = new ArrayController(n);
-    reverse.setShuffleType(ShuffleType.REVERSE);
-    shuffleSilent(reverse);
+    reverseInPlace(reverse);
 
     long almostSteps = countSteps(new BubbleSort(almost), almost);
     long reverseSteps = countSteps(new BubbleSort(reverse), reverse);
 
+    assertEquals(n * (n - 1L) / 2, reverseSteps);
     assertTrue(
         reverseSteps > almostSteps * 5, () -> "reverse=" + reverseSteps + " almost=" + almostSteps);
   }
@@ -409,12 +417,6 @@ class EqualizeSortDurationSessionTest {
     algorithm.setDelay(true);
     algorithm.sort();
     return counter.stepCount();
-  }
-
-  private static void shuffleSilent(ArrayController model) {
-    model.setDelayContext(NO_OP);
-    model.setOperationReporter(OperationReporter.NOOP);
-    model.shuffle();
   }
 
   private static void reverseInPlace(ArrayController model) {
