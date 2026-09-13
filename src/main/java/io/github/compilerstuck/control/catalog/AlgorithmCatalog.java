@@ -34,7 +34,8 @@ public final class AlgorithmCatalog {
         descriptor("american-flag-sort", "American Flag Sort", AmericanFlagSort::new),
         descriptor("pigeonhole-sort", "Pigeonhole Sort", PigeonholeSort::new),
         descriptor("tim-sort", "Tim Sort", TimSort::new),
-        descriptor("bogo-sort", "Bogo Sort", BogoSort::new));
+        descriptor("bogo-sort", "Bogo Sort", BogoSort::new),
+        descriptor("unbeliaveble-sort", "I Can't Believe It Can Sort", UnbeliavebleSort::new));
   }
 
   public static AlgorithmDescriptor findById(String id) {

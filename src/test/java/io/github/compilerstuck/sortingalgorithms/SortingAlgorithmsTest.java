@@ -62,7 +62,8 @@ class SortingAlgorithmsTest {
             ShakerSort.class,
             DoubleSelectionSort.class,
             PigeonholeSort.class,
-            GravitySort.class);
+            GravitySort.class,
+            UnbeliavebleSort.class);
 
     return algs.stream().flatMap(alg -> Stream.of(Arguments.of(alg, 10), Arguments.of(alg, 50)));
   }
