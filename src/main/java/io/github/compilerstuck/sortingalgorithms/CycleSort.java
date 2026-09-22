@@ -31,7 +31,10 @@ public class CycleSort extends SortingAlgorithm {
         arrayController.addComparisons(1);
       }
 
-      if (pos == cycle_start) continue;
+      if (pos == cycle_start) {
+        delay(new int[] {cycle_start});
+        continue;
+      }
 
       while (item == arrayController.get(pos)) {
         pos += 1;
