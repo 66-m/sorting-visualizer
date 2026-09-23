@@ -39,7 +39,8 @@ public final class AlgorithmCatalog {
           descriptor("american-flag-sort", "American Flag Sort", AmericanFlagSort::new),
           descriptor("pigeonhole-sort", "Pigeonhole Sort", PigeonholeSort::new),
           descriptor("tim-sort", "Tim Sort", TimSort::new),
-          descriptor("bogo-sort", "Bogo Sort", BogoSort::new));
+          descriptor("bogo-sort", "Bogo Sort", BogoSort::new),
+          descriptor("unbelievable-sort", "I Can't Believe It Can Sort", UnbelievableSort::new));
 
   private AlgorithmCatalog() {}
 
