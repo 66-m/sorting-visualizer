@@ -8,6 +8,7 @@ public class UnbeliavebleSort extends SortingAlgorithm {
     super(arrayController);
     this.name = "I Can't Believe It Can Sort";
     alternativeSize = arrayController.getLength();
+    selected = false;
   }
 
   public UnbeliavebleSort(ArrayModel arrayController, int alternativeSize) {
