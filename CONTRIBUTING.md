@@ -47,7 +47,9 @@ cross-build):
 
 Add `--self-check` to any launcher (or to `java -jar …`) to verify natives, the JavaFX toolkit
 and bundled resources without opening a window. Installer options live in
-`packaging/jpackage/`; icons in `packaging/icons/`.
+`packaging/jpackage/`; icons in `packaging/icons/`. The Linux menu entry comes from
+`packaging/jpackage/resources-linux/sorting-visualizer.desktop`, because jpackage ignores
+`--icon` when it builds an installer from an app image.
 
 ## How releases work
 
