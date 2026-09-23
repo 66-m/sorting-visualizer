@@ -4,7 +4,7 @@
 
 # Sorting Algorithm Visualizer
 
-See and hear sorting algorithms in real time — 23 algorithms, 30 visualizations, live metrics, and MIDI audio.
+Watch and listen to 23 sorting algorithms in real time, with 30 visualizations, live metrics and MIDI sound.
 
 [![CI](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -18,24 +18,24 @@ See and hear sorting algorithms in real time — 23 algorithms, 30 visualization
 
 ## Install
 
-Download the file for your system from the [latest release](https://github.com/66-m/sorting-visualizer/releases/latest). **No Java install needed**: each package bundles its own runtime.
+Download the file for your system from the [latest release](https://github.com/66-m/sorting-visualizer/releases/latest).
 
 | System | Download |
 |--------|----------|
-| Windows 10/11 (x64) | `sorting-visualizer-<version>-windows-x64.msi` (installer) or `…-windows-x64.zip` (portable, run `Sorting Visualizer.exe`) |
+| Windows 10/11 (x64) | `sorting-visualizer-<version>-windows-x64.msi`, or the portable `…-windows-x64.zip` (run `Sorting Visualizer.exe`) |
 | macOS, Apple Silicon | `sorting-visualizer-<version>-macos-arm64.dmg` |
 | macOS, Intel | `sorting-visualizer-<version>-macos-x64.dmg` |
-| Linux (x64), Ubuntu 24.04+ / Debian 13+ | `sorting-visualizer-<version>-linux-x64.deb` |
-| Linux (x64), any distribution | `sorting-visualizer-<version>-linux-x64.tar.gz`: extract, then run `sorting-visualizer/bin/sorting-visualizer` |
+| Linux (x64), Ubuntu 24.04+ or Debian 13+ | `sorting-visualizer-<version>-linux-x64.deb` |
+| Linux (x64), any distribution | `sorting-visualizer-<version>-linux-x64.tar.gz` (extract it and run `sorting-visualizer/bin/sorting-visualizer`) |
 
-The packages are not code-signed yet, so the first launch shows a warning:
+The packages are not signed yet, so your system warns you on first launch:
 
-- **macOS:** right-click the app and choose **Open** (or *System Settings → Privacy & Security → Open Anyway*).
-- **Windows:** SmartScreen may say "Windows protected your PC": choose **More info → Run anyway**.
+- **macOS:** right-click the app and choose **Open**, or use *System Settings → Privacy & Security → Open Anyway*.
+- **Windows:** if SmartScreen says "Windows protected your PC", choose **More info → Run anyway**.
 
 ### Already have Java?
 
-With Java 25 or newer installed, you can also use the cross-platform [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) (Windows, Linux and Intel Macs; on Apple Silicon use the `.dmg`):
+With Java 25 or newer you can also run the [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar) on Windows, Linux and Intel Macs. On Apple Silicon, use the `.dmg`.
 
 ```sh
 java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar
@@ -43,24 +43,24 @@ java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.s
 
 ### Launch flags
 
-Optional, after the program or JAR name (`fullscreen` wins over `portrait`):
+Add these after the program or JAR name. If you pass both `fullscreen` and `portrait`, `fullscreen` wins.
 
 | Flag | Effect |
 |------|--------|
-| `fullscreen` | Exclusive fullscreen visualization (hides desktop panels) |
-| `portrait` | Tall ~9:16 window |
-| `--display=N` | Visualization on display `N` (1-based; default is 2 when multiple monitors exist) |
-| `--self-check` | Verify the installation (natives, UI toolkit, resources) and exit without opening a window |
+| `fullscreen` | Show the visualization in exclusive fullscreen |
+| `portrait` | Use a tall window (about 9:16) |
+| `--display=N` | Show the visualization on display `N`, counting from 1 (default: 2 if you have several monitors) |
+| `--self-check` | Check that the installation works, then exit without opening a window |
 
 ## Features
 
-- Classic and niche sorts (Quick, Merge, Heap, Radix, Bogo, …), singly or run-all with a comparison table
-- 2D and 3D visualizations, custom colors, optional MIDI sound
-- Array sizes up to 100 000; live metrics and CSV export
+- Classic and unusual sorts (Quick, Merge, Heap, Radix, Bogo and more), one at a time or all in a row with a comparison table
+- 2D and 3D visualizations, custom colors and optional MIDI sound
+- Arrays of up to 100,000 elements, with live metrics
 
 ## Build from source
 
-Requires **[JDK 25+](https://adoptium.net/temurin/releases/?version=25)** (the current LTS); Maven comes with the repo (`./mvnw`).
+You need **[JDK 25 or newer](https://adoptium.net/temurin/releases/?version=25)**. Maven is included (`./mvnw`).
 
 ```sh
 git clone https://github.com/66-m/sorting-visualizer.git
@@ -71,11 +71,11 @@ cd sorting-visualizer
 
 | Command | What it does |
 |---------|----------------|
-| `./build` | Package with tests |
-| `./build skip-tests` | Fast package |
-| `./run` | Launch (same flags as above) |
+| `./build` | Build and run the tests |
+| `./build skip-tests` | Build without tests |
+| `./run` | Start the app (accepts the flags above) |
 
-On Windows: `build.cmd`, `run.cmd`, or `mvnw.cmd`. Packaging and how releases are made: [Contributing](CONTRIBUTING.md#packaging).
+On Windows, use `build.cmd`, `run.cmd` and `mvnw.cmd`. For packaging and releases, see [Contributing](CONTRIBUTING.md#packaging).
 
 ## Docs
 
