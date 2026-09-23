@@ -2,8 +2,8 @@ package io.github._66_m.control.ui;
 
 import io.github._66_m.control.config.AppConfig;
 import io.github._66_m.control.config.CanvasBackground;
+import io.github._66_m.control.model.RunResult;
 import io.github._66_m.control.render.RenderSystem;
-import io.github._66_m.sortingalgorithms.SortingAlgorithm;
 import java.util.List;
 
 /** Draws the algorithm comparison results table onto a {@link RenderSystem}. */
@@ -14,15 +14,7 @@ public final class ResultsTableRenderer {
   private float[] rowLines;
   private int[] rowArgb;
 
-  public void render(
-      RenderSystem rs,
-      CanvasBackground background,
-      List<SortingAlgorithm> algorithms,
-      List<String> comparisons,
-      List<String> realTime,
-      List<String> swaps,
-      List<String> writesMain,
-      List<String> writesAux) {
+  public void render(RenderSystem rs, CanvasBackground background, List<RunResult> results) {
     int width = rs.getWidth();
     int height = rs.getHeight();
 
@@ -37,20 +29,7 @@ public final class ResultsTableRenderer {
 
     drawGrid(rs, width, height, bg);
     drawHeaders(rs, width, textSize, cellPad);
-    drawData(
-        rs,
-        width,
-        height,
-        textSize,
-        topRow,
-        cellPad,
-        bg,
-        algorithms,
-        comparisons,
-        realTime,
-        swaps,
-        writesMain,
-        writesAux);
+    drawData(rs, width, height, textSize, topRow, cellPad, bg, results);
   }
 
   private void drawGrid(RenderSystem rs, int width, int height, CanvasBackground background) {
@@ -104,26 +83,21 @@ public final class ResultsTableRenderer {
       float topRow,
       float cellPad,
       CanvasBackground background,
-      List<SortingAlgorithm> algorithms,
-      List<String> comparisons,
-      List<String> realTime,
-      List<String> swaps,
-      List<String> writesMain,
-      List<String> writesAux) {
-    if (algorithms.isEmpty()) {
+      List<RunResult> results) {
+    if (results.isEmpty()) {
       return;
     }
 
     float columnWidth = width * AppConfig.TABLE_COLUMN_WIDTH_RATIO;
-    float rowHeight = (height - topRow) / algorithms.size();
+    float rowHeight = (height - topRow) / results.size();
     int textColor = packGray(background.overlayTextGray());
 
-    if (rowLines == null || rowLines.length < algorithms.size() * 4) {
-      rowLines = new float[algorithms.size() * 4];
-      rowArgb = new int[algorithms.size()];
+    if (rowLines == null || rowLines.length < results.size() * 4) {
+      rowLines = new float[results.size() * 4];
+      rowArgb = new int[results.size()];
     }
 
-    for (int i = 0; i < algorithms.size(); i++) {
+    for (int i = 0; i < results.size(); i++) {
       float rowY = topRow + rowHeight * i;
       int o = i * 4;
       rowLines[o] = 0;
@@ -132,23 +106,9 @@ public final class ResultsTableRenderer {
       rowLines[o + 3] = rowY;
       rowArgb[i] = textColor;
 
-      drawRow(
-          rs,
-          height,
-          textSize,
-          topRow,
-          cellPad,
-          i,
-          columnWidth,
-          rowY,
-          algorithms,
-          comparisons,
-          realTime,
-          swaps,
-          writesMain,
-          writesAux);
+      drawRow(rs, height, textSize, topRow, cellPad, i, columnWidth, rowY, results);
     }
-    rs.strokeLines(rowLines, rowArgb, algorithms.size());
+    rs.strokeLines(rowLines, rowArgb, results.size());
   }
 
   private void drawRow(
@@ -160,59 +120,32 @@ public final class ResultsTableRenderer {
       int index,
       float columnWidth,
       float rowY,
-      List<SortingAlgorithm> algorithms,
-      List<String> comparisons,
-      List<String> realTime,
-      List<String> swaps,
-      List<String> writesMain,
-      List<String> writesAux) {
-    SortingAlgorithm alg = algorithms.get(index);
-    float rowCenterY = rowY + cellPad + (height - topRow) / algorithms.size() / 2;
+      List<RunResult> results) {
+    RunResult result = results.get(index);
+    float rowCenterY = rowY + cellPad + (height - topRow) / results.size() / 2;
 
-    rs.drawText(alg.getName(), columnWidth * 0 + cellPad, rowCenterY, textSize);
+    rs.drawText(result.algorithmName(), columnWidth * 0 + cellPad, rowCenterY, textSize);
     rs.drawText(
-        String.valueOf(alg.getAlternativeSize()),
+        String.valueOf(result.elements()),
         columnWidth * 1 + columnWidth / 2 + cellPad,
         rowCenterY,
         textSize);
-
-    if (index < comparisons.size()) {
-      rs.drawText(
-          String.format("%,d", Long.parseLong(comparisons.get(index))),
-          columnWidth * 2 + cellPad,
-          rowCenterY,
-          textSize);
-    }
-
-    if (index < realTime.size()) {
-      String timeStr =
-          "~" + TimeEstimateFormat.format(Double.parseDouble(realTime.get(index))) + "ms";
-      rs.drawText(timeStr, columnWidth * 3 + cellPad, rowCenterY, textSize);
-    }
-
-    if (index < swaps.size()) {
-      rs.drawText(
-          String.format("%,d", Long.parseLong(swaps.get(index))),
-          columnWidth * 4 + cellPad,
-          rowCenterY,
-          textSize);
-    }
-
-    if (index < writesMain.size()) {
-      rs.drawText(
-          String.format("%,d", Long.parseLong(writesMain.get(index))),
-          columnWidth * 5 + cellPad,
-          rowCenterY,
-          textSize);
-    }
-
-    if (index < writesAux.size()) {
-      rs.drawText(
-          String.format("%,d", Long.parseLong(writesAux.get(index))),
-          columnWidth * 6 + cellPad,
-          rowCenterY,
-          textSize);
-    }
+    rs.drawText(
+        String.format("%,d", result.comparisons()),
+        columnWidth * 2 + cellPad,
+        rowCenterY,
+        textSize);
+    rs.drawText(
+        "~" + TimeEstimateFormat.format(result.realTimeNanos()) + "ms",
+        columnWidth * 3 + cellPad,
+        rowCenterY,
+        textSize);
+    rs.drawText(
+        String.format("%,d", result.swaps()), columnWidth * 4 + cellPad, rowCenterY, textSize);
+    rs.drawText(
+        String.format("%,d", result.writesMain()), columnWidth * 5 + cellPad, rowCenterY, textSize);
+    rs.drawText(
+        String.format("%,d", result.writesAux()), columnWidth * 6 + cellPad, rowCenterY, textSize);
   }
 
   private static int packGray(int channel) {

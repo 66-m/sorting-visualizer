@@ -78,21 +78,19 @@ class EqualizeSortDurationSessionTest {
   @Test
   @DisplayName("planDelayStride uses multi-credit budget when steps fit, else one beat per frame")
   void planDelayStrideChoosesMode() {
-    SortingSessionManager.DelayStridePlan fits = SortingSessionManager.planDelayStride(1_000, 2f);
+    EqualizeMath.DelayStridePlan fits = EqualizeMath.planDelayStride(1_000, 2f);
     assertEquals(1, fits.stride());
     assertEquals(1_000, fits.visualSteps());
     assertEquals(AppConfig.EQUALIZE_MAX_STEPS_PER_FRAME, fits.maxStepsPerFrame());
 
     // 2s → 120 frames; 1.25e9 Bubble steps exceed responsive work budget → fast-forward.
-    long bubbleRaw = SortingSessionManager.maxSwapDelaysUpperBound(50_000);
-    SortingSessionManager.DelayStridePlan strided =
-        SortingSessionManager.planDelayStride(bubbleRaw, 2f);
+    long bubbleRaw = EqualizeMath.maxSwapDelaysUpperBound(50_000);
+    EqualizeMath.DelayStridePlan strided = EqualizeMath.planDelayStride(bubbleRaw, 2f);
     assertTrue(strided.fastForward());
 
     // Fits in work budget with capped stride + catch-up credits.
-    long mediumRaw = SortingSessionManager.maxSwapDelaysUpperBound(5_000);
-    SortingSessionManager.DelayStridePlan medium =
-        SortingSessionManager.planDelayStride(mediumRaw, 2f);
+    long mediumRaw = EqualizeMath.maxSwapDelaysUpperBound(5_000);
+    EqualizeMath.DelayStridePlan medium = EqualizeMath.planDelayStride(mediumRaw, 2f);
     assertFalse(medium.fastForward());
     assertTrue(medium.stride() > 1);
     assertTrue(medium.stride() <= AppConfig.EQUALIZE_MAX_DELAY_STRIDE);
@@ -117,28 +115,27 @@ class EqualizeSortDurationSessionTest {
   @Test
   @DisplayName("estimateRawSteps distinguishes sparse vs swap-dense timeouts")
   void estimateRawStepsExtrapolatesAndClamps() {
-    assertEquals(100, SortingSessionManager.estimateRawSteps(false, 100, 0.5, 40));
+    assertEquals(100, EqualizeMath.estimateRawSteps(false, 100, 0.5, 40));
     // Completed counts are not clamped to the swap upper bound.
-    assertEquals(10_000, SortingSessionManager.estimateRawSteps(false, 10_000, 0, 40));
+    assertEquals(10_000, EqualizeMath.estimateRawSteps(false, 10_000, 0, 40));
 
     // Swap-dense timeout (partial ≥ n): quadratic upper bound.
     assertEquals(
-        SortingSessionManager.maxSwapDelaysUpperBound(40),
-        SortingSessionManager.estimateRawSteps(true, 40, 0.01, 40));
+        EqualizeMath.maxSwapDelaysUpperBound(40),
+        EqualizeMath.estimateRawSteps(true, 40, 0.01, 40));
     assertEquals(
-        SortingSessionManager.maxSwapDelaysUpperBound(50),
-        SortingSessionManager.estimateRawSteps(true, 0, 0, 50));
+        EqualizeMath.maxSwapDelaysUpperBound(50), EqualizeMath.estimateRawSteps(true, 0, 0, 50));
 
     // Sparse timeout (Selection-like, partial < n): extrapolate toward ~n, not n²/2.
-    long sparse = SortingSessionManager.estimateRawSteps(true, 5, 5.0 / 50_000, 50_000);
+    long sparse = EqualizeMath.estimateRawSteps(true, 5, 5.0 / 50_000, 50_000);
     assertEquals(50_000, sparse);
-    assertTrue(sparse < SortingSessionManager.maxSwapDelaysUpperBound(50_000) / 100);
+    assertTrue(sparse < EqualizeMath.maxSwapDelaysUpperBound(50_000) / 100);
 
     // Timed-out mid Merge-like sample with ≥ n delays uses Bubble bound (exact Merge counts
     // come from a completed dry-run with timedOut=false instead).
     assertEquals(
-        SortingSessionManager.maxSwapDelaysUpperBound(50_000),
-        SortingSessionManager.estimateRawSteps(true, 50_000, 0.10, 50_000));
+        EqualizeMath.maxSwapDelaysUpperBound(50_000),
+        EqualizeMath.estimateRawSteps(true, 50_000, 0.10, 50_000));
   }
 
   @Test
@@ -151,7 +148,7 @@ class EqualizeSortDurationSessionTest {
     EqualizePacing pacing = stateManager.equalizePacing();
     assertTrue(pacing.isActive());
     // n=32 Merge is well under the dry-run timeout; exact count ≪ n²/2.
-    assertTrue(pacing.totalSteps() < SortingSessionManager.maxSwapDelaysUpperBound(32));
+    assertTrue(pacing.totalSteps() < EqualizeMath.maxSwapDelaysUpperBound(32));
     assertEquals(1, merge.getDelayStride());
   }
 
@@ -350,7 +347,7 @@ class EqualizeSortDurationSessionTest {
   void createPeerCopiesAlternativeSize() {
     BubbleSort bubble = new BubbleSort(array);
     bubble.setAlternativeSize(99);
-    SortingAlgorithm peer = SortingSessionManager.createPeerAlgorithm(bubble, array);
+    SortingAlgorithm peer = EqualizeDryRun.createPeerAlgorithm(bubble, array);
     assertTrue(peer instanceof BubbleSort);
     assertEquals(99, peer.getAlternativeSize());
   }
@@ -359,7 +356,7 @@ class EqualizeSortDurationSessionTest {
   @DisplayName("createPeerAlgorithm returns null for stubs without ArrayModel ctor")
   void createPeerReturnsNullForStub() {
     CountingSortStub stub = new CountingSortStub(array, 3);
-    assertEquals(null, SortingSessionManager.createPeerAlgorithm(stub, array));
+    assertEquals(null, EqualizeDryRun.createPeerAlgorithm(stub, array));
   }
 
   @Test

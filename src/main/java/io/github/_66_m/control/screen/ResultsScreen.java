@@ -81,15 +81,7 @@ public final class ResultsScreen implements Screen {
             game.appContext() != null
                 ? game.appContext().getCanvasBackground()
                 : CanvasBackground.DARK;
-        resultsTableRenderer.render(
-            renderSystem,
-            background,
-            game.sessionManager().getCompletedAlgorithms(),
-            game.sessionManager().getComparisons(),
-            game.sessionManager().getRealTime(),
-            game.sessionManager().getSwaps(),
-            game.sessionManager().getWritesMain(),
-            game.sessionManager().getWritesAux());
+        resultsTableRenderer.render(renderSystem, background, game.sessionManager().getResults());
       }
 
       renderSystem.endWorld();

@@ -51,7 +51,7 @@ class SessionResultsGoldenTest {
   @Test
   void csvExportIsStable(@TempDir Path dir) throws Exception {
     Path csv = dir.resolve("results.csv");
-    session.exportCsv(csv, session.getCompletedAlgorithms());
+    session.exportCsv(csv);
 
     List<String> lines = Files.readAllLines(csv, StandardCharsets.UTF_8);
     assertEquals(3, lines.size());
@@ -67,21 +67,13 @@ class SessionResultsGoldenTest {
     PrintStream original = System.out;
     System.setOut(new PrintStream(out, true, StandardCharsets.UTF_8));
     try {
-      session.printTimestampsToConsole(session.getCompletedAlgorithms());
+      session.printTimestampsToConsole();
     } finally {
       System.setOut(original);
     }
     String nl = System.lineSeparator();
     assertEquals(
-        nl
-            + nl
-            + "Timestamps:"
-            + nl
-            + nl
-            + "00:00 Plain Sort"
-            + nl
-            + "00:00 Quoted \"Comma, Sort\""
-            + nl,
+        "\n\nTimestamps:\n" + nl + "00:00 Plain Sort" + nl + "00:00 Quoted \"Comma, Sort\"" + nl,
         out.toString(StandardCharsets.UTF_8));
   }
 
@@ -89,15 +81,7 @@ class SessionResultsGoldenTest {
   void resultsTableTextIsStable() {
     List<String> texts = new ArrayList<>();
     new ResultsTableRenderer()
-        .render(
-            recordingRenderSystem(texts),
-            CanvasBackground.DARK,
-            session.getCompletedAlgorithms(),
-            session.getComparisons(),
-            session.getRealTime(),
-            session.getSwaps(),
-            session.getWritesMain(),
-            session.getWritesAux());
+        .render(recordingRenderSystem(texts), CanvasBackground.DARK, session.getResults());
 
     assertEquals(
         List.of(

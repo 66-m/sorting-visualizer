@@ -60,11 +60,8 @@ class SortingSessionManagerTest {
     sessionManager.waitForCompletion();
 
     assertTrue(sessionManager.hasResults());
-    assertFalse(sessionManager.getComparisons().isEmpty());
-    assertFalse(sessionManager.getRealTime().isEmpty());
-    assertFalse(sessionManager.getSwaps().isEmpty());
-    assertFalse(sessionManager.getWritesMain().isEmpty());
-    assertFalse(sessionManager.getWritesAux().isEmpty());
+    assertEquals(1, sessionManager.getResults().size());
+    assertEquals("InstantSort", sessionManager.getResults().get(0).algorithmName());
     assertTrue(stateManager.shouldRestart());
     assertFalse(stateManager.isRunning());
   }
@@ -162,9 +159,8 @@ class SortingSessionManagerTest {
     sessionManager.waitForCompletion();
 
     assertTrue(stateManager.shouldContinueExecution());
-    assertEquals(1, sessionManager.getCompletedAlgorithms().size());
-    assertEquals("InstantSort", sessionManager.getCompletedAlgorithms().get(0).getName());
-    assertEquals(1, sessionManager.getComparisons().size());
+    assertEquals(1, sessionManager.getResults().size());
+    assertEquals("InstantSort", sessionManager.getResults().get(0).algorithmName());
     assertTrue(stateManager.shouldShowResults());
     assertTrue(stateManager.shouldRestart());
     assertFalse(stateManager.isRunning());
@@ -227,7 +223,7 @@ class SortingSessionManagerTest {
     sessionManager.waitForCompletion();
 
     Path csv = tempDir.resolve("results.csv");
-    sessionManager.exportCsv(csv, List.of(algorithm));
+    sessionManager.exportCsv(csv);
 
     String content = Files.readString(csv);
     assertTrue(
