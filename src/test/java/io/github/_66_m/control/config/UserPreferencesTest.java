@@ -26,7 +26,18 @@ class UserPreferencesTest {
 
   @AfterEach
   void tearDown() throws Exception {
+    Preferences parent = node.parent();
     node.removeNode();
+    // Also drop the now-empty test and package nodes so no trace is left in the user's prefs.
+    while (parent != null
+        && parent.absolutePath().startsWith("/io/github/_66_m")
+        && parent.childrenNames().length == 0
+        && parent.keys().length == 0) {
+      Preferences next = parent.parent();
+      parent.removeNode();
+      parent = next;
+    }
+    Preferences.userRoot().flush();
   }
 
   @Test
