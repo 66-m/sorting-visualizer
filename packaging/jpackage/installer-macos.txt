@@ -1,0 +1,1 @@
+--mac-package-name "Sorting Visualizer"

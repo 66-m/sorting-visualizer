@@ -1,0 +1,5 @@
+--linux-shortcut
+--linux-menu-group Education
+--linux-app-category education
+--linux-package-name sorting-visualizer
+--resource-dir packaging/jpackage/resources-linux

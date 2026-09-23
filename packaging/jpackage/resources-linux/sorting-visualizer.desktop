@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Sorting Visualizer
+Comment=APPLICATION_DESCRIPTION
+Exec=APPLICATION_LAUNCHER
+STARTUP_DIRECTORY
+# Installers built from --app-image get jpackage's default Java icon (JDK 26 ignores --icon there),
+# so point at the logo the app image ships via --app-content (app-image-linux.txt).
+Icon=/opt/sorting-visualizer/lib/icon-256.png
+Terminal=false
+Type=Application
+Categories=DEPLOY_BUNDLE_CATEGORY
+DESKTOP_MIMES

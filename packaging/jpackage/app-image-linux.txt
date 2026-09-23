@@ -1,0 +1,2 @@
+--description "Sorting Algorithm Visualizer"
+--app-content packaging/icons/icon-256.png

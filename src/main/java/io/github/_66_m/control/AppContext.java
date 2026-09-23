@@ -1,0 +1,537 @@
+package io.github._66_m.control;
+
+import io.github._66_m.control.config.CanvasBackground;
+import io.github._66_m.control.config.RunAllEntryPref;
+import io.github._66_m.control.config.SettingsDefaults;
+import io.github._66_m.control.config.ShuffleType;
+import io.github._66_m.control.config.UserPreferences;
+import io.github._66_m.control.config.audio.AudioSettings;
+import io.github._66_m.control.config.visual.VisualizationSettings;
+import io.github._66_m.control.model.ArrayController;
+import io.github._66_m.control.model.ArrayModel;
+import io.github._66_m.control.model.FrameGate;
+import io.github._66_m.control.model.SnapshotPublisher;
+import io.github._66_m.control.model.SortingSessionManager;
+import io.github._66_m.control.model.SortingStateManager;
+import io.github._66_m.control.render.DelayContext;
+import io.github._66_m.control.render.RenderSystem;
+import io.github._66_m.control.render.asset.ImageHandle;
+import io.github._66_m.control.render.asset.ImageRepository;
+import io.github._66_m.sortingalgorithms.SortingAlgorithm;
+import io.github._66_m.sound.SilentSound;
+import io.github._66_m.sound.Sound;
+import io.github._66_m.visual.ImageSourceVisualization;
+import io.github._66_m.visual.Visualization;
+import io.github._66_m.visual.gradient.ColorGradient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Live collaborator bundle for a running visualizer session. Provides the operations the Settings
+ * UI needs without depending on the game class.
+ */
+public final class AppContext {
+  private static final Logger LOGGER = Logger.getLogger(AppContext.class.getName());
+
+  private final ArrayController arrayController;
+  private final SortingStateManager stateManager;
+  private final SortingSessionManager sessionManager;
+  private final FrameGate frameGate = new FrameGate();
+  private final UserPreferences preferences;
+  private SnapshotPublisher snapshotPublisher;
+  private Sound sound;
+  private ColorGradient colorGradient;
+  private Visualization visualization;
+  private final List<SortingAlgorithm> algorithms = new ArrayList<>();
+  private int size;
+  private RenderSystem renderSystem;
+  private DelayContext delayContext;
+  private ImageRepository imageRepository;
+  private Runnable shutdownHandler;
+  private SettingsBridge settingsBridge = SettingsBridge.NOOP;
+
+  private int speedLevel = SettingsDefaults.DEFAULT_SPEED_LEVEL; // 1–10, default Normal
+  private int stepsPerFrame = SettingsDefaults.stepsPerFrame(SettingsDefaults.DEFAULT_SPEED_LEVEL);
+  private boolean perfStatsEnabled;
+  private boolean fiveSecondStartDelay;
+  private boolean equalizeSortDuration;
+  private CanvasBackground canvasBackground;
+
+  public AppContext(
+      ArrayController arrayController,
+      SortingStateManager stateManager,
+      SortingSessionManager sessionManager,
+      UserPreferences preferences) {
+    this.arrayController = arrayController;
+    this.stateManager = stateManager;
+    this.sessionManager = sessionManager;
+    this.preferences = preferences != null ? preferences : UserPreferences.load();
+    this.size = this.preferences.getArraySize();
+    this.speedLevel = this.preferences.getSpeedLevel();
+    this.perfStatsEnabled = this.preferences.isPerfStats();
+    this.fiveSecondStartDelay = this.preferences.isFiveSecondStartDelay();
+    this.equalizeSortDuration = this.preferences.isEqualizeSortDuration();
+    this.canvasBackground = this.preferences.getCanvasBackground();
+    if (sessionManager != null) {
+      sessionManager.setFrameGate(frameGate);
+      sessionManager.setEqualizeSupport(
+          () -> equalizeSortDuration,
+          () -> SettingsDefaults.equalizedDurationSec(speedLevel),
+          () -> delayContext);
+    }
+    applySpeedLevel();
+  }
+
+  public UserPreferences getPreferences() {
+    return preferences;
+  }
+
+  /** Full shutdown sync: writes every session-backed field, then flushes to disk. */
+  public void persistPreferences() {
+    flushPreferences();
+  }
+
+  /** Syncs in-memory session state into {@link #preferences}, then saves. Single save path. */
+  public void flushPreferences() {
+    syncSessionToPreferences();
+    preferences.save();
+  }
+
+  private void syncSessionToPreferences() {
+    preferences.setArraySize(size);
+    preferences.setSpeedLevel(speedLevel);
+    if (sound != null) {
+      preferences.setMuted(sound.isMuted());
+      preferences.setAudioSettings(sound.getSettings());
+    }
+    preferences.setShuffleType(arrayController.getShuffleType());
+    preferences.setPrintMeasurements(stateManager.shouldPrintMeasurements());
+    preferences.setShowComparisonTable(stateManager.shouldShowComparisonTable());
+    preferences.setPerfStats(perfStatsEnabled);
+    preferences.setFiveSecondStartDelay(fiveSecondStartDelay);
+    preferences.setEqualizeSortDuration(equalizeSortDuration);
+    preferences.setCanvasBackground(canvasBackground);
+    if (colorGradient != null) {
+      preferences.setGradientName(colorGradient.getName());
+      if (colorGradient.getColor1() != null) {
+        preferences.setGradientColor1Rgb(colorGradient.getColor1().getRGB());
+      }
+      if (colorGradient.getColor2() != null) {
+        preferences.setGradientColor2Rgb(colorGradient.getColor2().getRGB());
+      }
+    }
+  }
+
+  public ArrayController getArrayController() {
+    return arrayController;
+  }
+
+  /**
+   * Read-only published array for visuals and sound. Falls back to the live controller when no
+   * publisher is wired (tests).
+   */
+  public ArrayModel getPublishedArray() {
+    if (snapshotPublisher != null) {
+      return snapshotPublisher.publishedView();
+    }
+    return arrayController;
+  }
+
+  public SnapshotPublisher getSnapshotPublisher() {
+    return snapshotPublisher;
+  }
+
+  public void setSnapshotPublisher(SnapshotPublisher snapshotPublisher) {
+    this.snapshotPublisher = snapshotPublisher;
+    if (snapshotPublisher != null) {
+      snapshotPublisher.publish(arrayController);
+    }
+  }
+
+  /** Copy working → published and clear working markers. Safe when the sort worker is idle. */
+  public void publishArraySnapshot() {
+    if (snapshotPublisher != null) {
+      snapshotPublisher.publish(arrayController);
+    }
+  }
+
+  public SortingStateManager getStateManager() {
+    return stateManager;
+  }
+
+  public SortingSessionManager getSessionManager() {
+    return sessionManager;
+  }
+
+  public FrameGate getFrameGate() {
+    return frameGate;
+  }
+
+  public int getStepsPerFrame() {
+    return stepsPerFrame;
+  }
+
+  public int getSpeedLevel() {
+    return speedLevel;
+  }
+
+  /** Applies speed level 1–10 as steps granted per draw frame. */
+  public void setSpeedLevel(int level1to10) {
+    this.speedLevel = SettingsDefaults.clampSpeedLevel(level1to10);
+    applySpeedLevel();
+    preferences.setSpeedLevel(this.speedLevel);
+    flushPreferences();
+  }
+
+  private void applySpeedLevel() {
+    stepsPerFrame = SettingsDefaults.stepsPerFrame(speedLevel);
+  }
+
+  public Sound getSound() {
+    return sound;
+  }
+
+  public void setSound(Sound sound) {
+    this.sound = sound != null ? sound : new SilentSound(arrayController);
+    this.sound.applySettings(preferences.getAudioSettings());
+  }
+
+  public ColorGradient getColorGradient() {
+    return colorGradient;
+  }
+
+  public void setColorGradient(ColorGradient colorGradient) {
+    this.colorGradient = colorGradient;
+    if (this.colorGradient != null) {
+      this.colorGradient.updateGradient(size);
+      applyCanvasBackgroundToGradient();
+      preferences.setGradientName(this.colorGradient.getName());
+      if (this.colorGradient.getColor1() != null) {
+        preferences.setGradientColor1Rgb(this.colorGradient.getColor1().getRGB());
+      }
+      if (this.colorGradient.getColor2() != null) {
+        preferences.setGradientColor2Rgb(this.colorGradient.getColor2().getRGB());
+      }
+      flushPreferences();
+    }
+    if (visualization != null && this.colorGradient != null) {
+      visualization.updateColorGradient(this.colorGradient);
+    }
+  }
+
+  public Visualization getVisualization() {
+    return visualization;
+  }
+
+  public void setVisualization(Visualization visualization) {
+    this.visualization = visualization;
+    bindImageRepository(visualization);
+    if (visualization != null && colorGradient != null) {
+      visualization.updateColorGradient(colorGradient);
+    }
+  }
+
+  public void setVisualizationId(String id) {
+    preferences.setVisualizationId(id);
+    flushPreferences();
+  }
+
+  /** Persists per-visualization appearance settings (JSON map in prefs). */
+  public void saveVisualizationSettings(VisualizationSettings settings) {
+    if (settings == null) {
+      return;
+    }
+    preferences.putVisualSettings(settings);
+    flushPreferences();
+  }
+
+  /** Clears all persisted visualization customizations. */
+  public void clearAllVisualizationSettings() {
+    preferences.clearVisualSettings();
+    flushPreferences();
+  }
+
+  public void setAlgorithmId(String id) {
+    preferences.setAlgorithmId(id);
+    flushPreferences();
+  }
+
+  public void setMuted(boolean muted) {
+    if (sound != null) {
+      sound.setIsMuted(muted);
+    }
+    preferences.setMuted(muted);
+    flushPreferences();
+  }
+
+  public AudioSettings getAudioSettings() {
+    return sound != null ? sound.getSettings() : preferences.getAudioSettings();
+  }
+
+  public void setAudioSettings(AudioSettings settings) {
+    AudioSettings next = settings != null ? settings : AudioSettings.defaults();
+    if (sound != null) {
+      sound.applySettings(next);
+    }
+    preferences.setAudioSettings(next);
+    flushPreferences();
+  }
+
+  public List<SortingAlgorithm> getAlgorithms() {
+    return new ArrayList<>(algorithms);
+  }
+
+  public int getSize() {
+    return size;
+  }
+
+  public void setSize(int size) {
+    this.size = size;
+  }
+
+  public RenderSystem getRenderSystem() {
+    return renderSystem;
+  }
+
+  public void setRenderSystem(RenderSystem renderSystem) {
+    this.renderSystem = renderSystem;
+  }
+
+  /** Recent canvas FPS, or {@code 0} if graphics are not wired yet. */
+  public int getFramesPerSecond() {
+    return renderSystem != null ? renderSystem.framesPerSecond() : 0;
+  }
+
+  public DelayContext getDelayContext() {
+    return delayContext;
+  }
+
+  /** Wires draw system and delay port. */
+  public void setGraphics(RenderSystem renderSystem, DelayContext delay) {
+    this.renderSystem = renderSystem;
+    this.delayContext = delay;
+    applyCanvasBackgroundToRenderSystem();
+  }
+
+  /** Resizes the array and dependent components; refuses while a sort is running. */
+  public void updateArraySize(int newSize) {
+    if (stateManager != null && stateManager.isRunning()) {
+      LOGGER.log(Level.WARNING, "Ignoring array resize to {0} while a sort is active", newSize);
+      return;
+    }
+    int oldSize = arrayController != null ? arrayController.getLength() : size;
+    this.size = newSize;
+    // Grow gradient before publish so render never indexes past the LUT; shrink after publish so
+    // stale published values cannot exceed the new LUT during the hand-off.
+    if (newSize >= oldSize && colorGradient != null) {
+      colorGradient.updateGradient(newSize);
+    }
+    if (visualization != null && colorGradient != null) {
+      visualization.updateColorGradient(colorGradient);
+    }
+    for (SortingAlgorithm alg : algorithms) {
+      if (alg.getAlternativeSize() == arrayController.getLength()) {
+        alg.setAlternativeSize(newSize);
+      }
+    }
+    arrayController.resize(newSize);
+    publishArraySnapshot();
+    if (newSize < oldSize && colorGradient != null) {
+      colorGradient.updateGradient(newSize);
+      if (visualization != null) {
+        visualization.updateColorGradient(colorGradient);
+      }
+    }
+  }
+
+  public void setStart(boolean shouldStart) {
+    stateManager.setStartRequested(shouldStart);
+  }
+
+  public boolean isRunning() {
+    return stateManager.isRunning();
+  }
+
+  public void cancelSorting() {
+    frameGate.cancel();
+    sessionManager.cancel();
+  }
+
+  /** Skips the current algorithm during a multi-algorithm session; continues with the next. */
+  public void skipCurrentAlgorithm() {
+    sessionManager.skipCurrent();
+  }
+
+  public void setAlgorithms(List<SortingAlgorithm> algorithmList) {
+    algorithms.clear();
+    for (SortingAlgorithm alg : algorithmList) {
+      if (alg.isSelected()) {
+        algorithms.add(alg);
+      }
+    }
+    applySpeedLevel();
+  }
+
+  public void setAlgorithm(SortingAlgorithm algorithm) {
+    algorithms.clear();
+    if (algorithm != null) {
+      algorithms.add(algorithm);
+    }
+    applySpeedLevel();
+  }
+
+  public void setShowComparisonTable(boolean show) {
+    stateManager.setShowComparisonTable(show);
+    preferences.setShowComparisonTable(show);
+    flushPreferences();
+  }
+
+  public void setPrintMeasurements(boolean print) {
+    stateManager.setPrintMeasurements(print);
+    preferences.setPrintMeasurements(print);
+    flushPreferences();
+  }
+
+  public boolean isPerfStatsEnabled() {
+    return perfStatsEnabled;
+  }
+
+  public void setPerfStatsEnabled(boolean enabled) {
+    perfStatsEnabled = enabled;
+    preferences.setPerfStats(enabled);
+    flushPreferences();
+  }
+
+  public boolean isFiveSecondStartDelay() {
+    return fiveSecondStartDelay;
+  }
+
+  public void setFiveSecondStartDelay(boolean enabled) {
+    fiveSecondStartDelay = enabled;
+    preferences.setFiveSecondStartDelay(enabled);
+    flushPreferences();
+  }
+
+  public boolean isEqualizeSortDuration() {
+    return equalizeSortDuration;
+  }
+
+  public void setEqualizeSortDuration(boolean enabled) {
+    equalizeSortDuration = enabled;
+    preferences.setEqualizeSortDuration(enabled);
+    flushPreferences();
+  }
+
+  public CanvasBackground getCanvasBackground() {
+    return canvasBackground;
+  }
+
+  public void setCanvasBackground(CanvasBackground background) {
+    CanvasBackground next =
+        background != null ? background : SettingsDefaults.DEFAULT_CANVAS_BACKGROUND;
+    if (canvasBackground == next) {
+      return;
+    }
+    canvasBackground = next;
+    preferences.setCanvasBackground(next);
+    flushPreferences();
+    applyCanvasBackgroundToGradient();
+    applyCanvasBackgroundToRenderSystem();
+  }
+
+  private void applyCanvasBackgroundToGradient() {
+    if (colorGradient == null || canvasBackground == null) {
+      return;
+    }
+    colorGradient.setLightBackgroundMarkerOverride(
+        canvasBackground.isLight() ? canvasBackground.markerSetFallback() : null);
+  }
+
+  private void applyCanvasBackgroundToRenderSystem() {
+    if (renderSystem == null || canvasBackground == null) {
+      return;
+    }
+    renderSystem.setOverlayTextGray(canvasBackground.overlayTextGray());
+  }
+
+  public void setShuffleType(ShuffleType shuffleType) {
+    arrayController.setShuffleType(shuffleType);
+    preferences.setShuffleType(shuffleType);
+    flushPreferences();
+  }
+
+  public void setImagePath(String path) {
+    preferences.setImagePath(path != null ? path : "");
+    flushPreferences();
+  }
+
+  public ImageRepository getImageRepository() {
+    return imageRepository;
+  }
+
+  public void setImageRepository(ImageRepository imageRepository) {
+    this.imageRepository = imageRepository;
+    bindImageRepository(visualization);
+  }
+
+  /**
+   * Load and resize an image on the render thread (GDX texture dispose/upload). Settings may call
+   * from the JavaFX thread; work is marshalled when needed. Validates nothing about the filesystem;
+   * Settings VM does NIO checks first.
+   */
+  public boolean loadImageForVisualization(ImageSourceVisualization viz, String path) {
+    if (viz == null || imageRepository == null || renderSystem == null) {
+      return false;
+    }
+    if (renderSystem.isRenderThread()) {
+      return loadImageOnRenderThread(viz, path);
+    }
+    return renderSystem.runOnRenderThreadAndWait(() -> loadImageOnRenderThread(viz, path));
+  }
+
+  private boolean loadImageOnRenderThread(ImageSourceVisualization viz, String path) {
+    viz.bindRepository(imageRepository);
+    ImageHandle handle =
+        imageRepository.load(path, renderSystem.getWidth(), renderSystem.getHeight());
+    if (handle == null) {
+      return false;
+    }
+    viz.setImage(handle);
+    setImagePath(path);
+    return true;
+  }
+
+  private void bindImageRepository(Visualization visualization) {
+    if (visualization instanceof ImageSourceVisualization imageViz && imageRepository != null) {
+      imageViz.bindRepository(imageRepository);
+    }
+  }
+
+  public void persistRunAll(boolean runAll, List<RunAllEntryPref> entries) {
+    preferences.setRunAll(runAll);
+    preferences.setRunAllEntries(entries);
+    flushPreferences();
+  }
+
+  public void shutdown() {
+    persistPreferences();
+    if (shutdownHandler != null) {
+      shutdownHandler.run();
+    }
+  }
+
+  /** Registers the composition-root quit path (typically {@code Game::shutdown}). */
+  public void setShutdownHandler(Runnable shutdownHandler) {
+    this.shutdownHandler = shutdownHandler;
+  }
+
+  public SettingsBridge settingsBridge() {
+    return settingsBridge;
+  }
+
+  public void setSettingsBridge(SettingsBridge settingsBridge) {
+    this.settingsBridge = settingsBridge != null ? settingsBridge : SettingsBridge.NOOP;
+  }
+}

@@ -1,0 +1,242 @@
+name: Release
+
+# Pushing a tag vX.Y.Z builds, checks and publishes a GitHub Release with native installers
+# (no Java needed), portable archives, the cross-platform JAR and an SBOM.
+# Pushes to other branches that touch packaging run the same pipeline as a dry run (nothing is
+# published), so packaging changes are validated before they reach main. Pushes to main never
+# release by themselves.
+on:
+  push:
+    tags: ['v*.*.*']
+    branches-ignore: [main]
+    paths:
+      - pom.xml
+      - .mvn/**
+      - packaging/**
+      - .github/workflows/release.yml
+      - src/main/java/io/github/_66_m/control/DesktopLauncher.java
+      - src/main/java/io/github/_66_m/control/SelfCheck.java
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  JAVA_VERSION: '25'
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      publish: ${{ steps.v.outputs.publish }}
+    steps:
+      - id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Only a pushed tag publishes; manual runs are always dry runs, even on a tag.
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            publish=true
+          else
+            # Dry run: any valid numeric version (macOS requires a non-zero first component).
+            version="1.0.${GITHUB_RUN_NUMBER}"
+            publish=false
+          fi
+          if ! [[ "$version" =~ ^[1-9][0-9]*\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Release tags must look like v1.2.3 (got $GITHUB_REF_NAME)"
+            exit 1
+          fi
+          if [[ "$publish" == true ]]; then
+            # Refuse a tag that is not newer than the latest published release (e.g. v2.0.4).
+            latest="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null || true)"
+            latest="${latest#v}"
+            if [[ -n "$latest" && "$(printf '%s\n%s\n' "$latest" "$version" | sort -V | tail -1)" != "$version" || "$latest" == "$version" ]]; then
+              echo "::error::v$version is not newer than the latest release v$latest"
+              exit 1
+            fi
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "Version $version (publish: $publish)"
+
+  jar:
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      - name: Test and build the cross-platform JAR and SBOM
+        run: ./mvnw --batch-mode -Prelease -Drevision="$VERSION" verify
+      - name: Collect
+        run: |
+          mkdir dist
+          cp target/sorting-visualizer-jar-with-dependencies.jar dist/sorting-visualizer.jar
+          cp target/bom.json "dist/sorting-visualizer-$VERSION-sbom.cdx.json"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-jar
+          path: dist/
+          if-no-files-found: error
+
+  package:
+    needs: [version, jar]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: linux-x64
+            os-name: linux
+            os: ubuntu-latest
+            installer: deb
+            jar-check: true
+          - label: windows-x64
+            os-name: windows
+            os: windows-latest
+            installer: msi
+            jar-check: true
+          - label: macos-arm64
+            os-name: macos
+            os: macos-latest
+            installer: dmg
+            # The cross-platform JAR ships x64 JavaFX natives only; Apple Silicon users get the .dmg.
+            jar-check: false
+          - label: macos-x64
+            os-name: macos
+            os: macos-15-intel
+            installer: dmg
+            jar-check: true
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Install packaging tools (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -q && sudo apt-get install -y -q fakeroot xvfb
+      - name: Install WiX (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          wix extension add --global WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2
+          wix --version
+
+      - name: Build app image with bundled runtime
+        run: >
+          ./mvnw --batch-mode -Pjpackage -DskipTests -Djacoco.skip=true
+          -Drevision="$VERSION" -Djpackage.appVersion="$VERSION" verify
+
+      - name: Locate app image
+        id: app
+        run: |
+          case "$RUNNER_OS" in
+            Linux)   dir=target/jpackage/sorting-visualizer; launcher="$dir/bin/sorting-visualizer" ;;
+            Windows) dir="target/jpackage/Sorting Visualizer"; launcher="$dir/Sorting Visualizer.exe" ;;
+            macOS)   dir="target/jpackage/Sorting Visualizer.app"; launcher="$dir/Contents/MacOS/Sorting Visualizer" ;;
+          esac
+          test -e "$launcher"
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          echo "launcher=$launcher" >> "$GITHUB_OUTPUT"
+
+      - name: Self-check the app image (bundled runtime)
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then
+            xvfb-run -a "${{ steps.app.outputs.launcher }}" --self-check
+          else
+            # The Windows launcher is a GUI program: its exit code is the check result.
+            "${{ steps.app.outputs.launcher }}" --self-check
+          fi
+
+      - name: Show self-check output (Windows diagnostics)
+        # The GUI launcher has no console; rerun the same checks via the app's JAR to see why.
+        if: failure() && runner.os == 'Windows'
+        run: >
+          java --enable-native-access=ALL-UNNAMED
+          --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED
+          -jar "${{ steps.app.outputs.dir }}/app/sorting-visualizer-jar-with-dependencies.jar"
+          --self-check
+
+      - uses: actions/download-artifact@v8
+        if: matrix.jar-check
+        with:
+          name: dist-jar
+          path: jar/
+      - name: Self-check the cross-platform JAR
+        if: matrix.jar-check
+        run: |
+          cmd=(java --enable-native-access=ALL-UNNAMED
+               --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED
+               -jar jar/sorting-visualizer.jar --self-check)
+          if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a "${cmd[@]}"; else "${cmd[@]}"; fi
+
+      - name: Build installer
+        run: |
+          jpackage --type ${{ matrix.installer }} \
+            --app-image "${{ steps.app.outputs.dir }}" \
+            --name "Sorting Visualizer" \
+            --app-version "$VERSION" \
+            --vendor 66-m \
+            --description "Sorting Algorithm Visualizer" \
+            --license-file LICENSE \
+            --dest installer \
+            "@packaging/jpackage/installer-${{ matrix.os-name }}.txt"
+          ls -la installer
+
+      - name: Collect
+        run: |
+          mkdir dist
+          base="sorting-visualizer-$VERSION-${{ matrix.label }}"
+          cp installer/*.${{ matrix.installer }} "dist/$base.${{ matrix.installer }}"
+          case "$RUNNER_OS" in
+            Linux)   tar -C target/jpackage -czf "dist/$base.tar.gz" sorting-visualizer ;;
+            Windows) (cd target/jpackage && 7z a -tzip "../../dist/$base.zip" "Sorting Visualizer" > /dev/null) ;;
+          esac
+          ls -la dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-${{ matrix.label }}
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: [version, jar, package]
+    if: needs.version.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: dist-*
+          path: dist/
+          merge-multiple: true
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la dist
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --verify-tag \
+            --title "Sorting Visualizer $GITHUB_REF_NAME" \
+            --generate-notes

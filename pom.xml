@@ -5,7 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.66-m</groupId>
     <artifactId>sorting-visualizer</artifactId>
-    <version>2.0.4</version>
+    <!-- Set by the release workflow from the git tag (vX.Y.Z -> -Drevision=X.Y.Z). -->
+    <version>${revision}</version>
     <packaging>jar</packaging>
     <licenses>
         <license>
@@ -15,7 +16,8 @@
         </license>
     </licenses>
     <properties>
-        <maven.compiler.release>26</maven.compiler.release>
+        <revision>0.0.0-SNAPSHOT</revision>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <errorprone.version>2.50.0</errorprone.version>
         <javafx.version>27</javafx.version>
@@ -85,7 +87,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.github.compilerstuck.control.DesktopLauncher</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <mainClass>io.github._66_m.control.DesktopLauncher</mainClass>
                         </manifest>
                         <manifestEntries>
                             <!-- SoftSynthesizer low-latency open via MidiSys reflection -->
@@ -112,6 +115,48 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.14</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <!-- Floor just below the measured line coverage (62.7%) so it cannot drop silently. -->
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.60</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
@@ -185,8 +230,9 @@
                                 <configuration>
                                     <archive>
                                         <manifest>
+                                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                             <mainClass>
-                                                io.github.compilerstuck.control.DesktopLauncher
+                                                io.github._66_m.control.DesktopLauncher
                                             </mainClass>
                                         </manifest>
                                         <manifestEntries>
@@ -223,7 +269,21 @@
             </build>
         </profile>
         <profile>
+            <!--
+              Native app image with a trimmed, bundled Java runtime (users need no Java install):
+                ./mvnw -Pjpackage -DskipTests verify   ->  target/jpackage/sorting-visualizer[.app]
+              Runs on the OS being targeted (jpackage cannot cross-build). The release workflow turns
+              the app image into installers (see packaging/jpackage/ and .github/workflows/release.yml).
+            -->
             <id>jpackage</id>
+            <properties>
+                <!-- jpackage needs a purely numeric version; releases pass the tag version. -->
+                <jpackage.appVersion>1.0.0</jpackage.appVersion>
+                <!-- Launcher / app name; Windows and macOS use a display name (see OS profiles). -->
+                <jpackage.name>sorting-visualizer</jpackage.name>
+                <!-- JDK modules the app needs (from jdeps); jdk.localedata keeps locale formatting. -->
+                <jpackage.modules>java.base,java.desktop,java.logging,java.prefs,jdk.unsupported,jdk.localedata</jpackage.modules>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -238,9 +298,12 @@
                                     <goal>single</goal>
                                 </goals>
                                 <configuration>
+                                    <!-- jpackage copies everything in its input dir: keep only the app JAR there. -->
+                                    <outputDirectory>${project.build.directory}/jpackage-input</outputDirectory>
                                     <archive>
                                         <manifest>
-                                            <mainClass>io.github.compilerstuck.control.DesktopLauncher</mainClass>
+                                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                            <mainClass>io.github._66_m.control.DesktopLauncher</mainClass>
                                         </manifest>
                                         <manifestEntries>
                                             <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
@@ -260,34 +323,44 @@
                         <version>3.6.4</version>
                         <executions>
                             <execution>
-                                <id>jpackage-linux-app-image</id>
+                                <id>jpackage-app-image</id>
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
                                     <executable>jpackage</executable>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
                                     <arguments>
                                         <argument>--type</argument>
                                         <argument>app-image</argument>
                                         <argument>--name</argument>
-                                        <argument>sorting-visualizer</argument>
+                                        <argument>${jpackage.name}</argument>
+                                        <argument>--vendor</argument>
+                                        <argument>66-m</argument>
                                         <argument>--input</argument>
-                                        <argument>${project.build.directory}</argument>
+                                        <argument>${project.build.directory}/jpackage-input</argument>
                                         <argument>--main-jar</argument>
                                         <argument>${project.build.finalName}-jar-with-dependencies.jar</argument>
                                         <argument>--main-class</argument>
-                                        <argument>io.github.compilerstuck.control.DesktopLauncher</argument>
+                                        <argument>io.github._66_m.control.DesktopLauncher</argument>
                                         <argument>--dest</argument>
                                         <argument>${project.build.directory}/jpackage</argument>
                                         <argument>--app-version</argument>
-                                        <argument>${project.version}</argument>
+                                        <argument>${jpackage.appVersion}</argument>
+                                        <argument>--add-modules</argument>
+                                        <argument>${jpackage.modules}</argument>
+                                        <argument>--jlink-options</argument>
+                                        <argument>--strip-debug --no-header-files --no-man-pages --strip-native-commands --compress=zip-6</argument>
                                         <argument>--java-options</argument>
                                         <argument>--enable-native-access=ALL-UNNAMED</argument>
                                         <argument>--java-options</argument>
                                         <argument>--add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED</argument>
+                                        <argument>--java-options</argument>
+                                        <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                         <argument>--icon</argument>
-                                        <argument>${project.basedir}/images/logo.png</argument>
+                                        <argument>${jpackage.icon}</argument>
+                                        <argument>@${project.basedir}/packaging/jpackage/app-image-${jpackage.os}.txt</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -295,6 +368,46 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <!-- Per-OS jpackage icon and options, picked automatically on the build machine. -->
+        <profile>
+            <id>jpackage-linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>Linux</name>
+                </os>
+            </activation>
+            <properties>
+                <jpackage.os>linux</jpackage.os>
+                <jpackage.icon>${project.basedir}/packaging/icons/icon-256.png</jpackage.icon>
+            </properties>
+        </profile>
+        <profile>
+            <id>jpackage-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <jpackage.os>windows</jpackage.os>
+                <jpackage.name>Sorting Visualizer</jpackage.name>
+                <jpackage.icon>${project.basedir}/packaging/icons/sorting-visualizer.ico</jpackage.icon>
+            </properties>
+        </profile>
+        <profile>
+            <id>jpackage-mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <jpackage.os>mac</jpackage.os>
+                <jpackage.name>Sorting Visualizer</jpackage.name>
+                <jpackage.icon>${project.basedir}/packaging/icons/sorting-visualizer.icns</jpackage.icon>
+            </properties>
         </profile>
     </profiles>
 

@@ -9,7 +9,7 @@ By submitting a contribution, you agree that your work is licensed under the sam
 
 ## Development setup
 
-- **JDK 26+**
+- **JDK 25+** (LTS; e.g. [Temurin 25](https://adoptium.net/temurin/releases/?version=25))
 - Clone and build:
 
 ```sh
@@ -21,7 +21,7 @@ See [README](README.md) for scripts (`./build`, `./run`) and [launch flags](READ
 
 ## Packaging
 
-Release fat JAR (same layout as GitHub Releases):
+Cross-platform fat JAR (the `sorting-visualizer.jar` attached to releases):
 
 ```sh
 ./mvnw clean package -Prelease
@@ -32,17 +32,48 @@ java --enable-native-access=ALL-UNNAMED \
 ```
 
 `-Prelease` also writes a CycloneDX SBOM to `target/bom.json`, and pulls OpenJFX
-`javafx-graphics` natives for **win / linux / mac** so the Linux-built fat JAR runs on
+`javafx-graphics` natives for **win / linux / mac (x64)** so the Linux-built fat JAR runs on
 those desktops (host-only resolution would ship Linux `.so` files alone).
 
-Linux app-image (requires JDK `jpackage`, Linux host):
+Native app image with a bundled, trimmed Java runtime (for the OS you build on; jpackage cannot
+cross-build):
 
 ```sh
-./mvnw clean verify -Pjpackage
-# output under target/jpackage/sorting-visualizer/
+./mvnw clean verify -Pjpackage -DskipTests
+# Linux:   target/jpackage/sorting-visualizer/bin/sorting-visualizer
+# Windows: target/jpackage/Sorting Visualizer/Sorting Visualizer.exe
+# macOS:   target/jpackage/Sorting Visualizer.app
 ```
 
-Windows/macOS installers: run `jpackage` locally against the fat JAR (not covered by CI).
+Add `--self-check` to any launcher (or to `java -jar …`) to verify natives, the JavaFX toolkit
+and bundled resources without opening a window. Installer options live in
+`packaging/jpackage/`; icons in `packaging/icons/`. The Linux menu entry comes from
+`packaging/jpackage/resources-linux/sorting-visualizer.desktop`, because jpackage ignores
+`--icon` when it builds an installer from an app image.
+
+## How releases work
+
+Releases are built by [`.github/workflows/release.yml`](.github/workflows/release.yml); nothing
+is built or uploaded by hand.
+
+1. Merge the changes you want to ship into `main` (merging alone never publishes anything).
+2. Tag the commit and push the tag:
+
+   ```sh
+   git tag v2.1.0
+   git push origin v2.1.0
+   ```
+
+3. The workflow runs the tests, builds the JAR and SBOM, builds and `--self-check`s an app
+   image on Linux, Windows, macOS (Apple Silicon) and macOS (Intel), turns each into an installer
+   (`.deb`, `.msi`, `.dmg`) plus portable archives, and publishes a GitHub Release with notes
+   generated from the merged PRs (grouped by label, see `.github/release.yml`).
+
+The version comes only from the tag (`vMAJOR.MINOR.PATCH`, major ≥ 1): `pom.xml` holds a
+`0.0.0-SNAPSHOT` placeholder, so there are no version-bump commits. Pushes to other branches
+that touch packaging (`pom.xml`, `packaging/`, the release workflow, …) run the same pipeline as
+a dry run without publishing, so packaging changes are proven before they are merged. It can
+also be started manually from the Actions tab; manual runs are always dry runs.
 
 ## Project docs
 
@@ -52,12 +83,13 @@ Windows/macOS installers: run `jpackage` locally against the fat JAR (not covere
 ## Pull requests
 
 - Prefer small, focused changes.
-- Run `./mvnw verify` before opening a PR.
+- Run `./mvnw verify` before opening a PR (CI also runs it on every pushed branch).
 - Describe **why** the change exists and how you tested it (use the PR template).
 
 ## Code style
 
-CI runs Spotless (Google Java Format) and Error Prone during `./mvnw verify`. Format locally with:
+`./mvnw verify` runs Spotless (Google Java Format), Error Prone, the tests and a JaCoCo
+coverage check (report in `target/site/jacoco/`). Format locally with:
 
 ```sh
 ./mvnw spotless:apply
