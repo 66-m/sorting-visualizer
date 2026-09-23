@@ -36,6 +36,8 @@ jobs:
       publish: ${{ steps.v.outputs.publish }}
     steps:
       - id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Only a pushed tag publishes; manual runs are always dry runs, even on a tag.
           if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/tags/v* ]]; then
@@ -49,6 +51,15 @@ jobs:
           if ! [[ "$version" =~ ^[1-9][0-9]*\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Release tags must look like v1.2.3 (got $GITHUB_REF_NAME)"
             exit 1
+          fi
+          if [[ "$publish" == true ]]; then
+            # Refuse a tag that is not newer than the latest published release (e.g. v2.0.4).
+            latest="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null || true)"
+            latest="${latest#v}"
+            if [[ -n "$latest" && "$(printf '%s\n%s\n' "$latest" "$version" | sort -V | tail -1)" != "$version" || "$latest" == "$version" ]]; then
+              echo "::error::v$version is not newer than the latest release v$latest"
+              exit 1
+            fi
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "publish=$publish" >> "$GITHUB_OUTPUT"
