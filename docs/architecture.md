@@ -27,13 +27,13 @@ Engine owns cameras; visuals submit geometry in world units (or Overlay for text
 ```text
 io.github._66_m
 ├── control/
-│   ├── DesktopLauncher      # main: JavaFX then Lwjgl3Application
+│   ├── DesktopLauncher      # main: JavaFX then Lwjgl3Application (or SelfCheck for --self-check)
 │   ├── SortingVisualizerGame # Game; composition root + screen navigation
 │   ├── AppContext           # Façade for Settings (+ shutdown handler)
 │   ├── screen/              # VisualizerScreen, ResultsScreen
 │   ├── catalog/             # AlgorithmCatalog, VisualizationCatalog
-│   ├── config/
-│   ├── model/               # ArrayController, SnapshotPublisher, FrameGate, session/state
+│   ├── config/              # UserPreferences; visual/: settings records + SettingsSchema
+│   ├── model/               # ArrayController, SnapshotPublisher, FrameGate, session (below)
 │   ├── render/              # RenderSystem, GdxRenderSystem, GeometryBatch2D, FramePipeline, …
 │   │   └── asset/           # AppAssets, ImageRepository, ImageHandle, ImageRemapRenderer
 │   ├── shuffle/
@@ -85,7 +85,12 @@ flowchart TB
 | `VisualizationCatalog` | All visualizations with size/image constraints |
 | `FrameGate` | Steps-per-frame engine + `awaitIdle` publish fence |
 | `ConfigurableVisualization` | Optional per-viz settings; Customize dialog drafts then Apply |
-| `VisualizationSettingsCodec` | Versioned JSON for clipboard export/import + `visualSettingsById` prefs blob |
+| `SettingsSchema` | Declares each customizable visualization's fields (range, default, label, section); generates its JSON codec and its Customize panel (`SchemaCustomizePanel`) |
+| `VisualizationSettingsCodec` | Versioned JSON for clipboard export/import + `visualSettingsById` prefs blob (schema-driven) |
+| `SortingSessionManager` | Session façade: runs algorithms on the `SortingThread`, records a `RunResult` each |
+| `EqualizePlanner` / `EqualizeDryRun` / `EqualizeMath` | Equalize-sort-duration: silent dry-run, stride planning, pacing arming |
+| `RunResult` / `ResultsExport` | Typed per-algorithm metrics; CSV export and console timestamps |
+| `SelfCheck` | `--self-check`: natives, GLFW + JavaFX startup, bundled resources; used by release CI |
 
 ## Lifecycle
 
@@ -95,4 +100,4 @@ Per-visualization appearance: Settings → Customize beside the visualization co
 
 ## Build & run
 
-See [README](../README.md). ArchUnit bans `javafx.*` and `com.badlogic.gdx.*` from algorithms/model/shuffle/view-models; visuals must not depend on `Pixmap` / `Gdx` / `gdx.files` (image I/O lives in `control.render.asset`).
+See [README](../README.md); packaging and releases in [CONTRIBUTING](../CONTRIBUTING.md#packaging). ArchUnit bans `javafx.*`, `com.badlogic.gdx.*` and the UI packages from `control.config`, and bans `javafx.*` and `com.badlogic.gdx.*` from algorithms/model/shuffle/view-models; visuals must not depend on `Pixmap` / `Gdx` / `gdx.files` (image I/O lives in `control.render.asset`).
