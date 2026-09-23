@@ -1,0 +1,133 @@
+== circle
+defaults {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.4166666666666667,"startAngleDeg":0.0,"lineThickness":1.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.5,"startAngleDeg":360.0,"lineThickness":4.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.2,"startAngleDeg":0.0,"lineThickness":0.5}}
+nonDefault {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.425,"startAngleDeg":270.0,"lineThickness":3.125}}
+== color-gradient-graph
+defaults {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":false}}
+max clamped=false {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":true}}
+min clamped=false {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":false}}
+nonDefault {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":true}}
+== cube
+defaults {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"fillOpacity":120,"wireframeEnabled":true,"sceneScaleDivisor":3.5}}
+max clamped=true {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":3.141592653589793,"fillOpacity":254,"wireframeEnabled":true,"sceneScaleDivisor":8.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":0.0,"fillOpacity":0,"wireframeEnabled":false,"sceneScaleDivisor":1.5}}
+nonDefault {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":2.356194490192345,"fillOpacity":191,"wireframeEnabled":false,"sceneScaleDivisor":6.375}}
+== cubic-lines
+defaults {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sceneScaleDivisor":3.5,"markerSize":2.0,"lineOpacity":255}}
+max clamped=true {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":3.141592653589793,"sceneScaleDivisor":8.0,"markerSize":8.0,"lineOpacity":255}}
+min clamped=true {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":0.0,"sceneScaleDivisor":1.5,"markerSize":1.0,"lineOpacity":50}}
+nonDefault {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":2.356194490192345,"sceneScaleDivisor":6.375,"markerSize":6.25,"lineOpacity":204}}
+== disparity-chords
+defaults {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"coincidentMarkerSize":1.5,"chordOpacity":255}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.5,"lineThickness":4.0,"coincidentMarkerSize":8.0,"chordOpacity":255}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.15,"lineThickness":0.5,"coincidentMarkerSize":1.5,"chordOpacity":50}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.4125,"lineThickness":3.125,"coincidentMarkerSize":6.375,"chordOpacity":204}}
+== disparity-circle
+defaults {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"startAngleDeg":0.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.5,"lineThickness":4.0,"startAngleDeg":360.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.15,"lineThickness":0.5,"startAngleDeg":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.4125,"lineThickness":3.125,"startAngleDeg":270.0}}
+== disparity-circle-scatter
+defaults {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":4.0,"radiusScale":0.4166666666666667,"startAngleDeg":0.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":12.0,"radiusScale":0.5,"startAngleDeg":360.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":1.0,"radiusScale":0.15,"startAngleDeg":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":9.25,"radiusScale":0.4125,"startAngleDeg":270.0}}
+== disparity-circle-scatter-linked
+defaults {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":1.0,"radiusScale":0.4166666666666667}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":4.0,"radiusScale":0.5}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":0.5,"radiusScale":0.15}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":3.125,"radiusScale":0.4125}}
+== disparity-plane
+defaults {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"maxExtrusionFraction":0.25,"planeScale":0.8333333333333334,"tileGap":0.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.7853981633974483,"maxExtrusionFraction":0.5,"planeScale":0.9,"tileGap":0.2}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.0,"maxExtrusionFraction":0.125,"planeScale":0.4,"tileGap":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.5890486225480862,"maxExtrusionFraction":0.40625,"planeScale":0.775,"tileGap":0.15000000000000002}}
+== disparity-sphere-hoops
+defaults {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.9090909090909091}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":1.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.5}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.875}}
+== disparity-square-scatter
+defaults {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":6.0,"perimeterScale":0.8333333333333334}}
+max clamped=true {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":16.0,"perimeterScale":1.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":2.0,"perimeterScale":0.4}}
+nonDefault {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":12.5,"perimeterScale":0.85}}
+== hoops
+defaults {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.9090909090909091}}
+max clamped=true {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":1.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.5}}
+nonDefault {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.875}}
+== image-horizontal
+defaults {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"STRETCH","highlightStrength":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"CONTAIN","highlightStrength":0.75}}
+== image-vertical
+defaults {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"CONTAIN","highlightStrength":0.75}}
+== morphing-shell
+defaults {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sphereSize":15.0,"shellRadiusScale":0.5}}
+max clamped=true {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":1.5707963267948966,"sphereSize":30.0,"shellRadiusScale":0.75}}
+min clamped=true {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":0.0,"sphereSize":5.0,"shellRadiusScale":0.25}}
+nonDefault {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":1.1780972450961724,"sphereSize":23.75,"shellRadiusScale":0.625}}
+== mosaic-squares
+defaults {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":0.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":4.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":3.0}}
+== number-plot
+defaults {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":14.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":24.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":8.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":20.0}}
+== phyllotaxis
+defaults {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":180.5,"scaleDivisor":70.0,"pointSize":5.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":180.5,"scaleDivisor":120.0,"pointSize":12.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":137.5,"scaleDivisor":40.0,"pointSize":1.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":169.75,"scaleDivisor":100.0,"pointSize":9.25}}
+== plane
+defaults {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"planeScale":0.8333333333333334,"tileGap":0.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.7853981633974483,"planeScale":0.9,"tileGap":0.2}}
+min clamped=true {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.0,"planeScale":0.4,"tileGap":0.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.5890486225480862,"planeScale":0.775,"tileGap":0.15000000000000002}}
+== pyramid
+defaults {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"stackScale":0.5882352941176471}}
+max clamped=true {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.7853981633974483,"stackScale":0.7}}
+min clamped=true {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.0,"stackScale":0.3}}
+nonDefault {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.5890486225480862,"stackScale":0.6}}
+== scatter-plot
+defaults {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":3.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":12.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":1.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":9.25}}
+== scatter-plot-linked
+defaults {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":1.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":4.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":0.5}}
+nonDefault {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":3.125}}
+== sphere
+defaults {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"pointSize":3.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":1.5707963267948966,"globeScale":0.5,"pointSize":10.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":0.0,"globeScale":0.2,"pointSize":1.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"pointSize":7.75}}
+== sphere-hoops
+defaults {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.6666666666666666}}
+max clamped=true {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.9}}
+min clamped=true {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.4}}
+nonDefault {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.775}}
+== spheric-disparity-lines
+defaults {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"lineOpacity":255,"markerSize":2.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":1.5707963267948966,"globeScale":0.5,"lineOpacity":255,"markerSize":8.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":0.0,"globeScale":0.2,"lineOpacity":50,"markerSize":1.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"lineOpacity":204,"markerSize":6.25}}
+== swirl-dots
+defaults {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":8.0,"radiusScale":0.4,"pointSize":5.0}}
+max clamped=true {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":16.0,"radiusScale":0.5,"pointSize":12.0}}
+min clamped=true {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":2.0,"radiusScale":0.2,"pointSize":1.0}}
+nonDefault {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":12.5,"radiusScale":0.425,"pointSize":9.25}}
+== store
+{"circle":{"radiusScale":0.425,"startAngleDeg":270.0,"lineThickness":3.125},"color-gradient-graph":{"showIndexDividers":true},"cube":{"rotationSpeedRadPerSec":2.356194490192345,"fillOpacity":191,"wireframeEnabled":false,"sceneScaleDivisor":6.375},"cubic-lines":{"rotationSpeedRadPerSec":2.356194490192345,"sceneScaleDivisor":6.375,"markerSize":6.25,"lineOpacity":204},"disparity-chords":{"radiusScale":0.4125,"lineThickness":3.125,"coincidentMarkerSize":6.375,"chordOpacity":204},"disparity-circle":{"radiusScale":0.4125,"lineThickness":3.125,"startAngleDeg":270.0},"disparity-circle-scatter":{"pointSize":9.25,"radiusScale":0.4125,"startAngleDeg":270.0},"disparity-circle-scatter-linked":{"lineThickness":3.125,"radiusScale":0.4125},"disparity-plane":{"rotationSpeedRadPerSec":0.5890486225480862,"maxExtrusionFraction":0.40625,"planeScale":0.775,"tileGap":0.15000000000000002},"disparity-sphere-hoops":{"globeScale":0.875},"disparity-square-scatter":{"pointSize":12.5,"perimeterScale":0.85},"hoops":{"radiusScale":0.875},"image-horizontal":{"fitMode":"CONTAIN","highlightStrength":0.75},"image-vertical":{"fitMode":"CONTAIN","highlightStrength":0.75},"morphing-shell":{"rotationSpeedRadPerSec":1.1780972450961724,"sphereSize":23.75,"shellRadiusScale":0.625},"mosaic-squares":{"tileGapPx":3.0},"number-plot":{"fontSize":20.0},"phyllotaxis":{"angleStepDeg":169.75,"scaleDivisor":100.0,"pointSize":9.25},"plane":{"rotationSpeedRadPerSec":0.5890486225480862,"planeScale":0.775,"tileGap":0.15000000000000002},"pyramid":{"rotationSpeedRadPerSec":0.5890486225480862,"stackScale":0.6},"scatter-plot":{"pointSize":9.25},"scatter-plot-linked":{"lineThickness":3.125},"sphere":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"pointSize":7.75},"sphere-hoops":{"globeScale":0.775},"spheric-disparity-lines":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"lineOpacity":204,"markerSize":6.25},"swirl-dots":{"spiralTurns":12.5,"radiusScale":0.425,"pointSize":9.25}}
+storeRoundTrip {"circle":{"radiusScale":0.425,"startAngleDeg":270.0,"lineThickness":3.125},"color-gradient-graph":{"showIndexDividers":true},"cube":{"rotationSpeedRadPerSec":2.356194490192345,"fillOpacity":191,"wireframeEnabled":false,"sceneScaleDivisor":6.375},"cubic-lines":{"rotationSpeedRadPerSec":2.356194490192345,"sceneScaleDivisor":6.375,"markerSize":6.25,"lineOpacity":204},"disparity-chords":{"radiusScale":0.4125,"lineThickness":3.125,"coincidentMarkerSize":6.375,"chordOpacity":204},"disparity-circle":{"radiusScale":0.4125,"lineThickness":3.125,"startAngleDeg":270.0},"disparity-circle-scatter":{"pointSize":9.25,"radiusScale":0.4125,"startAngleDeg":270.0},"disparity-circle-scatter-linked":{"lineThickness":3.125,"radiusScale":0.4125},"disparity-plane":{"rotationSpeedRadPerSec":0.5890486225480862,"maxExtrusionFraction":0.40625,"planeScale":0.775,"tileGap":0.15000000000000002},"disparity-sphere-hoops":{"globeScale":0.875},"disparity-square-scatter":{"pointSize":12.5,"perimeterScale":0.85},"hoops":{"radiusScale":0.875},"image-horizontal":{"fitMode":"CONTAIN","highlightStrength":0.75},"image-vertical":{"fitMode":"CONTAIN","highlightStrength":0.75},"morphing-shell":{"rotationSpeedRadPerSec":1.1780972450961724,"sphereSize":23.75,"shellRadiusScale":0.625},"mosaic-squares":{"tileGapPx":3.0},"number-plot":{"fontSize":20.0},"phyllotaxis":{"angleStepDeg":169.75,"scaleDivisor":100.0,"pointSize":9.25},"plane":{"rotationSpeedRadPerSec":0.5890486225480862,"planeScale":0.775,"tileGap":0.15000000000000002},"pyramid":{"rotationSpeedRadPerSec":0.5890486225480862,"stackScale":0.6},"scatter-plot":{"pointSize":9.25},"scatter-plot-linked":{"lineThickness":3.125},"sphere":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"pointSize":7.75},"sphere-hoops":{"globeScale":0.775},"spheric-disparity-lines":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"lineOpacity":204,"markerSize":6.25},"swirl-dots":{"spiralTurns":12.5,"radiusScale":0.425,"pointSize":9.25}}

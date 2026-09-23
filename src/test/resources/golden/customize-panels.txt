@@ -1,0 +1,593 @@
+== circle
+panel.defaults {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.4166666666666667,"startAngleDeg":0.0,"lineThickness":1.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.2 max=0.5 value=0.4166666666666667 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.42' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Start angle' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=360.0 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Line thickness' for=Slider label customize-field-label @2,0
+      Slider min=0.5 max=4.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '1.00' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.4166666666666667,"startAngleDeg":0.0,"lineThickness":1.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.425,"startAngleDeg":270.0,"lineThickness":3.125}}
+valueLabels [0.43][270°][3.13]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"circle","settings":{"radiusScale":0.4166666666666667,"startAngleDeg":0.0,"lineThickness":1.0}}
+draftEventsFromResets>0 true
+valid true ''
+== color-gradient-graph
+panel.defaults {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":false}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Index dividers' for=CheckBox label customize-field-label @0,0
+      CheckBox selected=false text='' check-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":false}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":true}}
+valueLabels 
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"color-gradient-graph","settings":{"showIndexDividers":false}}
+draftEventsFromResets>0 true
+valid true ''
+== cube
+panel.defaults {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"fillOpacity":120,"wireframeEnabled":true,"sceneScaleDivisor":3.5}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'LAYOUT' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=1.5 max=8.0 value=3.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '3.50' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+  VBox customize-section settings-form-card
+    Label 'MOTION' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Rotation speed' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=3.141592653589793 value=0.3141592653589793 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.31 rad/s' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+  VBox customize-section settings-form-card
+    Label 'APPEARANCE' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Fill opacity' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=254.0 value=120.0 snap=true major=1.0 minor=0 block=1.0 slider customize-slider @0,1
+      Label '120' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Wireframe' for=CheckBox label customize-field-label @1,0
+      CheckBox selected=true text='' check-box @1,1
+      Region @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"fillOpacity":120,"wireframeEnabled":true,"sceneScaleDivisor":3.5}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":2.356194490192345,"fillOpacity":191,"wireframeEnabled":false,"sceneScaleDivisor":6.375}}
+valueLabels [6.38][2.36 rad/s][191]
+draftEventsDuringLoad 0
+resetButtons 4
+afterResets {"schemaVersion":1,"visualizationId":"cube","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"fillOpacity":120,"wireframeEnabled":true,"sceneScaleDivisor":3.5}}
+draftEventsFromResets>0 true
+valid true ''
+== cubic-lines
+panel.defaults {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sceneScaleDivisor":3.5,"markerSize":2.0,"lineOpacity":255}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=1.5 max=8.0 value=3.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '3.50' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=3.141592653589793 value=0.3141592653589793 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.31 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Marker size' for=Slider label customize-field-label @2,0
+      Slider min=1.0 max=8.0 value=2.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '2.0' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Line opacity' for=Slider label customize-field-label @3,0
+      Slider min=50.0 max=255.0 value=255.0 snap=true major=1.0 minor=0 block=1.0 slider customize-slider @3,1
+      Label '255' label settings-muted customize-value @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sceneScaleDivisor":3.5,"markerSize":2.0,"lineOpacity":255}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":2.356194490192345,"sceneScaleDivisor":6.375,"markerSize":6.25,"lineOpacity":204}}
+valueLabels [6.38][2.36 rad/s][6.3][204]
+draftEventsDuringLoad 0
+resetButtons 4
+afterResets {"schemaVersion":1,"visualizationId":"cubic-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sceneScaleDivisor":3.5,"markerSize":2.0,"lineOpacity":255}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-chords
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"coincidentMarkerSize":1.5,"chordOpacity":255}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.15 max=0.5 value=0.4166666666666667 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.42' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Line thickness' for=Slider label customize-field-label @1,0
+      Slider min=0.5 max=4.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '1.00' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Marker size' for=Slider label customize-field-label @2,0
+      Slider min=1.5 max=8.0 value=1.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '1.5' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Chord opacity' for=Slider label customize-field-label @3,0
+      Slider min=50.0 max=255.0 value=255.0 snap=true major=1.0 minor=0 block=1.0 slider customize-slider @3,1
+      Label '255' label settings-muted customize-value @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"coincidentMarkerSize":1.5,"chordOpacity":255}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.4125,"lineThickness":3.125,"coincidentMarkerSize":6.375,"chordOpacity":204}}
+valueLabels [0.41][3.13][6.4][204]
+draftEventsDuringLoad 0
+resetButtons 4
+afterResets {"schemaVersion":1,"visualizationId":"disparity-chords","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"coincidentMarkerSize":1.5,"chordOpacity":255}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-circle
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"startAngleDeg":0.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.15 max=0.5 value=0.4166666666666667 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.42' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Start angle' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=360.0 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Line thickness' for=Slider label customize-field-label @2,0
+      Slider min=0.5 max=4.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '1.00' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"startAngleDeg":0.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.4125,"lineThickness":3.125,"startAngleDeg":270.0}}
+valueLabels [0.41][270°][3.13]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"disparity-circle","settings":{"radiusScale":0.4166666666666667,"lineThickness":1.0,"startAngleDeg":0.0}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-circle-scatter
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":4.0,"radiusScale":0.4166666666666667,"startAngleDeg":0.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.15 max=0.5 value=0.4166666666666667 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.42' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Point size' for=Slider label customize-field-label @1,0
+      Slider min=1.0 max=12.0 value=4.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '4.0' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Start angle' for=Slider label customize-field-label @2,0
+      Slider min=0.0 max=360.0 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0°' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":4.0,"radiusScale":0.4166666666666667,"startAngleDeg":0.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":9.25,"radiusScale":0.4125,"startAngleDeg":270.0}}
+valueLabels [0.41][9.3][270°]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"disparity-circle-scatter","settings":{"pointSize":4.0,"radiusScale":0.4166666666666667,"startAngleDeg":0.0}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-circle-scatter-linked
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":1.0,"radiusScale":0.4166666666666667}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.15 max=0.5 value=0.4166666666666667 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.42' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Line thickness' for=Slider label customize-field-label @1,0
+      Slider min=0.5 max=4.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '1.00' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":1.0,"radiusScale":0.4166666666666667}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":3.125,"radiusScale":0.4125}}
+valueLabels [0.41][3.13]
+draftEventsDuringLoad 0
+resetButtons 2
+afterResets {"schemaVersion":1,"visualizationId":"disparity-circle-scatter-linked","settings":{"lineThickness":1.0,"radiusScale":0.4166666666666667}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-plane
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"maxExtrusionFraction":0.25,"planeScale":0.8333333333333334,"tileGap":0.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.4 max=0.9 value=0.8333333333333334 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.83' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=0.7853981633974483 value=0.20943951023931953 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.21 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Max extrusion' for=Slider label customize-field-label @2,0
+      Slider min=0.125 max=0.5 value=0.25 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.25' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Tile gap' for=Slider label customize-field-label @3,0
+      Slider min=0.0 max=0.2 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @3,1
+      Label '0.00' label settings-muted customize-value @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"maxExtrusionFraction":0.25,"planeScale":0.8333333333333334,"tileGap":0.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.5890486225480862,"maxExtrusionFraction":0.40625,"planeScale":0.775,"tileGap":0.15000000000000002}}
+valueLabels [0.78][0.59 rad/s][0.41][0.15]
+draftEventsDuringLoad 0
+resetButtons 4
+afterResets {"schemaVersion":1,"visualizationId":"disparity-plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"maxExtrusionFraction":0.25,"planeScale":0.8333333333333334,"tileGap":0.0}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-sphere-hoops
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.9090909090909091}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.5 max=1.0 value=0.9090909090909091 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.91' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.9090909090909091}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.875}}
+valueLabels [0.88]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"disparity-sphere-hoops","settings":{"globeScale":0.9090909090909091}}
+draftEventsFromResets>0 true
+valid true ''
+== disparity-square-scatter
+panel.defaults {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":6.0,"perimeterScale":0.8333333333333334}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.4 max=1.0 value=0.8333333333333334 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.83' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Point size' for=Slider label customize-field-label @1,0
+      Slider min=2.0 max=16.0 value=6.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '6.0' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":6.0,"perimeterScale":0.8333333333333334}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":12.5,"perimeterScale":0.85}}
+valueLabels [0.85][12.5]
+draftEventsDuringLoad 0
+resetButtons 2
+afterResets {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":6.0,"perimeterScale":0.8333333333333334}}
+draftEventsFromResets>0 true
+valid true ''
+== hoops
+panel.defaults {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.9090909090909091}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.5 max=1.0 value=0.9090909090909091 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.909' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.9090909090909091}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.875}}
+valueLabels [0.875]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.9090909090909091}}
+draftEventsFromResets>0 true
+valid true ''
+== image-horizontal
+panel.defaults {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Fit mode' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[STRETCH, CONTAIN] selected=STRETCH combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Highlight strength' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=1.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '1.00' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"CONTAIN","highlightStrength":0.75}}
+valueLabels [0.75]
+draftEventsDuringLoad 0
+resetButtons 2
+afterResets {"schemaVersion":1,"visualizationId":"image-horizontal","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+draftEventsFromResets>0 true
+valid true ''
+== image-vertical
+panel.defaults {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Fit mode' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[STRETCH, CONTAIN] selected=STRETCH combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Highlight strength' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=1.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '1.00' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"CONTAIN","highlightStrength":0.75}}
+valueLabels [0.75]
+draftEventsDuringLoad 0
+resetButtons 2
+afterResets {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+draftEventsFromResets>0 true
+valid true ''
+== morphing-shell
+panel.defaults {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sphereSize":15.0,"shellRadiusScale":0.5}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.25 max=0.75 value=0.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.50' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=1.5707963267948966 value=0.3141592653589793 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.31 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Sphere size' for=Slider label customize-field-label @2,0
+      Slider min=5.0 max=30.0 value=15.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '15.0' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sphereSize":15.0,"shellRadiusScale":0.5}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":1.1780972450961724,"sphereSize":23.75,"shellRadiusScale":0.625}}
+valueLabels [0.63][1.18 rad/s][23.8]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"morphing-shell","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"sphereSize":15.0,"shellRadiusScale":0.5}}
+draftEventsFromResets>0 true
+valid true ''
+== mosaic-squares
+panel.defaults {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":0.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Tile gap' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=4.0 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.0' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":0.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":3.0}}
+valueLabels [3.0]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"mosaic-squares","settings":{"tileGapPx":0.0}}
+draftEventsFromResets>0 true
+valid true ''
+== number-plot
+panel.defaults {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":14.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Font size' for=Slider label customize-field-label @0,0
+      Slider min=8.0 max=24.0 value=14.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '14' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":14.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":20.0}}
+valueLabels [20]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"number-plot","settings":{"fontSize":14.0}}
+draftEventsFromResets>0 true
+valid true ''
+== phyllotaxis
+panel.defaults {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":180.5,"scaleDivisor":70.0,"pointSize":5.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=40.0 max=120.0 value=70.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '70' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Angle step' for=Slider label customize-field-label @1,0
+      Slider min=137.5 max=180.5 value=180.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '180.5°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Point size' for=Slider label customize-field-label @2,0
+      Slider min=1.0 max=12.0 value=5.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '5.0' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":180.5,"scaleDivisor":70.0,"pointSize":5.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":169.75,"scaleDivisor":100.0,"pointSize":9.25}}
+valueLabels [100][169.8°][9.3]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"phyllotaxis","settings":{"angleStepDeg":180.5,"scaleDivisor":70.0,"pointSize":5.0}}
+draftEventsFromResets>0 true
+valid true ''
+== plane
+panel.defaults {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"planeScale":0.8333333333333334,"tileGap":0.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.4 max=0.9 value=0.8333333333333334 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.83' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=0.7853981633974483 value=0.20943951023931953 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.21 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Tile gap' for=Slider label customize-field-label @2,0
+      Slider min=0.0 max=0.2 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.00' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"planeScale":0.8333333333333334,"tileGap":0.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.5890486225480862,"planeScale":0.775,"tileGap":0.15000000000000002}}
+valueLabels [0.78][0.59 rad/s][0.15]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"plane","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"planeScale":0.8333333333333334,"tileGap":0.0}}
+draftEventsFromResets>0 true
+valid true ''
+== pyramid
+panel.defaults {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"stackScale":0.5882352941176471}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.3 max=0.7 value=0.5882352941176471 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.59' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=0.7853981633974483 value=0.20943951023931953 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.21 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"stackScale":0.5882352941176471}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.5890486225480862,"stackScale":0.6}}
+valueLabels [0.60][0.59 rad/s]
+draftEventsDuringLoad 0
+resetButtons 2
+afterResets {"schemaVersion":1,"visualizationId":"pyramid","settings":{"rotationSpeedRadPerSec":0.20943951023931953,"stackScale":0.5882352941176471}}
+draftEventsFromResets>0 true
+valid true ''
+== scatter-plot
+panel.defaults {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":3.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Point size' for=Slider label customize-field-label @0,0
+      Slider min=1.0 max=12.0 value=3.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '3.0' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":3.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":9.25}}
+valueLabels [9.3]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"scatter-plot","settings":{"pointSize":3.0}}
+draftEventsFromResets>0 true
+valid true ''
+== scatter-plot-linked
+panel.defaults {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":1.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Line thickness' for=Slider label customize-field-label @0,0
+      Slider min=0.5 max=4.0 value=1.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '1.00' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":1.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":3.125}}
+valueLabels [3.13]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"scatter-plot-linked","settings":{"lineThickness":1.0}}
+draftEventsFromResets>0 true
+valid true ''
+== sphere
+panel.defaults {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"pointSize":3.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.2 max=0.5 value=0.4347826086956522 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.43' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=1.5707963267948966 value=0.3141592653589793 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.31 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Point size' for=Slider label customize-field-label @2,0
+      Slider min=1.0 max=10.0 value=3.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '3.0' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"pointSize":3.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"pointSize":7.75}}
+valueLabels [0.43][1.18 rad/s][7.8]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"sphere","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"pointSize":3.0}}
+draftEventsFromResets>0 true
+valid true ''
+== sphere-hoops
+panel.defaults {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.6666666666666666}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.4 max=0.9 value=0.6666666666666666 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.67' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.6666666666666666}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.775}}
+valueLabels [0.78]
+draftEventsDuringLoad 0
+resetButtons 1
+afterResets {"schemaVersion":1,"visualizationId":"sphere-hoops","settings":{"globeScale":0.6666666666666666}}
+draftEventsFromResets>0 true
+valid true ''
+== spheric-disparity-lines
+panel.defaults {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"lineOpacity":255,"markerSize":2.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.2 max=0.5 value=0.4347826086956522 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.43' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Rotation speed' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=1.5707963267948966 value=0.3141592653589793 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.31 rad/s' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Marker size' for=Slider label customize-field-label @2,0
+      Slider min=1.0 max=8.0 value=2.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '2.0' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Line opacity' for=Slider label customize-field-label @3,0
+      Slider min=50.0 max=255.0 value=255.0 snap=true major=1.0 minor=0 block=1.0 slider customize-slider @3,1
+      Label '255' label settings-muted customize-value @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"lineOpacity":255,"markerSize":2.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":1.1780972450961724,"globeScale":0.425,"lineOpacity":204,"markerSize":6.25}}
+valueLabels [0.43][1.18 rad/s][6.3][204]
+draftEventsDuringLoad 0
+resetButtons 4
+afterResets {"schemaVersion":1,"visualizationId":"spheric-disparity-lines","settings":{"rotationSpeedRadPerSec":0.3141592653589793,"globeScale":0.4347826086956522,"lineOpacity":255,"markerSize":2.0}}
+draftEventsFromResets>0 true
+valid true ''
+== swirl-dots
+panel.defaults {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":8.0,"radiusScale":0.4,"pointSize":5.0}}
+VBox customize-panel
+  VBox customize-section
+    GridPane customize-field-grid
+      Label 'Radius' for=Slider label customize-field-label @0,0
+      Slider min=0.2 max=0.5 value=0.4 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.40' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Spiral turns' for=Slider label customize-field-label @1,0
+      Slider min=2.0 max=16.0 value=8.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '8.0' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Point size' for=Slider label customize-field-label @2,0
+      Slider min=1.0 max=12.0 value=5.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '5.0' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":8.0,"radiusScale":0.4,"pointSize":5.0}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":12.5,"radiusScale":0.425,"pointSize":9.25}}
+valueLabels [0.43][12.5][9.3]
+draftEventsDuringLoad 0
+resetButtons 3
+afterResets {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":8.0,"radiusScale":0.4,"pointSize":5.0}}
+draftEventsFromResets>0 true
+valid true ''
