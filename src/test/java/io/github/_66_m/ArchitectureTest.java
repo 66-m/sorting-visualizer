@@ -103,6 +103,17 @@ class ArchitectureTest {
           .resideInAPackage("javafx..")
           .allowEmptyShould(true);
 
+  /** Settings schemas describe the customize UI declaratively but must not depend on it. */
+  @ArchTest
+  static final ArchRule config_no_ui =
+      noClasses()
+          .that()
+          .resideInAPackage("..control.config..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage("javafx..", "..control.ui..", "com.badlogic.gdx..")
+          .allowEmptyShould(true);
+
   /** Phase 2 view-models must stay headless (G9). Package reserved in Phase 1. */
   @ArchTest
   static final ArchRule settingsfx_vm_no_javafx =

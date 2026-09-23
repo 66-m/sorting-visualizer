@@ -23,9 +23,38 @@ public record DisparityCircleSettings(
     startAngleDeg = Numbers.clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<DisparityCircleSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          DisparityCircleSettings.class,
+          new SettingsSchema.DoubleParam(
+              "radiusScale",
+              "Radius",
+              "LAYOUT",
+              RADIUS_SCALE_MIN,
+              RADIUS_SCALE_MAX,
+              DEFAULT_RADIUS_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "startAngleDeg",
+              "Start angle",
+              "LAYOUT",
+              START_ANGLE_DEG_MIN,
+              START_ANGLE_DEG_MAX,
+              DEFAULT_START_ANGLE_DEG,
+              "%.0f°"),
+          new SettingsSchema.DoubleParam(
+              "lineThickness",
+              "Line thickness",
+              "LAYOUT",
+              LINE_THICKNESS_MIN,
+              LINE_THICKNESS_MAX,
+              DEFAULT_LINE_THICKNESS,
+              "%.2f"));
+
   public static DisparityCircleSettings defaults() {
-    return new DisparityCircleSettings(
-        DEFAULT_RADIUS_SCALE, DEFAULT_LINE_THICKNESS, DEFAULT_START_ANGLE_DEG);
+    return SCHEMA.defaults();
   }
 
   @Override

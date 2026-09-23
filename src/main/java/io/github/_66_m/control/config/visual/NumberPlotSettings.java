@@ -13,8 +13,22 @@ public record NumberPlotSettings(double fontSize) implements VisualizationSettin
     fontSize = Numbers.clamp(fontSize, FONT_SIZE_MIN, FONT_SIZE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<NumberPlotSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          NumberPlotSettings.class,
+          new SettingsSchema.DoubleParam(
+              "fontSize",
+              "Font size",
+              "DISPLAY",
+              FONT_SIZE_MIN,
+              FONT_SIZE_MAX,
+              DEFAULT_FONT_SIZE,
+              "%.0f"));
+
   public static NumberPlotSettings defaults() {
-    return new NumberPlotSettings(DEFAULT_FONT_SIZE);
+    return SCHEMA.defaults();
   }
 
   @Override

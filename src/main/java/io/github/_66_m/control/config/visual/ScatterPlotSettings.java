@@ -13,8 +13,22 @@ public record ScatterPlotSettings(double pointSize) implements VisualizationSett
     pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<ScatterPlotSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          ScatterPlotSettings.class,
+          new SettingsSchema.DoubleParam(
+              "pointSize",
+              "Point size",
+              "LAYOUT",
+              POINT_SIZE_MIN,
+              POINT_SIZE_MAX,
+              DEFAULT_POINT_SIZE,
+              "%.1f"));
+
   public static ScatterPlotSettings defaults() {
-    return new ScatterPlotSettings(DEFAULT_POINT_SIZE);
+    return SCHEMA.defaults();
   }
 
   @Override

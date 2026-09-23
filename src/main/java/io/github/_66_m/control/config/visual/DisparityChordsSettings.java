@@ -29,12 +29,45 @@ public record DisparityChordsSettings(
         (int) Math.round(Numbers.clamp(chordOpacity, CHORD_OPACITY_MIN, CHORD_OPACITY_MAX));
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<DisparityChordsSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          DisparityChordsSettings.class,
+          new SettingsSchema.DoubleParam(
+              "radiusScale",
+              "Radius",
+              "LAYOUT",
+              RADIUS_SCALE_MIN,
+              RADIUS_SCALE_MAX,
+              DEFAULT_RADIUS_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "lineThickness",
+              "Line thickness",
+              "LAYOUT",
+              LINE_THICKNESS_MIN,
+              LINE_THICKNESS_MAX,
+              DEFAULT_LINE_THICKNESS,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "coincidentMarkerSize",
+              "Marker size",
+              "LAYOUT",
+              COINCIDENT_MARKER_SIZE_MIN,
+              COINCIDENT_MARKER_SIZE_MAX,
+              DEFAULT_COINCIDENT_MARKER_SIZE,
+              "%.1f"),
+          new SettingsSchema.IntParam(
+              "chordOpacity",
+              "Chord opacity",
+              "LAYOUT",
+              CHORD_OPACITY_MIN,
+              CHORD_OPACITY_MAX,
+              DEFAULT_CHORD_OPACITY));
+
   public static DisparityChordsSettings defaults() {
-    return new DisparityChordsSettings(
-        DEFAULT_RADIUS_SCALE,
-        DEFAULT_LINE_THICKNESS,
-        DEFAULT_COINCIDENT_MARKER_SIZE,
-        DEFAULT_CHORD_OPACITY);
+    return SCHEMA.defaults();
   }
 
   @Override

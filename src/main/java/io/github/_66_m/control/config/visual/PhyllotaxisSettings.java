@@ -22,9 +22,38 @@ public record PhyllotaxisSettings(double angleStepDeg, double scaleDivisor, doub
     pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<PhyllotaxisSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          PhyllotaxisSettings.class,
+          new SettingsSchema.DoubleParam(
+              "scaleDivisor",
+              "Scene scale",
+              "LAYOUT",
+              SCALE_DIVISOR_MIN,
+              SCALE_DIVISOR_MAX,
+              DEFAULT_SCALE_DIVISOR,
+              "%.0f"),
+          new SettingsSchema.DoubleParam(
+              "angleStepDeg",
+              "Angle step",
+              "LAYOUT",
+              ANGLE_STEP_DEG_MIN,
+              ANGLE_STEP_DEG_MAX,
+              DEFAULT_ANGLE_STEP_DEG,
+              "%.1f°"),
+          new SettingsSchema.DoubleParam(
+              "pointSize",
+              "Point size",
+              "LAYOUT",
+              POINT_SIZE_MIN,
+              POINT_SIZE_MAX,
+              DEFAULT_POINT_SIZE,
+              "%.1f"));
+
   public static PhyllotaxisSettings defaults() {
-    return new PhyllotaxisSettings(
-        DEFAULT_ANGLE_STEP_DEG, DEFAULT_SCALE_DIVISOR, DEFAULT_POINT_SIZE);
+    return SCHEMA.defaults();
   }
 
   @Override

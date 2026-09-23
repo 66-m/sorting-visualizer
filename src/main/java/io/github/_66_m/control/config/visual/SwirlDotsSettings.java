@@ -22,8 +22,38 @@ public record SwirlDotsSettings(double spiralTurns, double radiusScale, double p
     pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<SwirlDotsSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          SwirlDotsSettings.class,
+          new SettingsSchema.DoubleParam(
+              "radiusScale",
+              "Radius",
+              "LAYOUT",
+              RADIUS_SCALE_MIN,
+              RADIUS_SCALE_MAX,
+              DEFAULT_RADIUS_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "spiralTurns",
+              "Spiral turns",
+              "LAYOUT",
+              SPIRAL_TURNS_MIN,
+              SPIRAL_TURNS_MAX,
+              DEFAULT_SPIRAL_TURNS,
+              "%.1f"),
+          new SettingsSchema.DoubleParam(
+              "pointSize",
+              "Point size",
+              "LAYOUT",
+              POINT_SIZE_MIN,
+              POINT_SIZE_MAX,
+              DEFAULT_POINT_SIZE,
+              "%.1f"));
+
   public static SwirlDotsSettings defaults() {
-    return new SwirlDotsSettings(DEFAULT_SPIRAL_TURNS, DEFAULT_RADIUS_SCALE, DEFAULT_POINT_SIZE);
+    return SCHEMA.defaults();
   }
 
   @Override

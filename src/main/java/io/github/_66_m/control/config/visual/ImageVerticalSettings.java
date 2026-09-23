@@ -22,8 +22,23 @@ public record ImageVerticalSettings(FitMode fitMode, double highlightStrength)
         Numbers.clamp(highlightStrength, HIGHLIGHT_STRENGTH_MIN, HIGHLIGHT_STRENGTH_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<ImageVerticalSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          ImageVerticalSettings.class,
+          new SettingsSchema.EnumParam("fitMode", "Fit mode", "IMAGE", DEFAULT_FIT_MODE),
+          new SettingsSchema.DoubleParam(
+              "highlightStrength",
+              "Highlight strength",
+              "IMAGE",
+              HIGHLIGHT_STRENGTH_MIN,
+              HIGHLIGHT_STRENGTH_MAX,
+              DEFAULT_HIGHLIGHT_STRENGTH,
+              "%.2f"));
+
   public static ImageVerticalSettings defaults() {
-    return new ImageVerticalSettings(DEFAULT_FIT_MODE, DEFAULT_HIGHLIGHT_STRENGTH);
+    return SCHEMA.defaults();
   }
 
   @Override

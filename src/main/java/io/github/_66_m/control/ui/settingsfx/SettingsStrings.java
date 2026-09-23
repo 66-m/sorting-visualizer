@@ -83,13 +83,6 @@ public final class SettingsStrings {
   public static final String CUSTOMIZE_SAVE_AND_CLOSE = "Save and close";
   public static final String CUSTOMIZE_DISCARD = "Discard changes";
   public static final String CUSTOMIZE_KEEP_EDITING = "Keep editing";
-  public static final String CUBE_SECTION_MOTION = "MOTION";
-  public static final String CUBE_SECTION_APPEARANCE = "APPEARANCE";
-  public static final String CUBE_SECTION_FRAME = "LAYOUT";
-  public static final String CUBE_ROTATION_SPEED = "Rotation speed";
-  public static final String CUBE_FILL_OPACITY = "Fill opacity";
-  public static final String CUBE_SCENE_SCALE = "Scene scale";
-  public static final String CUBE_WIREFRAME = "Wireframe";
   public static final String RESET_SETTING_TOOLTIP = "Reset to default";
   public static final String BROWSE = "Browse…";
   public static final String CONFIGURE_ORDER = "Configure order…";

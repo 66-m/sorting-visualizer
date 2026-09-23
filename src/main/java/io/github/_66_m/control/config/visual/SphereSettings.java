@@ -24,9 +24,38 @@ public record SphereSettings(double rotationSpeedRadPerSec, double globeScale, d
     pointSize = Numbers.clamp(pointSize, POINT_SIZE_MIN, POINT_SIZE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<SphereSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          SphereSettings.class,
+          new SettingsSchema.DoubleParam(
+              "globeScale",
+              "Scene scale",
+              "LAYOUT",
+              GLOBE_SCALE_MIN,
+              GLOBE_SCALE_MAX,
+              DEFAULT_GLOBE_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "rotationSpeedRadPerSec",
+              "Rotation speed",
+              "LAYOUT",
+              ROTATION_SPEED_RAD_PER_SEC_MIN,
+              ROTATION_SPEED_RAD_PER_SEC_MAX,
+              DEFAULT_ROTATION_SPEED_RAD_PER_SEC,
+              "%.2f rad/s"),
+          new SettingsSchema.DoubleParam(
+              "pointSize",
+              "Point size",
+              "LAYOUT",
+              POINT_SIZE_MIN,
+              POINT_SIZE_MAX,
+              DEFAULT_POINT_SIZE,
+              "%.1f"));
+
   public static SphereSettings defaults() {
-    return new SphereSettings(
-        DEFAULT_ROTATION_SPEED_RAD_PER_SEC, DEFAULT_GLOBE_SCALE, DEFAULT_POINT_SIZE);
+    return SCHEMA.defaults();
   }
 
   @Override

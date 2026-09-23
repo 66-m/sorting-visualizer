@@ -33,12 +33,39 @@ public record CubeSettings(
         Numbers.clamp(sceneScaleDivisor, SCENE_SCALE_DIVISOR_MIN, SCENE_SCALE_DIVISOR_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<CubeSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          CubeSettings.class,
+          new SettingsSchema.DoubleParam(
+              "sceneScaleDivisor",
+              "Scene scale",
+              "LAYOUT",
+              SCENE_SCALE_DIVISOR_MIN,
+              SCENE_SCALE_DIVISOR_MAX,
+              DEFAULT_SCENE_SCALE_DIVISOR,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "rotationSpeedRadPerSec",
+              "Rotation speed",
+              "MOTION",
+              ROTATION_SPEED_MIN,
+              ROTATION_SPEED_MAX,
+              DEFAULT_ROTATION_SPEED,
+              "%.2f rad/s"),
+          new SettingsSchema.IntParam(
+              "fillOpacity",
+              "Fill opacity",
+              "APPEARANCE",
+              FILL_OPACITY_MIN,
+              FILL_OPACITY_MAX,
+              DEFAULT_FILL_OPACITY),
+          new SettingsSchema.BoolParam(
+              "wireframeEnabled", "Wireframe", "APPEARANCE", DEFAULT_WIREFRAME));
+
   public static CubeSettings defaults() {
-    return new CubeSettings(
-        DEFAULT_ROTATION_SPEED,
-        DEFAULT_FILL_OPACITY,
-        DEFAULT_WIREFRAME,
-        DEFAULT_SCENE_SCALE_DIVISOR);
+    return SCHEMA.defaults();
   }
 
   @Override

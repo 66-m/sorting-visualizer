@@ -29,12 +29,45 @@ public record SphericDisparityLinesSettings(
     markerSize = Numbers.clamp(markerSize, MARKER_SIZE_MIN, MARKER_SIZE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<SphericDisparityLinesSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          SphericDisparityLinesSettings.class,
+          new SettingsSchema.DoubleParam(
+              "globeScale",
+              "Scene scale",
+              "LAYOUT",
+              GLOBE_SCALE_MIN,
+              GLOBE_SCALE_MAX,
+              DEFAULT_GLOBE_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "rotationSpeedRadPerSec",
+              "Rotation speed",
+              "LAYOUT",
+              ROTATION_SPEED_RAD_PER_SEC_MIN,
+              ROTATION_SPEED_RAD_PER_SEC_MAX,
+              DEFAULT_ROTATION_SPEED_RAD_PER_SEC,
+              "%.2f rad/s"),
+          new SettingsSchema.DoubleParam(
+              "markerSize",
+              "Marker size",
+              "LAYOUT",
+              MARKER_SIZE_MIN,
+              MARKER_SIZE_MAX,
+              DEFAULT_MARKER_SIZE,
+              "%.1f"),
+          new SettingsSchema.IntParam(
+              "lineOpacity",
+              "Line opacity",
+              "LAYOUT",
+              LINE_OPACITY_MIN,
+              LINE_OPACITY_MAX,
+              DEFAULT_LINE_OPACITY));
+
   public static SphericDisparityLinesSettings defaults() {
-    return new SphericDisparityLinesSettings(
-        DEFAULT_ROTATION_SPEED_RAD_PER_SEC,
-        DEFAULT_GLOBE_SCALE,
-        DEFAULT_LINE_OPACITY,
-        DEFAULT_MARKER_SIZE);
+    return SCHEMA.defaults();
   }
 
   @Override

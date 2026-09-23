@@ -13,8 +13,22 @@ public record ScatterPlotLinkedSettings(double lineThickness) implements Visuali
     lineThickness = Numbers.clamp(lineThickness, LINE_THICKNESS_MIN, LINE_THICKNESS_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<ScatterPlotLinkedSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          ScatterPlotLinkedSettings.class,
+          new SettingsSchema.DoubleParam(
+              "lineThickness",
+              "Line thickness",
+              "LAYOUT",
+              LINE_THICKNESS_MIN,
+              LINE_THICKNESS_MAX,
+              DEFAULT_LINE_THICKNESS,
+              "%.2f"));
+
   public static ScatterPlotLinkedSettings defaults() {
-    return new ScatterPlotLinkedSettings(DEFAULT_LINE_THICKNESS);
+    return SCHEMA.defaults();
   }
 
   @Override

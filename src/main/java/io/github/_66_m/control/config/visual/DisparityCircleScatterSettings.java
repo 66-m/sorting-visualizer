@@ -22,9 +22,38 @@ public record DisparityCircleScatterSettings(
     startAngleDeg = Numbers.clamp(startAngleDeg, START_ANGLE_DEG_MIN, START_ANGLE_DEG_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<DisparityCircleScatterSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          DisparityCircleScatterSettings.class,
+          new SettingsSchema.DoubleParam(
+              "radiusScale",
+              "Radius",
+              "LAYOUT",
+              RADIUS_SCALE_MIN,
+              RADIUS_SCALE_MAX,
+              DEFAULT_RADIUS_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "pointSize",
+              "Point size",
+              "LAYOUT",
+              POINT_SIZE_MIN,
+              POINT_SIZE_MAX,
+              DEFAULT_POINT_SIZE,
+              "%.1f"),
+          new SettingsSchema.DoubleParam(
+              "startAngleDeg",
+              "Start angle",
+              "LAYOUT",
+              START_ANGLE_DEG_MIN,
+              START_ANGLE_DEG_MAX,
+              DEFAULT_START_ANGLE_DEG,
+              "%.0f°"));
+
   public static DisparityCircleScatterSettings defaults() {
-    return new DisparityCircleScatterSettings(
-        DEFAULT_POINT_SIZE, DEFAULT_RADIUS_SCALE, DEFAULT_START_ANGLE_DEG);
+    return SCHEMA.defaults();
   }
 
   @Override

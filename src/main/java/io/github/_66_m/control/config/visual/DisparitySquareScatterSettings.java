@@ -18,8 +18,30 @@ public record DisparitySquareScatterSettings(double pointSize, double perimeterS
     perimeterScale = Numbers.clamp(perimeterScale, PERIMETER_SCALE_MIN, PERIMETER_SCALE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<DisparitySquareScatterSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          DisparitySquareScatterSettings.class,
+          new SettingsSchema.DoubleParam(
+              "perimeterScale",
+              "Scene scale",
+              "LAYOUT",
+              PERIMETER_SCALE_MIN,
+              PERIMETER_SCALE_MAX,
+              DEFAULT_PERIMETER_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "pointSize",
+              "Point size",
+              "LAYOUT",
+              POINT_SIZE_MIN,
+              POINT_SIZE_MAX,
+              DEFAULT_POINT_SIZE,
+              "%.1f"));
+
   public static DisparitySquareScatterSettings defaults() {
-    return new DisparitySquareScatterSettings(DEFAULT_POINT_SIZE, DEFAULT_PERIMETER_SCALE);
+    return SCHEMA.defaults();
   }
 
   @Override

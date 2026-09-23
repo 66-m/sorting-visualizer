@@ -13,8 +13,22 @@ public record SphereHoopsSettings(double globeScale) implements VisualizationSet
     globeScale = Numbers.clamp(globeScale, GLOBE_SCALE_MIN, GLOBE_SCALE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<SphereHoopsSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          SphereHoopsSettings.class,
+          new SettingsSchema.DoubleParam(
+              "globeScale",
+              "Scene scale",
+              "LAYOUT",
+              GLOBE_SCALE_MIN,
+              GLOBE_SCALE_MAX,
+              DEFAULT_GLOBE_SCALE,
+              "%.2f"));
+
   public static SphereHoopsSettings defaults() {
-    return new SphereHoopsSettings(DEFAULT_GLOBE_SCALE);
+    return SCHEMA.defaults();
   }
 
   @Override

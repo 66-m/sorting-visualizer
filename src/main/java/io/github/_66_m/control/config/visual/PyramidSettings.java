@@ -20,8 +20,30 @@ public record PyramidSettings(double rotationSpeedRadPerSec, double stackScale)
     stackScale = Numbers.clamp(stackScale, STACK_SCALE_MIN, STACK_SCALE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<PyramidSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          PyramidSettings.class,
+          new SettingsSchema.DoubleParam(
+              "stackScale",
+              "Scene scale",
+              "LAYOUT",
+              STACK_SCALE_MIN,
+              STACK_SCALE_MAX,
+              DEFAULT_STACK_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "rotationSpeedRadPerSec",
+              "Rotation speed",
+              "LAYOUT",
+              ROTATION_SPEED_RAD_PER_SEC_MIN,
+              ROTATION_SPEED_RAD_PER_SEC_MAX,
+              DEFAULT_ROTATION_SPEED_RAD_PER_SEC,
+              "%.2f rad/s"));
+
   public static PyramidSettings defaults() {
-    return new PyramidSettings(DEFAULT_ROTATION_SPEED_RAD_PER_SEC, DEFAULT_STACK_SCALE);
+    return SCHEMA.defaults();
   }
 
   @Override

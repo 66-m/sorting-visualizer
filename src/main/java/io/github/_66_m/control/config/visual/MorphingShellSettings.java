@@ -26,9 +26,38 @@ public record MorphingShellSettings(
         Numbers.clamp(shellRadiusScale, SHELL_RADIUS_SCALE_MIN, SHELL_RADIUS_SCALE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<MorphingShellSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          MorphingShellSettings.class,
+          new SettingsSchema.DoubleParam(
+              "shellRadiusScale",
+              "Scene scale",
+              "LAYOUT",
+              SHELL_RADIUS_SCALE_MIN,
+              SHELL_RADIUS_SCALE_MAX,
+              DEFAULT_SHELL_RADIUS_SCALE,
+              "%.2f"),
+          new SettingsSchema.DoubleParam(
+              "rotationSpeedRadPerSec",
+              "Rotation speed",
+              "LAYOUT",
+              ROTATION_SPEED_RAD_PER_SEC_MIN,
+              ROTATION_SPEED_RAD_PER_SEC_MAX,
+              DEFAULT_ROTATION_SPEED_RAD_PER_SEC,
+              "%.2f rad/s"),
+          new SettingsSchema.DoubleParam(
+              "sphereSize",
+              "Sphere size",
+              "LAYOUT",
+              SPHERE_SIZE_MIN,
+              SPHERE_SIZE_MAX,
+              DEFAULT_SPHERE_SIZE,
+              "%.1f"));
+
   public static MorphingShellSettings defaults() {
-    return new MorphingShellSettings(
-        DEFAULT_ROTATION_SPEED_RAD_PER_SEC, DEFAULT_SPHERE_SIZE, DEFAULT_SHELL_RADIUS_SCALE);
+    return SCHEMA.defaults();
   }
 
   @Override

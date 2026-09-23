@@ -12,8 +12,16 @@ public record ColorGradientGraphSettings(boolean showIndexDividers)
     // no clamps
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<ColorGradientGraphSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          ColorGradientGraphSettings.class,
+          new SettingsSchema.BoolParam(
+              "showIndexDividers", "Index dividers", "DISPLAY", DEFAULT_SHOW_INDEX_DIVIDERS));
+
   public static ColorGradientGraphSettings defaults() {
-    return new ColorGradientGraphSettings(DEFAULT_SHOW_INDEX_DIVIDERS);
+    return SCHEMA.defaults();
   }
 
   @Override

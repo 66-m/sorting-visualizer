@@ -13,8 +13,22 @@ public record HoopsSettings(double radiusScale) implements VisualizationSettings
     radiusScale = Numbers.clamp(radiusScale, RADIUS_SCALE_MIN, RADIUS_SCALE_MAX);
   }
 
+  /** Customize-panel layout, ranges and JSON keys for these settings. */
+  public static final SettingsSchema<HoopsSettings> SCHEMA =
+      SettingsSchema.of(
+          ID,
+          HoopsSettings.class,
+          new SettingsSchema.DoubleParam(
+              "radiusScale",
+              "Radius",
+              "LAYOUT",
+              RADIUS_SCALE_MIN,
+              RADIUS_SCALE_MAX,
+              DEFAULT_RADIUS_SCALE,
+              "%.3f"));
+
   public static HoopsSettings defaults() {
-    return new HoopsSettings(DEFAULT_RADIUS_SCALE);
+    return SCHEMA.defaults();
   }
 
   @Override
