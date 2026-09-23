@@ -6,19 +6,17 @@ public class InsertionSort extends SortingAlgorithm {
 
   public InsertionSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Insertion Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public InsertionSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Insertion Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
 

@@ -4,13 +4,13 @@
 
 1. Create a class under `src/main/java/io/github/_66_m/sortingalgorithms/` that extends `SortingAlgorithm`.
 2. Implement `sort()` (or the abstract entry your base expects). Use `ArrayModel` for reads/writes/swaps/metrics, call `delay(...)` for animation, and respect `isCancelled()`.
-3. Register it in [`AlgorithmCatalog`](../src/main/java/io/github/_66_m/control/catalog/AlgorithmCatalog.java) with a **stable id** (kebab-case), display name, and constructor reference.
-4. Optionally add a unit test under `src/test/java/io/github/_66_m/sortingalgorithms/` that sorts a small array headlessly (see existing tests).
+3. Register it in [`AlgorithmCatalog`](../src/main/java/io/github/_66_m/control/catalog/AlgorithmCatalog.java) with a **stable id** (kebab-case), display name, and constructor reference. The catalog is the only place the display name lives; do not set a name in the algorithm class.
+4. That's it for tests: `SortingAlgorithmsTest` runs every catalog entry over many sizes and input shapes and requires the output to be exactly the sorted input. `CatalogConsistencyTest` fails if the class is not registered.
 
 ## Checklist
 
 - [ ] No `javax.swing` / `processing.core` imports in the algorithm class (ArchUnit)
-- [ ] Catalog id unique and stable (used by user preferences)
+- [ ] Catalog id and display name unique; id stable (used by user preferences)
 - [ ] `./mvnw verify` passes
 
 ## Adding a visualization

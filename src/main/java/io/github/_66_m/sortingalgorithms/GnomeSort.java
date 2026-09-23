@@ -6,24 +6,25 @@ public class GnomeSort extends SortingAlgorithm {
 
   public GnomeSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Gnome Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public GnomeSort(ArrayModel arrayController, int alternativeArrSize) {
     super(arrayController);
-    this.name = "Gnome Sort";
     this.alternativeSize = alternativeArrSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int index = 0;
     while (index < arrayController.getLength() && !isCancelled()) {
 
-      if (index == 0) index++;
+      if (index == 0) {
+        index++;
+        continue; // re-check the bound: a 1-element array has no index 1
+      }
       if (arrayController.get(index) >= arrayController.get(index - 1)) index++;
       else {
         arrayController.swap(index, index - 1);

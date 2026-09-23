@@ -6,19 +6,17 @@ public class AmericanFlagSort extends SortingAlgorithm {
 
   public AmericanFlagSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "American Flag Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public AmericanFlagSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "American Flag Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     final int M = arrayController.getLength();
 

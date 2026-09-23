@@ -6,13 +6,12 @@ public class SelectionSort extends SortingAlgorithm {
 
   public SelectionSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Selection Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
 

@@ -6,19 +6,17 @@ public class CycleSort extends SortingAlgorithm {
 
   public CycleSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Cycle Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public CycleSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Cycle Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
 

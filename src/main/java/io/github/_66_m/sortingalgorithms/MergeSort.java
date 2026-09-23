@@ -6,13 +6,12 @@ public class MergeSort extends SortingAlgorithm {
 
   public MergeSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Merge Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     sort(arrayController, 0, arrayController.getLength() - 1);
   }

@@ -61,7 +61,7 @@ class SortingAlgorithmDelayStrideTest {
     StrideProbe(ArrayController model, int calls) {
       super(model);
       this.calls = calls;
-      this.name = "StrideProbe";
+      setName("StrideProbe");
     }
 
     @Override
@@ -75,7 +75,7 @@ class SortingAlgorithmDelayStrideTest {
   private static final class MarkerProbe extends SortingAlgorithm {
     MarkerProbe(ArrayController model) {
       super(model);
-      this.name = "MarkerProbe";
+      setName("MarkerProbe");
     }
 
     @Override

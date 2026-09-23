@@ -6,19 +6,17 @@ public class CombSort extends SortingAlgorithm {
 
   public CombSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Comb Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public CombSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Comb Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
 

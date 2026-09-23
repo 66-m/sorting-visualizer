@@ -6,13 +6,12 @@ public class DoubleSelectionSort extends SortingAlgorithm {
 
   public DoubleSelectionSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Double Selection Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     for (int i = 0, j = arrayController.getLength() - 1; i < j && !isCancelled(); i++, j--) {
       int min = arrayController.get(i), max = arrayController.get(i);

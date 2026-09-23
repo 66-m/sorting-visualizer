@@ -9,13 +9,11 @@ public class TimSort extends SortingAlgorithm {
 
   public TimSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Tim Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public TimSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Tim Sort";
     this.alternativeSize = alternativeSize;
   }
 
@@ -99,7 +97,7 @@ public class TimSort extends SortingAlgorithm {
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     for (int i = 0; i < arrayController.getLength() && !isCancelled(); i += RUN) {
       insertionSort(i, Math.min((i + 31), (arrayController.getLength() - 1)));

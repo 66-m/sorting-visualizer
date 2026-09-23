@@ -449,7 +449,7 @@ class EqualizeSortDurationSessionTest {
     CountingSortStub(ArrayModel model, int steps) {
       super(model, NO_OP);
       this.steps = steps;
-      this.name = "CountingSortStub";
+      setName("CountingSortStub");
     }
 
     @Override
@@ -469,7 +469,7 @@ class EqualizeSortDurationSessionTest {
       super(model, NO_OP);
       this.steps = steps;
       this.sleepMs = sleepMs;
-      this.name = "SlowCountingStub";
+      setName("SlowCountingStub");
     }
 
     @Override
@@ -489,7 +489,7 @@ class EqualizeSortDurationSessionTest {
   private static final class SlowPeerSort extends SortingAlgorithm {
     SlowPeerSort(ArrayModel model) {
       super(model, NO_OP);
-      this.name = "SlowPeerSort";
+      setName("SlowPeerSort");
     }
 
     @Override
@@ -517,7 +517,7 @@ class EqualizeSortDurationSessionTest {
       super(model, NO_OP);
       this.partialSteps = partialSteps;
       this.sleepMs = sleepMs;
-      this.name = "TimeoutAfterPartialStub";
+      setName("TimeoutAfterPartialStub");
     }
 
     @Override

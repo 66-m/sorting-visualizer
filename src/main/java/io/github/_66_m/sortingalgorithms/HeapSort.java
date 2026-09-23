@@ -6,13 +6,12 @@ public class HeapSort extends SortingAlgorithm {
 
   public HeapSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Heap Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
 

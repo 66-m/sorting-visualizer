@@ -117,7 +117,8 @@ public final class SortingVisualizerGame extends Game {
 
     // Bootstrap the selected visualization only; VisualizationViewModel adopts it and lazy-creates
     // others on demand (SettingsFxController.show is async on the JavaFX thread).
-    VisualizationDescriptor vizDesc = VisualizationCatalog.findById(prefs.getVisualizationId());
+    VisualizationDescriptor vizDesc =
+        VisualizationCatalog.findByIdOrDefault(prefs.getVisualizationId());
     visualization = vizDesc.factory().create(published, colorGradient, sound, renderSystem);
     var savedVizSettings = prefs.getVisualSettingsMap().get(vizDesc.id());
     if (savedVizSettings != null && visualization instanceof ConfigurableVisualization cfg) {
@@ -125,7 +126,7 @@ public final class SortingVisualizerGame extends Game {
     }
     appContext.setVisualization(visualization);
 
-    AlgorithmDescriptor algDesc = AlgorithmCatalog.findById(prefs.getAlgorithmId());
+    AlgorithmDescriptor algDesc = AlgorithmCatalog.findByIdOrDefault(prefs.getAlgorithmId());
     SortingAlgorithm algorithm = algDesc.factory().apply(arrayController, delayContext);
     algorithm.setOperationReporter(stateManager::setCurrentOperation);
     algorithms = new ArrayList<>();

@@ -7,13 +7,12 @@ public class BucketSort extends SortingAlgorithm {
 
   public BucketSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Bucket Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int max = Arrays.stream(arrayController.getArray()).max().getAsInt();
     int[] bucket = new int[max + 1];

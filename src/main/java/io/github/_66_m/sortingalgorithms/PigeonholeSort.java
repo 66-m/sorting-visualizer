@@ -7,19 +7,17 @@ public class PigeonholeSort extends SortingAlgorithm {
 
   public PigeonholeSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Pigeonhole Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public PigeonholeSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Pigeonhole Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int min = arrayController.get(0);
     int max = arrayController.get(0);

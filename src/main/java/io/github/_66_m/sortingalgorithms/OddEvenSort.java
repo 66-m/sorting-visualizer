@@ -6,19 +6,17 @@ public class OddEvenSort extends SortingAlgorithm {
 
   public OddEvenSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Odd Even Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public OddEvenSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Odd Even Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     boolean isSorted = false; // Initially array is unsorted
 

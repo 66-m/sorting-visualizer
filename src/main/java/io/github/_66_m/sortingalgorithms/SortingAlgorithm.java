@@ -8,7 +8,10 @@ import io.github._66_m.visual.Marker;
 
 public abstract class SortingAlgorithm {
   protected DelayContext proc;
-  protected String name;
+
+  /** Display name; set by the algorithm catalog (the single source of names). */
+  private String name;
+
   protected boolean delay;
   protected int alternativeSize;
   protected boolean selected = true;
@@ -55,8 +58,13 @@ public abstract class SortingAlgorithm {
     this.delay = delay;
   }
 
+  /** Display name from the algorithm catalog, or the class name if created outside the catalog. */
   public String getName() {
-    return name;
+    return name != null ? name : getClass().getSimpleName();
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public void setAlternativeSize(int alternativeSize) {

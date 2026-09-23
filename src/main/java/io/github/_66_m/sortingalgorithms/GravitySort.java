@@ -25,7 +25,6 @@ public class GravitySort extends SortingAlgorithm {
 
   public GravitySort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Gravity Sort";
     alternativeSize = arrayController.getLength();
   }
 
@@ -84,7 +83,7 @@ public class GravitySort extends SortingAlgorithm {
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
     if (n == 0) {

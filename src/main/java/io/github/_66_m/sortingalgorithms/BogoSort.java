@@ -10,21 +10,19 @@ public class BogoSort extends SortingAlgorithm {
 
   public BogoSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Bogo Sort";
     alternativeSize = arrayController.getLength();
     selected = false;
   }
 
   public BogoSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Bogo Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
     trycnt = 0;
-    report(name);
+    report(getName());
     Random r = new Random();
     while (!arrayController.isSorted() && !isCancelled()) {
 

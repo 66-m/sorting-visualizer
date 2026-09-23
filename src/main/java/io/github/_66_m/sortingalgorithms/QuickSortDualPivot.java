@@ -6,19 +6,17 @@ public class QuickSortDualPivot extends SortingAlgorithm {
 
   public QuickSortDualPivot(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Quick Sort (Dual Pivot)";
     alternativeSize = arrayController.getLength();
   }
 
   public QuickSortDualPivot(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Quick Sort (Dual Pivot)";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     sort(arrayController, 0, arrayController.getLength() - 1);
   }

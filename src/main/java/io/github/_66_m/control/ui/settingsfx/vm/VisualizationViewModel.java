@@ -124,7 +124,7 @@ public final class VisualizationViewModel {
       visualizationsById.put(id, fromApp);
       return fromApp;
     }
-    VisualizationDescriptor descriptor = VisualizationCatalog.findById(id);
+    VisualizationDescriptor descriptor = VisualizationCatalog.findByIdOrDefault(id);
     Visualization viz =
         descriptor
             .factory()

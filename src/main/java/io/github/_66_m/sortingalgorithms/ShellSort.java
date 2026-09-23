@@ -7,13 +7,12 @@ public class ShellSort extends SortingAlgorithm {
 
   public ShellSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Shell Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
 

@@ -48,13 +48,14 @@ class VisualizationSubmissionSmokeTest {
 
   @Test
   void barsSubmitsOneRectPerElement() {
-    FakeRenderSystem rs = renderOnce(VisualizationCatalog.findById("bars"), 256, 800, 400);
+    FakeRenderSystem rs =
+        renderOnce(VisualizationCatalog.find("bars").orElseThrow(), 256, 800, 400);
     assertEquals(256, rs.rectCount());
   }
 
   @Test
   void cubeSubmitsBoxes() {
-    FakeRenderSystem rs = renderOnce(VisualizationCatalog.findById("cube"), 64, 400, 400);
+    FakeRenderSystem rs = renderOnce(VisualizationCatalog.find("cube").orElseThrow(), 64, 400, 400);
     assertTrue(rs.boxInstances() > 0);
     assertTrue(rs.begin3DCount() >= 1);
   }
@@ -94,14 +95,15 @@ class VisualizationSubmissionSmokeTest {
 
   @Test
   void numberPlotSubmitsTextPerElement() {
-    FakeRenderSystem rs = renderOnce(VisualizationCatalog.findById("number-plot"), 64, 800, 400);
+    FakeRenderSystem rs =
+        renderOnce(VisualizationCatalog.find("number-plot").orElseThrow(), 64, 800, 400);
     assertTrue(rs.textCount() >= 64);
   }
 
   @Test
   void imageHorizontalUploadsPixelsFromBlankBuffer() {
     FakeRenderSystem rs =
-        renderOnce(VisualizationCatalog.findById("image-horizontal"), 64, 400, 300);
+        renderOnce(VisualizationCatalog.find("image-horizontal").orElseThrow(), 64, 400, 300);
     assertTrue(rs.pixelUploadCount() >= 1);
   }
 
@@ -131,7 +133,8 @@ class VisualizationSubmissionSmokeTest {
     ColorGradient gradient =
         new ColorGradient(Color.BLACK, Color.WHITE, Color.RED, "submission-smoke", size);
     Visualization visualization =
-        VisualizationCatalog.findById("cube")
+        VisualizationCatalog.find("cube")
+            .orElseThrow()
             .factory()
             .create(publisher.publishedView(), gradient, sound, rs);
     ((ConfigurableVisualization) visualization).applySettings(settings);

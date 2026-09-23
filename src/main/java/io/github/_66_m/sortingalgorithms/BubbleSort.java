@@ -6,19 +6,17 @@ public class BubbleSort extends SortingAlgorithm {
 
   public BubbleSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Bubble Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public BubbleSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Bubble Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     int n = arrayController.getLength();
     boolean swapped;

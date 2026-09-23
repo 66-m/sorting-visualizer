@@ -7,13 +7,12 @@ public class CountingSort extends SortingAlgorithm {
 
   public CountingSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Counting Sort";
     alternativeSize = arrayController.getLength();
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
     int max = Arrays.stream(arrayController.getArray()).max().getAsInt();
     int[] counter = new int[max + 1];
     for (int i : arrayController.getArray()) {

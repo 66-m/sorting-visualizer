@@ -10,19 +10,17 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
   public RadixLSDSortBase10(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
     alternativeSize = arrayController.getLength();
   }
 
   public RadixLSDSortBase10(ArrayModel arrayController, int radix_base) {
     super(arrayController);
     RADIX = radix_base;
-    this.name = "Radix Sort (LSD) (Base " + RADIX + ")";
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     @SuppressWarnings("unchecked")
     List<Integer>[] bucket = new List[RADIX];
@@ -59,6 +57,10 @@ public class RadixLSDSortBase10 extends SortingAlgorithm {
 
           delay(new int[] {buckA[j] - 1});
         }
+      }
+      // A bucket holding every element is never emptied above; clear all before the next pass.
+      for (List<Integer> b : bucket) {
+        b.clear();
       }
 
       placement *= RADIX;

@@ -292,13 +292,13 @@ class SortingSessionManagerTest {
     InstantSortAlgorithm(ArrayModel arrayModel) {
       super(arrayModel, NO_OP_PROCESSING);
       model = arrayModel;
-      name = "InstantSort";
+      setName("InstantSort");
       setDelay(false);
     }
 
     @Override
     public void sort() {
-      report(name);
+      report(getName());
       for (int i = 0; i < model.getLength(); i++) {
         model.set(i, i);
       }
@@ -316,13 +316,13 @@ class SortingSessionManagerTest {
       model = arrayModel;
       this.gate = gate;
       this.finished = finished;
-      name = "CreditLeavingSort";
+      setName("CreditLeavingSort");
       setDelay(false);
     }
 
     @Override
     public void sort() {
-      report(name);
+      report(getName());
       for (int i = 0; i < model.getLength(); i++) {
         model.set(i, i);
       }
@@ -336,7 +336,7 @@ class SortingSessionManagerTest {
 
     UntilCancelledAlgorithm(ArrayModel arrayModel) {
       super(arrayModel, NO_OP_PROCESSING);
-      name = "UntilCancelled";
+      setName("UntilCancelled");
       setDelay(false);
     }
 
@@ -347,7 +347,7 @@ class SortingSessionManagerTest {
     @Override
     public void sort() {
       running = true;
-      report(name);
+      report(getName());
       while (!isCancelled()) {
         Thread.onSpinWait();
       }
@@ -362,7 +362,7 @@ class SortingSessionManagerTest {
     ScrambleThenWaitAlgorithm(ArrayModel arrayModel) {
       super(arrayModel, NO_OP_PROCESSING);
       model = arrayModel;
-      name = "ScrambleThenWait";
+      setName("ScrambleThenWait");
       setDelay(false);
     }
 
@@ -372,7 +372,7 @@ class SortingSessionManagerTest {
 
     @Override
     public void sort() {
-      report(name);
+      report(getName());
       // Distinct from identity and from reverse(identity): reverse of this is {3,4,2,1,0}.
       model.set(0, 0);
       model.set(1, 1);
@@ -394,7 +394,7 @@ class SortingSessionManagerTest {
     CaptureStartAlgorithm(ArrayModel arrayModel) {
       super(arrayModel, NO_OP_PROCESSING);
       model = arrayModel;
-      name = "CaptureStart";
+      setName("CaptureStart");
       setDelay(false);
     }
 
@@ -404,7 +404,7 @@ class SortingSessionManagerTest {
 
     @Override
     public void sort() {
-      report(name);
+      report(getName());
       startSnapshot = model.getArray().clone();
       for (int i = 0; i < model.getLength(); i++) {
         model.set(i, i);

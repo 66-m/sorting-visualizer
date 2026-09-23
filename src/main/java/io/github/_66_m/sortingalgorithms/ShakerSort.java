@@ -6,19 +6,17 @@ public class ShakerSort extends SortingAlgorithm {
 
   public ShakerSort(ArrayModel arrayController) {
     super(arrayController);
-    this.name = "Shaker Sort";
     alternativeSize = arrayController.getLength();
   }
 
   public ShakerSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
-    this.name = "Shaker Sort";
     this.alternativeSize = alternativeSize;
   }
 
   @Override
   public void sort() {
-    report(name);
+    report(getName());
 
     boolean swapped = true;
     int start = 0;
