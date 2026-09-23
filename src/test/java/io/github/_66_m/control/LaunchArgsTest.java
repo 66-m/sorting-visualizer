@@ -78,4 +78,12 @@ class LaunchArgsTest {
     assertTrue(LaunchArgs.perfStats());
     assertFalse(LaunchArgs.fullscreen());
   }
+
+  @Test
+  void selfCheckFlag() {
+    LaunchArgs.parse(new String[] {"--self-check"});
+    assertTrue(LaunchArgs.selfCheck());
+    LaunchArgs.parse(new String[] {"fullscreen"});
+    assertFalse(LaunchArgs.selfCheck());
+  }
 }

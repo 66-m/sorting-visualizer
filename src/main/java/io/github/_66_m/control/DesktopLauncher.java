@@ -15,6 +15,9 @@ public final class DesktopLauncher {
 
   public static void main(String[] args) {
     LaunchArgs.parse(args);
+    if (LaunchArgs.selfCheck()) {
+      System.exit(SelfCheck.run(System.out));
+    }
     AppIcons.installApplicationIcons();
     JavaFxBootstrap.start();
 

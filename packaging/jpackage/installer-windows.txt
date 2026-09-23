@@ -1,0 +1,5 @@
+--win-menu
+--win-menu-group "Sorting Visualizer"
+--win-shortcut
+--win-dir-chooser
+--win-upgrade-uuid 8ea00d04-1977-4082-ab14-3abee392c80e

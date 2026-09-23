@@ -13,6 +13,7 @@ public final class LaunchArgs {
   private static boolean launchPortrait;
   private static int launchDisplay;
   private static boolean launchPerfStats;
+  private static boolean launchSelfCheck;
 
   private LaunchArgs() {}
 
@@ -25,6 +26,7 @@ public final class LaunchArgs {
     launchPortrait = false;
     launchDisplay = 0;
     launchPerfStats = false;
+    launchSelfCheck = false;
     if (passedArgs == null) {
       return;
     }
@@ -38,6 +40,8 @@ public final class LaunchArgs {
         launchPortrait = true;
       } else if ("--perf-stats".equalsIgnoreCase(arg)) {
         launchPerfStats = true;
+      } else if ("--self-check".equalsIgnoreCase(arg)) {
+        launchSelfCheck = true;
       } else if ("--legacy-3d".equalsIgnoreCase(arg) || "--legacy-2d".equalsIgnoreCase(arg)) {
         LOGGER.warning(
             "Ignoring removed flag "
@@ -83,6 +87,11 @@ public final class LaunchArgs {
 
   public static int display() {
     return launchDisplay;
+  }
+
+  /** When true, run {@link SelfCheck} and exit instead of starting the app. */
+  public static boolean selfCheck() {
+    return launchSelfCheck;
   }
 
   /** When true, show FrameStats overlay and log a summary every 60 frames. */
