@@ -116,7 +116,22 @@ class SessionResultsGoldenTest {
     assertTrue(line.startsWith(prefix), line);
     assertTrue(line.endsWith(suffix), line);
     String time = line.substring(prefix.length(), line.length() - suffix.length());
-    assertTrue(time.matches("\\d+,\\d\\d"), "time column: " + time);
+    assertTrue(time.matches("\\d+\\.\\d\\d"), "time column: " + time);
+    assertEquals(7, csvFieldCount(line), "every row must have one field per header column");
+  }
+
+  /** Counts CSV fields, treating commas inside double quotes as part of the field. */
+  private static int csvFieldCount(String line) {
+    int fields = 1;
+    boolean quoted = false;
+    for (char c : line.toCharArray()) {
+      if (c == '"') {
+        quoted = !quoted;
+      } else if (c == ',' && !quoted) {
+        fields++;
+      }
+    }
+    return fields;
   }
 
   private static RenderSystem recordingRenderSystem(List<String> texts) {
