@@ -35,7 +35,7 @@ public final class AlgorithmCatalog {
         descriptor("pigeonhole-sort", "Pigeonhole Sort", PigeonholeSort::new),
         descriptor("tim-sort", "Tim Sort", TimSort::new),
         descriptor("bogo-sort", "Bogo Sort", BogoSort::new),
-        descriptor("unbeliaveble-sort", "I Can't Believe It Can Sort", UnbeliavebleSort::new));
+        descriptor("unbelievable-sort", "I Can't Believe It Can Sort", UnbelievableSort::new));
   }
 
   public static AlgorithmDescriptor findById(String id) {

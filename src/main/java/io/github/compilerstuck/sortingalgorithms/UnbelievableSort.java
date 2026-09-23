@@ -2,16 +2,16 @@ package io.github.compilerstuck.sortingalgorithms;
 
 import io.github.compilerstuck.control.model.ArrayModel;
 
-public class UnbeliavebleSort extends SortingAlgorithm {
+public class UnbelievableSort extends SortingAlgorithm {
 
-  public UnbeliavebleSort(ArrayModel arrayController) {
+  public UnbelievableSort(ArrayModel arrayController) {
     super(arrayController);
     this.name = "I Can't Believe It Can Sort";
     alternativeSize = arrayController.getLength();
     selected = false;
   }
 
-  public UnbeliavebleSort(ArrayModel arrayController, int alternativeSize) {
+  public UnbelievableSort(ArrayModel arrayController, int alternativeSize) {
     super(arrayController);
     this.name = "I Can't Believe It Can Sort";
     this.alternativeSize = alternativeSize;
