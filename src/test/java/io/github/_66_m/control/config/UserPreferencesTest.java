@@ -20,8 +20,7 @@ class UserPreferencesTest {
   @BeforeEach
   void setUp() throws Exception {
     node =
-        Preferences.userRoot()
-            .node("io/github/_66_m/sorting-visualizer-test/" + UUID.randomUUID());
+        Preferences.userRoot().node("io/github/_66_m/sorting-visualizer-test/" + UUID.randomUUID());
     node.clear();
   }
 
