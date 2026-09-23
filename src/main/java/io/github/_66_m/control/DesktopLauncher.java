@@ -15,6 +15,9 @@ public final class DesktopLauncher {
 
   public static void main(String[] args) {
     LaunchArgs.parse(args);
+    // macOS: GLFW must otherwise run on the process's first thread, which JavaFX needs for itself;
+    // the glfw_async build lifts that restriction (no-op on other systems).
+    Lwjgl3ApplicationConfiguration.useGlfwAsync();
     if (LaunchArgs.selfCheck()) {
       System.exit(SelfCheck.run(System.out));
     }

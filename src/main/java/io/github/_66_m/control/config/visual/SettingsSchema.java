@@ -2,6 +2,7 @@ package io.github._66_m.control.config.visual;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,6 +74,7 @@ public final class SettingsSchema<S extends VisualizationSettings> {
   private final List<Param> params;
   private final Map<String, Param> byKey;
   private final RecordComponent[] components;
+  private final Map<String, Method> accessors = new LinkedHashMap<>();
   private final Constructor<S> canonical;
 
   private SettingsSchema(String id, Class<S> type, List<Param> params) {
@@ -98,6 +100,7 @@ public final class SettingsSchema<S extends VisualizationSettings> {
         throw new IllegalArgumentException(
             type.getSimpleName() + ": param " + p.key() + " does not match " + c.getType());
       }
+      accessors.put(c.getName(), c.getAccessor());
     }
     if (components.length != params.size()) {
       throw new IllegalArgumentException(type.getSimpleName() + ": params without a component");
@@ -166,16 +169,15 @@ public final class SettingsSchema<S extends VisualizationSettings> {
 
   /** Reads one field of {@code settings}. */
   public Object get(S settings, Param param) {
-    for (RecordComponent c : components) {
-      if (c.getName().equals(param.key())) {
-        try {
-          return c.getAccessor().invoke(settings);
-        } catch (ReflectiveOperationException e) {
-          throw new IllegalStateException(type.getName() + "." + c.getName(), e);
-        }
-      }
+    Method accessor = accessors.get(param.key());
+    if (accessor == null) {
+      throw new IllegalArgumentException(param.key());
     }
-    throw new IllegalArgumentException(param.key());
+    try {
+      return accessor.invoke(settings);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(type.getName() + "." + param.key(), e);
+    }
   }
 
   public static Object defaultValue(Param param) {

@@ -28,8 +28,8 @@ public final class InstanceRenderer3D implements Disposable {
    */
   private static final int INITIAL_MAX_INSTANCES = 4096;
 
-  private static final String VERT_PATH = "shaders/instance_lit.vert";
-  private static final String FRAG_PATH = "shaders/instance_lit.frag";
+  public static final String VERT_PATH = "shaders/instance_lit.vert";
+  public static final String FRAG_PATH = "shaders/instance_lit.frag";
 
   public enum Kind {
     BOX,

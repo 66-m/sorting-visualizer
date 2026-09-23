@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 final class EqualizePlanner {
   private static final Logger LOGGER = Logger.getLogger(EqualizePlanner.class.getName());
 
-  private static final DelayContext NO_OP_DELAY =
+  static final DelayContext NO_OP_DELAY =
       () -> {
         /* no-op */
       };

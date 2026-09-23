@@ -52,6 +52,26 @@ class CustomizePanelsGoldenTest {
     VisualizationSettingsGolden.assertGolden("customize-panels.txt", out.toString());
   }
 
+  @Test
+  void loadBeforeBuildKeepsEveryValue() throws Exception {
+    for (Class<? extends VisualizationSettings> type :
+        VisualizationSettingsGolden.settingsTypes()) {
+      VisualizationSettings nonDefault = VisualizationSettingsGolden.nonDefault(type);
+      String roundTrip =
+          onFxThread(
+              () -> {
+                VisualizationCustomizePanel panel =
+                    VisualizationCustomizePanels.forId(nonDefault.visualizationId())
+                        .orElseThrow()
+                        .get();
+                panel.load(nonDefault);
+                panel.build();
+                return encode(panel.toSettings());
+              });
+      org.junit.jupiter.api.Assertions.assertEquals(encode(nonDefault), roundTrip);
+    }
+  }
+
   private static String describePanel(
       Class<? extends VisualizationSettings> type, Supplier<VisualizationCustomizePanel> factory) {
     StringBuilder out = new StringBuilder();

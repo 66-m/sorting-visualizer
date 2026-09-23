@@ -18,8 +18,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  * cores). Does not use ShapeRenderer or ModelBatch.
  */
 public final class LineRenderer3D implements Disposable {
-  private static final String VERT_PATH = "shaders/line3d.vert";
-  private static final String FRAG_PATH = "shaders/line3d.frag";
+  public static final String VERT_PATH = "shaders/line3d.vert";
+  public static final String FRAG_PATH = "shaders/line3d.frag";
 
   /** Floats per vertex: xyz + rgba. */
   private static final int FLOATS_PER_VERT = 7;

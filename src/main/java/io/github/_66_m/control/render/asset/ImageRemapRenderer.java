@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  * u_index}). Horizontal mode remaps bands by Y; vertical by X.
  */
 public final class ImageRemapRenderer implements Disposable {
+  public static final String VERT_PATH = "shaders/image_remap.vert";
+  public static final String FRAG_PATH = "shaders/image_remap.frag";
 
   private final ShaderProgram shader;
   private final Mesh quad;
@@ -32,10 +34,7 @@ public final class ImageRemapRenderer implements Disposable {
     ShaderProgram.prependVertexCode = "#version 300 es\n";
     ShaderProgram.prependFragmentCode = "#version 300 es\n";
     try {
-      shader =
-          new ShaderProgram(
-              Gdx.files.internal("shaders/image_remap.vert"),
-              Gdx.files.internal("shaders/image_remap.frag"));
+      shader = new ShaderProgram(Gdx.files.internal(VERT_PATH), Gdx.files.internal(FRAG_PATH));
     } finally {
       ShaderProgram.prependVertexCode = prevV;
       ShaderProgram.prependFragmentCode = prevF;

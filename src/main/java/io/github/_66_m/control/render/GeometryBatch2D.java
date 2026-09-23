@@ -17,8 +17,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  * {@code glLineWidth} is ignored on many GL cores).
  */
 public final class GeometryBatch2D implements Disposable {
-  private static final String VERT_PATH = "shaders/geo2d.vert";
-  private static final String FRAG_PATH = "shaders/geo2d.frag";
+  public static final String VERT_PATH = "shaders/geo2d.vert";
+  public static final String FRAG_PATH = "shaders/geo2d.frag";
 
   /** Floats per vertex: xy + rgba + uv. */
   static final int FLOATS_PER_VERT = 8;

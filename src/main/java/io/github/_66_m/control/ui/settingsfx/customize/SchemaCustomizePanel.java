@@ -45,6 +45,7 @@ public final class SchemaCustomizePanel<S extends VisualizationSettings>
       case EnumParam e -> {
         ComboBox<Enum<?>> combo = new ComboBox<>();
         combo.getItems().setAll(e.constants());
+        combo.getSelectionModel().select(e.defaultValue());
         yield combo;
       }
     };
@@ -98,7 +99,6 @@ public final class SchemaCustomizePanel<S extends VisualizationSettings>
       }
       case EnumParam e -> {
         ComboBox<Enum<?>> combo = (ComboBox<Enum<?>>) control;
-        combo.getSelectionModel().select(e.defaultValue());
         draft.bind(combo.getSelectionModel().selectedItemProperty());
         yield CustomizePanelSupport.comboRow(e.label(), combo, e.defaultValue());
       }

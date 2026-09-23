@@ -37,7 +37,8 @@ jobs:
     steps:
       - id: v
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+          # Only a pushed tag publishes; manual runs are always dry runs, even on a tag.
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/tags/v* ]]; then
             version="${GITHUB_REF_NAME#v}"
             publish=true
           else
@@ -85,19 +86,23 @@ jobs:
       matrix:
         include:
           - label: linux-x64
+            os-name: linux
             os: ubuntu-latest
             installer: deb
             jar-check: true
           - label: windows-x64
+            os-name: windows
             os: windows-latest
             installer: msi
             jar-check: true
           - label: macos-arm64
+            os-name: macos
             os: macos-latest
             installer: dmg
             # The cross-platform JAR ships x64 JavaFX natives only; Apple Silicon users get the .dmg.
             jar-check: false
           - label: macos-x64
+            os-name: macos
             os: macos-15-intel
             installer: dmg
             jar-check: true
@@ -151,6 +156,15 @@ jobs:
             "${{ steps.app.outputs.launcher }}" --self-check
           fi
 
+      - name: Show self-check output (Windows diagnostics)
+        # The GUI launcher has no console; rerun the same checks via the app's JAR to see why.
+        if: failure() && runner.os == 'Windows'
+        run: >
+          java --enable-native-access=ALL-UNNAMED
+          --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED
+          -jar "${{ steps.app.outputs.dir }}/app/sorting-visualizer-jar-with-dependencies.jar"
+          --self-check
+
       - uses: actions/download-artifact@v8
         if: matrix.jar-check
         with:
@@ -174,7 +188,7 @@ jobs:
             --description "Sorting Algorithm Visualizer" \
             --license-file LICENSE \
             --dest installer \
-            "@packaging/jpackage/installer-${RUNNER_OS,,}.txt"
+            "@packaging/jpackage/installer-${{ matrix.os-name }}.txt"
           ls -la installer
 
       - name: Collect

@@ -71,7 +71,7 @@ The version comes only from the tag (`vMAJOR.MINOR.PATCH`, major ≥ 1): `pom.xm
 `0.0.0-SNAPSHOT` placeholder, so there are no version-bump commits. Pushes to other branches
 that touch packaging (`pom.xml`, `packaging/`, the release workflow, …) run the same pipeline as
 a dry run without publishing, so packaging changes are proven before they are merged. It can
-also be started manually from the Actions tab (dry run).
+also be started manually from the Actions tab; manual runs are always dry runs.
 
 ## Project docs
 

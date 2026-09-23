@@ -1,5 +1,6 @@
 package io.github._66_m.control.model;
 
+import io.github._66_m.control.ui.TimeEstimateFormat;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Writer;
@@ -7,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
 
 /** Writes session results as CSV or as a console timestamp list. */
 public final class ResultsExport {
@@ -25,7 +25,8 @@ public final class ResultsExport {
         writer.write(',');
         writer.write(Long.toString(r.comparisons()));
         writer.write(',');
-        writer.write(csvMillis(r.realTimeNanos()));
+        // Dot decimal separator: a comma would split the value into two CSV columns.
+        writer.write(TimeEstimateFormat.formatMillis(r.realTimeNanos()));
         writer.write(',');
         writer.write(Long.toString(r.swaps()));
         writer.write(',');
@@ -44,17 +45,6 @@ public final class ResultsExport {
       int seconds = r.elapsedSeconds();
       out.println(String.format("%02d:%02d", seconds / 60, seconds % 60) + " " + r.algorithmName());
     }
-  }
-
-  /**
-   * Milliseconds with a dot decimal separator. The on-screen table uses a comma, but inside a CSV a
-   * bare comma would split the value into two columns.
-   */
-  static String csvMillis(double rawTimeNs) {
-    if (!(rawTimeNs > 0) || Double.isInfinite(rawTimeNs)) {
-      return "0.00";
-    }
-    return String.format(Locale.ROOT, "%.2f", rawTimeNs / 1_000_000.0);
   }
 
   private static String csvEscape(String value) {

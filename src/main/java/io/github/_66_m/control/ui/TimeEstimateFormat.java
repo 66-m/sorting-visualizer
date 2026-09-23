@@ -11,10 +11,17 @@ public final class TimeEstimateFormat {
 
   /** Formats nanoseconds as milliseconds with two decimal places (comma decimal separator). */
   public static String format(double rawTimeNs) {
+    return formatMillis(rawTimeNs).replace('.', ',');
+  }
+
+  /**
+   * Formats nanoseconds as milliseconds with two decimal places and a dot decimal separator, for
+   * machine-readable output such as CSV.
+   */
+  public static String formatMillis(double rawTimeNs) {
     if (!(rawTimeNs > 0) || Double.isNaN(rawTimeNs) || Double.isInfinite(rawTimeNs)) {
-      return "0,00";
+      return "0.00";
     }
-    double ms = rawTimeNs / 1_000_000.0;
-    return String.format(Locale.ROOT, "%.2f", ms).replace('.', ',');
+    return String.format(Locale.ROOT, "%.2f", rawTimeNs / 1_000_000.0);
   }
 }

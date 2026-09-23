@@ -251,10 +251,7 @@ public class SortingSessionManager {
         // DelayContext so nothing waits on the FrameGate.
         algorithm.setDelay(true);
         algorithm.setDelayStride(1);
-        algorithm.setDelayContext(
-            () -> {
-              /* no-op */
-            });
+        algorithm.setDelayContext(EqualizePlanner.NO_OP_DELAY);
         ctx.state.setFrameGateSuspended(true);
         ctx.sound.cutNotes();
         ctx.drainGate();
