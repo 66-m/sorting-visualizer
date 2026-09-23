@@ -20,12 +20,12 @@ Toolkit coexistence: bootstrap JavaFX with `Platform.startup` **before** `Lwjgl3
 | **World3D** | scene center | up | boxes / quads / spheres / 3D lines |
 | **Overlay** | top-left screen | down | HUD, `drawText`, image remap (`drawImageRemap` / Overlay shader) |
 
-Engine owns cameras; visuals submit geometry in world units (or Overlay for text/pixels). See `.cursor/evals/04-libgdx-architecture/` for the migration history.
+Engine owns cameras; visuals submit geometry in world units (or Overlay for text/pixels).
 
 ## Package map
 
 ```text
-io.github.compilerstuck
+io.github._66_m
 ├── control/
 │   ├── DesktopLauncher      # main: JavaFX then Lwjgl3Application
 │   ├── SortingVisualizerGame # Game; composition root + screen navigation

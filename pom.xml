@@ -85,7 +85,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.github.compilerstuck.control.DesktopLauncher</mainClass>
+                            <mainClass>io.github._66_m.control.DesktopLauncher</mainClass>
                         </manifest>
                         <manifestEntries>
                             <!-- SoftSynthesizer low-latency open via MidiSys reflection -->
@@ -186,7 +186,7 @@
                                     <archive>
                                         <manifest>
                                             <mainClass>
-                                                io.github.compilerstuck.control.DesktopLauncher
+                                                io.github._66_m.control.DesktopLauncher
                                             </mainClass>
                                         </manifest>
                                         <manifestEntries>
@@ -240,7 +240,7 @@
                                 <configuration>
                                     <archive>
                                         <manifest>
-                                            <mainClass>io.github.compilerstuck.control.DesktopLauncher</mainClass>
+                                            <mainClass>io.github._66_m.control.DesktopLauncher</mainClass>
                                         </manifest>
                                         <manifestEntries>
                                             <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
@@ -277,7 +277,7 @@
                                         <argument>--main-jar</argument>
                                         <argument>${project.build.finalName}-jar-with-dependencies.jar</argument>
                                         <argument>--main-class</argument>
-                                        <argument>io.github.compilerstuck.control.DesktopLauncher</argument>
+                                        <argument>io.github._66_m.control.DesktopLauncher</argument>
                                         <argument>--dest</argument>
                                         <argument>${project.build.directory}/jpackage</argument>
                                         <argument>--app-version</argument>
