@@ -15,7 +15,7 @@
         </license>
     </licenses>
     <properties>
-        <maven.compiler.release>26</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <errorprone.version>2.50.0</errorprone.version>
         <javafx.version>27</javafx.version>

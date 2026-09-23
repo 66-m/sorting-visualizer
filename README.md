@@ -18,7 +18,7 @@ See and hear sorting algorithms in real time — 22 algorithms, 30 visualization
 
 ## Quick start
 
-Requires **[JDK 26+](https://jdk.java.net/26/)**.
+Requires **[JDK 25+](https://adoptium.net/temurin/releases/?version=25)** (the current LTS).
 
 Download [`sorting-visualizer.jar`](https://github.com/66-m/sorting-visualizer/releases/latest/download/sorting-visualizer.jar), then:
 

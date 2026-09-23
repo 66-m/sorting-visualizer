@@ -8,10 +8,8 @@ build/run/test commands live in `README.md` and `CONTRIBUTING.md` - use those; n
 below only cover non-obvious, environment-specific caveats.
 
 ### Toolchain
-- Requires **JDK 26+** (`pom.xml` sets `maven.compiler.release=26`). JDK 26 (Temurin) is
-  preinstalled and wired as the default `/usr/bin/java` via `update-alternatives`, so
-  `./mvnw`/`./build`/`./run` pick it up automatically. `JAVA_HOME` is also exported in
-  `~/.bashrc`. The stock system JDK is 21, which will NOT compile this project.
+- Requires **JDK 25+** (`pom.xml` sets `maven.compiler.release=25`). JDK 21 will NOT
+  compile this project.
 - Use the Maven wrapper `./mvnw` (Maven 3.9.9); there is no system `mvn`.
 
 ### Lint / test / build / run

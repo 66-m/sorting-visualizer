@@ -9,7 +9,7 @@ By submitting a contribution, you agree that your work is licensed under the sam
 
 ## Development setup
 
-- **JDK 26+**
+- **JDK 25+** (LTS; e.g. [Temurin 25](https://adoptium.net/temurin/releases/?version=25))
 - Clone and build:
 
 ```sh
