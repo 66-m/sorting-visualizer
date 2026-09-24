@@ -7,11 +7,11 @@ import io.github._66_m.control.config.visual.VisualizationSettings;
 import io.github._66_m.control.model.ArrayModel;
 import io.github._66_m.control.render.RenderSystem;
 import io.github._66_m.control.render.mesh.AsyncValue;
+import io.github._66_m.control.render.mesh.EarthTexture;
 import io.github._66_m.control.render.mesh.GlobeMeshes;
 import io.github._66_m.control.render.mesh.ObjLoader;
 import io.github._66_m.control.render.mesh.PieceFrame;
 import io.github._66_m.control.render.mesh.PieceMesh;
-import io.github._66_m.control.render.mesh.ProceduralPlanet;
 import io.github._66_m.control.render.mesh.TextureImage;
 import io.github._66_m.sound.Sound;
 import io.github._66_m.visual.gradient.ColorGradient;
@@ -26,8 +26,7 @@ import javax.imageio.ImageIO;
  * A textured, spinning planet. {@code MOSAIC}: latitude × longitude tiles, each showing the texture
  * of its value's tile (optionally lifted by disparity). {@code WEDGES}: pole-to-pole slices pushed
  * outward by disparity, showing their value's texture, with a core visible through the gaps. The
- * texture is any equirectangular image (e.g. NASA Blue Marble); a generated planet until one is
- * picked.
+ * texture is any equirectangular image; the bundled NASA Blue Marble Earth until one is picked.
  */
 public class Globe extends AbstractModelVisualization {
 
@@ -163,7 +162,7 @@ public class Globe extends AbstractModelVisualization {
   }
 
   private PieceMesh texturedMesh(PieceMesh mesh) {
-    TextureImage tex = texture != null ? texture : ProceduralPlanet.texture();
+    TextureImage tex = texture != null ? texture : EarthTexture.get();
     if (textured == null || texturedFrom != mesh || texturedWith != tex) {
       textured = mesh.withTexture(tex);
       texturedFrom = mesh;
