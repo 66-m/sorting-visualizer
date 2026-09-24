@@ -41,16 +41,16 @@ public record GlobeSettings(
 
   public static final Mode DEFAULT_MODE = Mode.MOSAIC;
   public static final Tiling DEFAULT_TILING = Tiling.EQUAL_AREA;
-  public static final boolean DEFAULT_TILE_BORDERS = true;
-  public static final boolean DEFAULT_LIFT = false;
+  public static final boolean DEFAULT_TILE_BORDERS = false;
+  public static final boolean DEFAULT_LIFT = true;
   public static final double DEFAULT_LIFT_HEIGHT = 0.15;
   public static final double DEFAULT_EXPLODE = 0.35;
-  public static final Core DEFAULT_CORE = Core.MAGMA;
+  public static final Core DEFAULT_CORE = Core.NONE;
   public static final double DEFAULT_HIGHLIGHT_STRENGTH = 0.6;
   public static final double DEFAULT_AXIAL_TILT_DEG = 23.4;
   public static final double DEFAULT_VIEW_TILT_DEG = 10.0;
-  public static final double DEFAULT_ROTATION_SPEED = 0.15;
-  public static final double DEFAULT_SCENE_SCALE = 0.8;
+  public static final double DEFAULT_ROTATION_SPEED = 0.21;
+  public static final double DEFAULT_SCENE_SCALE = 0.81;
 
   public GlobeSettings {
     mode = mode == null ? DEFAULT_MODE : mode;

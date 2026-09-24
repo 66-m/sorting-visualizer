@@ -273,7 +273,7 @@ afterResets {"schemaVersion":1,"visualizationId":"disparity-square-scatter","set
 draftEventsFromResets>0 true
 valid true ''
 == globe
-panel.defaults {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.15,"explode":0.35,"core":"MAGMA","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.15,"sceneScale":0.8}}
+panel.defaults {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":false,"lift":true,"liftHeight":0.15,"explode":0.35,"core":"NONE","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.21,"sceneScale":0.81}}
 VBox customize-panel settings-form-stack
   VBox customize-section settings-form-card
     Label 'GLOBE' label settings-section-label
@@ -287,11 +287,11 @@ VBox customize-panel settings-form-stack
       Region @1,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
       Label 'Tile borders' for=CheckBox label customize-field-label @2,0
-      CheckBox selected=true text='' check-box @2,1
+      CheckBox selected=false text='' check-box @2,1
       Region @2,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
       Label 'Lift tiles by disparity' for=CheckBox label customize-field-label @3,0
-      CheckBox selected=false text='' check-box @3,1
+      CheckBox selected=true text='' check-box @3,1
       Region @3,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
       Label 'Lift height' for=Slider label customize-field-label @4,0
@@ -303,7 +303,7 @@ VBox customize-panel settings-form-stack
       Label '0.35' label settings-muted customize-value @5,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @5,3
       Label 'Core' for=ComboBox label customize-field-label @6,0
-      ComboBox items=[NONE, DARK, MAGMA] selected=MAGMA combo-box-base combo-box @6,1
+      ComboBox items=[NONE, DARK, MAGMA] selected=NONE combo-box-base combo-box @6,1
       Region @6,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @6,3
       Label 'Highlight strength' for=Slider label customize-field-label @7,0
@@ -322,19 +322,19 @@ VBox customize-panel settings-form-stack
       Label '10°' label settings-muted customize-value @1,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
       Label 'Rotation speed' for=Slider label customize-field-label @2,0
-      Slider min=-2.0 max=2.0 value=0.15 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
-      Label '0.15 rad/s' label settings-muted customize-value @2,2
+      Slider min=-2.0 max=2.0 value=0.21 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.21 rad/s' label settings-muted customize-value @2,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
       Label 'Scene scale' for=Slider label customize-field-label @3,0
-      Slider min=0.4 max=1.0 value=0.8 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @3,1
-      Label '0.80' label settings-muted customize-value @3,2
+      Slider min=0.4 max=1.0 value=0.81 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @3,1
+      Label '0.81' label settings-muted customize-value @3,2
       Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
-afterLoadDefaults {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.15,"explode":0.35,"core":"MAGMA","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.15,"sceneScale":0.8}}
-afterLoadNonDefault {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"WEDGES","tiling":"EQUAL_AREA","tileBorders":false,"lift":true,"liftHeight":0.375,"explode":0.75,"core":"MAGMA","highlightStrength":0.75,"axialTiltDeg":33.75,"viewTiltDeg":30.0,"rotationSpeedRadPerSec":1.0,"sceneScale":0.85}}
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":false,"lift":true,"liftHeight":0.15,"explode":0.35,"core":"NONE","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.21,"sceneScale":0.81}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"WEDGES","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.375,"explode":0.75,"core":"MAGMA","highlightStrength":0.75,"axialTiltDeg":33.75,"viewTiltDeg":30.0,"rotationSpeedRadPerSec":1.0,"sceneScale":0.85}}
 valueLabels [0.38][0.75][0.75][33.8°][30°][1.00 rad/s][0.85]
 draftEventsDuringLoad 0
 resetButtons 12
-afterResets {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.15,"explode":0.35,"core":"MAGMA","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.15,"sceneScale":0.8}}
+afterResets {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":false,"lift":true,"liftHeight":0.15,"explode":0.35,"core":"NONE","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.21,"sceneScale":0.81}}
 draftEventsFromResets>0 true
 valid true ''
 == hoops
