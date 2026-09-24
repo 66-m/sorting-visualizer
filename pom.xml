@@ -55,6 +55,30 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+                <executions>
+                    <!--
+                      JavaVersionGuard (the JAR's Main-Class) is compiled for Java 8, so an older Java
+                      shows "needs Java 25" instead of an UnsupportedClassVersionError.
+                    -->
+                    <execution>
+                        <id>compile-java8-guard</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>8</release>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/java8</compileSourceRoot>
+                            </compileSourceRoots>
+                            <compilerArgs combine.self="override">
+                                <arg>-Xlint:-options</arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths combine.self="override"/>
+                            <proc>none</proc>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
@@ -64,6 +88,7 @@
                     <java>
                         <includes>
                             <include>src/main/java/**/*.java</include>
+                            <include>src/main/java8/**/*.java</include>
                             <include>src/test/java/**/*.java</include>
                         </includes>
                         <googleJavaFormat>
@@ -88,11 +113,13 @@
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <mainClass>io.github._66_m.control.DesktopLauncher</mainClass>
+                            <mainClass>io.github._66_m.control.JavaVersionGuard</mainClass>
                         </manifest>
                         <manifestEntries>
                             <!-- SoftSynthesizer low-latency open via MidiSys reflection -->
                             <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
+                            <!-- LWJGL/libGDX natives; lets `java -jar` (or a double-click) run without flags. -->
+                            <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -232,11 +259,12 @@
                                         <manifest>
                                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                             <mainClass>
-                                                io.github._66_m.control.DesktopLauncher
+                                                io.github._66_m.control.JavaVersionGuard
                                             </mainClass>
                                         </manifest>
                                         <manifestEntries>
                                             <Add-Opens>java.desktop/com.sun.media.sound=ALL-UNNAMED</Add-Opens>
+                                            <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
                                         </manifestEntries>
                                     </archive>
                                     <appendAssemblyId>true</appendAssemblyId>

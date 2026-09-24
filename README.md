@@ -41,6 +41,11 @@ With Java 25 or newer you can also run the [`sorting-visualizer.jar`](https://gi
 java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar
 ```
 
+If the app doesn't start, it shows a message saying why. The two most common causes:
+
+- **"needs Java 25 or newer"**: `java` (or the `.jar` file association) still points to an older Java. Check with `java -version`, or use the installer, which includes Java.
+- **"needs OpenGL 3.3"**: update your graphics driver. Remote desktop sessions and virtual machines often don't provide OpenGL 3.3.
+
 ### Launch flags
 
 Add these after the program or JAR name. If you pass both `fullscreen` and `portrait`, `fullscreen` wins.
