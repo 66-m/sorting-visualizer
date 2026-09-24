@@ -4,19 +4,23 @@ import io.github._66_m.control.AppContext;
 import io.github._66_m.control.catalog.VisualConstraints;
 import io.github._66_m.control.catalog.VisualizationCatalog;
 import io.github._66_m.control.catalog.VisualizationDescriptor;
+import io.github._66_m.control.config.MediaKind;
 import io.github._66_m.control.config.SettingsDefaults;
 import io.github._66_m.control.config.visual.VisualizationSettings;
 import io.github._66_m.control.ui.settingsfx.customize.VisualizationCustomizePanels;
 import io.github._66_m.visual.ConfigurableVisualization;
 import io.github._66_m.visual.ImageSourceVisualization;
+import io.github._66_m.visual.MediaSourceVisualization;
 import io.github._66_m.visual.Visualization;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.IntConsumer;
 
@@ -27,6 +31,9 @@ public final class VisualizationViewModel {
   public static final String PROP_NEEDS_IMAGE = "needsImage";
   public static final String PROP_IMAGE_PATH = "imagePath";
   public static final String PROP_IMAGE_ERROR = "imageError";
+  public static final String PROP_MEDIA_KIND = "mediaKind";
+  public static final String PROP_MEDIA_PATH = "mediaPath";
+  public static final String PROP_MEDIA_ERROR = "mediaError";
   public static final String PROP_INPUTS_ENABLED = "inputsEnabled";
   public static final String PROP_CONFIGURABLE = "configurable";
 
@@ -39,6 +46,9 @@ public final class VisualizationViewModel {
   private boolean needsImage;
   private String imagePath = "";
   private String imageError = "";
+  private MediaKind mediaKind = MediaKind.NONE;
+  private String mediaPath = "";
+  private String mediaError = "";
   private boolean inputsEnabled = true;
   private boolean configurable;
   private IntConsumer sizeDisplaySync = size -> {};
@@ -76,6 +86,87 @@ public final class VisualizationViewModel {
   /** True when the selected visualization implements {@link ConfigurableVisualization}. */
   public boolean isConfigurable() {
     return configurable;
+  }
+
+  /** Media file kind the selected visualization accepts ({@link MediaKind#NONE} if none). */
+  public MediaKind mediaKind() {
+    return mediaKind;
+  }
+
+  public String getMediaPath() {
+    return mediaPath;
+  }
+
+  public String getMediaError() {
+    return mediaError;
+  }
+
+  /**
+   * Validates {@code path} and hands it to the selected media visualization. Returns {@code true}
+   * when the visualization accepted it (decoding may still fail later, shown on the canvas).
+   */
+  public boolean setMediaPath(Path path) {
+    if (!inputsEnabled || mediaKind == MediaKind.NONE) {
+      return false;
+    }
+    String oldPath = mediaPath;
+    String oldError = mediaError;
+    if (path == null || !Files.isRegularFile(path) || !Files.isReadable(path)) {
+      mediaError = mediaKind.label() + " file not found or not readable";
+      pcs.firePropertyChange(PROP_MEDIA_ERROR, oldError, mediaError);
+      return false;
+    }
+    Visualization viz = getOrCreate(selectedId);
+    String absolute = path.toAbsolutePath().toString();
+    boolean loaded =
+        viz instanceof MediaSourceVisualization mediaViz
+            && app.loadMediaForVisualization(mediaViz, absolute);
+    if (!loaded) {
+      mediaError = "Unsupported " + mediaKind.label().toLowerCase(Locale.ROOT) + " file";
+      pcs.firePropertyChange(PROP_MEDIA_ERROR, oldError, mediaError);
+      return false;
+    }
+    mediaPath = absolute;
+    mediaError = "";
+    pcs.firePropertyChange(PROP_MEDIA_PATH, oldPath, mediaPath);
+    pcs.firePropertyChange(PROP_MEDIA_ERROR, oldError, mediaError);
+    return true;
+  }
+
+  /**
+   * {@code true} for an existing readable file; malformed paths (e.g. from another OS) are false.
+   */
+  private static boolean isReadableFile(String path) {
+    if (path == null || path.isBlank()) {
+      return false;
+    }
+    try {
+      Path p = Path.of(path);
+      return Files.isRegularFile(p) && Files.isReadable(p);
+    } catch (InvalidPathException e) {
+      return false;
+    }
+  }
+
+  /** Loads the remembered path for the selected media visualization if it has none yet. */
+  private void restoreMediaPath(Visualization viz) {
+    String oldPath = mediaPath;
+    String oldError = mediaError;
+    mediaError = "";
+    mediaPath = "";
+    if (viz instanceof MediaSourceVisualization mediaViz) {
+      String current = mediaViz.mediaPath();
+      if (current != null && !current.isBlank()) {
+        mediaPath = current;
+      } else {
+        String saved = app.getPreferences().getMediaPath(mediaKind);
+        if (isReadableFile(saved) && app.loadMediaForVisualization(mediaViz, saved)) {
+          mediaPath = saved;
+        }
+      }
+    }
+    pcs.firePropertyChange(PROP_MEDIA_PATH, oldPath, mediaPath);
+    pcs.firePropertyChange(PROP_MEDIA_ERROR, oldError, mediaError);
   }
 
   public VisualConstraints currentConstraints() {
@@ -299,17 +390,21 @@ public final class VisualizationViewModel {
     String oldId = selectedId;
     boolean oldNeeds = needsImage;
     boolean oldConfigurable = configurable;
+    MediaKind oldMediaKind = mediaKind;
     selectedId = descriptor.id();
     needsImage = constraints.requiresImage();
+    mediaKind = constraints.media();
     Visualization viz = getOrCreate(selectedId);
     configurable = viz instanceof ConfigurableVisualization;
     app.setVisualization(viz);
     app.setVisualizationId(descriptor.id());
+    restoreMediaPath(viz);
 
     if (fireEvents) {
       pcs.firePropertyChange(PROP_SELECTED_ID, oldId, selectedId);
       pcs.firePropertyChange(PROP_NEEDS_IMAGE, oldNeeds, needsImage);
       pcs.firePropertyChange(PROP_CONFIGURABLE, oldConfigurable, configurable);
+      pcs.firePropertyChange(PROP_MEDIA_KIND, oldMediaKind, mediaKind);
     }
   }
 }

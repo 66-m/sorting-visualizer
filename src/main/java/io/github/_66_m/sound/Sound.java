@@ -8,6 +8,9 @@ public abstract class Sound {
   protected boolean isMuted;
   protected AudioSettings settings = AudioSettings.defaults();
 
+  /** 0–1 multiplier on note velocity, set by visualizations that mix their own audio. */
+  protected volatile float volumeScale = 1f;
+
   public Sound(ArrayModel arrayModel) {
     this.arrayModel = arrayModel;
   }
@@ -40,6 +43,18 @@ public abstract class Sound {
    */
   public void dispose() {
     // no-op
+  }
+
+  /**
+   * Scales sort-tone loudness (0–1) on top of the user's audio settings, e.g. to sit under a video
+   * soundtrack. Reset to {@code 1} when the visualization is deactivated.
+   */
+  public void setVolumeScale(float scale) {
+    volumeScale = Math.max(0f, Math.min(1f, scale));
+  }
+
+  public float getVolumeScale() {
+    return volumeScale;
   }
 
   public void setIsMuted(boolean muted) {

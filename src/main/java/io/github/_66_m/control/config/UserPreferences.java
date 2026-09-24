@@ -4,6 +4,7 @@ import io.github._66_m.control.config.audio.AudioSettings;
 import io.github._66_m.control.config.audio.AudioSettingsCodec;
 import io.github._66_m.control.config.visual.VisualizationSettings;
 import io.github._66_m.control.config.visual.VisualizationSettingsCodec;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,7 @@ public final class UserPreferences {
   private CanvasBackground canvasBackground = SettingsDefaults.DEFAULT_CANVAS_BACKGROUND;
   private String visualSettingsById = SettingsDefaults.DEFAULT_VISUAL_SETTINGS_BY_ID;
   private String audioSettingsJson = SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON;
+  private final EnumMap<MediaKind, String> mediaPaths = new EnumMap<>(MediaKind.class);
 
   public static UserPreferences load() {
     return load(Preferences.userRoot().node(NODE));
@@ -133,6 +135,11 @@ public final class UserPreferences {
     if (prefs.audioSettingsJson == null) {
       prefs.audioSettingsJson = SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON;
     }
+    for (MediaKind kind : MediaKind.values()) {
+      if (kind != MediaKind.NONE) {
+        prefs.mediaPaths.put(kind, node.get(kind.prefKey(), ""));
+      }
+    }
     return prefs;
   }
 
@@ -177,6 +184,11 @@ public final class UserPreferences {
         audioSettingsJson != null
             ? audioSettingsJson
             : SettingsDefaults.DEFAULT_AUDIO_SETTINGS_JSON);
+    for (MediaKind kind : MediaKind.values()) {
+      if (kind != MediaKind.NONE) {
+        node.put(kind.prefKey(), getMediaPath(kind));
+      }
+    }
     try {
       node.flush();
     } catch (BackingStoreException ex) {
@@ -266,6 +278,22 @@ public final class UserPreferences {
 
   public void setImagePath(String imagePath) {
     this.imagePath = imagePath != null ? imagePath : "";
+  }
+
+  /** Last path picked for {@code kind}; empty when none (or for {@link MediaKind#NONE}). */
+  public String getMediaPath(MediaKind kind) {
+    if (kind == null || kind == MediaKind.NONE) {
+      return "";
+    }
+    String path = mediaPaths.get(kind);
+    return path != null ? path : "";
+  }
+
+  public void setMediaPath(MediaKind kind, String path) {
+    if (kind == null || kind == MediaKind.NONE) {
+      return;
+    }
+    mediaPaths.put(kind, path != null ? path : "");
   }
 
   public String getGradientName() {

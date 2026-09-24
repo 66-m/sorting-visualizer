@@ -61,6 +61,7 @@ public final class VisualizerScreen implements Screen {
     SortingStateManager stateManager = game.stateManager();
     GdxRenderSystem renderSystem = game.renderSystem();
     ArrayController arrayController = game.arrayController();
+    game.currentVisualization().onSessionState(stateManager.isRunning());
 
     if (stateManager.shouldShowResults() && stateManager.shouldShowComparisonTable()) {
       game.showResults();

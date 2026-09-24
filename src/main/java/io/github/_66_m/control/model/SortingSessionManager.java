@@ -131,7 +131,7 @@ public class SortingSessionManager {
   private void executeSortingAlgorithms(List<SortingAlgorithm> algorithms) {
     SortingStateManager state = ctx.state;
     try {
-      int startTime = (int) (System.currentTimeMillis() / 1000L);
+      long sessionStartNanos = System.nanoTime();
 
       for (SortingAlgorithm algorithm : algorithms) {
         if (!state.shouldContinueExecution()) {
@@ -139,6 +139,9 @@ public class SortingSessionManager {
           break;
         }
 
+        // Chapter timestamps mark where each algorithm's segment begins (its shuffle), not where it
+        // ends; the end of one run is the start of the next.
+        int startSeconds = (int) ((System.nanoTime() - sessionStartNanos) / 1_000_000_000L);
         armAlgorithmToken(algorithm);
         prepareForAlgorithm(algorithm);
 
@@ -162,8 +165,7 @@ public class SortingSessionManager {
           continue;
         }
 
-        int elapsedSeconds = (int) (System.currentTimeMillis() / 1000L) - startTime;
-        results.record(algorithm, ctx.array, elapsedSeconds);
+        results.record(algorithm, ctx.array, startSeconds);
         pauseAfterAlgorithm();
       }
 

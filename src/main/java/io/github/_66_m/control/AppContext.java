@@ -21,6 +21,7 @@ import io.github._66_m.sortingalgorithms.SortingAlgorithm;
 import io.github._66_m.sound.SilentSound;
 import io.github._66_m.sound.Sound;
 import io.github._66_m.visual.ImageSourceVisualization;
+import io.github._66_m.visual.MediaSourceVisualization;
 import io.github._66_m.visual.Visualization;
 import io.github._66_m.visual.gradient.ColorGradient;
 import java.util.ArrayList;
@@ -226,6 +227,9 @@ public final class AppContext {
   }
 
   public void setVisualization(Visualization visualization) {
+    if (this.visualization != null && this.visualization != visualization) {
+      this.visualization.deactivate();
+    }
     this.visualization = visualization;
     bindImageRepository(visualization);
     if (visualization != null && colorGradient != null) {
@@ -500,6 +504,22 @@ public final class AppContext {
     }
     viz.setImage(handle);
     setImagePath(path);
+    return true;
+  }
+
+  /**
+   * Hands {@code path} to a media visualization and remembers it per {@link MediaKind}. Loading
+   * itself may continue asynchronously inside the visualization.
+   */
+  public boolean loadMediaForVisualization(MediaSourceVisualization viz, String path) {
+    if (viz == null || path == null || path.isBlank()) {
+      return false;
+    }
+    if (!viz.loadMedia(path)) {
+      return false;
+    }
+    preferences.setMediaPath(viz.mediaKind(), path);
+    flushPreferences();
     return true;
   }
 

@@ -1,13 +1,35 @@
 package io.github._66_m.control.catalog;
 
+import io.github._66_m.control.config.MediaKind;
+
 /** Describes the array-size constraints a visualization imposes, if any. */
 public record VisualConstraints(
-    boolean requiresPerfectSquare, boolean requiresPerfectCube, boolean requiresImage) {
+    boolean requiresPerfectSquare,
+    boolean requiresPerfectCube,
+    boolean requiresImage,
+    MediaKind media) {
 
   public static final VisualConstraints NONE = new VisualConstraints(false, false, false);
   public static final VisualConstraints SQUARE = new VisualConstraints(true, false, false);
   public static final VisualConstraints CUBE = new VisualConstraints(false, true, false);
   public static final VisualConstraints IMAGE = new VisualConstraints(false, false, true);
+  public static final VisualConstraints VIDEO = media(MediaKind.VIDEO);
+  public static final VisualConstraints MODEL = media(MediaKind.MODEL);
+  public static final VisualConstraints TEXTURE = media(MediaKind.TEXTURE);
+
+  public VisualConstraints {
+    media = media == null ? MediaKind.NONE : media;
+  }
+
+  public VisualConstraints(
+      boolean requiresPerfectSquare, boolean requiresPerfectCube, boolean requiresImage) {
+    this(requiresPerfectSquare, requiresPerfectCube, requiresImage, MediaKind.NONE);
+  }
+
+  /** No size constraint; offers a media file picker of {@code kind}. */
+  public static VisualConstraints media(MediaKind kind) {
+    return new VisualConstraints(false, false, false, kind);
+  }
 
   public static boolean isPerfectSquare(int n) {
     if (n < 0) return false;

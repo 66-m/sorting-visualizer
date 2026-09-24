@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github._66_m.control.config.MediaKind;
 import io.github._66_m.control.config.SettingsDefaults;
 import io.github._66_m.control.config.visual.CubeSettings;
 import io.github._66_m.control.config.visual.VisualizationSettingsCodec;
@@ -53,6 +54,35 @@ class VisualizationViewModelTest {
     Files.write(png, new byte[] {(byte) 0x89, 0x50, 0x4E, 0x47});
     assertFalse(vm.setImagePath(png));
     assertTrue(vm.getImageError().isEmpty());
+  }
+
+  @Test
+  void mediaVisualizationsExposeTheirFileKind() {
+    assertEquals(MediaKind.NONE, vm.mediaKind());
+    vm.selectVisualization("video");
+    assertEquals(MediaKind.VIDEO, vm.mediaKind());
+    vm.selectVisualization("model-shards");
+    assertEquals(MediaKind.MODEL, vm.mediaKind());
+    vm.selectVisualization("globe");
+    assertEquals(MediaKind.TEXTURE, vm.mediaKind());
+    vm.selectVisualization("bars");
+    assertEquals(MediaKind.NONE, vm.mediaKind());
+  }
+
+  @Test
+  void mediaPathRejectsMissingFilesAndWrongTypes(@TempDir Path dir) throws Exception {
+    vm.selectVisualization("model-points");
+    assertFalse(vm.setMediaPath(dir.resolve("missing.obj")));
+    assertFalse(vm.getMediaError().isEmpty());
+    Path txt = dir.resolve("notes.txt");
+    Files.writeString(txt, "hello");
+    assertFalse(vm.setMediaPath(txt));
+    Path obj = dir.resolve("tri.obj");
+    Files.writeString(obj, "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n");
+    assertTrue(vm.setMediaPath(obj));
+    assertEquals(obj.toAbsolutePath().toString(), vm.getMediaPath());
+    assertEquals(
+        obj.toAbsolutePath().toString(), fx.app.getPreferences().getMediaPath(MediaKind.MODEL));
   }
 
   @Test

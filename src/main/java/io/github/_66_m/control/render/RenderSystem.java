@@ -2,6 +2,9 @@ package io.github._66_m.control.render;
 
 import io.github._66_m.control.render.asset.ImageHandle;
 import io.github._66_m.control.render.asset.ImageStripRemap;
+import io.github._66_m.control.render.media.MediaRemap;
+import io.github._66_m.control.render.mesh.PieceFrame;
+import io.github._66_m.control.render.mesh.PieceMesh;
 
 /**
  * Idiomatic libGDX draw surface for visualizations: batched 2D + instanced-style 3D. Owned by the
@@ -144,6 +147,12 @@ public interface RenderSystem {
     drawArgbPixels(dst, w, h, contentRevision);
   }
 
+  /**
+   * Overlay: fullscreen strip / tile remap of a CPU frame (video). Implementations upload the
+   * frame's pixels only when its revision changes. Default: no-op.
+   */
+  default void drawMediaRemap(MediaRemap remap) {}
+
   // --- World3D (center, Y-up) ---
 
   void begin3D();
@@ -158,6 +167,13 @@ public interface RenderSystem {
 
   /** Small spheres / blobs at instance positions (scale.x used as radius). */
   void drawSpheres(InstanceData data);
+
+  /**
+   * Draws a mesh split into independently transformed pieces (shards, slices, globe tiles). The
+   * mesh is uploaded once and cached by identity; {@code frame} is uploaded every call. Default:
+   * no-op.
+   */
+  default void drawPieces(PieceMesh mesh, PieceFrame frame) {}
 
   /** 3D line segments: {@code xyzxyz} = [x1,y1,z1,x2,y2,z2] × count in world units. */
   void strokeLines3D(float[] xyzxyz, int[] argb, int count);

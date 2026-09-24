@@ -24,6 +24,15 @@ public final class SafeFileDialogs {
 
   /** Opens an image open-dialog; returns {@code null} if cancelled or on failure. */
   public static File chooseImageFile() {
+    return chooseFile(
+        "Images", "png", "jpg", "jpeg", "gif", "bmp", "PNG", "JPG", "JPEG", "GIF", "BMP");
+  }
+
+  /**
+   * Opens an open-dialog filtered to {@code extensions} (shown as {@code description}); returns
+   * {@code null} if cancelled or on failure.
+   */
+  public static File chooseFile(String description, String... extensions) {
     AtomicReference<File> selected = new AtomicReference<>();
     Runnable show =
         () -> {
@@ -35,10 +44,7 @@ public final class SafeFileDialogs {
           JFileChooser chooser = new JFileChooser();
           chooser.setDialogTitle(SettingsStrings.BROWSE);
           chooser.setAcceptAllFileFilterUsed(true);
-          chooser.setFileFilter(
-              new FileNameExtensionFilter(
-                  "Images", "png", "jpg", "jpeg", "gif", "bmp", "PNG", "JPG", "JPEG", "GIF",
-                  "BMP"));
+          chooser.setFileFilter(new FileNameExtensionFilter(description, extensions));
           int result = chooser.showOpenDialog(null);
           if (result == JFileChooser.APPROVE_OPTION) {
             selected.set(chooser.getSelectedFile());
@@ -52,10 +58,9 @@ public final class SafeFileDialogs {
         EventQueue.invokeAndWait(show);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-        LOGGER.log(Level.WARNING, "Image file chooser interrupted", e);
+        LOGGER.log(Level.WARNING, "File chooser interrupted", e);
       } catch (InvocationTargetException e) {
-        LOGGER.log(
-            Level.WARNING, "Image file chooser failed", e.getCause() != null ? e.getCause() : e);
+        LOGGER.log(Level.WARNING, "File chooser failed", e.getCause() != null ? e.getCause() : e);
       }
     }
     return selected.get();
