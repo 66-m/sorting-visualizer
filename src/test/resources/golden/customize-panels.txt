@@ -272,6 +272,71 @@ resetButtons 2
 afterResets {"schemaVersion":1,"visualizationId":"disparity-square-scatter","settings":{"pointSize":6.0,"perimeterScale":0.8333333333333334}}
 draftEventsFromResets>0 true
 valid true ''
+== globe
+panel.defaults {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.15,"explode":0.35,"core":"MAGMA","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.15,"sceneScale":0.8}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'GLOBE' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Mode' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[MOSAIC, WEDGES] selected=MOSAIC combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Tiling' for=ComboBox label customize-field-label @1,0
+      ComboBox items=[EQUIRECT, EQUAL_AREA] selected=EQUAL_AREA combo-box-base combo-box @1,1
+      Region @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Tile borders' for=CheckBox label customize-field-label @2,0
+      CheckBox selected=true text='' check-box @2,1
+      Region @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Lift tiles by disparity' for=CheckBox label customize-field-label @3,0
+      CheckBox selected=false text='' check-box @3,1
+      Region @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+      Label 'Lift height' for=Slider label customize-field-label @4,0
+      Slider min=0.0 max=0.5 value=0.15 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @4,1
+      Label '0.15' label settings-muted customize-value @4,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @4,3
+      Label 'Wedge explode' for=Slider label customize-field-label @5,0
+      Slider min=0.0 max=1.0 value=0.35 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @5,1
+      Label '0.35' label settings-muted customize-value @5,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @5,3
+      Label 'Core' for=ComboBox label customize-field-label @6,0
+      ComboBox items=[NONE, DARK, MAGMA] selected=MAGMA combo-box-base combo-box @6,1
+      Region @6,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @6,3
+      Label 'Highlight strength' for=Slider label customize-field-label @7,0
+      Slider min=0.0 max=1.0 value=0.6 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @7,1
+      Label '0.60' label settings-muted customize-value @7,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @7,3
+  VBox customize-section settings-form-card
+    Label 'LAYOUT' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Axial tilt' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=45.0 value=23.4 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '23.4°' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'View tilt' for=Slider label customize-field-label @1,0
+      Slider min=-60.0 max=60.0 value=10.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '10°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Rotation speed' for=Slider label customize-field-label @2,0
+      Slider min=-2.0 max=2.0 value=0.15 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.15 rad/s' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Scene scale' for=Slider label customize-field-label @3,0
+      Slider min=0.4 max=1.0 value=0.8 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @3,1
+      Label '0.80' label settings-muted customize-value @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.15,"explode":0.35,"core":"MAGMA","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.15,"sceneScale":0.8}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"WEDGES","tiling":"EQUAL_AREA","tileBorders":false,"lift":true,"liftHeight":0.375,"explode":0.75,"core":"MAGMA","highlightStrength":0.75,"axialTiltDeg":33.75,"viewTiltDeg":30.0,"rotationSpeedRadPerSec":1.0,"sceneScale":0.85}}
+valueLabels [0.38][0.75][0.75][33.8°][30°][1.00 rad/s][0.85]
+draftEventsDuringLoad 0
+resetButtons 12
+afterResets {"schemaVersion":1,"visualizationId":"globe","settings":{"mode":"MOSAIC","tiling":"EQUAL_AREA","tileBorders":true,"lift":false,"liftHeight":0.15,"explode":0.35,"core":"MAGMA","highlightStrength":0.6,"axialTiltDeg":23.4,"viewTiltDeg":10.0,"rotationSpeedRadPerSec":0.15,"sceneScale":0.8}}
+draftEventsFromResets>0 true
+valid true ''
 == hoops
 panel.defaults {"schemaVersion":1,"visualizationId":"hoops","settings":{"radiusScale":0.9090909090909091}}
 VBox customize-panel
@@ -329,6 +394,234 @@ valueLabels [0.75]
 draftEventsDuringLoad 0
 resetButtons 2
 afterResets {"schemaVersion":1,"visualizationId":"image-vertical","settings":{"fitMode":"STRETCH","highlightStrength":1.0}}
+draftEventsFromResets>0 true
+valid true ''
+== model-points
+panel.defaults {"schemaVersion":1,"visualizationId":"model-points","settings":{"mode":"DISPARITY","order":"HEIGHT","colorSource":"MODEL","upAxis":"Y_UP","dotSize":2.5,"explode":0.5,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'MODEL' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Mode' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[SCATTER, COLOR, DISPARITY] selected=DISPARITY combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Assembly order' for=ComboBox label customize-field-label @1,0
+      ComboBox items=[HEIGHT, RADIAL, ANGLE, SPIRAL] selected=HEIGHT combo-box-base combo-box @1,1
+      Region @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Colors' for=ComboBox label customize-field-label @2,0
+      ComboBox items=[MODEL, GRADIENT] selected=MODEL combo-box-base combo-box @2,1
+      Region @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Up axis' for=ComboBox label customize-field-label @3,0
+      ComboBox items=[Y_UP, Z_UP] selected=Y_UP combo-box-base combo-box @3,1
+      Region @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+  VBox customize-section settings-form-card
+    Label 'LOOK' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Dot size' for=Slider label customize-field-label @0,0
+      Slider min=0.5 max=8.0 value=2.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '2.5' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Explode distance' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=2.0 value=0.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.50' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+  VBox customize-section settings-form-card
+    Label 'LAYOUT' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.3 max=1.0 value=0.6 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.60' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Tilt' for=Slider label customize-field-label @1,0
+      Slider min=-90.0 max=90.0 value=15.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '15°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Rotation speed' for=Slider label customize-field-label @2,0
+      Slider min=-2.0 max=2.0 value=0.3 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.30 rad/s' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"model-points","settings":{"mode":"DISPARITY","order":"HEIGHT","colorSource":"MODEL","upAxis":"Y_UP","dotSize":2.5,"explode":0.5,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"model-points","settings":{"mode":"DISPARITY","order":"SPIRAL","colorSource":"GRADIENT","upAxis":"Z_UP","dotSize":6.125,"explode":1.5,"sceneScale":0.825,"tiltDeg":45.0,"rotationSpeedRadPerSec":1.0}}
+valueLabels [6.1][1.50][0.83][45°][1.00 rad/s]
+draftEventsDuringLoad 0
+resetButtons 9
+afterResets {"schemaVersion":1,"visualizationId":"model-points","settings":{"mode":"DISPARITY","order":"HEIGHT","colorSource":"MODEL","upAxis":"Y_UP","dotSize":2.5,"explode":0.5,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+draftEventsFromResets>0 true
+valid true ''
+== model-shards
+panel.defaults {"schemaVersion":1,"visualizationId":"model-shards","settings":{"order":"RADIAL","pieceCount":512,"colorSource":"MODEL","upAxis":"Y_UP","explode":0.6,"maxSpinDeg":180.0,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'MODEL' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Assembly order' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[HEIGHT, RADIAL, ANGLE, SPIRAL] selected=RADIAL combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Shards (0 = one per element)' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=4096.0 value=512.0 snap=true major=1.0 minor=0 block=1.0 slider customize-slider @1,1
+      Label '512' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Colors' for=ComboBox label customize-field-label @2,0
+      ComboBox items=[MODEL, GRADIENT] selected=MODEL combo-box-base combo-box @2,1
+      Region @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Up axis' for=ComboBox label customize-field-label @3,0
+      ComboBox items=[Y_UP, Z_UP] selected=Y_UP combo-box-base combo-box @3,1
+      Region @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+  VBox customize-section settings-form-card
+    Label 'LOOK' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Explode distance' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=2.0 value=0.6 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.60' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Max shard spin' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=720.0 value=180.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '180°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+  VBox customize-section settings-form-card
+    Label 'LAYOUT' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.3 max=1.0 value=0.6 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.60' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Tilt' for=Slider label customize-field-label @1,0
+      Slider min=-90.0 max=90.0 value=15.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '15°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Rotation speed' for=Slider label customize-field-label @2,0
+      Slider min=-2.0 max=2.0 value=0.3 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.30 rad/s' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"model-shards","settings":{"order":"RADIAL","pieceCount":512,"colorSource":"MODEL","upAxis":"Y_UP","explode":0.6,"maxSpinDeg":180.0,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"model-shards","settings":{"order":"SPIRAL","pieceCount":3072,"colorSource":"GRADIENT","upAxis":"Z_UP","explode":1.5,"maxSpinDeg":540.0,"sceneScale":0.825,"tiltDeg":45.0,"rotationSpeedRadPerSec":1.0}}
+valueLabels [3072][1.50][540°][0.83][45°][1.00 rad/s]
+draftEventsDuringLoad 0
+resetButtons 9
+afterResets {"schemaVersion":1,"visualizationId":"model-shards","settings":{"order":"RADIAL","pieceCount":512,"colorSource":"MODEL","upAxis":"Y_UP","explode":0.6,"maxSpinDeg":180.0,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+draftEventsFromResets>0 true
+valid true ''
+== model-slices
+panel.defaults {"schemaVersion":1,"visualizationId":"model-slices","settings":{"axis":"Y","pieceCount":0,"colorSource":"MODEL","upAxis":"Y_UP","sliceGap":0.0,"sceneScale":0.7,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'MODEL' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Slice axis' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[X, Y, Z] selected=Y combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Slices (0 = one per element)' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=4096.0 value=0.0 snap=true major=1.0 minor=0 block=1.0 slider customize-slider @1,1
+      Label '0' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Colors' for=ComboBox label customize-field-label @2,0
+      ComboBox items=[MODEL, GRADIENT] selected=MODEL combo-box-base combo-box @2,1
+      Region @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Up axis' for=ComboBox label customize-field-label @3,0
+      ComboBox items=[Y_UP, Z_UP] selected=Y_UP combo-box-base combo-box @3,1
+      Region @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+  VBox customize-section settings-form-card
+    Label 'LOOK' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Slice gap' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=2.0 value=0.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.00' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+  VBox customize-section settings-form-card
+    Label 'LAYOUT' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.3 max=1.0 value=0.7 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.70' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Tilt' for=Slider label customize-field-label @1,0
+      Slider min=-90.0 max=90.0 value=15.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '15°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Rotation speed' for=Slider label customize-field-label @2,0
+      Slider min=-2.0 max=2.0 value=0.3 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.30 rad/s' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"model-slices","settings":{"axis":"Y","pieceCount":0,"colorSource":"MODEL","upAxis":"Y_UP","sliceGap":0.0,"sceneScale":0.7,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"model-slices","settings":{"axis":"Z","pieceCount":3072,"colorSource":"GRADIENT","upAxis":"Z_UP","sliceGap":1.5,"sceneScale":0.825,"tiltDeg":45.0,"rotationSpeedRadPerSec":1.0}}
+valueLabels [3072][1.50][0.83][45°][1.00 rad/s]
+draftEventsDuringLoad 0
+resetButtons 8
+afterResets {"schemaVersion":1,"visualizationId":"model-slices","settings":{"axis":"Y","pieceCount":0,"colorSource":"MODEL","upAxis":"Y_UP","sliceGap":0.0,"sceneScale":0.7,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+draftEventsFromResets>0 true
+valid true ''
+== model-voxels
+panel.defaults {"schemaVersion":1,"visualizationId":"model-voxels","settings":{"mode":"DISPARITY","order":"HEIGHT","fill":"SHELL","direction":"RADIAL","colorSource":"MODEL","upAxis":"Y_UP","explode":0.5,"voxelGap":0.1,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'MODEL' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Mode' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[SCATTER, COLOR, DISPARITY] selected=DISPARITY combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Assembly order' for=ComboBox label customize-field-label @1,0
+      ComboBox items=[HEIGHT, RADIAL, ANGLE, SPIRAL] selected=HEIGHT combo-box-base combo-box @1,1
+      Region @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Fill' for=ComboBox label customize-field-label @2,0
+      ComboBox items=[SHELL, SOLID] selected=SHELL combo-box-base combo-box @2,1
+      Region @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Disparity direction' for=ComboBox label customize-field-label @3,0
+      ComboBox items=[RADIAL, NORMAL, DOWN] selected=RADIAL combo-box-base combo-box @3,1
+      Region @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+      Label 'Colors' for=ComboBox label customize-field-label @4,0
+      ComboBox items=[MODEL, GRADIENT] selected=MODEL combo-box-base combo-box @4,1
+      Region @4,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @4,3
+      Label 'Up axis' for=ComboBox label customize-field-label @5,0
+      ComboBox items=[Y_UP, Z_UP] selected=Y_UP combo-box-base combo-box @5,1
+      Region @5,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @5,3
+  VBox customize-section settings-form-card
+    Label 'LOOK' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Explode distance' for=Slider label customize-field-label @0,0
+      Slider min=0.0 max=2.0 value=0.5 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.50' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Voxel gap' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=0.5 value=0.1 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.10' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+  VBox customize-section settings-form-card
+    Label 'LAYOUT' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Scene scale' for=Slider label customize-field-label @0,0
+      Slider min=0.3 max=1.0 value=0.6 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @0,1
+      Label '0.60' label settings-muted customize-value @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Tilt' for=Slider label customize-field-label @1,0
+      Slider min=-90.0 max=90.0 value=15.0 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '15°' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Rotation speed' for=Slider label customize-field-label @2,0
+      Slider min=-2.0 max=2.0 value=0.3 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.30 rad/s' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"model-voxels","settings":{"mode":"DISPARITY","order":"HEIGHT","fill":"SHELL","direction":"RADIAL","colorSource":"MODEL","upAxis":"Y_UP","explode":0.5,"voxelGap":0.1,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"model-voxels","settings":{"mode":"DISPARITY","order":"SPIRAL","fill":"SOLID","direction":"DOWN","colorSource":"GRADIENT","upAxis":"Z_UP","explode":1.5,"voxelGap":0.375,"sceneScale":0.825,"tiltDeg":45.0,"rotationSpeedRadPerSec":1.0}}
+valueLabels [1.50][0.38][0.83][45°][1.00 rad/s]
+draftEventsDuringLoad 0
+resetButtons 11
+afterResets {"schemaVersion":1,"visualizationId":"model-voxels","settings":{"mode":"DISPARITY","order":"HEIGHT","fill":"SHELL","direction":"RADIAL","colorSource":"MODEL","upAxis":"Y_UP","explode":0.5,"voxelGap":0.1,"sceneScale":0.6,"tiltDeg":15.0,"rotationSpeedRadPerSec":0.3}}
 draftEventsFromResets>0 true
 valid true ''
 == morphing-shell
@@ -589,5 +882,50 @@ valueLabels [0.43][12.5][9.3]
 draftEventsDuringLoad 0
 resetButtons 3
 afterResets {"schemaVersion":1,"visualizationId":"swirl-dots","settings":{"spiralTurns":8.0,"radiusScale":0.4,"pointSize":5.0}}
+draftEventsFromResets>0 true
+valid true ''
+== video
+panel.defaults {"schemaVersion":1,"visualizationId":"video","settings":{"layout":"COLUMNS","fitMode":"CONTAIN","gridLines":false,"highlightStrength":0.6,"playback":"SYNC_WITH_RUN","soundtrackVolume":0.8,"sortToneVolume":0.4}}
+VBox customize-panel settings-form-stack
+  VBox customize-section settings-form-card
+    Label 'VIDEO' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Layout' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[COLUMNS, ROWS, GRID] selected=COLUMNS combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Fit mode' for=ComboBox label customize-field-label @1,0
+      ComboBox items=[CONTAIN, STRETCH] selected=CONTAIN combo-box-base combo-box @1,1
+      Region @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Grid lines' for=CheckBox label customize-field-label @2,0
+      CheckBox selected=false text='' check-box @2,1
+      Region @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+      Label 'Highlight strength' for=Slider label customize-field-label @3,0
+      Slider min=0.0 max=1.0 value=0.6 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @3,1
+      Label '0.60' label settings-muted customize-value @3,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @3,3
+  VBox customize-section settings-form-card
+    Label 'PLAYBACK' label settings-section-label
+    GridPane customize-field-grid
+      Label 'Playback' for=ComboBox label customize-field-label @0,0
+      ComboBox items=[SYNC_WITH_RUN, LOOP] selected=SYNC_WITH_RUN combo-box-base combo-box @0,1
+      Region @0,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @0,3
+      Label 'Soundtrack volume' for=Slider label customize-field-label @1,0
+      Slider min=0.0 max=1.0 value=0.8 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @1,1
+      Label '0.80' label settings-muted customize-value @1,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @1,3
+      Label 'Sort tone volume' for=Slider label customize-field-label @2,0
+      Slider min=0.0 max=1.0 value=0.4 snap=false major=25.0 minor=3 block=10.0 slider customize-slider @2,1
+      Label '0.40' label settings-muted customize-value @2,2
+      Button '↺' tooltip='Reset to default' button button-outlined small customize-icon-reset @2,3
+afterLoadDefaults {"schemaVersion":1,"visualizationId":"video","settings":{"layout":"COLUMNS","fitMode":"CONTAIN","gridLines":false,"highlightStrength":0.6,"playback":"SYNC_WITH_RUN","soundtrackVolume":0.8,"sortToneVolume":0.4}}
+afterLoadNonDefault {"schemaVersion":1,"visualizationId":"video","settings":{"layout":"GRID","fitMode":"STRETCH","gridLines":true,"highlightStrength":0.75,"playback":"LOOP","soundtrackVolume":0.75,"sortToneVolume":0.75}}
+valueLabels [0.75][0.75][0.75]
+draftEventsDuringLoad 0
+resetButtons 7
+afterResets {"schemaVersion":1,"visualizationId":"video","settings":{"layout":"COLUMNS","fitMode":"CONTAIN","gridLines":false,"highlightStrength":0.6,"playback":"SYNC_WITH_RUN","soundtrackVolume":0.8,"sortToneVolume":0.4}}
 draftEventsFromResets>0 true
 valid true ''

@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github._66_m.control.render.asset.AppAssets;
 import io.github._66_m.control.render.asset.ImageHandle;
 import io.github._66_m.control.render.asset.ImageRepository;
+import io.github._66_m.control.render.media.MediaRemap;
+import io.github._66_m.control.render.mesh.PieceFrame;
+import io.github._66_m.control.render.mesh.PieceMesh;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +47,9 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   private final GdxWorld2DPass world2d;
   private final GdxWorld3DPass world3d;
   private final GdxOverlayPass overlay;
+
+  private MediaRemapRenderer mediaRemap;
+  private boolean mediaRemapFailed;
 
   private volatile Thread renderThread;
   private float overlayTextR = 1f;
@@ -322,6 +328,30 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   }
 
   @Override
+  public void drawPieces(PieceMesh mesh, PieceFrame frame) {
+    world3d.drawPieces(mesh, frame);
+  }
+
+  @Override
+  public void drawMediaRemap(MediaRemap remap) {
+    if (remap == null || remap.frame == null || mediaRemapFailed || Gdx.gl30 == null) {
+      return;
+    }
+    if (mediaRemap == null) {
+      try {
+        mediaRemap = new MediaRemapRenderer();
+      } catch (RuntimeException e) {
+        mediaRemapFailed = true;
+        LOGGER.log(Level.SEVERE, "Failed to init MediaRemapRenderer", e);
+        return;
+      }
+    }
+    overlay.enterOverlayPass();
+    applyOverlayViewport();
+    frameStats.pixelUploads += mediaRemap.draw(remap, getWidth(), getHeight());
+  }
+
+  @Override
   public void drawImageRemap(
       ImageHandle image,
       int[] stripIndices,
@@ -405,6 +435,10 @@ public final class GdxRenderSystem implements RenderSystem, Disposable {
   @Override
   public void dispose() {
     endFrame();
+    if (mediaRemap != null) {
+      mediaRemap.dispose();
+      mediaRemap = null;
+    }
     world2d.dispose();
     world3d.dispose();
     overlay.dispose();

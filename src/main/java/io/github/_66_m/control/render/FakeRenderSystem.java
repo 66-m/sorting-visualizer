@@ -2,6 +2,9 @@ package io.github._66_m.control.render;
 
 import io.github._66_m.control.render.asset.ImageHandle;
 import io.github._66_m.control.render.asset.ImageStripRemap;
+import io.github._66_m.control.render.media.MediaRemap;
+import io.github._66_m.control.render.mesh.PieceFrame;
+import io.github._66_m.control.render.mesh.PieceMesh;
 
 /** No-op {@link RenderSystem} for headless tests, with submission counters for smoke asserts. */
 public final class FakeRenderSystem implements RenderSystem {
@@ -26,6 +29,9 @@ public final class FakeRenderSystem implements RenderSystem {
   private int lastRemapRevision = Integer.MIN_VALUE;
   private int framesPerSecond;
 
+  private int mediaRemapCount;
+  private int pieceCount;
+
   public FakeRenderSystem(int width, int height) {
     this.width = width;
     this.height = height;
@@ -48,6 +54,8 @@ public final class FakeRenderSystem implements RenderSystem {
     textCount = 0;
     pixelUploadCount = 0;
     imageRemapCount = 0;
+    mediaRemapCount = 0;
+    pieceCount = 0;
     begin3DCount = 0;
     boxInstances = 0;
     quadInstances = 0;
@@ -81,6 +89,28 @@ public final class FakeRenderSystem implements RenderSystem {
     return pixelUploadCount;
   }
 
+  public int pieceCount() {
+    return pieceCount;
+  }
+
+  @Override
+  public void drawPieces(PieceMesh mesh, PieceFrame frame) {
+    if (mesh != null && frame != null && frame.count > 0) {
+      pieceCount += frame.count;
+    }
+  }
+
+  public int mediaRemapCount() {
+    return mediaRemapCount;
+  }
+
+  @Override
+  public void drawMediaRemap(MediaRemap remap) {
+    if (remap != null && remap.frame != null && remap.length > 0) {
+      mediaRemapCount++;
+    }
+  }
+
   public int imageRemapCount() {
     return imageRemapCount;
   }
@@ -106,7 +136,7 @@ public final class FakeRenderSystem implements RenderSystem {
   }
 
   public int total3DPrimitives() {
-    return boxInstances + quadInstances + sphereInstances + line3DCount;
+    return boxInstances + quadInstances + sphereInstances + line3DCount + pieceCount;
   }
 
   @Override

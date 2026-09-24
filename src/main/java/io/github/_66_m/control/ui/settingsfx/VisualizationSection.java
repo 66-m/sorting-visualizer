@@ -2,9 +2,11 @@ package io.github._66_m.control.ui.settingsfx;
 
 import atlantafx.base.theme.Styles;
 import io.github._66_m.control.catalog.VisualizationDescriptor;
+import io.github._66_m.control.config.MediaKind;
 import io.github._66_m.control.ui.settingsfx.customize.VisualizationCustomizePanels;
 import io.github._66_m.control.ui.settingsfx.vm.VisualizationViewModel;
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,9 +129,80 @@ public final class VisualizationSection {
     imageBlock.setVisible(vm.needsImage());
     imageBlock.setManaged(vm.needsImage());
 
+    TextField mediaPath = new TextField(vm.getMediaPath());
+    mediaPath.setPromptText(SettingsStrings.MEDIA_PATH_PROMPT);
+    mediaPath.setMaxWidth(Double.MAX_VALUE);
+    Button mediaBrowse = new Button(SettingsStrings.BROWSE);
+    mediaBrowse.getStyleClass().add(Styles.BUTTON_OUTLINED);
+    mediaBrowse.setOnAction(
+        e -> {
+          MediaKind kind = vm.mediaKind();
+          File file =
+              SafeFileDialogs.chooseFile(kind.label(), kind.extensions().toArray(String[]::new));
+          if (file != null) {
+            mediaPath.setText(file.getAbsolutePath());
+            vm.setMediaPath(Path.of(file.getAbsolutePath()));
+          }
+        });
+    mediaPath.setOnAction(e -> applyMediaText(vm, mediaPath.getText()));
+    mediaPath
+        .focusedProperty()
+        .addListener(
+            (obs, wasFocused, isFocused) -> {
+              if (wasFocused && !isFocused) {
+                applyMediaText(vm, mediaPath.getText());
+              }
+            });
+    Label mediaError = new Label(vm.getMediaError());
+    mediaError.getStyleClass().add("settings-inline-error");
+    mediaError.setVisible(!vm.getMediaError().isBlank());
+    mediaError.setManaged(!vm.getMediaError().isBlank());
+    Label mediaHint = new Label(SettingsStrings.MEDIA_HINT);
+    mediaHint.getStyleClass().add("settings-muted");
+    mediaHint.setWrapText(true);
+    Label mediaLabel = SettingsControls.fieldLabel(vm.mediaKind().label());
+    mediaLabel.setLabelFor(mediaPath);
+    VBox mediaBlock =
+        new VBox(
+            SettingsLayout.GAP_XS,
+            mediaLabel,
+            SettingsControls.controlWithAction(mediaPath, mediaBrowse),
+            mediaHint,
+            mediaError);
+    boolean needsMedia = vm.mediaKind() != MediaKind.NONE;
+    mediaBlock.setVisible(needsMedia);
+    mediaBlock.setManaged(needsMedia);
+
     vm.addPropertyChangeListener(
         evt -> {
-          if (VisualizationViewModel.PROP_SELECTED_ID.equals(evt.getPropertyName())) {
+          if (VisualizationViewModel.PROP_MEDIA_KIND.equals(evt.getPropertyName())) {
+            MediaKind kind = (MediaKind) evt.getNewValue();
+            VmBindings.runFx(
+                () -> {
+                  boolean show = kind != null && kind != MediaKind.NONE;
+                  mediaBlock.setVisible(show);
+                  mediaBlock.setManaged(show);
+                  if (kind != null) {
+                    mediaLabel.setText(kind.label());
+                  }
+                });
+          } else if (VisualizationViewModel.PROP_MEDIA_PATH.equals(evt.getPropertyName())) {
+            String value = evt.getNewValue() == null ? "" : String.valueOf(evt.getNewValue());
+            VmBindings.runFx(
+                () -> {
+                  if (!mediaPath.getText().equals(value)) {
+                    mediaPath.setText(value);
+                  }
+                });
+          } else if (VisualizationViewModel.PROP_MEDIA_ERROR.equals(evt.getPropertyName())) {
+            String msg = evt.getNewValue() == null ? "" : String.valueOf(evt.getNewValue());
+            VmBindings.runFx(
+                () -> {
+                  mediaError.setText(msg);
+                  mediaError.setVisible(!msg.isBlank());
+                  mediaError.setManaged(!msg.isBlank());
+                });
+          } else if (VisualizationViewModel.PROP_SELECTED_ID.equals(evt.getPropertyName())) {
             String id = String.valueOf(evt.getNewValue());
             VmBindings.runFx(
                 () -> {
@@ -214,9 +287,32 @@ public final class VisualizationSection {
         vm::addPropertyChangeListener,
         VisualizationViewModel.PROP_INPUTS_ENABLED);
 
-    VBox root = new VBox(SettingsLayout.GAP_SM, comboRow, imageBlock);
+    VmBindings.bindInputsEnabled(
+        mediaPath,
+        vm::isInputsEnabled,
+        vm::addPropertyChangeListener,
+        VisualizationViewModel.PROP_INPUTS_ENABLED);
+    VmBindings.bindInputsEnabled(
+        mediaBrowse,
+        vm::isInputsEnabled,
+        vm::addPropertyChangeListener,
+        VisualizationViewModel.PROP_INPUTS_ENABLED);
+
+    VBox root = new VBox(SettingsLayout.GAP_SM, comboRow, imageBlock, mediaBlock);
     root.setId(ROOT_ID);
     return root;
+  }
+
+  private static void applyMediaText(VisualizationViewModel vm, String text) {
+    String trimmed = text == null ? "" : text.trim();
+    if (trimmed.isEmpty() || trimmed.equals(vm.getMediaPath())) {
+      return;
+    }
+    try {
+      vm.setMediaPath(Path.of(trimmed));
+    } catch (InvalidPathException e) {
+      vm.setMediaPath(null); // Reports "not found or not readable".
+    }
   }
 
   private static boolean canCustomize(VisualizationViewModel vm) {

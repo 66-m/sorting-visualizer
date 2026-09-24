@@ -177,6 +177,9 @@ public final class SettingsStrings {
   public static final String SPEED_EQUALIZE_SLOW = "Longer";
   public static final String SPEED_EQUALIZE_FAST = "Faster";
   public static final String IMAGE_PATH_PROMPT = "Image path";
+  public static final String MEDIA_PATH_PROMPT = "File path (empty = built-in default)";
+  public static final String MEDIA_HINT =
+      "Video needs ffmpeg on the PATH. Models: Wavefront .obj (with optional .mtl texture).";
 
   private SettingsStrings() {}
 }

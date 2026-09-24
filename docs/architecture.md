@@ -35,7 +35,9 @@ io.github._66_m
 │   ├── config/              # UserPreferences; visual/: settings records + SettingsSchema
 │   ├── model/               # ArrayController, SnapshotPublisher, FrameGate, session (below)
 │   ├── render/              # RenderSystem, GdxRenderSystem, GeometryBatch2D, FramePipeline, …
-│   │   └── asset/           # AppAssets, ImageRepository, ImageHandle, ImageRemapRenderer
+│   │   ├── asset/           # AppAssets, ImageRepository, ImageHandle, ImageRemapRenderer
+│   │   ├── media/           # VideoPlayer (ffmpeg), PixelFrame, MediaRemap (GDX-free)
+│   │   └── mesh/            # OBJ loading, sampling, voxels, shards/slices, globe meshes (GDX-free)
 │   ├── shuffle/
 │   └── ui/settingsfx/       # JavaFX Settings + headless vm/
 ├── sortingalgorithms/
@@ -82,7 +84,9 @@ flowchart TB
 | `RenderSystem` | Idiomatic draw API: `fillRects` / `fillCircles` / `drawBoxes` / `drawImageRemap` / … |
 | `HudRenderer` | Overlay watermark and metrics (after world pass; counters from working controller) |
 | `FrameGateDelayContext` | Algorithm pacing; no graphics types |
-| `VisualizationCatalog` | All visualizations with size/image constraints |
+| `VisualizationCatalog` | All visualizations with size/image/media constraints |
+| `MediaSourceVisualization` | Video / model / texture visuals; the Settings media picker hands them a path (remembered per `MediaKind`) and they load it in the background |
+| `PieceRenderer` | One draw call for a mesh split into pieces (shards, slices, globe tiles); per-piece matrix, color and UV remap come from an `RGBA32F` data texture |
 | `FrameGate` | Steps-per-frame engine + `awaitIdle` publish fence |
 | `ConfigurableVisualization` | Optional per-viz settings; Customize dialog drafts then Apply |
 | `SettingsSchema` | Declares each customizable visualization's fields (range, default, label, section); generates its JSON codec and its Customize panel (`SchemaCustomizePanel`) |

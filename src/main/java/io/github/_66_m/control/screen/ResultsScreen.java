@@ -54,6 +54,7 @@ public final class ResultsScreen implements Screen {
   @Override
   public void render(float delta) {
     SortingStateManager stateManager = game.stateManager();
+    game.currentVisualization().onSessionState(stateManager.isRunning());
     if (!(stateManager.shouldShowResults() && stateManager.shouldShowComparisonTable())) {
       game.showVisualizer();
       return;

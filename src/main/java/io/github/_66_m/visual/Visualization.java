@@ -34,6 +34,18 @@ public abstract class Visualization {
     this.colorGradient = colorGradient;
   }
 
+  /**
+   * Called by the engine once per frame on every screen (also while the results table is shown)
+   * with whether a sorting session is currently running. Default: no-op.
+   */
+  public void onSessionState(boolean running) {}
+
+  /**
+   * Called when this visualization stops being the active one, or the app shuts down. Release
+   * playback / background work here; the instance may be activated again later. Default: no-op.
+   */
+  public void deactivate() {}
+
   protected static boolean contentChanged(long cachedRevision, ArrayModel model) {
     return cachedRevision != model.getVisualRevision();
   }

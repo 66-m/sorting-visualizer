@@ -21,9 +21,14 @@ public final class VisualizationSettingsSchemas {
           DisparityPlaneSettings.SCHEMA,
           DisparitySphereHoopsSettings.SCHEMA,
           DisparitySquareScatterSettings.SCHEMA,
+          GlobeSettings.SCHEMA,
           HoopsSettings.SCHEMA,
           ImageHorizontalSettings.SCHEMA,
           ImageVerticalSettings.SCHEMA,
+          ModelPointCloudSettings.SCHEMA,
+          ModelShardsSettings.SCHEMA,
+          ModelSlicesSettings.SCHEMA,
+          ModelVoxelsSettings.SCHEMA,
           MorphingShellSettings.SCHEMA,
           MosaicSquaresSettings.SCHEMA,
           NumberPlotSettings.SCHEMA,
@@ -35,7 +40,8 @@ public final class VisualizationSettingsSchemas {
           SphereSettings.SCHEMA,
           SphereHoopsSettings.SCHEMA,
           SphericDisparityLinesSettings.SCHEMA,
-          SwirlDotsSettings.SCHEMA);
+          SwirlDotsSettings.SCHEMA,
+          VideoSettings.SCHEMA);
 
   private static final Map<String, SettingsSchema<?>> BY_ID = index(ALL);
 

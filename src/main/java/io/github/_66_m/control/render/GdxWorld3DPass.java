@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import io.github._66_m.control.render.mesh.PieceFrame;
+import io.github._66_m.control.render.mesh.PieceMesh;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -20,6 +23,8 @@ final class GdxWorld3DPass implements Disposable {
 
   private final InstanceRenderer3D instanceRenderer;
   private final LineRenderer3D lineRenderer;
+  private PieceRenderer pieceRenderer;
+  private boolean pieceRendererFailed;
 
   GdxWorld3DPass(GdxRenderSystem host) {
     this.host = host;
@@ -134,6 +139,26 @@ final class GdxWorld3DPass implements Disposable {
     }
   }
 
+  void drawPieces(PieceMesh mesh, PieceFrame frame) {
+    if (mesh == null || frame == null || frame.count <= 0 || pieceRendererFailed) {
+      return;
+    }
+    if (pieceRenderer == null) {
+      try {
+        pieceRenderer = new PieceRenderer();
+      } catch (RuntimeException e) {
+        pieceRendererFailed = true;
+        LOGGER.log(Level.SEVERE, "Failed to init PieceRenderer", e);
+        return;
+      }
+    }
+    if (!host.pipeline().inWorld3D()) {
+      begin3D();
+    }
+    pieceRenderer.draw(mesh, frame, host.cam3d().combined);
+    host.frameStats().instancesSubmitted += frame.count;
+  }
+
   /** Draws 3D line segments via {@link LineRenderer3D}. */
   void strokeLines3D(float[] xyzxyz, int[] argb, int count) {
     strokeLines3D(xyzxyz, argb, count, true);
@@ -175,6 +200,10 @@ final class GdxWorld3DPass implements Disposable {
 
   @Override
   public void dispose() {
+    if (pieceRenderer != null) {
+      pieceRenderer.dispose();
+      pieceRenderer = null;
+    }
     lineRenderer.dispose();
     instanceRenderer.dispose();
   }

@@ -14,10 +14,15 @@ import io.github._66_m.visual.DisparityGraphMirrored;
 import io.github._66_m.visual.DisparityPlane;
 import io.github._66_m.visual.DisparitySphereHoops;
 import io.github._66_m.visual.DisparitySquareScatter;
+import io.github._66_m.visual.Globe;
 import io.github._66_m.visual.Hoops;
 import io.github._66_m.visual.HorizontalPyramid;
 import io.github._66_m.visual.ImageHorizontal;
 import io.github._66_m.visual.ImageVertical;
+import io.github._66_m.visual.ModelPointCloud;
+import io.github._66_m.visual.ModelShards;
+import io.github._66_m.visual.ModelSlices;
+import io.github._66_m.visual.ModelVoxels;
 import io.github._66_m.visual.MorphingShell;
 import io.github._66_m.visual.MosaicSquares;
 import io.github._66_m.visual.NumberPlot;
@@ -30,6 +35,7 @@ import io.github._66_m.visual.Sphere;
 import io.github._66_m.visual.SphereHoops;
 import io.github._66_m.visual.SphericDisparityLines;
 import io.github._66_m.visual.SwirlDots;
+import io.github._66_m.visual.Video;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -158,6 +164,33 @@ public final class VisualizationCatalog {
               "3D - Disparity Sphere Hoops",
               VisualConstraints.NONE,
               (a, g, s, rs) -> new DisparitySphereHoops(a, g, s, rs)),
+          new VisualizationDescriptor(
+              "video", "Video", VisualConstraints.VIDEO, (a, g, s, rs) -> new Video(a, g, s, rs)),
+          new VisualizationDescriptor(
+              "model-points",
+              "3D - Model Point Cloud",
+              VisualConstraints.MODEL,
+              (a, g, s, rs) -> new ModelPointCloud(a, g, s, rs)),
+          new VisualizationDescriptor(
+              "model-voxels",
+              "3D - Model Voxels",
+              VisualConstraints.MODEL,
+              (a, g, s, rs) -> new ModelVoxels(a, g, s, rs)),
+          new VisualizationDescriptor(
+              "model-shards",
+              "3D - Model Shards",
+              VisualConstraints.MODEL,
+              (a, g, s, rs) -> new ModelShards(a, g, s, rs)),
+          new VisualizationDescriptor(
+              "model-slices",
+              "3D - Model Slices",
+              VisualConstraints.MODEL,
+              (a, g, s, rs) -> new ModelSlices(a, g, s, rs)),
+          new VisualizationDescriptor(
+              "globe",
+              "3D - Globe",
+              VisualConstraints.TEXTURE,
+              (a, g, s, rs) -> new Globe(a, g, s, rs)),
           new VisualizationDescriptor(
               "cube", "3D - Cube", VisualConstraints.CUBE, (a, g, s, rs) -> new Cube(a, g, s, rs)),
           new VisualizationDescriptor(

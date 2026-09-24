@@ -4,7 +4,7 @@
 
 # Sorting Algorithm Visualizer
 
-Watch and listen to 23 sorting algorithms in real time, with 30 visualizations, live metrics and MIDI sound.
+Watch and listen to 23 sorting algorithms in real time, with 36 visualizations, live metrics and MIDI sound.
 
 [![CI](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/66-m/sorting-visualizer/actions/workflows/ci.yml)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -56,7 +56,20 @@ Add these after the program or JAR name. If you pass both `fullscreen` and `port
 
 - Classic and unusual sorts (Quick, Merge, Heap, Radix, Bogo and more), one at a time or all in a row with a comparison table
 - 2D and 3D visualizations, custom colors and optional MIDI sound
+- Sort a playing video (with its soundtrack), your own 3D models (`.obj`) or a textured globe
 - Arrays of up to 100,000 elements, with live metrics
+
+### Video, 3D model and globe visualizations
+
+- **Video** cuts a playing video into columns, rows or grid tiles. It needs
+  [ffmpeg](https://ffmpeg.org/) (with `ffprobe`) on your `PATH`; point to another binary with
+  `-Dsortvis.ffmpeg=/path/to/ffmpeg` or the `SORTVIS_FFMPEG` environment variable. With the
+  default playback mode the video restarts on every Run and stops when the session ends.
+- **3D - Model Point Cloud / Voxels / Shards / Slices** load a Wavefront `.obj` (an `.mtl` with
+  `Kd` colors or a `map_Kd` texture is picked up). A built-in rocket is shown until you pick a
+  file. Use *Up axis* in Customize for Z-up files.
+- **3D - Globe** wraps any equirectangular image (for example NASA's public-domain Blue Marble)
+  around a sphere; a generated planet is used until you pick one.
 
 ## Build from source
 

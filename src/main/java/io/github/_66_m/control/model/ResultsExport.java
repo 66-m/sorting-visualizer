@@ -38,11 +38,14 @@ public final class ResultsExport {
     }
   }
 
-  /** Prints when each algorithm finished, relative to the session start, as {@code mm:ss name}. */
+  /**
+   * Prints when each algorithm started (its shuffle), relative to the session start, as {@code
+   * mm:ss name}, so the list can be pasted as YouTube chapters.
+   */
   public static void printTimestamps(PrintStream out, List<RunResult> results) {
     out.println("\n\nTimestamps:\n");
     for (RunResult r : results) {
-      int seconds = r.elapsedSeconds();
+      int seconds = r.startSeconds();
       out.println(String.format("%02d:%02d", seconds / 60, seconds % 60) + " " + r.algorithmName());
     }
   }

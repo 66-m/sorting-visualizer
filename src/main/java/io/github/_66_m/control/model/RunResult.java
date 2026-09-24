@@ -10,7 +10,7 @@ package io.github._66_m.control.model;
  * @param swaps counted swaps
  * @param writesMain writes to the main array
  * @param writesAux writes to auxiliary arrays
- * @param elapsedSeconds seconds since the session started when the algorithm finished
+ * @param startSeconds seconds since the session started when the algorithm's shuffle began
  */
 public record RunResult(
     String algorithmName,
@@ -20,4 +20,4 @@ public record RunResult(
     long swaps,
     long writesMain,
     long writesAux,
-    int elapsedSeconds) {}
+    int startSeconds) {}

@@ -329,6 +329,10 @@ public final class SortingVisualizerGame extends Game {
 
   @Override
   public void dispose() {
+    Visualization active = currentVisualization();
+    if (active != null) {
+      active.deactivate();
+    }
     if (visualizerScreen != null) {
       visualizerScreen.dispose();
       visualizerScreen = null;

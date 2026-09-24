@@ -86,8 +86,13 @@ public class MidiSys extends Sound {
       synthesizerChannel.allSoundOff();
       synthesizerChannel.allNotesOff();
 
+      float scale = volumeScale;
+      if (scale <= 0f) {
+        return;
+      }
       int note = settings.noteFor(arrayModel.get(index), arrayModel.getLength());
-      synthesizerChannel.noteOn(note, settings.velocity());
+      int velocity = Math.max(1, Math.round(settings.velocity() * scale));
+      synthesizerChannel.noteOn(note, velocity);
     }
   }
 

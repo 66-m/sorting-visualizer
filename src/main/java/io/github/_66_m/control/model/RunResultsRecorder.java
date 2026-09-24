@@ -11,8 +11,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 final class RunResultsRecorder {
   private final List<RunResult> results = new CopyOnWriteArrayList<>();
 
-  /** Snapshots {@code array}'s metrics for {@code algorithm}, which just finished. */
-  void record(SortingAlgorithm algorithm, ArrayController array, int elapsedSeconds) {
+  /**
+   * Snapshots {@code array}'s metrics for {@code algorithm}, which just finished and whose segment
+   * (shuffle included) began {@code startSeconds} after the session started.
+   */
+  void record(SortingAlgorithm algorithm, ArrayController array, int startSeconds) {
     results.add(
         new RunResult(
             algorithm.getName(),
@@ -22,7 +25,7 @@ final class RunResultsRecorder {
             array.getSwaps(),
             array.getWrites(),
             array.getWritesAux(),
-            elapsedSeconds));
+            startSeconds));
   }
 
   void clear() {
