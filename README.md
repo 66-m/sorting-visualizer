@@ -41,14 +41,9 @@ With Java 25 or newer you can also run the [`sorting-visualizer.jar`](https://gi
 java --enable-native-access=ALL-UNNAMED --add-opens=java.desktop/com.sun.media.sound=ALL-UNNAMED -jar sorting-visualizer.jar
 ```
 
-If the app doesn't start, it shows a message saying why. The two most common causes:
-
-- **"needs Java 25 or newer"**: `java` (or the `.jar` file association) still points to an older Java. Check with `java -version`, or use the installer, which includes Java.
-- **"needs OpenGL 3.3"**: update your graphics driver. Remote desktop sessions and virtual machines often don't provide OpenGL 3.3.
-
 ### Launch flags
 
-Add these after the program or JAR name. If you pass both `fullscreen` and `portrait`, `fullscreen` wins.
+Add these after the program or JAR name.
 
 | Flag | Effect |
 |------|--------|
@@ -61,20 +56,8 @@ Add these after the program or JAR name. If you pass both `fullscreen` and `port
 
 - Classic and unusual sorts (Quick, Merge, Heap, Radix, Bogo and more), one at a time or all in a row with a comparison table
 - 2D and 3D visualizations, custom colors and optional MIDI sound
-- Sort a playing video (with its soundtrack), your own 3D models (`.obj`) or a textured globe
+- Sort a playing video (needs [ffmpeg](https://ffmpeg.org/)), your own 3D models (`.obj`) or the Earth
 - Arrays of up to 100,000 elements, with live metrics
-
-### Video, 3D model and globe visualizations
-
-- **Video** cuts a playing video into columns, rows or grid tiles. It needs
-  [ffmpeg](https://ffmpeg.org/) (with `ffprobe`) on your `PATH`; point to another binary with
-  `-Dsortvis.ffmpeg=/path/to/ffmpeg` or the `SORTVIS_FFMPEG` environment variable. With the
-  default playback mode the video restarts on every Run and stops when the session ends.
-- **3D - Model Point Cloud / Voxels / Shards / Slices** load a Wavefront `.obj` (an `.mtl` with
-  `Kd` colors or a `map_Kd` texture is picked up). A built-in rocket is shown until you pick a
-  file. Use *Up axis* in Customize for Z-up files.
-- **3D - Globe** shows the Earth (NASA Blue Marble) or any other equirectangular image you
-  pick, e.g. the Moon or Mars.
 
 ## Build from source
 
