@@ -68,8 +68,8 @@ Add these after the program or JAR name. If you pass both `fullscreen` and `port
 - **3D - Model Point Cloud / Voxels / Shards / Slices** load a Wavefront `.obj` (an `.mtl` with
   `Kd` colors or a `map_Kd` texture is picked up). A built-in rocket is shown until you pick a
   file. Use *Up axis* in Customize for Z-up files.
-- **3D - Globe** shows the Earth (NASA Blue Marble, see [Credits](#credits)) or any other
-  equirectangular image you pick, e.g. the Moon or Mars.
+- **3D - Globe** shows the Earth (NASA Blue Marble) or any other equirectangular image you
+  pick, e.g. the Moon or Mars.
 
 ## Build from source
 
@@ -101,9 +101,3 @@ On Windows, use `build.cmd`, `run.cmd` and `mvnw.cmd`. For packaging and release
 Copyright (C) 2020-2026 Marcel Mauel
 
 Licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). See [`LICENSE`](LICENSE).
-
-## Credits
-
-The Globe's Earth texture is NASA's *Blue Marble: Next Generation* (topography and bathymetry,
-December 2004) from [NASA Visible Earth](https://visibleearth.nasa.gov/images/73909), by Reto
-Stöckli, NASA Earth Observatory. NASA imagery is not copyrighted.
