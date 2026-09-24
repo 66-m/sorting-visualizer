@@ -21,6 +21,16 @@ public final class DesktopLauncher {
     if (LaunchArgs.selfCheck()) {
       System.exit(SelfCheck.run(System.out));
     }
+    try {
+      launch();
+    } catch (Throwable t) {
+      StartupFailure.report(t);
+      // Also stops the JavaFX toolkit, which would otherwise keep a windowless process running.
+      System.exit(1);
+    }
+  }
+
+  private static void launch() {
     AppIcons.installApplicationIcons();
     JavaFxBootstrap.start();
 

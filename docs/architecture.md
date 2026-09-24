@@ -27,7 +27,9 @@ Engine owns cameras; visuals submit geometry in world units (or Overlay for text
 ```text
 io.github._66_m
 ├── control/
+│   ├── JavaVersionGuard     # JAR Main-Class, built for Java 8 (src/main/java8): "needs Java 25" on older Java
 │   ├── DesktopLauncher      # main: JavaFX then Lwjgl3Application (or SelfCheck for --self-check)
+│   ├── StartupFailure       # error dialog + exit when startup fails (e.g. no OpenGL 3.3)
 │   ├── SortingVisualizerGame # Game; composition root + screen navigation
 │   ├── AppContext           # Façade for Settings (+ shutdown handler)
 │   ├── screen/              # VisualizerScreen, ResultsScreen
